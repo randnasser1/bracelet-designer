@@ -10,27 +10,27 @@
 
   <div id="charms-library">
     <!-- Charms to choose from -->
-    <img src="charms/heart.png" class="charm" draggable="true" data-id="heart">
-    <img src="charms/letter-a.png" class="charm" draggable="true" data-id="letter-a">
-    <img src="charms/cat.png" class="charm" draggable="true" data-id="cat">
-    <!-- Add more charms -->
+    <img src="charms/heart.png" class="charm" draggable="true" data-id="plain-heart">
+    <img src="charms/letter-a.png" class="charm" draggable="true" data-id="special-letter-a">
+    <img src="charms/cat.png" class="charm" draggable="true" data-id="special-cat">
+    <img src="charms/dragon.png" class="charm" draggable="true" data-id="rare-dragon">
+    <!-- Add more charms here -->
   </div>
+
   <div id="priceDisplay">Total: 8.00 JDs</div>
 
   <div id="bracelet">
     <!-- 18 empty charm slots -->
-    <div class="slot" data-index="0"></div>
-    <div class="slot" data-index="1"></div>
-    <!-- ... up to 17 -->
+    ${[...Array(18)].map((_, i) => `<div class="slot" data-index="${i}"></div>`).join('')}
   </div>
-<label>
-  <input type="checkbox" id="goldToggle"> Gold Bracelet?
-</label>
+
+  <label>
+    <input type="checkbox" id="goldToggle"> Gold Bracelet?
+  </label>
 
   <button id="saveBtn">Save Bracelet</button>
 
   <script src="app.js"></script>
   <script src="firebase.js" type="module"></script>
-  
 </body>
 </html>
