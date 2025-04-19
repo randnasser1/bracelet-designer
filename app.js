@@ -53,29 +53,31 @@ function updatePrice() {
     }
   });
 
-  let total = BASE_PRICE;
   const totalCharms = typeCounts.plain + typeCounts.special + typeCounts.rare;
 
-  if (totalCharms > CHARM_LIMIT) {
-    const extras = totalCharms - CHARM_LIMIT;
+  let basePrice = isGold() ? 9 : 8;
+  let total = basePrice;
 
-    // Remove included 15 plain + 3 special
-    const extraPlain = Math.max(typeCounts.plain - 15, 0);
-    const extraSpecial = Math.max(typeCounts.special - 3, 0);
-    const extraRare = typeCounts.rare;
-
-    total += extraPlain * PRICES.plain;
-    total += extraSpecial * PRICES.special;
-    total += extraRare * PRICES.rare;
-  }
-
-  // Offer the "full glam" discount if all 18 are special (no rares)
-  if (typeCounts.special === 18 && typeCounts.rare === 0) {
+  // Full glam discount: 18+ special charms, no rares
+  if (typeCounts.special >= 18 && typeCounts.rare === 0) {
     total = 20;
+  } else {
+    // Charge only for extra charms beyond 18
+    const extras = totalCharms - 18;
+    if (extras > 0) {
+      const extraPlain = Math.max(typeCounts.plain - 15, 0);
+      const extraSpecial = Math.max(typeCounts.special - 3, 0);
+      const extraRare = typeCounts.rare;
+
+      total += extraPlain * PRICES.plain;
+      total += extraSpecial * PRICES.special;
+      total += extraRare * PRICES.rare;
+    }
   }
 
   document.getElementById('priceDisplay').textContent = `Total: ${total.toFixed(2)} JDs`;
 }
+
 
 document.getElementById('saveBtn').addEventListener('click', async () => {
   const layout = Array.from(slots).map(slot => {
