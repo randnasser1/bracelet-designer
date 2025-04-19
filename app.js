@@ -19,29 +19,36 @@ charms.forEach(charm => {
 slots.forEach(slot => {
   slot.addEventListener('dragover', e => e.preventDefault());
 
- slot.addEventListener('drop', e => {
-  e.preventDefault();
-  const charmId = e.dataTransfer.getData('text/plain');
+  slot.addEventListener('drop', e => {
+    e.preventDefault();
+    const charmId = e.dataTransfer.getData('text/plain');
 
-  // Detect type from ID (e.g., "plain-heart", "special-cat")
-  const charmType = getCharmType(charmId);
+    // Detect type from ID (e.g., "plain-heart", "special-cat")
+    const charmType = getCharmType(charmId);
 
-  const charmImg = document.createElement('img');
-  charmImg.src = `charms/${charmId}.png`;
-  charmImg.classList.add('charm');
-  charmImg.dataset.id = charmId;
-  charmImg.dataset.type = charmType;
+    const charmImg = document.createElement('img');
+    charmImg.src = `charms/${charmId}.png`;
+    charmImg.classList.add('charm');
+    charmImg.dataset.id = charmId;
+    charmImg.dataset.type = charmType;
 
-  slot.innerHTML = '';
-  slot.appendChild(charmImg);
+    slot.innerHTML = '';
+    slot.appendChild(charmImg);
 
-  updatePrice();
+    updatePrice();
+  });
 });
+
 function getCharmType(id) {
   if (id.startsWith('rare-')) return 'rare';
   if (id.startsWith('special-')) return 'special';
   return 'plain';
 }
+
+function isGold() {
+  return document.getElementById('goldToggle').checked;
+}
+
 function updatePrice() {
   const allCharms = Array.from(document.querySelectorAll('#bracelet .slot img'));
   const typeCounts = { plain: 0, special: 0, rare: 0 };
@@ -77,7 +84,6 @@ function updatePrice() {
 
   document.getElementById('priceDisplay').textContent = `Total: ${total.toFixed(2)} JDs`;
 }
-
 
 document.getElementById('saveBtn').addEventListener('click', async () => {
   const layout = Array.from(slots).map(slot => {
