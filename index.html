@@ -9,31 +9,30 @@
   <h1>Design Your Bracelet</h1>
 
   <div id="charms-library">
-    <!-- Charms to choose from -->
-    <img src="charms/Ball.webp" class="charm" draggable="true" data-id="ball">
-    <img src="charms/Be mine.webp" class="charm" draggable="true" data-id="be-mine">
-    <img src="charms/Heart.webp" class="charm" draggable="true" data-id="heart">
-    <img src="charms/Heart eye.webp" class="charm" draggable="true" data-id="heart-eye">
-    <img src="charms/Chess.webp" class="charm" draggable="true" data-id="chess">
-    <img src="charms/Daddys Girl.webp" class="charm" draggable="true" data-id="daddys-girl">
-    <img src="charms/Drama queen.webp" class="charm" draggable="true" data-id="drama-queen">
-    <img src="charms/C.webp" class="charm" draggable="true" data-id="c">
-    <img src="charms/Juice.webp" class="charm" draggable="true" data-id="juice">
-    <img src="charms/N.webp" class="charm" draggable="true" data-id="n">
-    <img src="charms/Rich Guys.webp" class="charm" draggable="true" data-id="rich-guys">
-    <img src="charms/Sexy.webp" class="charm" draggable="true" data-id="sexy">
-    <img src="charms/Shit happens.webp" class="charm" draggable="true" data-id="shit-happens">
-    <img src="charms/Sports.webp" class="charm" draggable="true" data-id="sports">
-    <img src="charms/Star blue.webp" class="charm" draggable="true" data-id="star-blue">
-    <img src="charms/Star.webp" class="charm" draggable="true" data-id="star">
-    <img src="charms/T.webp" class="charm" draggable="true" data-id="t">
-    <img src="charms/U.webp" class="charm" draggable="true" data-id="u">
+    <!-- Make sure these .webp files exist in your /charms folder -->
+    <img src="charms/ball.webp"         class="charm" draggable="true" data-id="plain-ball">
+    <img src="charms/be-mine.webp"     class="charm" draggable="true" data-id="plain-be-mine">
+    <img src="charms/heart.webp"        class="charm" draggable="true" data-id="plain-heart">
+    <img src="charms/heart-eye.webp"   class="charm" draggable="true" data-id="plain-heart-eye">
+    <img src="charms/chess.webp"       class="charm" draggable="true" data-id="plain-chess">
+    <img src="charms/daddys-girl.webp" class="charm" draggable="true" data-id="plain-daddys-girl">
+    <img src="charms/drama-queen.webp" class="charm" draggable="true" data-id="plain-drama-queen">
+    <img src="charms/c.webp"           class="charm" draggable="true" data-id="plain-c">
+    <img src="charms/juice.webp"       class="charm" draggable="true" data-id="plain-juice">
+    <img src="charms/n.webp"           class="charm" draggable="true" data-id="plain-n">
+    <img src="charms/rich-guys.webp"   class="charm" draggable="true" data-id="plain-rich-guys">
+    <img src="charms/sexy.webp"        class="charm" draggable="true" data-id="plain-sexy">
+    <img src="charms/shit-happens.webp"class="charm" draggable="true" data-id="plain-shit-happens">
+    <img src="charms/sports.webp"      class="charm" draggable="true" data-id="plain-sports">
+    <img src="charms/star-blue.webp"   class="charm" draggable="true" data-id="plain-star-blue">
+    <img src="charms/star.webp"        class="charm" draggable="true" data-id="plain-star">
+    <img src="charms/t.webp"           class="charm" draggable="true" data-id="plain-t">
+    <img src="charms/u.webp"           class="charm" draggable="true" data-id="plain-u">
   </div>
 
   <div id="priceDisplay">Total: 8.00 JDs</div>
 
-  <!-- this container starts empty -->
-  <div id="bracelet"></div>
+  <div id="bracelet"></div>  <!-- slots get injected here -->
 
   <label>
     <input type="checkbox" id="goldToggle"> Gold Bracelet?
