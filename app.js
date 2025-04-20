@@ -1,104 +1,91 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const braceletEl    = document.getElementById("bracelet");
-  const priceDisplay  = document.getElementById("priceDisplay");
-  const countDisplay  = document.getElementById("countDisplay");
-  const goldToggle    = document.getElementById("goldToggle");
-  const addSlotBtn    = document.getElementById("addSlotBtn");
-  const removeSlotBtn = document.getElementById("removeSlotBtn");
-  const charmPool     = document.querySelectorAll(".charm-pool .charm");
+let bracelet = document.getElementById('bracelet');
+let goldToggle = document.getElementById('goldToggle');
+let priceDisplay = document.getElementById('priceDisplay');
+let countDisplay = document.getElementById('countDisplay');
+let addSlotBtn = document.getElementById('addSlotBtn');
+let removeSlotBtn = document.getElementById('removeSlotBtn');
 
-  const BASE_PRICE   = 8;
-  const GOLD_EXTRA   = 1;
-  const CHARM_PRICE  = { plain: 0.4, special: 1.5, rare: 2 };
-  let slots = [];  // each slot: { id: string, charm: { id, type } | null }
+const BASE_PLAIN = 15;
+const BASE_SPECIAL = 3;
+let slots = [];
+let maxBaseSlots = 18;
 
-  // Create a new slot object
-  function newSlot(id) {
-    return { id, charm: null };
+function createSlot() {
+  const slot = document.createElement('div');
+  slot.classList.add('slot');
+  slot.dataset.id = '';
+  slot.dataset.type = '';
+  slot.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    slot.classList.add('dragover');
+  });
+  slot.addEventListener('dragleave', () => {
+    slot.classList.remove('dragover');
+  });
+  slot.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('id');
+    const type = e.dataTransfer.getData('type');
+    slot.innerHTML = `<img src="charms/${id}.webp" class="charm" draggable="false">`;
+    slot.dataset.id = id;
+    slot.dataset.type = type;
+    slot.classList.remove('dragover');
+    updatePrice();
+  });
+  return slot;
+}
+
+function initBracelet() {
+  bracelet.innerHTML = '';
+  slots = [];
+  for (let i = 0; i < maxBaseSlots; i++) {
+    let slot = createSlot();
+    bracelet.appendChild(slot);
+    slots.push(slot);
   }
+  updatePrice();
+}
 
-  // Render all slots in the DOM
-  function renderSlots() {
-    braceletEl.innerHTML = "";
-    slots.forEach(slot => {
-      const slotEl = document.createElement("div");
-      slotEl.className = "slot";
-      slotEl.dataset.slotId = slot.id;
+function updatePrice() {
+  let total = goldToggle.checked ? 9 : 8;
+  let plain = 0, special = 0, rare = 0;
 
-      // Drag & drop events
-      slotEl.addEventListener("dragover", e => {
-        e.preventDefault();
-        slotEl.classList.add("dragover");
-      });
-      slotEl.addEventListener("dragleave", () => {
-        slotEl.classList.remove("dragover");
-      });
-      slotEl.addEventListener("drop", e => {
-        e.preventDefault();
-        slotEl.classList.remove("dragover");
-        const charmId   = e.dataTransfer.getData("charm-id");
-        const charmType = e.dataTransfer.getData("charm-type");
-        slot.charm = { id: charmId, type: charmType };
+  slots.forEach((slot, index) => {
+    if (slot.dataset.type === 'plain') plain++;
+    else if (slot.dataset.type === 'special') special++;
+    else if (slot.dataset.type === 'rare') rare++;
+  });
 
-        // show the dropped charm
-        slotEl.innerHTML = `<img src="charms/${charmId}.webp" class="charm" draggable="false">`;
-        updatePrice();
-      });
+  const extraPlain = Math.max(0, plain - BASE_PLAIN);
+  const extraSpecial = Math.max(0, special - BASE_SPECIAL);
+  total += extraPlain * 0.4 + extraSpecial * 1.5 + rare * 2;
 
-      // if slot already has a charm (on re-render), show it
-      if (slot.charm) {
-        slotEl.innerHTML = `<img src="charms/${slot.charm.id}.webp" class="charm" draggable="false">`;
-      }
+  priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
+  countDisplay.textContent = `${slots.filter(s => s.dataset.id).length} / ${slots.length} charms`;
+}
 
-      braceletEl.appendChild(slotEl);
-    });
+document.querySelectorAll('.charm').forEach(charm => {
+  charm.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('id', charm.dataset.id);
+    e.dataTransfer.setData('type', charm.dataset.type);
+  });
+});
+
+goldToggle.addEventListener('change', updatePrice);
+
+addSlotBtn.addEventListener('click', () => {
+  const newSlot = createSlot();
+  bracelet.appendChild(newSlot);
+  slots.push(newSlot);
+  updatePrice();
+});
+
+removeSlotBtn.addEventListener('click', () => {
+  if (slots.length > 1) {
+    const slot = slots.pop();
+    bracelet.removeChild(slot);
     updatePrice();
   }
-
-  // Calculate and update price & count
-  function updatePrice() {
-    let total = BASE_PRICE + (goldToggle.checked ? GOLD_EXTRA : 0);
-    let placed = 0;
-
-    slots.forEach(slot => {
-      if (slot.charm) {
-        placed++;
-        total += CHARM_PRICE[slot.charm.type] || 0;
-      }
-    });
-
-    priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
-    countDisplay.textContent = `${placed} / ${slots.length} charms`;
-  }
-
-  // Initialize dragging from charm pool
-  charmPool.forEach(img => {
-    img.addEventListener("dragstart", e => {
-      e.dataTransfer.setData("charm-id",   img.dataset.id);
-      e.dataTransfer.setData("charm-type", img.dataset.type);
-    });
-  });
-
-  // Gold toggle updates immediately
-  goldToggle.addEventListener("change", updatePrice);
-
-  // Add a slot
-  addSlotBtn.addEventListener("click", () => {
-    slots.push(newSlot(`slot${slots.length + 1}`));
-    renderSlots();
-  });
-
-  // Remove last slot (and its charm)
-  removeSlotBtn.addEventListener("click", () => {
-    if (slots.length > 1) {
-      slots.pop();
-      renderSlots();
-    }
-  });
-
-  // Start with 18 slots
-  for (let i = 1; i <= 18; i++) {
-    slots.push(newSlot(`slot${i}`));
-  }
-  renderSlots();
 });
+
+initBracelet();
