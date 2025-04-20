@@ -1,88 +1,28 @@
 body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background-color: #fdf6f9;
+  font-family: 'Poppins', sans-serif;
+  background: #ffe6f0;
   color: #333;
+  margin: 0;
+  padding: 2rem;
+  text-align: center;
 }
 
 h1 {
-  margin-top: 20px;
-  font-size: 2rem;
-  color: #d63384;
-}
-
-#charmPicker {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 20px;
-  gap: 10px;
-}
-
-.charm {
-  width: 40px;
-  height: 40px;
-  cursor: grab;
-  transition: transform 0.2s;
-}
-
-.charm:hover {
-  transform: scale(1.2);
-}
-
-#bracelet {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 5px;
-  padding: 20px;
-  background-color: #fff0f5;
-  border: 2px dashed #d63384;
-  border-radius: 10px;
-  max-width: 600px;
-  margin: 0 auto 20px;
-}
-
-.slot {
-  width: 50px;
-  height: 50px;
-  background-color: #fff;
-  border: 1px dashed #ccc;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.slot img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.slot.dragover {
-  background-color: #ffe0f0;
+  font-size: 2.5rem;
+  color: #d6336c;
+  margin-bottom: 1rem;
 }
 
 .controls {
-  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
-#priceDisplay, #countDisplay {
-  font-size: 1.2rem;
-  margin: 10px 0;
-}
-
-button {
-  background-color: #d63384;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-button:hover {
-  background-color: #c22577;
-}
+.controls label {
+  font-weight: 600;
+  color: #a61e4d;
+  display: flex;
+  align-items
