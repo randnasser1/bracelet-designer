@@ -21,14 +21,6 @@ h1 {
   margin-bottom: 1.5rem;
 }
 
-.controls label {
-  font-weight: 600;
-  color: #a61e4d;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
 .btn {
   background: #ff85b3;
   color: white;
@@ -44,7 +36,7 @@ h1 {
   background: #ff5fa3;
 }
 
-#bracelet {
+.bracelet {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -66,12 +58,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.slot.dragover {
-  background: #ffd6e8;
-  border-color: #ff85b3;
+  overflow: hidden;
 }
 
 .slot img {
@@ -79,7 +66,6 @@ h1 {
   height: 100%;
   object-fit: contain;
 }
-
 
 .price-info {
   font-size: 1.2rem;
@@ -113,12 +99,4 @@ h1 {
 .charm-pool img:active {
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
-}
-
-
-.charm-pool img.dragging {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
-  opacity: 0.6;
 }
