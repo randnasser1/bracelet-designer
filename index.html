@@ -1,73 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Charm Bracelet Designer</title>
   <style>
+    /* Cute Pink Theme */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
     body {
-      font-family: Arial, sans-serif;
-      background: #f8f9fa;
+      font-family: 'Poppins', sans-serif;
+      background: #ffe6f0;
+      color: #333;
       margin: 0;
       padding: 2rem;
       text-align: center;
     }
     h1 {
+      font-size: 2.5rem;
+      color: #d6336c;
       margin-bottom: 1rem;
     }
     .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
       margin-bottom: 1.5rem;
     }
     .controls label {
-      font-weight: bold;
-      margin-right: 1rem;
+      font-weight: 600;
+      color: #a61e4d;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
     }
     .btn {
-      padding: 0.6rem 1.2rem;
-      margin: 0 0.5rem;
+      background: #ff85b3;
+      color: white;
       border: none;
-      border-radius: 6px;
-      background: #0077cc;
-      color: #fff;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: background 0.2s ease;
     }
     .btn:hover {
-      background: #005fa3;
+      background: #ff5fa3;
     }
     #bracelet {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       justify-content: center;
-      margin: 1rem 0;
       padding: 1rem;
-      border: 2px dashed #ccc;
-      border-radius: 8px;
-      background: #fff;
-      min-height: 100px;
+      border: 2px dashed #f5a0c2;
+      border-radius: 12px;
+      background: #fff0f5;
+      min-height: 120px;
+      margin-bottom: 1rem;
     }
     .slot {
       width: 60px;
       height: 60px;
-      border: 2px solid #ddd;
+      border: 2px solid #f5a0c2;
       border-radius: 10px;
-      background: #f9f9f9;
+      background: #ffe6f0;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.2s ease, border-color 0.2s ease;
+      transition: background 0.2s ease, border-color 0.2s ease;
     }
     .slot.dragover {
-      border-color: #aaa;
-      background-color: #eef;
+      background: #ffd6e8;
+      border-color: #ff85b3;
     }
     .charm-pool {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       justify-content: center;
-      margin-bottom: 2rem;
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #fff0f5;
+      border: 1px solid #f5a0c2;
+      border-radius: 12px;
+      max-height: 200px;
+      overflow-y: auto;
     }
     .charm-pool img {
       width: 50px;
@@ -78,12 +96,13 @@
     }
     .charm-pool img:active {
       transform: scale(1.1);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
     }
     .price-info {
       font-size: 1.2rem;
       margin: 0.5rem 0;
-      font-weight: bold;
+      font-weight: 600;
+      color: #d6336c;
     }
   </style>
 </head>
@@ -93,9 +112,10 @@
 
   <div class="controls">
     <label>
-      <input type="checkbox" id="goldToggle" />
+      <input type="checkbox" id="goldToggle"/>
       Gold Bracelet?
     </label>
+    <button class="btn" id="saveBtn">Save Bracelet</button>
     <button class="btn" id="addSlotBtn">Add Charm</button>
     <button class="btn" id="removeSlotBtn">Remove Charm</button>
   </div>
@@ -105,26 +125,27 @@
   <div class="price-info" id="priceDisplay">Total: 8.00 JDs</div>
   <div class="price-info" id="countDisplay">0 / 18 charms</div>
 
-  <h2>Charm Pool</h2>
+  <h2>Charm Gallery</h2>
   <div class="charm-pool">
-    <img class="charm" draggable="true" data-id="ball"            data-type="plain"  src="charms/ball.webp"            title="Ball" />
-    <img class="charm" draggable="true" data-id="be-mine"        data-type="plain"  src="charms/be-mine.webp"        title="Be Mine" />
-    <img class="charm" draggable="true" data-id="heart"           data-type="plain"  src="charms/heart.webp"           title="Heart" />
-    <img class="charm" draggable="true" data-id="heart-eye"      data-type="plain"  src="charms/heart-eye.webp"      title="Heart Eye" />
-    <img class="charm" draggable="true" data-id="chess"           data-type="plain"  src="charms/chess.webp"           title="Chess" />
-    <img class="charm" draggable="true" data-id="daddys-girl"   data-type="plain"  src="charms/daddys-girl.webp"   title="Daddys Girl" />
-    <img class="charm" draggable="true" data-id="drama-queen"    data-type="plain"  src="charms/drama-queen.webp"    title="Drama Queen" />
-    <img class="charm" draggable="true" data-id="c"               data-type="plain"  src="charms/c.webp"               title="C" />
-    <img class="charm" draggable="true" data-id="juice"           data-type="plain"  src="charms/juice.webp"           title="Juice" />
-    <img class="charm" draggable="true" data-id="n"               data-type="plain"  src="charms/n.webp"               title="N" />
-    <img class="charm" draggable="true" data-id="rich-guys"      data-type="plain"  src="charms/rich-guys.webp"      title="Rich Guys" />
-    <img class="charm" draggable="true" data-id="sexy"            data-type="plain"  src="charms/sexy.webp"            title="Sexy" />
-    <img class="charm" draggable="true" data-id="shit-happens"  data-type="plain"  src="charms/shit-happens.webp"  title="Shit Happens" />
-    <img class="charm" draggable="true" data-id="sports"          data-type="plain"  src="charms/sports.webp"          title="Sports" />
-    <img class="charm" draggable="true" data-id="star-blue"      data-type="plain"  src="charms/star-blue.webp"      title="Star Blue" />
-    <img class="charm" draggable="true" data-id="star"            data-type="plain"  src="charms/star.webp"            title="Star" />
-    <img class="charm" draggable="true" data-id="t"               data-type="plain"  src="charms/t.webp"               title="T" />
-    <img class="charm" draggable="true" data-id="u"               data-type="plain"  src="charms/u.webp"               title="U" />
+    <!-- Lowercase, hyphenated filenames -->
+    <img class="charm" draggable="true" data-id="ball"            data-type="plain" src="charms/ball.webp"            title="Ball"/>
+    <img class="charm" draggable="true" data-id="be-mine"        data-type="plain" src="charms/be-mine.webp"        title="Be Mine"/>
+    <img class="charm" draggable="true" data-id="heart"           data-type="plain" src="charms/heart.webp"           title="Heart"/>
+    <img class="charm" draggable="true" data-id="heart-eye"      data-type="plain" src="charms/heart-eye.webp"      title="Heart Eye"/>
+    <img class="charm" draggable="true" data-id="chess"           data-type="plain" src="charms/chess.webp"           title="Chess"/>
+    <img class="charm" draggable="true" data-id="daddys-girl"   data-type="plain" src="charms/daddys-girl.webp"   title="Daddy's Girl"/>
+    <img class="charm" draggable="true" data-id="drama-queen"    data-type="plain" src="charms/drama-queen.webp"    title="Drama Queen"/>
+    <img class="charm" draggable="true" data-id="c"               data-type="plain" src="charms/c.webp"               title="C"/>
+    <img class="charm" draggable="true" data-id="juice"           data-type="plain" src="charms/juice.webp"           title="Juice"/>
+    <img class="charm" draggable="true" data-id="n"               data-type="plain" src="charms/n.webp"               title="N"/>
+    <img class="charm" draggable="true" data-id="rich-guys"      data-type="plain" src="charms/rich-guys.webp"      title="Rich Guys"/>
+    <img class="charm" draggable="true" data-id="sexy"            data-type="plain" src="charms/sexy.webp"            title="Sexy"/>
+    <img class="charm" draggable="true" data-id="shit-happens"  data-type="plain" src="charms/shit-happens.webp"  title="Shit Happens"/>
+    <img class="charm" draggable="true" data-id="sports"          data-type="plain" src="charms/sports.webp"          title="Sports"/>
+    <img class="charm" draggable="true" data-id="star-blue"      data-type="plain" src="charms/star-blue.webp"      title="Star Blue"/>
+    <img class="charm" draggable="true" data-id="star"            data-type="plain" src="charms/star.webp"            title="Star"/>
+    <img class="charm" draggable="true" data-id="t"               data-type="plain" src="charms/t.webp"               title="T"/>
+    <img class="charm" draggable="true" data-id="u"               data-type="plain" src="charms/u.webp"               title="U"/>
   </div>
 
   <script src="script.js"></script>
