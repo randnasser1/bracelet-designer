@@ -1,72 +1,104 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const bracelet = document.getElementById("bracelet");
-  const charmPool = document.querySelector(".charm-pool");
-  const priceDisplay = document.getElementById("priceDisplay");
-  const countDisplay = document.getElementById("countDisplay");
-  const goldToggle = document.getElementById("goldToggle");
+document.addEventListener("DOMContentLoaded", () => {
+  const braceletEl    = document.getElementById("bracelet");
+  const priceDisplay  = document.getElementById("priceDisplay");
+  const countDisplay  = document.getElementById("countDisplay");
+  const goldToggle    = document.getElementById("goldToggle");
+  const addSlotBtn    = document.getElementById("addSlotBtn");
+  const removeSlotBtn = document.getElementById("removeSlotBtn");
+  const charmPool     = document.querySelectorAll(".charm-pool .charm");
 
-  const basePrice = 8; // base price of bracelet
-  const goldPrice = 1; // additional price for gold
-  const charmPrices = {
-    plain: 0.4,
-    special: 1.5,
-    rare: 2
-  };
+  const BASE_PRICE   = 8;
+  const GOLD_EXTRA   = 1;
+  const CHARM_PRICE  = { plain: 0.4, special: 1.5, rare: 2 };
+  let slots = [];  // each slot: { id: string, charm: { id, type } | null }
 
-  let slots = Array.from({ length: 18 }, (_, index) => ({ id: `slot${index + 1}`, charm: null }));
+  // Create a new slot object
+  function newSlot(id) {
+    return { id, charm: null };
+  }
 
+  // Render all slots in the DOM
+  function renderSlots() {
+    braceletEl.innerHTML = "";
+    slots.forEach(slot => {
+      const slotEl = document.createElement("div");
+      slotEl.className = "slot";
+      slotEl.dataset.slotId = slot.id;
+
+      // Drag & drop events
+      slotEl.addEventListener("dragover", e => {
+        e.preventDefault();
+        slotEl.classList.add("dragover");
+      });
+      slotEl.addEventListener("dragleave", () => {
+        slotEl.classList.remove("dragover");
+      });
+      slotEl.addEventListener("drop", e => {
+        e.preventDefault();
+        slotEl.classList.remove("dragover");
+        const charmId   = e.dataTransfer.getData("charm-id");
+        const charmType = e.dataTransfer.getData("charm-type");
+        slot.charm = { id: charmId, type: charmType };
+
+        // show the dropped charm
+        slotEl.innerHTML = `<img src="charms/${charmId}.webp" class="charm" draggable="false">`;
+        updatePrice();
+      });
+
+      // if slot already has a charm (on re-render), show it
+      if (slot.charm) {
+        slotEl.innerHTML = `<img src="charms/${slot.charm.id}.webp" class="charm" draggable="false">`;
+      }
+
+      braceletEl.appendChild(slotEl);
+    });
+    updatePrice();
+  }
+
+  // Calculate and update price & count
   function updatePrice() {
-    let totalPrice = basePrice + (goldToggle.checked ? goldPrice : 0);
-    let charmCount = 0;
+    let total = BASE_PRICE + (goldToggle.checked ? GOLD_EXTRA : 0);
+    let placed = 0;
+
     slots.forEach(slot => {
       if (slot.charm) {
-        charmCount++;
-        totalPrice += charmPrices[slot.charm.type];
+        placed++;
+        total += CHARM_PRICE[slot.charm.type] || 0;
       }
     });
-    priceDisplay.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
-    countDisplay.textContent = `${charmCount} / 18 charms`;
+
+    priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
+    countDisplay.textContent = `${placed} / ${slots.length} charms`;
   }
 
-  // Set up the bracelet slots
-  function setUpSlots() {
-    bracelet.innerHTML = '';
-    slots.forEach((slot, index) => {
-      const slotElement = document.createElement("div");
-      slotElement.classList.add("slot");
-      slotElement.setAttribute("data-id", slot.id);
-      slotElement.addEventListener("dragover", (e) => e.preventDefault());
-      slotElement.addEventListener("drop", handleDrop);
-      bracelet.appendChild(slotElement);
+  // Initialize dragging from charm pool
+  charmPool.forEach(img => {
+    img.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("charm-id",   img.dataset.id);
+      e.dataTransfer.setData("charm-type", img.dataset.type);
     });
-  }
-
-  // Handle charm drop into a slot
-  function handleDrop(e) {
-    const slotId = e.target.getAttribute("data-id");
-    const slot = slots.find(s => s.id === slotId);
-    const charmId = e.dataTransfer.getData("text/plain");
-    const charm = document.querySelector(`[data-id='${charmId}']`);
-
-    if (slot && charm) {
-      const charmType = charm.dataset.type;
-      slot.charm = { id: charmId, type: charmType };
-
-      e.target.style.backgroundImage = `url(${charm.src})`;
-      e.target.style.backgroundSize = "cover";
-      e.target.style.backgroundPosition = "center";
-      updatePrice();
-    }
-  }
-
-  // Handle dragging
-  charmPool.addEventListener("dragstart", function (e) {
-    e.dataTransfer.setData("text/plain", e.target.getAttribute("data-id"));
   });
 
-  // Handle gold toggle
+  // Gold toggle updates immediately
   goldToggle.addEventListener("change", updatePrice);
 
-  // Initialize
-  setUpSlots();
+  // Add a slot
+  addSlotBtn.addEventListener("click", () => {
+    slots.push(newSlot(`slot${slots.length + 1}`));
+    renderSlots();
+  });
+
+  // Remove last slot (and its charm)
+  removeSlotBtn.addEventListener("click", () => {
+    if (slots.length > 1) {
+      slots.pop();
+      renderSlots();
+    }
+  });
+
+  // Start with 18 slots
+  for (let i = 1; i <= 18; i++) {
+    slots.push(newSlot(`slot${i}`));
+  }
+  renderSlots();
 });
