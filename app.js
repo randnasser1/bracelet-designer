@@ -1,86 +1,93 @@
-const bracelet = document.getElementById("bracelet");
-const goldToggle = document.getElementById("goldToggle");
-const priceDisplay = document.getElementById("priceDisplay");
-const countDisplay = document.getElementById("countDisplay");
-const addSlotBtn = document.getElementById("addSlotBtn");
-const removeSlotBtn = document.getElementById("removeSlotBtn");
-const saveBtn = document.getElementById("saveBtn");
+const bracelet = document.getElementById('bracelet');
+const goldToggle = document.getElementById('goldToggle');
+const priceDisplay = document.getElementById('priceDisplay');
+const countDisplay = document.getElementById('countDisplay');
+const addSlotBtn = document.getElementById('addSlotBtn');
+const removeSlotBtn = document.getElementById('removeSlotBtn');
 
-const MAX_INITIAL_SLOTS = 18;
-let basePrice = 8.0;
+let charmLimit = 18;
 
+// Initial bracelet slots
 function createSlot() {
-  const slot = document.createElement("div");
-  slot.className = "slot";
+  const slot = document.createElement('div');
+  slot.classList.add('slot');
   return slot;
 }
 
-// Create initial 18 slots
-for (let i = 0; i < MAX_INITIAL_SLOTS; i++) {
-  bracelet.appendChild(createSlot());
+function populateInitialSlots() {
+  bracelet.innerHTML = '';
+  for (let i = 0; i < charmLimit; i++) {
+    bracelet.appendChild(createSlot());
+  }
 }
 
-// Enable Sortable
-Sortable.create(bracelet, {
-  animation: 150,
-  group: {
-    name: 'shared',
-    pull: true,
-    put: true
-  },
-  onAdd: updatePrice,
-  onRemove: updatePrice,
-  onUpdate: updatePrice
-});
+populateInitialSlots();
 
-Sortable.create(document.querySelector(".charm-pool"), {
-  group: {
-    name: 'shared',
-    pull: 'clone',
-    put: false
-  },
-  sort: false
-});
+// Price Calculation
+function updatePriceAndCount() {
+  let count = 0;
+  let special = 0;
+  let rare = 0;
 
-function updatePrice() {
-  const charms = bracelet.querySelectorAll("img");
-  let plain = 0, special = 0, rare = 0;
-
-  charms.forEach(img => {
+  document.querySelectorAll('#bracelet .slot img').forEach(img => {
+    count++;
     const type = img.dataset.type;
-    if (type === "plain") plain++;
-    else if (type === "special") special++;
-    else if (type === "rare") rare++;
+    if (type === 'special') special++;
+    else if (type === 'rare') rare++;
   });
 
-  const extraPlain = Math.max(plain - 15, 0);
-  const extraSpecial = Math.max(special - 3, 0);
-
-  let total = goldToggle.checked ? 9 : basePrice;
-  total += extraPlain * 0.4 + extraSpecial * 1.5 + rare * 2;
+  let base = goldToggle.checked ? 9 : 8;
+  let extraPlain = Math.max(0, count - 18 + (special + rare));
+  let total = base + (special * 1.5) + (rare * 2) + (extraPlain * 0.4);
 
   priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
-  countDisplay.textContent = `${charms.length} / ${MAX_INITIAL_SLOTS} charms`;
+  countDisplay.textContent = `${count} / ${charmLimit} charms`;
 }
 
-goldToggle.addEventListener("change", updatePrice);
+goldToggle.addEventListener('change', updatePriceAndCount);
 
-addSlotBtn.addEventListener("click", () => {
+// Add/Remove Slots
+addSlotBtn.addEventListener('click', () => {
   bracelet.appendChild(createSlot());
+  charmLimit++;
+  updatePriceAndCount();
 });
 
-removeSlotBtn.addEventListener("click", () => {
-  const lastSlot = bracelet.lastElementChild;
-  if (lastSlot && lastSlot.classList.contains("slot")) {
-    bracelet.removeChild(lastSlot);
-    updatePrice();
+removeSlotBtn.addEventListener('click', () => {
+  const slots = bracelet.querySelectorAll('.slot');
+  if (slots.length > 0) {
+    const last = slots[slots.length - 1];
+    if (!last.querySelector('img')) {
+      last.remove();
+      charmLimit--;
+      updatePriceAndCount();
+    }
   }
 });
 
-saveBtn.addEventListener("click", () => {
-  const charms = bracelet.querySelectorAll("img");
-  const layout = Array.from(charms).map(img => img.dataset.id);
-  alert("Saved layout:\n" + layout.join(", "));
+// SortableJS for bracelet
+new Sortable(bracelet, {
+  group: {
+    name: 'charms',
+    pull: true,
+    put: true
+  },
+  animation: 150,
+  ghostClass: 'drag-ghost',
+  onAdd: updatePriceAndCount,
+  onRemove: updatePriceAndCount,
+  onSort: updatePriceAndCount,
+  draggable: '.slot'
 });
 
-updatePrice();
+// SortableJS for charm gallery (clone only)
+new Sortable(document.querySelector('.charm-pool'), {
+  group: {
+    name: 'charms',
+    pull: 'clone',
+    put: false
+  },
+  sort: false,
+  animation: 150,
+  draggable: '.charm'
+});
