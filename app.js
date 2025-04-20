@@ -18,6 +18,17 @@ let totalPrice = braceletBasePrice;
 let totalCharms = 0;
 let isGold = false;
 
+// Initialize with 18 slots
+const initialSlots = 18;
+for (let i = 0; i < initialSlots; i++) {
+  const slot = document.createElement('div');
+  slot.classList.add('slot');
+  bracelet.appendChild(slot);
+  totalCharms++;
+}
+
+updatePrice();
+
 // Update price display
 function updatePrice() {
   priceDisplay.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
@@ -33,7 +44,7 @@ document.getElementById('goldToggle').addEventListener('change', (e) => {
 
 // Add and remove charm slots
 document.getElementById('addSlotBtn').addEventListener('click', () => {
-  if (totalCharms < 18) {
+  if (totalCharms < 20) { // Allow adding up to 20 charms (or more if you adjust this limit)
     const slot = document.createElement('div');
     slot.classList.add('slot');
     bracelet.appendChild(slot);
@@ -43,7 +54,7 @@ document.getElementById('addSlotBtn').addEventListener('click', () => {
 });
 
 document.getElementById('removeSlotBtn').addEventListener('click', () => {
-  if (totalCharms > 0) {
+  if (totalCharms > initialSlots) {
     bracelet.removeChild(bracelet.lastChild);
     totalCharms--;
     updatePrice();
