@@ -1,91 +1,72 @@
-let bracelet = document.getElementById('bracelet');
-let goldToggle = document.getElementById('goldToggle');
-let priceDisplay = document.getElementById('priceDisplay');
-let countDisplay = document.getElementById('countDisplay');
-let addSlotBtn = document.getElementById('addSlotBtn');
-let removeSlotBtn = document.getElementById('removeSlotBtn');
+document.addEventListener("DOMContentLoaded", function () {
+  const bracelet = document.getElementById("bracelet");
+  const charmPool = document.querySelector(".charm-pool");
+  const priceDisplay = document.getElementById("priceDisplay");
+  const countDisplay = document.getElementById("countDisplay");
+  const goldToggle = document.getElementById("goldToggle");
 
-const BASE_PLAIN = 15;
-const BASE_SPECIAL = 3;
-let slots = [];
-let maxBaseSlots = 18;
+  const basePrice = 8; // base price of bracelet
+  const goldPrice = 1; // additional price for gold
+  const charmPrices = {
+    plain: 0.4,
+    special: 1.5,
+    rare: 2
+  };
 
-function createSlot() {
-  const slot = document.createElement('div');
-  slot.classList.add('slot');
-  slot.dataset.id = '';
-  slot.dataset.type = '';
-  slot.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    slot.classList.add('dragover');
-  });
-  slot.addEventListener('dragleave', () => {
-    slot.classList.remove('dragover');
-  });
-  slot.addEventListener('drop', (e) => {
-    e.preventDefault();
-    const id = e.dataTransfer.getData('id');
-    const type = e.dataTransfer.getData('type');
-    slot.innerHTML = `<img src="charms/${id}.webp" class="charm" draggable="false">`;
-    slot.dataset.id = id;
-    slot.dataset.type = type;
-    slot.classList.remove('dragover');
-    updatePrice();
-  });
-  return slot;
-}
+  let slots = Array.from({ length: 18 }, (_, index) => ({ id: `slot${index + 1}`, charm: null }));
 
-function initBracelet() {
-  bracelet.innerHTML = '';
-  slots = [];
-  for (let i = 0; i < maxBaseSlots; i++) {
-    let slot = createSlot();
-    bracelet.appendChild(slot);
-    slots.push(slot);
+  function updatePrice() {
+    let totalPrice = basePrice + (goldToggle.checked ? goldPrice : 0);
+    let charmCount = 0;
+    slots.forEach(slot => {
+      if (slot.charm) {
+        charmCount++;
+        totalPrice += charmPrices[slot.charm.type];
+      }
+    });
+    priceDisplay.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
+    countDisplay.textContent = `${charmCount} / 18 charms`;
   }
-  updatePrice();
-}
 
-function updatePrice() {
-  let total = goldToggle.checked ? 9 : 8;
-  let plain = 0, special = 0, rare = 0;
-
-  slots.forEach((slot) => {
-    if (slot.dataset.type === 'plain') plain++;
-    else if (slot.dataset.type === 'special') special++;
-    else if (slot.dataset.type === 'rare') rare++;
-  });
-
-  const extraPlain = Math.max(0, plain - BASE_PLAIN);
-  const extraSpecial = Math.max(0, special - BASE_SPECIAL);
-  total += extraPlain * 0.4 + extraSpecial * 1.5 + rare * 2;
-
-  priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
-  countDisplay.textContent = `${slots.filter(s => s.dataset.id).length} / ${slots.length} charms`;
-}
-
-document.querySelectorAll('.charm').forEach(charm => {
-  charm.addEventListener('dragstart', (e) => {
-    e.dataTransfer.setData('id', charm.dataset.id);
-    e.dataTransfer.setData('type', charm.dataset.type);
-  });
-});
-
-goldToggle.addEventListener('change', updatePrice);
-
-addSlotBtn.addEventListener('click', () => {
-  const newSlot = createSlot();
-  bracelet.appendChild(newSlot);
-  slots.push(newSlot);
-  updatePrice();
-});
-
-removeSlotBtn.addEventListener('click', () => {
-  if (slots.length > 1) {
-    const slot = slots.pop();
-    bracelet.removeChild(slot);
-    updatePrice();
+  // Set up the bracelet slots
+  function setUpSlots() {
+    bracelet.innerHTML = '';
+    slots.forEach((slot, index) => {
+      const slotElement = document.createElement("div");
+      slotElement.classList.add("slot");
+      slotElement.setAttribute("data-id", slot.id);
+      slotElement.addEventListener("dragover", (e) => e.preventDefault());
+      slotElement.addEventListener("drop", handleDrop);
+      bracelet.appendChild(slotElement);
+    });
   }
-});
 
-initBracelet();
+  // Handle charm drop into a slot
+  function handleDrop(e) {
+    const slotId = e.target.getAttribute("data-id");
+    const slot = slots.find(s => s.id === slotId);
+    const charmId = e.dataTransfer.getData("text/plain");
+    const charm = document.querySelector(`[data-id='${charmId}']`);
+
+    if (slot && charm) {
+      const charmType = charm.dataset.type;
+      slot.charm = { id: charmId, type: charmType };
+
+      e.target.style.backgroundImage = `url(${charm.src})`;
+      e.target.style.backgroundSize = "cover";
+      e.target.style.backgroundPosition = "center";
+      updatePrice();
+    }
+  }
+
+  // Handle dragging
+  charmPool.addEventListener("dragstart", function (e) {
+    e.dataTransfer.setData("text/plain", e.target.getAttribute("data-id"));
+  });
+
+  // Handle gold toggle
+  goldToggle.addEventListener("change", updatePrice);
+
+  // Initialize
+  setUpSlots();
+});
