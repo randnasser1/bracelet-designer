@@ -1,131 +1,88 @@
-/* style.css - Bubblegum Theme for Charm Bracelet Designer */
-
-/* Import bubblegum font */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-/* Global body styles */
 body {
-  font-family: 'Poppins', sans-serif;
-  background: #ffe6f0;
-  color: #333;
-  margin: 0;
-  padding: 2rem;
+  font-family: Arial, sans-serif;
   text-align: center;
+  background-color: #fdf6f9;
+  color: #333;
 }
 
-/* Main heading */
 h1 {
-  font-size: 2.5rem;
-  color: #d6336c;
-  margin-bottom: 1rem;
+  margin-top: 20px;
+  font-size: 2rem;
+  color: #d63384;
 }
 
-/* Controls container (top buttons and toggle) */
-.controls {
+#charmPicker {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  margin: 20px;
+  gap: 10px;
 }
 
-/* Label inside controls (for the Gold toggle) */
-.controls label {
-  font-weight: 600;
-  color: #a61e4d;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+.charm {
+  width: 40px;
+  height: 40px;
+  cursor: grab;
+  transition: transform 0.2s;
 }
 
-/* Generic button style */
-.btn {
-  background: #ff85b3;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1.2rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
+.charm:hover {
+  transform: scale(1.2);
 }
 
-.btn:hover {
-  background: #ff5fa3;
-}
-
-/* Bracelet container (slots go here) */
 #bracelet {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
   justify-content: center;
-  padding: 1rem;
-  border: 2px dashed #f5a0c2;
-  border-radius: 12px;
-  background: #fff0f5;
-  min-height: 120px;
-  margin-bottom: 1rem;
+  gap: 5px;
+  padding: 20px;
+  background-color: #fff0f5;
+  border: 2px dashed #d63384;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto 20px;
 }
 
-/* Individual slot style */
 .slot {
-  width: 60px;
-  height: 60px;
-  border: 2px solid #f5a0c2;
-  border-radius: 10px;
-  background: #ffe6f0;
+  width: 50px;
+  height: 50px;
+  background-color: #fff;
+  border: 1px dashed #ccc;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .slot.dragover {
-  background: #ffd6e8;
-  border-color: #ff85b3;
+  background-color: #ffe0f0;
 }
 
-/* Ensure any image dropped into a slot fits */
-.slot img {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
+.controls {
+  margin-bottom: 20px;
 }
 
-/* Price and count display */
-.price-info {
+#priceDisplay, #countDisplay {
   font-size: 1.2rem;
-  margin: 0.5rem 0;
-  font-weight: 600;
-  color: #d6336c;
+  margin: 10px 0;
 }
 
-/* Charm gallery container */
-.charm-pool {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 2rem;
-  padding: 1rem;
-  background: #fff0f5;
-  border: 1px solid #f5a0c2;
-  border-radius: 12px;
-  max-height: 200px;
-  overflow-y: auto;
+button {
+  background-color: #d63384;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
 }
 
-/* Individual charms in the gallery */
-.charm-pool img {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
-  cursor: grab;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.charm-pool img:active {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
+button:hover {
+  background-color: #c22577;
 }
