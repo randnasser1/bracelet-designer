@@ -1,46 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Italian Charm Bracelet Designer</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Charm Bracelet Designer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #fdf6f9;
+      color: #333;
+    }
+    h1 {
+      margin-top: 20px;
+      font-size: 2rem;
+      color: #d63384;
+    }
+    #charmPicker {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 20px;
+      gap: 10px;
+    }
+    .charm {
+      width: 50px;
+      height: 50px;
+      cursor: grab;
+      transition: transform 0.2s;
+    }
+    .charm:hover {
+      transform: scale(1.2);
+    }
+    #bracelet {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+      padding: 20px;
+      background-color: #fff0f5;
+      border: 2px dashed #d63384;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: 0 auto 20px;
+    }
+    .slot {
+      width: 50px;
+      height: 50px;
+      background-color: #fff;
+      border: 1px dashed #ccc;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slot.dragover {
+      background-color: #ffe0f0;
+    }
+    .controls {
+      margin-bottom: 20px;
+    }
+    #priceDisplay, #countDisplay {
+      font-size: 1.2rem;
+      margin: 10px 0;
+    }
+    button {
+      background-color: #d63384;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover {
+      background-color: #c22577;
+    }
+  </style>
 </head>
 <body>
   <h1>Design Your Bracelet</h1>
-
-  <div id="charms-library">
-    <!-- Make sure these .webp files exist in your /charms folder -->
-    <img src="charms/ball.webp"         class="charm" draggable="true" data-id="plain-ball">
-    <img src="charms/be-mine.webp"     class="charm" draggable="true" data-id="plain-be-mine">
-    <img src="charms/heart.webp"        class="charm" draggable="true" data-id="plain-heart">
-    <img src="charms/heart-eye.webp"   class="charm" draggable="true" data-id="plain-heart-eye">
-    <img src="charms/chess.webp"       class="charm" draggable="true" data-id="plain-chess">
-    <img src="charms/daddys-girl.webp" class="charm" draggable="true" data-id="plain-daddys-girl">
-    <img src="charms/drama-queen.webp" class="charm" draggable="true" data-id="plain-drama-queen">
-    <img src="charms/c.webp"           class="charm" draggable="true" data-id="plain-c">
-    <img src="charms/juice.webp"       class="charm" draggable="true" data-id="plain-juice">
-    <img src="charms/n.webp"           class="charm" draggable="true" data-id="plain-n">
-    <img src="charms/rich-guys.webp"   class="charm" draggable="true" data-id="plain-rich-guys">
-    <img src="charms/sexy.webp"        class="charm" draggable="true" data-id="plain-sexy">
-    <img src="charms/shit-happens.webp"class="charm" draggable="true" data-id="plain-shit-happens">
-    <img src="charms/sports.webp"      class="charm" draggable="true" data-id="plain-sports">
-    <img src="charms/star-blue.webp"   class="charm" draggable="true" data-id="plain-star-blue">
-    <img src="charms/star.webp"        class="charm" draggable="true" data-id="plain-star">
-    <img src="charms/t.webp"           class="charm" draggable="true" data-id="plain-t">
-    <img src="charms/u.webp"           class="charm" draggable="true" data-id="plain-u">
+  <div class="controls">
+    <label>
+      <input type="checkbox" id="goldToggle" /> Gold Bracelet?
+    </label>
+    <button id="saveBtn">Save Bracelet</button>
+    <div id="priceDisplay">Total: 8.00 JDs</div>
+    <div id="countDisplay">0 / 18 charms</div>
+  </div>
+  <div id="bracelet">
+    ${[...Array(18)].map(() => '<div class="slot"></div>').join('')}
+  </div>
+  <div id="charmPicker">
+    <img src="charms/heart.webp" class="charm" draggable="true" data-id="heart" data-type="plain" title="Heart" />
+    <img src="charms/drama-queen.webp" class="charm" draggable="true" data-id="drama-queen" data-type="special" title="Drama Queen" />
+    <img src="charms/star-blue.webp" class="charm" draggable="true" data-id="star-blue" data-type="rare" title="Star Blue" />
+    <img src="charms/ball.webp" class="charm" draggable="true" data-id="ball" data-type="plain" title="Ball" />
+    <img src="charms/be-mine.webp" class="charm" draggable="true" data-id="be-mine" data-type="special" title="Be Mine" />
+    <img src="charms/chess.webp" class="charm" draggable="true" data-id="chess" data-type="plain" title="Chess" />
+    <img src="charms/daddys-girl.webp" class="charm" draggable="true" data-id="daddys-girl" data-type="special" title="Daddy's Girl" />
+    <img src="charms/heart-eye.webp" class="charm" draggable="true" data-id="heart-eye" data-type="special" title="Heart Eye" />
+    <img src="charms/juice.webp" class="charm" draggable="true" data-id="juice" data-type="plain" title="Juice" />
+    <img src="charms/n.webp" class="charm" draggable="true" data-id="n" data-type="plain" title="N" />
+    <img src="charms/rich-guys.webp" class="charm" draggable="true" data-id="rich-guys" data-type="rare" title="Rich Guys" />
+    <img src="charms/sexy.webp" class="charm" draggable="true" data-id="sexy" data-type="special" title="Sexy" />
+    <img src="charms/shit-happens.webp" class="charm" draggable="true" data-id="shit-happens" data-type="rare" title="Shit Happens" />
+    <img src="charms/sports.webp" class="charm" draggable="true" data-id="sports" data-type="plain" title="Sports" />
+    <img src="charms/star.webp" class="charm" draggable="true" data-id="star" data-type="plain" title="Star" />
+    <img src="charms/t.webp" class="charm" draggable="true" data-id="t" data-type="plain" title="T" />
+    <img src="charms/u.webp" class="charm" draggable="true" data-id="u" data-type="plain" title="U" />
   </div>
 
-  <div id="priceDisplay">Total: 8.00 JDs</div>
-
-  <div id="bracelet"></div>  <!-- slots get injected here -->
-
-  <label>
-    <input type="checkbox" id="goldToggle"> Gold Bracelet?
-  </label>
-
-  <button id="saveBtn">Save Bracelet</button>
-
   <script src="app.js"></script>
-  <script src="firebase.js" type="module"></script>
 </body>
 </html>
