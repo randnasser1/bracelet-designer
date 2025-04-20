@@ -1,93 +1,125 @@
+// Variables for bracelet slots, charm pool, and pricing
 const bracelet = document.getElementById('bracelet');
-const goldToggle = document.getElementById('goldToggle');
+const charmPool = document.querySelector('.charm-pool');
 const priceDisplay = document.getElementById('priceDisplay');
 const countDisplay = document.getElementById('countDisplay');
 const addSlotBtn = document.getElementById('addSlotBtn');
 const removeSlotBtn = document.getElementById('removeSlotBtn');
+const goldToggle = document.getElementById('goldToggle');
 
-let charmLimit = 18;
+// Constants
+const basePrice = 8.00;
+const goldPrice = 1.00;
+const charmPrices = {
+  plain: 0.4,
+  special: 1.5,
+  rare: 2.0
+};
 
-// Initial bracelet slots
-function createSlot() {
-  const slot = document.createElement('div');
-  slot.classList.add('slot');
-  return slot;
-}
+// Initialize bracelet slots
+let braceletSlots = Array(18).fill(null);
 
-function populateInitialSlots() {
-  bracelet.innerHTML = '';
-  for (let i = 0; i < charmLimit; i++) {
-    bracelet.appendChild(createSlot());
-  }
-}
+// Function to update the bracelet display
+function updateBracelet() {
+  bracelet.innerHTML = ''; // Clear bracelet container
+  braceletSlots.forEach((charm, index) => {
+    const slot = document.createElement('div');
+    slot.classList.add('slot');
+    slot.setAttribute('data-index', index);
 
-populateInitialSlots();
+    if (charm) {
+      const img = document.createElement('img');
+      img.src = charm.src;
+      img.alt = charm.title;
+      slot.appendChild(img);
+    }
 
-// Price Calculation
-function updatePriceAndCount() {
-  let count = 0;
-  let special = 0;
-  let rare = 0;
-
-  document.querySelectorAll('#bracelet .slot img').forEach(img => {
-    count++;
-    const type = img.dataset.type;
-    if (type === 'special') special++;
-    else if (type === 'rare') rare++;
+    bracelet.appendChild(slot);
   });
 
-  let base = goldToggle.checked ? 9 : 8;
-  let extraPlain = Math.max(0, count - 18 + (special + rare));
-  let total = base + (special * 1.5) + (rare * 2) + (extraPlain * 0.4);
+  // Update count and price
+  const charmCount = braceletSlots.filter(slot => slot !== null).length;
+  const totalPrice = basePrice + (goldToggle.checked ? goldPrice : 0) + braceletSlots.reduce((total, charm) => {
+    if (charm) {
+      return total + charmPrices[charm.type];
+    }
+    return total;
+  }, 0);
 
-  priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
-  countDisplay.textContent = `${count} / ${charmLimit} charms`;
+  countDisplay.textContent = `${charmCount} / 18 charms`;
+  priceDisplay.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
 }
 
-goldToggle.addEventListener('change', updatePriceAndCount);
-
-// Add/Remove Slots
-addSlotBtn.addEventListener('click', () => {
-  bracelet.appendChild(createSlot());
-  charmLimit++;
-  updatePriceAndCount();
+// Function to handle charm drag and drop
+charmPool.addEventListener('dragstart', (e) => {
+  e.target.classList.add('dragging');
 });
 
-removeSlotBtn.addEventListener('click', () => {
-  const slots = bracelet.querySelectorAll('.slot');
-  if (slots.length > 0) {
-    const last = slots[slots.length - 1];
-    if (!last.querySelector('img')) {
-      last.remove();
-      charmLimit--;
-      updatePriceAndCount();
-    }
+charmPool.addEventListener('dragend', (e) => {
+  e.target.classList.remove('dragging');
+});
+
+bracelet.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  const draggedItem = document.querySelector('.dragging');
+  const targetSlot = e.target.closest('.slot');
+
+  if (targetSlot && targetSlot !== draggedItem) {
+    targetSlot.classList.add('dragover');
   }
 });
 
-// SortableJS for bracelet
-new Sortable(bracelet, {
-  group: {
-    name: 'charms',
-    pull: true,
-    put: true
-  },
-  animation: 150,
-  ghostClass: 'drag-ghost',
-  onAdd: updatePriceAndCount,
-  onRemove: updatePriceAndCount,
-  onSort: updatePriceAndCount,
-  draggable: '.slot'
+bracelet.addEventListener('dragleave', (e) => {
+  const targetSlot = e.target.closest('.slot');
+  if (targetSlot) {
+    targetSlot.classList.remove('dragover');
+  }
 });
 
-// SortableJS for charm gallery (clone only)
-new Sortable(document.querySelector('.charm-pool'), {
-  group: {
-    name: 'charms',
-    pull: 'clone',
-    put: false
-  },
-  sort: false,
-  animation: 150,
-  draggable: '.charm'
+bracelet.addEventListener('drop', (e) => {
+  e.preventDefault();
+  const draggedItem = document.querySelector('.dragging');
+  const targetSlot = e.target.closest('.slot');
+
+  if (targetSlot && targetSlot !== draggedItem) {
+    const index = targetSlot.getAttribute('data-index');
+    const charm = {
+      src: draggedItem.src,
+      title: draggedItem.title,
+      type: draggedItem.getAttribute('data-type')
+    };
+    braceletSlots[index] = charm;
+    updateBracelet();
+  }
+
+  // Remove dragover highlight
+  if (targetSlot) {
+    targetSlot.classList.remove('dragover');
+  }
 });
+
+// Event listener to add a slot (when max charms allowed)
+addSlotBtn.addEventListener('click', () => {
+  const firstEmptySlotIndex = braceletSlots.indexOf(null);
+  if (firstEmptySlotIndex !== -1) {
+    braceletSlots[firstEmptySlotIndex] = null;
+    updateBracelet();
+  }
+});
+
+// Event listener to remove a charm (when there are charms in the bracelet)
+removeSlotBtn.addEventListener('click', () => {
+  const lastFilledSlotIndex = braceletSlots.lastIndexOf(null);
+  if (lastFilledSlotIndex !== -1) {
+    braceletSlots[lastFilledSlotIndex] = null;
+    updateBracelet();
+  }
+});
+
+// Event listener for gold toggle
+goldToggle.addEventListener('change', () => {
+  updateBracelet();
+});
+
+// Initial Bracelet update
+updateBracelet();
