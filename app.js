@@ -1,91 +1,92 @@
-let bracelet = document.getElementById('bracelet');
-let goldToggle = document.getElementById('goldToggle');
-let priceDisplay = document.getElementById('priceDisplay');
-let countDisplay = document.getElementById('countDisplay');
-let addSlotBtn = document.getElementById('addSlotBtn');
-let removeSlotBtn = document.getElementById('removeSlotBtn');
+const charms = document.querySelectorAll('.charm');
+const bracelet = document.getElementById('bracelet');
+const slots = bracelet.querySelectorAll('.slot');
 
-const BASE_PLAIN = 15;
-const BASE_SPECIAL = 3;
-let slots = [];
-let maxBaseSlots = 18;
+const priceDisplay = document.getElementById('priceDisplay');
+const countDisplay = document.getElementById('countDisplay');
 
-function createSlot() {
-  const slot = document.createElement('div');
-  slot.classList.add('slot');
-  slot.dataset.id = '';
-  slot.dataset.type = '';
+// Default prices
+const braceletBasePrice = 8;
+const goldPrice = 1;
+const charmPrices = {
+  plain: 0.4,
+  special: 1.5,
+  rare: 2
+};
+
+let totalPrice = braceletBasePrice;
+let totalCharms = 0;
+let isGold = false;
+
+// Update price display
+function updatePrice() {
+  priceDisplay.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
+  countDisplay.textContent = `${totalCharms} / 18 charms`;
+}
+
+// Toggle gold bracelet
+document.getElementById('goldToggle').addEventListener('change', (e) => {
+  isGold = e.target.checked;
+  totalPrice = braceletBasePrice + (isGold ? goldPrice : 0);
+  updatePrice();
+});
+
+// Add and remove charm slots
+document.getElementById('addSlotBtn').addEventListener('click', () => {
+  if (totalCharms < 18) {
+    const slot = document.createElement('div');
+    slot.classList.add('slot');
+    bracelet.appendChild(slot);
+    totalCharms++;
+    updatePrice();
+  }
+});
+
+document.getElementById('removeSlotBtn').addEventListener('click', () => {
+  if (totalCharms > 0) {
+    bracelet.removeChild(bracelet.lastChild);
+    totalCharms--;
+    updatePrice();
+  }
+});
+
+// Handle drag events for charms
+charms.forEach(charm => {
+  charm.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text', e.target.dataset.id);
+    e.target.classList.add('dragging');
+  });
+
+  charm.addEventListener('dragend', (e) => {
+    e.target.classList.remove('dragging');
+  });
+});
+
+// Handle drop events in bracelet slots
+slots.forEach(slot => {
   slot.addEventListener('dragover', (e) => {
     e.preventDefault();
-    slot.classList.add('dragover');
+    const draggingCharm = document.querySelector('.charm.dragging');
+    if (draggingCharm) {
+      slot.classList.add('dragover');
+    }
   });
+
   slot.addEventListener('dragleave', () => {
     slot.classList.remove('dragover');
   });
+
   slot.addEventListener('drop', (e) => {
-    e.preventDefault();
-    const id = e.dataTransfer.getData('id');
-    const type = e.dataTransfer.getData('type');
-    slot.innerHTML = `<img src="charms/${id}.webp" class="charm" draggable="false">`;
-    slot.dataset.id = id;
-    slot.dataset.type = type;
+    const charmId = e.dataTransfer.getData('text');
+    const charm = document.querySelector(`.charm[data-id="${charmId}"]`);
+    if (charm) {
+      const newImg = document.createElement('img');
+      newImg.src = charm.src;
+      newImg.alt = charm.alt;
+      newImg.classList.add('charm-image');
+      slot.innerHTML = '';
+      slot.appendChild(newImg);
+    }
     slot.classList.remove('dragover');
-    updatePrice();
-  });
-  return slot;
-}
-
-function initBracelet() {
-  bracelet.innerHTML = '';
-  slots = [];
-  for (let i = 0; i < maxBaseSlots; i++) {
-    let slot = createSlot();
-    bracelet.appendChild(slot);
-    slots.push(slot);
-  }
-  updatePrice();
-}
-
-function updatePrice() {
-  let total = goldToggle.checked ? 9 : 8;
-  let plain = 0, special = 0, rare = 0;
-
-  slots.forEach((slot, index) => {
-    if (slot.dataset.type === 'plain') plain++;
-    else if (slot.dataset.type === 'special') special++;
-    else if (slot.dataset.type === 'rare') rare++;
-  });
-
-  const extraPlain = Math.max(0, plain - BASE_PLAIN);
-  const extraSpecial = Math.max(0, special - BASE_SPECIAL);
-  total += extraPlain * 0.4 + extraSpecial * 1.5 + rare * 2;
-
-  priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
-  countDisplay.textContent = `${slots.filter(s => s.dataset.id).length} / ${slots.length} charms`;
-}
-
-document.querySelectorAll('.charm').forEach(charm => {
-  charm.addEventListener('dragstart', (e) => {
-    e.dataTransfer.setData('id', charm.dataset.id);
-    e.dataTransfer.setData('type', charm.dataset.type);
   });
 });
-
-goldToggle.addEventListener('change', updatePrice);
-
-addSlotBtn.addEventListener('click', () => {
-  const newSlot = createSlot();
-  bracelet.appendChild(newSlot);
-  slots.push(newSlot);
-  updatePrice();
-});
-
-removeSlotBtn.addEventListener('click', () => {
-  if (slots.length > 1) {
-    const slot = slots.pop();
-    bracelet.removeChild(slot);
-    updatePrice();
-  }
-});
-
-initBracelet();
