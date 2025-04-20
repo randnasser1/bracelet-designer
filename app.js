@@ -1,125 +1,86 @@
-// Variables for bracelet slots, charm pool, and pricing
-const bracelet = document.getElementById('bracelet');
-const charmPool = document.querySelector('.charm-pool');
-const priceDisplay = document.getElementById('priceDisplay');
-const countDisplay = document.getElementById('countDisplay');
-const addSlotBtn = document.getElementById('addSlotBtn');
-const removeSlotBtn = document.getElementById('removeSlotBtn');
-const goldToggle = document.getElementById('goldToggle');
+document.addEventListener("DOMContentLoaded", function () {
+  const bracelet = document.getElementById("bracelet");
+  const charmPool = document.querySelector(".charm-pool");
+  const priceDisplay = document.getElementById("priceDisplay");
+  const countDisplay = document.getElementById("countDisplay");
+  const goldToggle = document.getElementById("goldToggle");
 
-// Constants
-const basePrice = 8.00;
-const goldPrice = 1.00;
-const charmPrices = {
-  plain: 0.4,
-  special: 1.5,
-  rare: 2.0
-};
+  const charmPrices = {
+    plain: 0.4,
+    special: 1.5,
+    rare: 2
+  };
 
-// Initialize bracelet slots
-let braceletSlots = Array(18).fill(null);
+  let charmCount = 0;
+  let totalPrice = 8;
 
-// Function to update the bracelet display
-function updateBracelet() {
-  bracelet.innerHTML = ''; // Clear bracelet container
-  braceletSlots.forEach((charm, index) => {
-    const slot = document.createElement('div');
-    slot.classList.add('slot');
-    slot.setAttribute('data-index', index);
-
-    if (charm) {
-      const img = document.createElement('img');
-      img.src = charm.src;
-      img.alt = charm.title;
-      slot.appendChild(img);
+  // Set initial bracelet slots
+  function createBraceletSlots() {
+    for (let i = 0; i < 18; i++) {
+      const slot = document.createElement("div");
+      slot.classList.add("slot");
+      bracelet.appendChild(slot);
     }
+  }
 
-    bracelet.appendChild(slot);
+  // Update the price display
+  function updatePrice() {
+    priceDisplay.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
+    countDisplay.textContent = `${charmCount} / 18 charms`;
+  }
+
+  // Add charm to the bracelet
+  function addCharmToBracelet(charmElement) {
+    const charmId = charmElement.dataset.id;
+    const charmType = charmElement.dataset.type;
+
+    if (charmCount < 18) {
+      const slot = bracelet.children[charmCount];
+      const charmImage = document.createElement("img");
+      charmImage.src = charmElement.src;
+      charmImage.alt = charmId;
+      charmImage.title = charmId;
+      charmImage.classList.add("charm");
+      slot.appendChild(charmImage);
+
+      charmCount++;
+      totalPrice += charmPrices[charmType];
+      updatePrice();
+    }
+  }
+
+  // Handle charm click
+  charmPool.addEventListener("click", function (event) {
+    if (event.target.classList.contains("charm")) {
+      addCharmToBracelet(event.target);
+    }
   });
 
-  // Update count and price
-  const charmCount = braceletSlots.filter(slot => slot !== null).length;
-  const totalPrice = basePrice + (goldToggle.checked ? goldPrice : 0) + braceletSlots.reduce((total, charm) => {
-    if (charm) {
-      return total + charmPrices[charm.type];
+  // Handle add/remove slot buttons
+  document.getElementById("addSlotBtn").addEventListener("click", function () {
+    if (charmCount < 18) {
+      const slot = document.createElement("div");
+      slot.classList.add("slot");
+      bracelet.appendChild(slot);
+      charmCount++;
     }
-    return total;
-  }, 0);
+  });
 
-  countDisplay.textContent = `${charmCount} / 18 charms`;
-  priceDisplay.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
-}
+  document.getElementById("removeSlotBtn").addEventListener("click", function () {
+    if (charmCount > 0) {
+      const lastSlot = bracelet.children[charmCount - 1];
+      lastSlot.innerHTML = '';
+      charmCount--;
+    }
+  });
 
-// Function to handle charm drag and drop
-charmPool.addEventListener('dragstart', (e) => {
-  e.target.classList.add('dragging');
+  // Gold toggle
+  goldToggle.addEventListener("change", function () {
+    totalPrice = goldToggle.checked ? 9 : 8;
+    updatePrice();
+  });
+
+  // Initialize
+  createBraceletSlots();
+  updatePrice();
 });
-
-charmPool.addEventListener('dragend', (e) => {
-  e.target.classList.remove('dragging');
-});
-
-bracelet.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  const draggedItem = document.querySelector('.dragging');
-  const targetSlot = e.target.closest('.slot');
-
-  if (targetSlot && targetSlot !== draggedItem) {
-    targetSlot.classList.add('dragover');
-  }
-});
-
-bracelet.addEventListener('dragleave', (e) => {
-  const targetSlot = e.target.closest('.slot');
-  if (targetSlot) {
-    targetSlot.classList.remove('dragover');
-  }
-});
-
-bracelet.addEventListener('drop', (e) => {
-  e.preventDefault();
-  const draggedItem = document.querySelector('.dragging');
-  const targetSlot = e.target.closest('.slot');
-
-  if (targetSlot && targetSlot !== draggedItem) {
-    const index = targetSlot.getAttribute('data-index');
-    const charm = {
-      src: draggedItem.src,
-      title: draggedItem.title,
-      type: draggedItem.getAttribute('data-type')
-    };
-    braceletSlots[index] = charm;
-    updateBracelet();
-  }
-
-  // Remove dragover highlight
-  if (targetSlot) {
-    targetSlot.classList.remove('dragover');
-  }
-});
-
-// Event listener to add a slot (when max charms allowed)
-addSlotBtn.addEventListener('click', () => {
-  const firstEmptySlotIndex = braceletSlots.indexOf(null);
-  if (firstEmptySlotIndex !== -1) {
-    braceletSlots[firstEmptySlotIndex] = null;
-    updateBracelet();
-  }
-});
-
-// Event listener to remove a charm (when there are charms in the bracelet)
-removeSlotBtn.addEventListener('click', () => {
-  const lastFilledSlotIndex = braceletSlots.lastIndexOf(null);
-  if (lastFilledSlotIndex !== -1) {
-    braceletSlots[lastFilledSlotIndex] = null;
-    updateBracelet();
-  }
-});
-
-// Event listener for gold toggle
-goldToggle.addEventListener('change', () => {
-  updateBracelet();
-});
-
-// Initial Bracelet update
-updateBracelet();
