@@ -85,3 +85,8 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   });
   await saveBracelet(layout);
 });
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  slots.forEach(slot => slot.innerHTML = '');
+  updatePrice();
+});
