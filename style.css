@@ -1,53 +1,88 @@
 body {
   font-family: Arial, sans-serif;
-  padding: 20px;
   text-align: center;
+  background-color: #fdf6f9;
+  color: #333;
 }
 
-#charms-library {
+h1 {
+  margin-top: 20px;
+  font-size: 2rem;
+  color: #d63384;
+}
+
+#charmPicker {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 20px;
   gap: 10px;
-  margin-bottom: 30px;
 }
+
 .charm {
+  width: 40px;
+  height: 40px;
   cursor: grab;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s;
 }
+
 .charm:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: scale(1.2);
+}
+
+#bracelet {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  padding: 20px;
+  background-color: #fff0f5;
+  border: 2px dashed #d63384;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto 20px;
 }
 
 .slot {
-  border: 2px dashed #ccc;
-  min-height: 40px;
-  width: 40px;
-  background-color: #f9f9f9;
-  transition: background-color 0.2s ease;
+  width: 50px;
+  height: 50px;
+  background-color: #fff;
+  border: 1px dashed #ccc;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.slot.dragover {
-  background-color: #e0f7fa;
-  border-color: #00bcd4;
-}
-
 .slot img {
-  width: 30px;
-  height: 30px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
-#charmsGallery {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  max-height: 150px;
-  overflow-y: auto;
-  padding: 10px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+.slot.dragover {
+  background-color: #ffe0f0;
+}
+
+.controls {
+  margin-bottom: 20px;
+}
+
+#priceDisplay, #countDisplay {
+  font-size: 1.2rem;
+  margin: 10px 0;
+}
+
+button {
+  background-color: #d63384;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+button:hover {
+  background-color: #c22577;
 }
