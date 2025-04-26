@@ -114,6 +114,11 @@ h1 {
   height: 100%;
   object-fit: contain;
 }
+.dragging {
+  opacity: 0.5;
+  background: #ffd6e8;
+}
+
 
 /* Fix for dragged image */
 .charm-pool img.dragging {
