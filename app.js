@@ -34,6 +34,14 @@ bracelet.addEventListener('click', (e) => {
   }
 });
 
+// Make the bracelet slots sortable (drag-and-drop reorder)
+Sortable.create(bracelet, {
+  animation: 200,
+  ghostClass: 'dragging',
+  filter: '.slot:not(:has(img))', // Allow dragging only slots that have an image
+});
+
+
 // Update price
 function updatePrice() {
   const filledSlots = document.querySelectorAll('.slot img').length;
