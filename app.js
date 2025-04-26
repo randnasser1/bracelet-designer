@@ -1,73 +1,90 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const bracelet = document.getElementById('bracelet');
-  const charmPool = document.querySelector('.charm-pool');
-  const priceDisplay = document.getElementById('priceDisplay');
-  const countDisplay = document.getElementById('countDisplay');
-  const addSlotBtn = document.getElementById('addSlotBtn');
-  const removeSlotBtn = document.getElementById('removeSlotBtn');
-  
-  let totalPrice = 8.00; // Starting price for the bracelet (base price)
-  let charmCount = 0;
-  const maxCharms = 18;
-  
-  // Initialize slots with empty spaces (18 slots)
-  for (let i = 0; i < maxCharms; i++) {
-    const slot = document.createElement('div');
-    slot.classList.add('slot');
-    slot.addEventListener('click', () => removeCharm(slot));
-    bracelet.appendChild(slot);
-  }
+// Setup the bracelet with 18 slots initially
+const bracelet = document.getElementById('bracelet');
+for (let i = 0; i < 18; i++) {
+  const slot = document.createElement('div');
+  slot.className = 'slot';
+  bracelet.appendChild(slot);
+}
 
-  // Function to update the price and charm count display
-  function updateDisplay() {
-    priceDisplay.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
-    countDisplay.textContent = `${charmCount} / 18 charms`;
-  }
-
-  // Add charm to slot
-  function addCharmToSlot(charm) {
-    const emptySlot = [...bracelet.children].find(slot => !slot.contains(charm));
-    if (emptySlot && charmCount < maxCharms) {
-      const imgClone = charm.cloneNode();
-      emptySlot.appendChild(imgClone);
-      charmCount++;
-      totalPrice += 1.5; // Example price increment for each charm added
-      updateDisplay();
-    }
-  }
-
-  // Remove charm from slot
-  function removeCharm(slot) {
-    const charmInSlot = slot.querySelector('img');
-    if (charmInSlot) {
-      slot.removeChild(charmInSlot);
-      charmCount--;
-      totalPrice -= 1.5; // Example price decrement for each charm removed
-      updateDisplay();
-    }
-  }
-
-  // Add event listener for charm images
-  charmPool.addEventListener('click', (e) => {
-    if (e.target && e.target.classList.contains('charm')) {
-      addCharmToSlot(e.target);
+// Handle clicking on charms
+const charms = document.querySelectorAll('.charm');
+charms.forEach(charm => {
+  charm.addEventListener('click', () => {
+    const slots = document.querySelectorAll('.slot');
+    for (const slot of slots) {
+      if (!slot.querySelector('img')) {
+        const img = document.createElement('img');
+        img.src = charm.src;
+        img.alt = charm.title;
+        slot.appendChild(img);
+        updatePrice();
+        updateCount();
+        break;
+      }
     }
   });
+});
 
-  // Add charm slot
-  addSlotBtn.addEventListener('click', () => {
-    if (charmCount < maxCharms) {
-      addCharmToSlot(charmPool.querySelector('.charm')); // Adds first charm as example
+// Handle clicking on a slot with a charm to remove it
+bracelet.addEventListener('click', (e) => {
+  if (e.target.tagName === 'IMG' && e.target.parentElement.classList.contains('slot')) {
+    e.target.remove();
+    updatePrice();
+    updateCount();
+  }
+});
+
+// Update price
+function updatePrice() {
+  const filledSlots = document.querySelectorAll('.slot img').length;
+  const goldSelected = document.getElementById('goldToggle').checked;
+  const basePrice = goldSelected ? 9 : 8;
+  const extraCharms = Math.max(0, filledSlots - 18);
+  const extraPrice = extraCharms * 0.4;
+  const total = basePrice + extraPrice;
+  document.getElementById('priceDisplay').textContent = `Total: ${total.toFixed(2)} JDs`;
+}
+
+// Update charm count
+function updateCount() {
+  const filledSlots = document.querySelectorAll('.slot img').length;
+  document.getElementById('countDisplay').textContent = `${filledSlots} / 18 charms`;
+}
+
+// Add a new slot
+document.getElementById('addSlotBtn').addEventListener('click', () => {
+  const slot = document.createElement('div');
+  slot.className = 'slot';
+  bracelet.appendChild(slot);
+});
+
+// Remove the last slot
+document.getElementById('removeSlotBtn').addEventListener('click', () => {
+  const slots = bracelet.querySelectorAll('.slot');
+  if (slots.length > 0) {
+    const lastSlot = slots[slots.length - 1];
+    lastSlot.remove();
+    updatePrice();
+    updateCount();
+  }
+});
+
+// Update price when gold toggle changes
+document.getElementById('goldToggle').addEventListener('change', () => {
+  updatePrice();
+});
+
+// Save bracelet layout (optional)
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const layout = [];
+  document.querySelectorAll('.slot').forEach(slot => {
+    const img = slot.querySelector('img');
+    if (img) {
+      layout.push(img.getAttribute('data-id') || img.alt || '');
+    } else {
+      layout.push('');
     }
   });
-
-  // Remove charm slot
-  removeSlotBtn.addEventListener('click', () => {
-    const lastSlot = bracelet.querySelector('.slot:last-child');
-    if (lastSlot && lastSlot.querySelector('img')) {
-      removeCharm(lastSlot);
-    }
-  });
-
-  updateDisplay();
+  console.log('Saved bracelet:', layout);
+  alert('Bracelet saved! (Check console for layout)');
 });
