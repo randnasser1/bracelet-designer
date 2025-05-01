@@ -112,3 +112,10 @@ h1 {
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
 }
+
+/* Ensure no size changes when the gold bracelet is selected */
+#goldToggle:checked ~ #bracelet .slot,
+#goldToggle:checked ~ #bracelet .charm-pool img {
+  width: 30px;  /* enforce the size for gold */
+  height: 30px; /* enforce the size for gold */
+}
