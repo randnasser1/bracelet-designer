@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Italian Charm Bracelet Designer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <title>Bubblegum Charm Bracelet Designer</title>
   <style>
+    /* Bubblegum Theme */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
     body {
       font-family: 'Poppins', sans-serif;
       background: #ffe6f0;
@@ -49,7 +50,7 @@
     #bracelet {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 5px; /* adjusted gap size */
       justify-content: center;
       padding: 1rem;
       border: 2px dashed #f5a0c2;
@@ -59,9 +60,9 @@
       margin-bottom: 1rem;
     }
     .slot {
-      width: 60px;
-      height: 60px;
-      border: 2px solid #f5a0c2;
+      width: 50px; /* adjusted width */
+      height: 50px; /* adjusted height */
+      border: 2px dashed #f5a0c2;
       border-radius: 10px;
       background: #ffe6f0;
       display: flex;
@@ -79,7 +80,7 @@
       font-weight: 600;
       color: #d6336c;
     }
-    .charm-pool, .rare-charm-pool {
+    .charm-pool {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
@@ -92,27 +93,22 @@
       max-height: 200px;
       overflow-y: auto;
     }
-    .charm-pool img, .rare-charm-pool img {
-      width: 30px;
-      height: 30px;
+    .charm-pool img {
+      width: 50px; /* adjusted width */
+      height: 50px; /* adjusted height */
       object-fit: contain;
-      cursor: pointer;
+      cursor: grab;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .charm-pool img:active, .rare-charm-pool img:active {
+    .charm-pool img:active {
       transform: scale(1.1);
       box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
-    }
-    .slot img {
-      width: 30px;
-      height: 30px;
-      object-fit: contain;
     }
   </style>
 </head>
 <body>
 
-  <h1>Bubblegum Bracelet Designer</h1>
+  <h1>Italian Bracelet Designer</h1>
 
   <div class="controls">
     <label>
