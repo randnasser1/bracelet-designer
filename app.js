@@ -12,27 +12,24 @@ const BASE_GOLD = { src: 'basecharms/gold.png', name: 'Gold Base', price: 0 };
 // Initialize bracelet with 18 base charms
 function initializeBracelet() {
   bracelet.innerHTML = '';
-  const isGold = goldToggle.checked;
-  const baseCharm = isGold ? BASE_GOLD : BASE_SILVER;
+  const baseCharm = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
 
   for (let i = 0; i < MAX_SLOTS; i++) {
     const slot = document.createElement('div');
-    slot.className = 'bracelet-slot empty'; // Ensuring it starts as empty
+-   slot.className = 'bracelet-slot empty';
++   slot.className = 'slot empty';
 
     const img = document.createElement('img');
     img.src = baseCharm.src;
     img.alt = baseCharm.name;
-    img.title = baseCharm.name;
-    img.dataset.name = baseCharm.name;
-    img.dataset.price = '0';
     img.dataset.type = 'base';
-
     slot.appendChild(img);
     bracelet.appendChild(slot);
   }
 
   updatePrice();
 }
+
 
 // Add clicked charm to first non-base slot
 function addCharmToBracelet(charmImg) {
@@ -107,7 +104,7 @@ charmImages.forEach(img => {
 });
 
 // Handling dragover for slots
-const slots = document.querySelectorAll('.bracelet-slot');
+const slots = document.querySelectorAll('.slot');
 
 slots.forEach(slot => {
   slot.addEventListener('dragover', (e) => {
