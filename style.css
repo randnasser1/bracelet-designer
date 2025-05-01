@@ -1,101 +1,112 @@
-<style>
-  /* Bubblegum Theme */
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: #ffe6f0;
-    color: #333;
-    margin: 0;
-    padding: 2rem;
-    text-align: center;
-  }
-  h1 {
-    font-size: 2.5rem;
-    color: #d6336c;
-    margin-bottom: 1rem;
-  }
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-  }
-  .controls label {
-    font-weight: 600;
-    color: #a61e4d;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-  .btn {
-    background: #ff85b3;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 0.6rem 1.2rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  .btn:hover {
-    background: #ff5fa3;
-  }
-  #bracelet {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px; /* adjusted gap size */
-    justify-content: center;
-    padding: 1rem;
-    border: 2px dashed #f5a0c2;
-    border-radius: 12px;
-    background: #fff0f5;
-    min-height: 120px;
-    margin-bottom: 1rem;
-  }
-  .slot {
-    width: 50px; /* adjusted width */
-    height: 50px; /* adjusted height */
-    border: 2px dashed #f5a0c2;
-    border-radius: 10px;
-    background: #ffe6f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s ease, border-color 0.2s ease;
-  }
-  .slot.dragover {
-    background: #ffd6e8;
-    border-color: #ff85b3;
-  }
-  .price-info {
-    font-size: 1.2rem;
-    margin: 0.5rem 0;
-    font-weight: 600;
-    color: #d6336c;
-  }
-  .charm-pool {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 2rem;
-    padding: 1rem;
-    background: #fff0f5;
-    border: 1px solid #f5a0c2;
-    border-radius: 12px;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-  .charm-pool img {
-    width: 50px; /* adjusted width */
-    height: 50px; /* adjusted height */
-    object-fit: contain;
-    cursor: grab;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  .charm-pool img:active {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
-  }
-</style>
+/* Bubblegum Theme */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #ffe6f0;
+  color: #333;
+  margin: 0;
+  padding: 2rem;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #d6336c;
+  margin-bottom: 1rem;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.controls label {
+  font-weight: 600;
+  color: #a61e4d;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn {
+  background: #ff85b3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn:hover {
+  background: #ff5fa3;
+}
+
+#bracelet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px; /* smaller gap */
+  justify-content: center;
+  padding: 1rem;
+  border: 2px dashed #f5a0c2;
+  border-radius: 12px;
+  background: #fff0f5;
+  min-height: 100px; /* reduced height */
+  margin-bottom: 1rem;
+}
+
+.slot {
+  width: 40px; /* reduced width */
+  height: 40px; /* reduced height */
+  border: 2px dashed #f5a0c2;
+  border-radius: 10px;
+  background: #ffe6f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.slot.dragover {
+  background: #ffd6e8;
+  border-color: #ff85b3;
+}
+
+.price-info {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+  font-weight: 600;
+  color: #d6336c;
+}
+
+.charm-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; /* reduced gap */
+  justify-content: center;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #fff0f5;
+  border: 1px solid #f5a0c2;
+  border-radius: 12px;
+  max-height: 150px; /* reduced max height */
+  overflow-y: auto;
+}
+
+.charm-pool img {
+  width: 40px; /* reduced width */
+  height: 40px; /* reduced height */
+  object-fit: contain;
+  cursor: grab;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.charm-pool img:active {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
+}
