@@ -65,29 +65,30 @@ function updatePrice() {
   // Base price: silver=8, gold=9
   let total = goldToggle.checked ? 9 : 8;
 
-  // Gather all placed charms
-  const placedImgs = Array.from(bracelet.querySelectorAll('.slot img'));
+  // All placed images
+  const placed = Array.from(bracelet.querySelectorAll('.slot img'));
 
   // Separate normal vs. rare
-  const normalImgs = placedImgs.filter(img => img.dataset.type === 'normal');
-  const rareImgs   = placedImgs.filter(img => img.dataset.type === 'rare');
+  const normalImgs = placed.filter(img => img.dataset.type === 'normal');
+  const rareImgs   = placed.filter(img => img.dataset.type === 'rare');
 
-  // Compute normal charms cost: skip first 3
-  const normalPrices    = normalImgs.map(img => parseFloat(img.dataset.price));
-  const chargeableNorms = normalPrices.slice(3);            // everything after the first 3
-  const normalTotal     = chargeableNorms.reduce((sum, p) => sum + p, 0);
+  // Normal charms: first 3 free
+  const normalPrices = normalImgs.map(img => parseFloat(img.dataset.price));
+  const chargeableNormals = normalPrices.slice(3);
+  const normalTotal = chargeableNormals.reduce((sum, p) => sum + p, 0);
 
-  // Compute rare charms cost (all of them)
-  const rareTotal       = rareImgs.reduce((sum, img) => sum + parseFloat(img.dataset.price), 0);
+  // Rare charms: all full price
+  const rareTotal = rareImgs.reduce((sum, img) => sum + parseFloat(img.dataset.price), 0);
 
-  // Add to base
+  // Sum up
   total += normalTotal + rareTotal;
 
-  // Update displays
+  // Update UI
   const count = normalImgs.length + rareImgs.length;
   priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
   countDisplay.textContent = `${count} / ${MAX_SLOTS} charms`;
 }
+
 
 // — drag/drop onto slots —
 function setupDragDrop() {
