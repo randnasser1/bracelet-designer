@@ -53,16 +53,24 @@ h1 {
   margin-bottom: 1rem;
 }
 .slot {
-  width: 60px;
-  height: 60px;
-  border: 2px solid #f5a0c2;
-  border-radius: 10px;
+  width: 8px;
+  height: 8px;
+  border: 1px dashed #f5a0c2;
+  border-radius: 3px;
   background: #ffe6f0;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
+
+.slot img,
+.charm-pool img {
+  width: 7px;
+  height: 7px;
+  object-fit: contain;
+}
+
 .slot.dragover {
   background: #ffd6e8;
   border-color: #ff85b3;
@@ -86,11 +94,7 @@ h1 {
   max-height: 200px;
   overflow-y: auto;
 }
-.charm-pool img, .slot img {
-  width: 50px;  /* Adjust the width to a consistent size */
-  height: 50px; /* Adjust the height to match the width */
-  object-fit: contain; /* Ensures the image fits without distortion */
-}
+
 .charm-pool img:active {
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
