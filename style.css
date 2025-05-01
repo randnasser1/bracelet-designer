@@ -1,87 +1,114 @@
-/* Bubblegum Theme */
+/* === Bubblegum Theme with Your Existing Sizes === */
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 body {
-  background-color: pink;
-  font-family: Arial, sans-serif;
-  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  background: #ffe6f0;
+  color: #333;
   margin: 0;
-  padding: 0;
+  padding: 2rem;
+  text-align: center;
 }
 
 h1 {
-  margin-top: 20px;
+  font-size: 2.5rem;
   color: #d6336c;
+  margin-bottom: 1rem;
 }
 
 .controls {
-  margin: 20px;
-}
-
-.bracelet {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 5px;
-  padding: 20px;
-  border: 2px dashed #d6336c;
-  margin: 0 auto;
-  max-width: 800px;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.controls label {
+  font-weight: 600;
+  color: #a61e4d;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn {
+  background: #ff85b3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn:hover {
+  background: #ff5fa3;
+}
+
+#bracelet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;                      /* your existing gap */
+  justify-content: center;
+  padding: 1rem;
+  border: 2px dashed #f5a0c2;
+  border-radius: 12px;
+  background: #fff0f5;
+  min-height: 120px;             /* your existing height */
+  margin-bottom: 1rem;
 }
 
 .slot {
-  width: 45px;
-  height: 45px;
-  border: 2px solid #ccc;
-  background-color: white;
+  width: 50px;                   /* your existing width */
+  height: 50px;                  /* your existing height */
+  border: 2px dashed #f5a0c2;
+  border-radius: 10px;
+  background: #ffe6f0;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-.slot img {
-  width: 40px !important;
-  height: 40px !important;
-  object-fit: contain;
-  display: block;
+.slot.dragover {
+  background: #ffd6e8;
+  border-color: #ff85b3;
+}
+
+.price-info {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+  font-weight: 600;
+  color: #d6336c;
 }
 
 .charm-pool {
   display: flex;
   flex-wrap: wrap;
+  gap: 10px;                     /* your existing pool gap */
   justify-content: center;
-  gap: 10px;
-  margin-top: 30px;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #fff0f5;
+  border: 1px solid #f5a0c2;
+  border-radius: 12px;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
+.slot img,
 .charm-pool img {
-  width: 40px !important;
-  height: 40px !important;
+  width: 40px;                   /* your existing charm size */
+  height: 40px;
   object-fit: contain;
   display: block;
-  cursor: grab;
 }
 
-img {
-  max-width: 100%;
-  height: auto;
+.slot img:active,
+.charm-pool img:active {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
 }
-
-.summary {
-  margin-top: 15px;
-  color: #333;
-}
-
-button {
-  background-color: #ff5f9e;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  margin: 5px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-button:hover {
-  background-color: #e5538c;
-}
-
