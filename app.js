@@ -62,29 +62,31 @@ function addCharmToBracelet(charmImg) {
 
 // — recalc total & count —
 function updatePrice() {
+  // Base price: silver=8, gold=9
   let total = goldToggle.checked ? 9 : 8;
-  let count = 0;
 
-  bracelet.querySelectorAll('.slot img').forEach(img => {
-    if (img.dataset.type !== 'base') {
-      total += parseFloat(img.dataset.price);
-      count++;
-    }
-  });
+  // Gather all placed charms
+  const placedImgs = Array.from(bracelet.querySelectorAll('.slot img'));
 
+  // Separate normal vs. rare
+  const normalImgs = placedImgs.filter(img => img.dataset.type === 'normal');
+  const rareImgs   = placedImgs.filter(img => img.dataset.type === 'rare');
+
+  // Compute normal charms cost: skip first 3
+  const normalPrices    = normalImgs.map(img => parseFloat(img.dataset.price));
+  const chargeableNorms = normalPrices.slice(3);            // everything after the first 3
+  const normalTotal     = chargeableNorms.reduce((sum, p) => sum + p, 0);
+
+  // Compute rare charms cost (all of them)
+  const rareTotal       = rareImgs.reduce((sum, img) => sum + parseFloat(img.dataset.price), 0);
+
+  // Add to base
+  total += normalTotal + rareTotal;
+
+  // Update displays
+  const count = normalImgs.length + rareImgs.length;
   priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
   countDisplay.textContent = `${count} / ${MAX_SLOTS} charms`;
-}
-
-// — gallery click delegation —
-function setupGalleryClicks() {
-  [charmPool, rareCharmPool].forEach(pool => {
-    pool.addEventListener('click', e => {
-      if (e.target.tagName === 'IMG') {
-        addCharmToBracelet(e.target);
-      }
-    });
-  });
 }
 
 // — drag/drop onto slots —
