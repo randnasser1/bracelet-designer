@@ -65,7 +65,23 @@ function updatePrice() {
   priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
   countDisplay.textContent = `${count} / ${MAX_SLOTS} charms`;
 }
+goldToggle.addEventListener('change', () => {
+  const base = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
 
+  bracelet
+    .querySelectorAll('.slot img')
+    .forEach(img => {
+      if (img.dataset.type === 'base') {
+        img.src   = base.src;
+        img.alt   = base.name;
+        img.title = base.name;
+        img.dataset.name = base.name;
+      }
+    });
+
+  // Now update the total (8→9 JDs base):
+  updatePrice();
+});
 // wire up clicks
 // grab gallery containers
 const charmPool      = document.getElementById('charmPool');
@@ -86,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeBracelet();
   setupGalleryClicks();
   setupDragDrop();
-  goldToggle.addEventListener('change', initializeBracelet);
+  
 });
 
 // drag/drop onto slots
