@@ -67,14 +67,27 @@ function updatePrice() {
 }
 
 // wire up clicks
-function bindCharmClicks() {
-  [...charmPool.children, ...rareCharmPool.children].forEach(img => {
-    img.draggable = true;
-    img.addEventListener('click', () => addCharmToBracelet(img));
-    img.addEventListener('dragstart', () => img.classList.add('dragging'));
-    img.addEventListener('dragend',   () => img.classList.remove('dragging'));
+// grab gallery containers
+const charmPool      = document.getElementById('charmPool');
+const rareCharmPool  = document.getElementById('rareCharmPool');
+
+// on any click inside either pool, if it's an IMG, add it:
+function setupGalleryClicks() {
+  [charmPool, rareCharmPool].forEach(pool => {
+    pool.addEventListener('click', e => {
+      if (e.target.tagName === 'IMG') {
+        addCharmToBracelet(e.target);
+      }
+    });
   });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  initializeBracelet();
+  setupGalleryClicks();
+  setupDragDrop();
+  goldToggle.addEventListener('change', initializeBracelet);
+});
 
 // drag/drop onto slots
 function setupDragDrop() {
