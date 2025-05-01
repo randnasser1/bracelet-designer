@@ -1,127 +1,166 @@
-// Select the charm container, bracelet container, and checkbox for gold
-const charmContainer = document.querySelector('.charm-pool');
-const rareCharmContainer = document.querySelector('.rare-charm-pool');
-const braceletContainer = document.getElementById('bracelet');
+// Get references to HTML elements
+const bracelet = document.getElementById('bracelet');
+const priceDisplay = document.getElementById('priceDisplay');
+const countDisplay = document.getElementById('countDisplay');
 const goldToggle = document.getElementById('goldToggle');
+const saveBtn = document.getElementById('saveBtn');
+const addSlotBtn = document.getElementById('addSlotBtn');
+const removeSlotBtn = document.getElementById('removeSlotBtn');
+const charmPool = document.querySelector('.charm-pool');
+const rareCharmPool = document.querySelector('.rare-charm-pool');
 
-// List of charm images (regular charms from your folder)
-const charmImages = [
-    'IMG_5957.png', 'IMG_5958.png', 'IMG_5959.png', 'IMG_5960.png',
-    'IMG_5961.png', 'IMG_5962.png', 'IMG_5963.png', 'IMG_5964.png',
-    'IMG_5965.png', 'IMG_5968.png', 'IMG_5969.png', 'IMG_5970.png',
-    'IMG_5971.png', 'IMG_5983.png', 'IMG_5992.png', 'IMG_5999.png',
-    'IMG_6001.png', 'IMG_6005.png', 'IMG_6009.png', 'IMG_6010.png',
-    'IMG_6011.png', 'IMG_6012.png', 'IMG_6013.png', 'IMG_6014.png',
-    'IMG_6016.png', 'IMG_6018.png', 'IMG_6019.png', 'IMG_6020.png',
-    'IMG_6021.png', 'IMG_6023.png', 'IMG_6024.png', 'IMG_6025.png',
-    'IMG_6028.png', 'IMG_6030.png', 'IMG_6031.png', 'IMG_6032.png'
-];
+// Base prices
+const basePrice = 8.00;  // Silver bracelet
+const goldPrice = 9.00;  // Gold bracelet
+const additionalPlainCharmPrice = 0.4;
+const specialCharmPrice = 1.5;
+const rareCharmPrice = 2.00; // Rare charm additional price
 
-// List of rare charms
-const rareCharmImages = [
-    'IMG_6035.png', 'IMG_6036.png', 'IMG_6038.png', 'IMG_6040.png',
-    'IMG_6041.png', 'IMG_6045.png', 'IMG_6049.png', 'IMG_6050.png',
-    'IMG_6052.png', 'IMG_6057.png', 'IMG_6060.png', 'IMG_6061.png'
-];
+// Charm storage
+let braceletSlots = [];
+let currentPrice = basePrice;
+let charmCount = 0;
 
-// Set base charm based on the gold toggle
-function getBaseCharm() {
-    return goldToggle.checked ? 'gold.png' : 'silver.png';
+// Define paths for charms
+const baseCharmPath = goldToggle.checked ? 'basecharms/gold.png' : 'basecharms/silver.png'; // Update base path based on gold toggle
+const rareCharmPath = 'rares/';  // Path to rare charms folder
+
+// Function to update price and slot count
+function updatePrice() {
+  priceDisplay.textContent = `Total: ${currentPrice.toFixed(2)} JDs`;
+  countDisplay.textContent = `${charmCount} / 18 charms`;
 }
 
-// Function to create and append charms to the charm container
-function loadCharms() {
-    charmImages.forEach(image => {
-        const charm = document.createElement('img');
-        charm.src = `charms/${image}`;
-        charm.alt = image.split('.')[0];
-        charm.classList.add('charm');
-        
-        // Add click event to each charm to add it to the bracelet
-        charm.addEventListener('click', function () {
-            const braceletCharm = charm.cloneNode();
-            braceletCharm.classList.add('bracelet-charm');
-            braceletContainer.appendChild(braceletCharm);
-            updatePricing();
-        });
-
-        charmContainer.appendChild(charm);
-    });
-}
-
-// Function to create and append rare charms to the rare charm container
-function loadRareCharms() {
-    rareCharmImages.forEach(image => {
-        const charm = document.createElement('img');
-        charm.src = `rares/${image}`;
-        charm.alt = image.split('.')[0];
-        charm.classList.add('charm');
-        
-        // Add click event to each rare charm to add it to the bracelet
-        charm.addEventListener('click', function () {
-            const braceletCharm = charm.cloneNode();
-            braceletCharm.classList.add('bracelet-charm');
-            braceletCharm.dataset.rare = 'true'; // Mark this as a rare charm
-            braceletContainer.appendChild(braceletCharm);
-            updatePricing();
-        });
-
-        rareCharmContainer.appendChild(charm);
-    });
-}
-
-// Function to add base charm slots to the bracelet
+// Function to add a base charm to a slot
 function addBaseCharmSlot() {
-    const baseCharm = getBaseCharm();
-    const slot = document.createElement('div');
-    slot.classList.add('slot');
-    const img = document.createElement('img');
-    img.src = `basecharms/${baseCharm}`;
-    slot.appendChild(img);
-    braceletContainer.appendChild(slot);
-    updatePricing();
+  const slot = document.createElement('div');
+  slot.classList.add('slot');
+  const img = document.createElement('img');
+  img.src = baseCharmPath;  // Use the correct path here
+  img.alt = "Base Charm";
+  slot.appendChild(img);
+  bracelet.appendChild(slot);
+  braceletSlots.push('base');  // Mark slot as a base charm
+  charmCount++;
+  currentPrice += basePrice;
+  updatePrice();
 }
 
-// Add the initial base charms to the bracelet (18 slots)
+// Function to add a rare charm to a slot
+function addRareCharmSlot(charmFile) {
+  const slot = document.createElement('div');
+  slot.classList.add('slot');
+  const img = document.createElement('img');
+  img.src = rareCharmPath + charmFile;  // Combine path and charm file
+  img.alt = "Rare Charm";
+  slot.appendChild(img);
+  bracelet.appendChild(slot);
+  braceletSlots.push('rare');  // Mark slot as a rare charm
+  charmCount++;
+  currentPrice += rareCharmPrice;
+  updatePrice();
+}
+
+// Function to remove a slot (either base or rare)
+function removeSlot() {
+  if (braceletSlots.length > 0) {
+    const lastSlot = braceletSlots.pop();
+    const lastSlotElement = bracelet.lastElementChild;
+    if (lastSlot === 'base') {
+      currentPrice -= basePrice;
+    } else if (lastSlot === 'rare') {
+      currentPrice -= rareCharmPrice;
+    }
+    bracelet.removeChild(lastSlotElement);
+    charmCount--;
+    updatePrice();
+  }
+}
+
+// Fill the bracelet with base charms (18 slots)
 function fillBraceletWithBaseCharms() {
-    for (let i = 0; i < 18; i++) {
-        addBaseCharmSlot();
-    }
-}
-
-// Event listener for adding a new charm slot
-document.getElementById('addSlotBtn').addEventListener('click', function () {
+  for (let i = 0; i < 18; i++) {
     addBaseCharmSlot();
-});
-
-// Event listener for removing a charm slot (if needed)
-document.getElementById('removeSlotBtn').addEventListener('click', function () {
-    if (braceletContainer.children.length > 0) {
-        braceletContainer.removeChild(braceletContainer.lastElementChild);
-    }
-    updatePricing();
-});
-
-// Function to update pricing info based on the bracelet's contents
-function updatePricing() {
-    const charmCount = braceletContainer.children.length;
-    let price = 8; // Start with the base price
-    let rareCount = 0;
-
-    // Calculate the price based on the charms and rare ones
-    for (let slot of braceletContainer.children) {
-        if (slot.classList.contains('bracelet-charm') && slot.dataset.rare === 'true') {
-            rareCount++;
-            price += 2; // +2 JDs for each rare charm
-        }
-    }
-
-    price += (charmCount - 18) * 0.4; // 0.4 JDs for each additional charm
-    document.getElementById('priceDisplay').innerText = `Total: ${price.toFixed(2)} JDs`;
-    document.getElementById('countDisplay').innerText = `${charmCount} / 18 charms`;
+  }
 }
 
-// Initial load of charms and base charms
-loadCharms();
-loadRareCharms();
+// Handle gold toggle change
+goldToggle.addEventListener('change', () => {
+  const isGold = goldToggle.checked;
+  const newBaseCharmPath = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+  const baseSlots = braceletSlots.filter(slot => slot === 'base');
+
+  // Clear the bracelet and re-add base charms with updated price
+  bracelet.innerHTML = '';
+  braceletSlots = [];
+  charmCount = 0;
+  currentPrice = isGold ? goldPrice : basePrice;
+
+  // Re-add base charms (with updated gold or silver base)
+  for (let i = 0; i < baseSlots.length; i++) {
+    addBaseCharmSlot();
+  }
+
+  updatePrice();
+});
+
+// Add event listener for the Add Slot button
+addSlotBtn.addEventListener('click', () => {
+  addBaseCharmSlot();  // Add a base charm when a new slot is added
+});
+
+// Add event listener for the Remove Slot button
+removeSlotBtn.addEventListener('click', () => {
+  removeSlot();  // Remove the last charm added
+});
+
+// Add event listener for saving the bracelet
+saveBtn.addEventListener('click', () => {
+  // Add saving functionality (like storing the design to local storage or backend)
+  alert("Bracelet saved!");
+});
+
+// Add charms to the gallery (Base Charms and Rare Charms)
+function addCharmToPool(charmFile, isRare = false) {
+  const img = document.createElement('img');
+  img.src = isRare ? rareCharmPath + charmFile : baseCharmPath;
+  img.alt = isRare ? "Rare Charm" : "Base Charm";
+  img.title = charmFile.split('.')[0];
+
+  img.addEventListener('click', () => {
+    if (isRare) {
+      addRareCharmSlot(charmFile);
+    } else {
+      addBaseCharmSlot();
+    }
+  });
+
+  return img;
+}
+
+// Add base and rare charms to the pool
+const baseCharmFiles = [
+  'ball.png', 'be-mine.png', 'heart.png', 'heart-eye.png', 'chess.png', 'daddys-girl.png', 'drama-queen.png', 
+  'c.png', 'juice.png', 'n.png', 'rich-guys.png', 'sexy.png', 'shit-happens.png', 'sports.png', 'star-blue.png', 
+  'star.png', 't.png', 'u.png'
+];
+
+const rareCharmFiles = [
+  'IMG_6035.png', 'IMG_6036.png', 'IMG_6038.png', 'IMG_6040.png', 'IMG_6041.png', 'IMG_6045.png', 
+  'IMG_6049.png', 'IMG_6050.png', 'IMG_6052.png', 'IMG_6057.png', 'IMG_6060.png', 'IMG_6061.png'
+];
+
+// Populate base charm pool
+baseCharmFiles.forEach(charmFile => {
+  const img = addCharmToPool(charmFile, false);
+  charmPool.appendChild(img);
+});
+
+// Populate rare charm pool
+rareCharmFiles.forEach(charmFile => {
+  const img = addCharmToPool(charmFile, true);
+  rareCharmPool.appendChild(img);
+});
+
+// Initially fill the bracelet with base charms
 fillBraceletWithBaseCharms();
