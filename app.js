@@ -6,8 +6,8 @@ const charmPool = document.getElementById('charmPool');
 const rareCharmPool = document.getElementById('rareCharmPool');
 
 const MAX_SLOTS = 18;
-const BASE_SILVER = { src: 'charms/silver-base.webp', name: 'Silver Base', price: 0 };
-const BASE_GOLD = { src: 'charms/gold-base.webp', name: 'Gold Base', price: 0 };
+const BASE_SILVER = { src: 'basecharms/silver.png', name: 'Silver Base', price: 0 };
+const BASE_GOLD = { src: 'basecharms/gold.png', name: 'Gold Base', price: 0 };
 
 // Initialize bracelet with 18 base charms
 function initializeBracelet() {
