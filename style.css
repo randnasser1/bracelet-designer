@@ -1,44 +1,158 @@
-/* Basic styles for the gallery and bracelet slots */
-
-/* Fix for charm gallery image size */
-.normal-charms img, .rare-charms img {
-    width: 40px; /* Adjust as needed */
-    height: 30px; /* Adjust as needed */
-    object-fit: cover; /* Ensures image is well-fitted */
-    margin: 5px; /* Add some space between charms */
-    cursor: pointer; /* Pointer cursor when hovering over charms */
+/* Bubblegum Theme */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #ffe6f0;
+  color: #333;
+  margin: 0;
+  padding: 2rem;
+  text-align: center;
 }
 
-/* Bracelet slot styling */
-.bracelet-slot {
-    width: 40px;
-    height: 30px;
-    border: 1px solid #ccc;
-    margin: 5px;
-    display: inline-block;
-    vertical-align: top;
-    position: relative;
-    overflow: hidden;
-    background-color: #f7f7f7;
+h1 {
+  font-size: 2.5rem;
+  color: #d6336c;
+  margin-bottom: 1rem;
 }
 
-/* Optional: styling for slots with charms */
-.bracelet-slot img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
-/* Optional: button style for adding charms */
-#addCharmButton {
-    padding: 10px 20px;
-    background-color: #ff6f91;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.controls label {
+  font-weight: 600;
+  color: #a61e4d;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
-#addCharmButton:hover {
-    background-color: #ff4a77;
+.btn {
+  background: #ff85b3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn:hover {
+  background: #ff5fa3;
+}
+
+#bracelet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  padding: 1rem;
+  border: 2px dashed #f5a0c2;
+  border-radius: 12px;
+  background: #fff0f5;
+  min-height: 120px;
+  margin-bottom: 1rem;
+}
+
+.slot {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #f5a0c2;
+  border-radius: 10px;
+  background: #ffe6f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.slot.dragover {
+  background: #ffd6e8;
+  border-color: #ff85b3;
+}
+
+.price-info {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+  font-weight: 600;
+  color: #d6336c;
+}
+
+.charm-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #fff0f5;
+  border: 1px solid #f5a0c2;
+  border-radius: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.charm-pool img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  cursor: grab;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.charm-pool img:active {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
+}
+
+.slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.dragging {
+  opacity: 0.5;
+  background: #ffd6e8;
+}
+
+/* Fix for dragged image */
+.charm-pool img.dragging {
+  opacity: 0.6;
+}
+
+.slot.empty {
+  background: #ffe6f0;
+  border-color: #f5a0c2;
+  cursor: pointer;
+}
+
+/* Hover effect on empty slots */
+.slot.empty:hover {
+  background: #ffd6e8;
+  border-color: #ff85b3;
+}
+
+.slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.slot img:active {
+  transform: scale(1.05);
+}
+
+.charm-pool img {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.charm-pool img:active {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
 }
