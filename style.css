@@ -2,8 +2,8 @@
 
 /* Fix for charm gallery image size */
 .normal-charms img, .rare-charms img {
-    width: 60px; /* Adjust as needed */
-    height: 60px; /* Adjust as needed */
+    width: 40px; /* Adjust as needed */
+    height: 30px; /* Adjust as needed */
     object-fit: cover; /* Ensures image is well-fitted */
     margin: 5px; /* Add some space between charms */
     cursor: pointer; /* Pointer cursor when hovering over charms */
