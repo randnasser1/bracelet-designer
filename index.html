@@ -111,6 +111,21 @@
       object-fit: contain;
     }
     
+    /* Styles for the rare charm gallery */
+    .rare-charm-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #fff0f5;
+      border: 1px solid #f5a0c2;
+      border-radius: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
   </style>
 </head>
 <body>
@@ -136,6 +151,11 @@
   <h2>Charm Gallery</h2>
   <div class="charm-pool">
     <!-- Charms will be dynamically added here -->
+  </div>
+
+  <h2>Rare Charms Gallery (+2 JDs)</h2>
+  <div class="rare-charm-pool">
+    <!-- Rare charms will be dynamically added here -->
   </div>
 
   
