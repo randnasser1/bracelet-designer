@@ -1,28 +1,29 @@
-// === app.js ===
-const bracelet       = document.getElementById('bracelet');
-const priceDisplay   = document.getElementById('priceDisplay');
-const countDisplay   = document.getElementById('countDisplay');
-const goldToggle     = document.getElementById('goldToggle');
-const charmPool      = document.getElementById('charmPool');
-const rareCharmPool  = document.getElementById('rareCharmPool');
+// grab everything
+const bracelet      = document.getElementById('bracelet');
+const goldToggle    = document.getElementById('goldToggle');
+const priceDisplay  = document.getElementById('priceDisplay');
+const countDisplay  = document.getElementById('countDisplay');
+const charmPool     = document.getElementById('charmPool');
+const rareCharmPool = document.getElementById('rareCharmPool');
 
-const MAX_SLOTS = 18;
+const MAX_SLOTS   = 18;
 const BASE_SILVER = { src: 'basecharms/silver.png', name: 'Silver Base', price: 0 };
 const BASE_GOLD   = { src: 'basecharms/gold.png',   name: 'Gold Base',   price: 0 };
 
-// build slots with class "slot"
+// (Re)build the 18 slots
 function initializeBracelet() {
   bracelet.innerHTML = '';
-  const base = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
+  const baseCharm = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
 
   for (let i = 0; i < MAX_SLOTS; i++) {
     const slot = document.createElement('div');
     slot.className = 'slot empty';
 
     const img = document.createElement('img');
-    img.src        = base.src;
-    img.alt        = base.name;
-    img.dataset.name  = base.name;
+    img.src         = baseCharm.src;
+    img.alt         = baseCharm.name;
+    img.title       = baseCharm.name;
+    img.dataset.name  = baseCharm.name;
     img.dataset.price = '0';
     img.dataset.type  = 'base';
 
@@ -33,7 +34,7 @@ function initializeBracelet() {
   updatePrice();
 }
 
-// add charm on click
+// add a clicked or dragged charm into the first empty slot
 function addCharmToBracelet(charmImg) {
   const slots = bracelet.querySelectorAll('.slot');
   for (const slot of slots) {
@@ -51,7 +52,7 @@ function addCharmToBracelet(charmImg) {
   alert('All slots are filled!');
 }
 
-// price & count
+// recalc total & count
 function updatePrice() {
   let total = goldToggle.checked ? 9 : 8;
   let count = 0;
@@ -65,15 +66,17 @@ function updatePrice() {
   countDisplay.textContent = `${count} / ${MAX_SLOTS} charms`;
 }
 
-// bind clicks
+// wire up clicks
 function bindCharmClicks() {
   [...charmPool.children, ...rareCharmPool.children].forEach(img => {
-    img.addEventListener('click', () => addCharmToBracelet(img));
     img.draggable = true;
+    img.addEventListener('click', () => addCharmToBracelet(img));
+    img.addEventListener('dragstart', () => img.classList.add('dragging'));
+    img.addEventListener('dragend',   () => img.classList.remove('dragging'));
   });
 }
 
-// drag/drop
+// drag/drop onto slots
 function setupDragDrop() {
   bracelet.addEventListener('dragover', e => {
     if (e.target.classList.contains('slot')) {
@@ -91,7 +94,7 @@ function setupDragDrop() {
       e.preventDefault();
       const dragImg = document.querySelector('img.dragging');
       if (dragImg && e.target.classList.contains('empty')) {
-        e.target.classList.remove('empty', 'dragover');
+        e.target.classList.remove('empty','dragover');
         e.target.innerHTML = '';
         e.target.appendChild(dragImg);
         dragImg.classList.remove('dragging');
@@ -99,16 +102,12 @@ function setupDragDrop() {
       }
     }
   });
-  document.querySelectorAll('.charm-pool img').forEach(img => {
-    img.addEventListener('dragstart', () => img.classList.add('dragging'));
-    img.addEventListener('dragend',   () => img.classList.remove('dragging'));
-  });
 }
 
-// events
-goldToggle.addEventListener('change', initializeBracelet);
+// when the page loads…
 document.addEventListener('DOMContentLoaded', () => {
   initializeBracelet();
   bindCharmClicks();
   setupDragDrop();
+  goldToggle.addEventListener('change', initializeBracelet);
 });
