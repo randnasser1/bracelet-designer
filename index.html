@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Italian Charm Bracelet Designer</title>
+  <title>Bubblegum Charm Bracelet Designer</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     /* Bubblegum Theme */
@@ -93,7 +93,6 @@
       max-height: 200px;
       overflow-y: auto;
     }
-    
     .charm-pool img {
       width: 50px;
       height: 50px;
@@ -110,8 +109,6 @@
       height: 100%;
       object-fit: contain;
     }
-    
-    /* Styles for the rare charm gallery */
     .rare-charm-pool {
       display: flex;
       flex-wrap: wrap;
@@ -125,7 +122,6 @@
       max-height: 200px;
       overflow-y: auto;
     }
-    
   </style>
 </head>
 <body>
@@ -149,17 +145,16 @@
   <div class="price-info" id="countDisplay">0 / 18 charms</div>
 
   <h2>Charm Gallery</h2>
-  <div class="charm-pool">
-    <!-- Charms will be dynamically added here -->
+  <div class="charm-pool" id="charmPool">
+    <!-- Base Charms (Gold or Silver based on selection) -->
   </div>
 
-  <h2>Rare Charms Gallery (+2 JDs)</h2>
-  <div class="rare-charm-pool">
-    <!-- Rare charms will be dynamically added here -->
+  <h2>Rare Charm Gallery</h2>
+  <div class="rare-charm-pool" id="rareCharmPool">
+    <!-- Rare Charms -->
   </div>
 
-  
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-<script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
