@@ -1,5 +1,3 @@
-/* === Bubblegum Theme with Your Existing Sizes === */
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 body {
@@ -48,36 +46,41 @@ h1 {
   background: #ff5fa3;
 }
 
+/* Bracelet container */
 #bracelet {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;                      /* your existing gap */
+  gap: 5px;
   justify-content: center;
   padding: 1rem;
   border: 2px dashed #f5a0c2;
   border-radius: 12px;
   background: #fff0f5;
-  min-height: 120px;             /* your existing height */
+  min-height: 120px;
   margin-bottom: 1rem;
 }
 
-.slot {
-  width: 50px;                   /* your existing width */
-  height: 50px;                  /* your existing height */
+/* Slots: whether JS gives them class "slot" or "bracelet-slot" */
+.slot,
+.bracelet-slot {
+  width: 50px;
+  height: 50px;
   border: 2px dashed #f5a0c2;
   border-radius: 10px;
-  background: #ffe6f0;
-  display: flex;
+  background: transparent;     /* make slot itself transparent */
+  display: flex;               /* center child img */
   align-items: center;
   justify-content: center;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-.slot.dragover {
+.slot.dragover,
+.bracelet-slot.dragover {
   background: #ffd6e8;
   border-color: #ff85b3;
 }
 
+/* Price/info text */
 .price-info {
   font-size: 1.2rem;
   margin: 0.5rem 0;
@@ -85,10 +88,13 @@ h1 {
   color: #d6336c;
 }
 
-.charm-pool {
+/* Charm galleries */
+.charm-pool,
+.normal-charms,
+.rare-charms {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;                     /* your existing pool gap */
+  gap: 10px;
   justify-content: center;
   margin-top: 2rem;
   padding: 1rem;
@@ -99,16 +105,30 @@ h1 {
   overflow-y: auto;
 }
 
+/* Shrink ALL charm imgs to 40px */
 .slot img,
-.charm-pool img {
-  width: 40px;                   /* your existing charm size */
-  height: 40px;
+.bracelet-slot img,
+.charm-pool img,
+.normal-charms img,
+.rare-charms img {
+  width: 40px !important;
+  height: 40px !important;
   object-fit: contain;
   display: block;
 }
 
+/* Active tap/click effect */
 .slot img:active,
-.charm-pool img:active {
+.bracelet-slot img:active,
+.charm-pool img:active,
+.normal-charms img:active,
+.rare-charms img:active {
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
+}
+
+/* Catch-all images */
+img {
+  max-width: 100%;
+  height: auto;
 }
