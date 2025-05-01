@@ -16,7 +16,7 @@ function initializeBracelet() {
 
   for (let i = 0; i < MAX_SLOTS; i++) {
     const slot = document.createElement('div');
--   slot.className = 'bracelet-slot empty';
+-   slot.className = 'slot empty';
 +   slot.className = 'slot empty';
 
     const img = document.createElement('img');
@@ -33,7 +33,7 @@ function initializeBracelet() {
 
 // Add clicked charm to first non-base slot
 function addCharmToBracelet(charmImg) {
-  const slots = bracelet.querySelectorAll('.bracelet-slot');
+  const slots = bracelet.querySelectorAll('.slot');
 
   for (const slot of slots) {
     const img = slot.querySelector('img');
@@ -63,7 +63,7 @@ function updatePrice() {
   let total = isGold ? 9 : 8;
   let count = 0;
 
-  bracelet.querySelectorAll('.bracelet-slot img').forEach(img => {
+  bracelet.querySelectorAll('.slot img').forEach(img => {
     const type = img.dataset.type;
     const price = parseFloat(img.dataset.price || '0');
     if (type !== 'base') {
@@ -135,8 +135,8 @@ addEventListener('DOMContentLoaded', () => {
   const addCharmButton = document.getElementById('addCharmButton');
   addCharmButton.addEventListener('click', function () {
     const firstCharm = document.querySelector('.normal-charms img'); 
-    for (let i = 0; i < bracelet.querySelectorAll('.bracelet-slot').length; i++) {
-      const slot = bracelet.querySelectorAll('.bracelet-slot')[i];
+    for (let i = 0; i < bracelet.querySelectorAll('.slot').length; i++) {
+      const slot = bracelet.querySelectorAll('.slot')[i];
       if (!slot.querySelector('img')) {
         const charmClone = firstCharm.cloneNode(true);
         slot.appendChild(charmClone);
