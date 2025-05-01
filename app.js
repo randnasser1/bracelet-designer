@@ -17,7 +17,7 @@ function initializeBracelet() {
 
   for (let i = 0; i < MAX_SLOTS; i++) {
     const slot = document.createElement('div');
-    slot.className = 'bracelet-slot';
+    slot.className = 'bracelet-slot empty'; // Ensuring it starts as empty
 
     const img = document.createElement('img');
     img.src = baseCharm.src;
@@ -51,6 +51,7 @@ function addCharmToBracelet(charmImg) {
 
       slot.innerHTML = '';
       slot.appendChild(newImg);
+      slot.classList.remove('empty'); // Mark slot as filled
       updatePrice();
       return;
     }
@@ -92,6 +93,47 @@ goldToggle.addEventListener('change', initializeBracelet);
 initializeBracelet();
 bindCharmClicks();
 
+// Handle drag-and-drop functionality for charms
+const charmImages = document.querySelectorAll('.charm-pool img');
+
+charmImages.forEach(img => {
+  img.addEventListener('dragstart', () => {
+    img.classList.add('dragging');
+  });
+
+  img.addEventListener('dragend', () => {
+    img.classList.remove('dragging');
+  });
+});
+
+// Handling dragover for slots
+const slots = document.querySelectorAll('.bracelet-slot');
+
+slots.forEach(slot => {
+  slot.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    slot.classList.add('dragover');
+  });
+
+  slot.addEventListener('dragleave', () => {
+    slot.classList.remove('dragover');
+  });
+
+  slot.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const draggedImg = document.querySelector('.dragging');
+    if (draggedImg && slot.classList.contains('empty')) {
+      slot.innerHTML = '';
+      slot.appendChild(draggedImg);
+      draggedImg.classList.remove('dragging');
+      slot.classList.remove('dragover');
+      slot.classList.remove('empty'); // Mark slot as filled
+      updatePrice();
+    }
+  });
+});
+
+// Optional button for adding charms
 addEventListener('DOMContentLoaded', () => {
   const addCharmButton = document.getElementById('addCharmButton');
   addCharmButton.addEventListener('click', function () {
