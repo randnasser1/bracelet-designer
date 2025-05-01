@@ -132,23 +132,24 @@ function setupDragDrop() {
 // — swap base images on toggle without clearing user charms —
 function setupGoldToggle() {
   goldToggle.addEventListener('change', () => {
-    const base = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
-    bracelet.querySelectorAll('.slot img').forEach(img => {
-      if (img.dataset.type === 'base') {
-        img.src         = base.src;
-        img.alt         = base.name;
-        img.title       = base.name;
-        img.dataset.name  = base.name;
-      }
-    });
-    updatePrice();
+  const base = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
+  bracelet.querySelectorAll('.slot img').forEach(img => {
+    if (img.dataset.type === 'base') {
+      img.src   = base.src;
+      img.alt   = base.name;
+      img.title = base.name;
+      img.dataset.name = base.name;
+    }
   });
+  updatePrice();
+});
+
 }
 
 // — wire it all up on page load —
 document.addEventListener('DOMContentLoaded', () => {
   initializeBracelet();
-  setupGalleryClicks();
-  setupDragDrop();
-  setupGoldToggle();
+  setupGalleryClicks();  // click‐to‐add
+  setupDragDrop();       // drag/drop
+  // goldToggle listener is already bound above
 });
