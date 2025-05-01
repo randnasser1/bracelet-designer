@@ -11,7 +11,7 @@ body {
 }
 
 h1 {
-  font-size: 2.5rem;
+  font-size: 2rem; /* Slightly smaller heading */
   color: #d6336c;
   margin-bottom: 1rem;
 }
@@ -37,7 +37,7 @@ h1 {
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 0.6rem 1.2rem;
+  padding: 0.5rem 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -50,21 +50,23 @@ h1 {
 #bracelet {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px; /* smaller gap */
+  gap: 2px; /* reduced gap */
   justify-content: center;
   padding: 1rem;
   border: 2px dashed #f5a0c2;
   border-radius: 12px;
   background: #fff0f5;
-  min-height: 100px; /* reduced height */
+  min-height: 80px; /* even smaller height */
   margin-bottom: 1rem;
+  max-width: 360px; /* limiting max width */
+  margin: 0 auto; /* Centering */
 }
 
 .slot {
-  width: 40px; /* reduced width */
-  height: 40px; /* reduced height */
+  width: 30px; /* reduced width */
+  height: 30px; /* reduced height */
   border: 2px dashed #f5a0c2;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #ffe6f0;
   display: flex;
   align-items: center;
@@ -78,7 +80,7 @@ h1 {
 }
 
 .price-info {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   margin: 0.5rem 0;
   font-weight: 600;
   color: #d6336c;
@@ -87,20 +89,20 @@ h1 {
 .charm-pool {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px; /* reduced gap */
+  gap: 5px; /* smaller gap between charms */
   justify-content: center;
   margin-top: 2rem;
   padding: 1rem;
   background: #fff0f5;
   border: 1px solid #f5a0c2;
   border-radius: 12px;
-  max-height: 150px; /* reduced max height */
+  max-height: 150px;
   overflow-y: auto;
 }
 
 .charm-pool img {
-  width: 40px; /* reduced width */
-  height: 40px; /* reduced height */
+  width: 30px; /* reduced width */
+  height: 30px; /* reduced height */
   object-fit: contain;
   cursor: grab;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
