@@ -50,7 +50,7 @@
     #bracelet {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px; /* adjusted gap size */
+      gap: 5px;
       justify-content: center;
       padding: 1rem;
       border: 2px dashed #f5a0c2;
@@ -60,8 +60,8 @@
       margin-bottom: 1rem;
     }
     .slot {
-      width: 50px; /* adjusted width */
-      height: 50px; /* adjusted height */
+      width: 50px;
+      height: 50px;
       border: 2px dashed #f5a0c2;
       border-radius: 10px;
       background: #ffe6f0;
@@ -93,17 +93,12 @@
       max-height: 200px;
       overflow-y: auto;
     }
-    .slot img {
-  width: 40px; /* Ensure consistent charm size within the slots */
-  height: 40px; /* Ensure consistent charm size within the slots */
-  object-fit: contain;
-}
-
-.charm-pool img {
-  width: 40px; /* Consistent charm size in the pool */
-  height: 40px; /* Consistent charm size in the pool */
-}
-
+    .slot img,
+    .charm-pool img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
     .charm-pool img:active {
       transform: scale(1.1);
       box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
@@ -124,7 +119,6 @@
   </div>
 
   <div id="bracelet">
-    <!-- 18 base silver charms by default -->
     <script>
       for (let i = 0; i < 18; i++) {
         document.write(`<div class="slot" data-base="true"><img src="basecharms/silver.png" alt="Silver Charm" data-name="silver" data-price="0" data-type="base"></div>`);
