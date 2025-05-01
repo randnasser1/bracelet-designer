@@ -50,18 +50,18 @@
     #bracelet {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px; /* adjusted gap size */
+      gap: 4px; /* smaller gap */
       justify-content: center;
       padding: 1rem;
       border: 2px dashed #f5a0c2;
       border-radius: 12px;
       background: #fff0f5;
-      min-height: 120px;
+      min-height: 100px; /* reduced height */
       margin-bottom: 1rem;
     }
     .slot {
-      width: 50px; /* adjusted width */
-      height: 50px; /* adjusted height */
+      width: 40px; /* reduced width */
+      height: 40px; /* reduced height */
       border: 2px dashed #f5a0c2;
       border-radius: 10px;
       background: #ffe6f0;
@@ -83,19 +83,19 @@
     .charm-pool {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px; /* reduced gap */
       justify-content: center;
       margin-top: 2rem;
       padding: 1rem;
       background: #fff0f5;
       border: 1px solid #f5a0c2;
       border-radius: 12px;
-      max-height: 200px;
+      max-height: 150px; /* reduced max height */
       overflow-y: auto;
     }
     .charm-pool img {
-      width: 50px; /* adjusted width */
-      height: 50px; /* adjusted height */
+      width: 40px; /* reduced width */
+      height: 40px; /* reduced height */
       object-fit: contain;
       cursor: grab;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -108,7 +108,7 @@
 </head>
 <body>
 
-  <h1>Italian Bracelet Designer</h1>
+  <h1>Bubblegum Bracelet Designer</h1>
 
   <div class="controls">
     <label>
@@ -119,18 +119,10 @@
     <button class="btn" id="removeSlotBtn">Remove Charm</button>
   </div>
 
-  <div id="bracelet">
-    <!-- 18 base silver charms by default -->
-    <script>
-      for (let i = 0; i < 18; i++) {
-        document.write(`<div class="slot" data-base="true"><img src="basecharms/silver.png" alt="Silver Charm" data-name="silver" data-price="0" data-type="base"></div>`);
-      }
-    </script>
-  </div>
+  <div id="bracelet"><!-- slots injected by script.js --></div>
 
   <div class="price-info" id="priceDisplay">Total: 8.00 JDs</div>
   <div class="price-info" id="countDisplay">0 / 18 charms</div>
-
 
   <!-- Normal Charms -->
   <div class="normal-charms">
