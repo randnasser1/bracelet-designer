@@ -1,137 +1,89 @@
-const bracelet      = document.getElementById('bracelet');
-const goldToggle    = document.getElementById('goldToggle');
-const priceDisplay  = document.getElementById('priceDisplay');
-const countDisplay  = document.getElementById('countDisplay');
-const charmPool     = document.getElementById('charmPool');
-const rareCharmPool = document.getElementById('rareCharmPool');
+<script>
+  const bracelet = document.getElementById("bracelet");
+  const priceDisplay = document.getElementById("priceDisplay");
+  const countDisplay = document.getElementById("countDisplay");
+  const goldToggle = document.getElementById("goldToggle");
 
-const MAX_SLOTS   = 18;
-const BASE_SILVER = { src: 'basecharms/silver.png', name: 'Silver Base', price: 0 };
-const BASE_GOLD   = { src: 'basecharms/gold.png',   name: 'Gold Base',   price: 0 };
+  const BASE_SILVER = { src: "basecharms/silver.png", name: "silver", price: 0, type: "base" };
+  const BASE_GOLD = { src: "basecharms/gold.png", name: "gold", price: 1, type: "base" };
+  const BRACELET_BASE_PRICE = { silver: 8.0, gold: 9.0 };
+  const MAX_SLOTS = 18;
 
-function initializeBracelet() {
-  bracelet.innerHTML = '';
-  const base = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
-  for (let i = 0; i < MAX_SLOTS; i++) {
-    const slot = document.createElement('div');
-    slot.className = 'slot empty';
-
-    const img = document.createElement('img');
-    img.src = base.src;
-    img.alt = base.name;
-    img.title = base.name;
-    img.dataset.name = base.name;
-    img.dataset.price = '0';
-    img.dataset.type = 'base';
-
-    slot.appendChild(img);
-    bracelet.appendChild(slot);
+  function getCharmData(img) {
+    return {
+      src: img.src,
+      name: img.dataset.name,
+      price: parseFloat(img.dataset.price),
+      type: img.dataset.type,
+    };
   }
-  updatePrice();
-}
 
-function addCharmToBracelet(charmImg) {
-  const slots = bracelet.querySelectorAll('.slot');
-  for (const slot of slots) {
-    const img = slot.querySelector('img');
-    if (img.dataset.type === 'base') {
-      const newImg = charmImg.cloneNode();
-      newImg.dataset.type  = charmImg.dataset.type;
-      newImg.dataset.price = charmImg.dataset.price;
-      newImg.alt           = charmImg.alt;
-      newImg.title         = charmImg.title;
+  function updatePriceAndCount() {
+    let total = goldToggle.checked ? BRACELET_BASE_PRICE.gold : BRACELET_BASE_PRICE.silver;
+    let count = 0;
 
-      slot.innerHTML = '';
-      slot.appendChild(newImg);
-      slot.classList.remove('empty');
-      updatePrice();
-      return;
-    }
-  }
-  alert('All slots are filled!');
-}
-
-function setupGalleryClicks() {
-  [charmPool, rareCharmPool].forEach(pool => {
-    pool.querySelectorAll('img').forEach(img => {
-      img.addEventListener('click', () => addCharmToBracelet(img));
-    });
-  });
-}
-
-function updatePrice() {
-  let total = goldToggle.checked ? 9 : 8;
-  const placed = Array.from(bracelet.querySelectorAll('.slot img'));
-  const normalImgs = placed.filter(img => img.dataset.type === 'normal');
-  const rareImgs   = placed.filter(img => img.dataset.type === 'rare');
-
-  const normalPrices = normalImgs.map(img => parseFloat(img.dataset.price));
-  const chargeableNormals = normalPrices.slice(3);
-  const normalTotal = chargeableNormals.reduce((sum, p) => sum + p, 0);
-  const rareTotal = rareImgs.reduce((sum, img) => sum + parseFloat(img.dataset.price), 0);
-
-  total += normalTotal + rareTotal;
-  const count = normalImgs.length + rareImgs.length;
-  priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
-  countDisplay.textContent = `${count} / ${MAX_SLOTS} charms`;
-}
-
-function setupDragDrop() {
-  [charmPool, rareCharmPool].forEach(pool => {
-    pool.querySelectorAll('img').forEach(img => {
-      img.draggable = true;
-      img.addEventListener('dragstart', () => img.classList.add('dragging'));
-      img.addEventListener('dragend', () => img.classList.remove('dragging'));
-    });
-  });
-
-  bracelet.addEventListener('dragover', e => {
-    if (e.target.classList.contains('slot')) {
-      e.preventDefault();
-      e.target.classList.add('dragover');
-    }
-  });
-
-  bracelet.addEventListener('dragleave', e => {
-    if (e.target.classList.contains('slot')) {
-      e.target.classList.remove('dragover');
-    }
-  });
-
-  bracelet.addEventListener('drop', e => {
-    if (e.target.classList.contains('slot')) {
-      e.preventDefault();
-      const dragImg = document.querySelector('img.dragging');
-      if (dragImg && e.target.classList.contains('empty')) {
-        const clone = dragImg.cloneNode();
-        clone.classList.remove('dragging');
-        e.target.innerHTML = '';
-        e.target.appendChild(clone);
-        e.target.classList.remove('empty', 'dragover');
-        updatePrice();
+    document.querySelectorAll("#bracelet .slot img").forEach((img) => {
+      const type = img.dataset.type;
+      if (type === "plain" || type === "special" || type === "rare") {
+        total += parseFloat(img.dataset.price);
+        count++;
       }
-    }
-  });
-}
+    });
 
-function setupGoldToggle() {
-  goldToggle.addEventListener('change', () => {
+    priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
+    countDisplay.textContent = `${count} / ${MAX_SLOTS} charms`;
+  }
+
+  function addSlot() {
+    const currentSlots = bracelet.querySelectorAll(".slot").length;
+    if (currentSlots < MAX_SLOTS) {
+      const slot = document.createElement("div");
+      slot.className = "slot";
+      slot.dataset.base = "true";
+      const base = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
+      slot.innerHTML = `<img src="${base.src}" alt="${base.name}" data-name="${base.name}" data-price="${base.price}" data-type="base">`;
+      bracelet.appendChild(slot);
+      updatePriceAndCount();
+    }
+  }
+
+  function removeSlot() {
+    const slots = bracelet.querySelectorAll(".slot");
+    if (slots.length > 0) {
+      slots[slots.length - 1].remove();
+      updatePriceAndCount();
+    }
+  }
+
+  function applyGoldToggle() {
     const base = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
-    bracelet.querySelectorAll('.slot img').forEach(img => {
-      if (img.dataset.type === 'base') {
+    bracelet.querySelectorAll(".slot").forEach((slot) => {
+      const img = slot.querySelector("img");
+      if (img.dataset.type === "base") {
         img.src = base.src;
         img.alt = base.name;
-        img.title = base.name;
         img.dataset.name = base.name;
+        img.dataset.price = base.price;
+        img.dataset.type = "base";
       }
     });
-    updatePrice();
-  });
-}
+    updatePriceAndCount();
+  }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initializeBracelet();
-  setupGalleryClicks();
-  setupDragDrop();
-  setupGoldToggle();
-});
+  function saveBracelet() {
+    const data = Array.from(bracelet.querySelectorAll(".slot img")).map((img) => ({
+      name: img.dataset.name,
+      price: img.dataset.price,
+      type: img.dataset.type,
+    }));
+    localStorage.setItem("savedBracelet", JSON.stringify(data));
+    alert("Bracelet saved!");
+  }
+
+  document.getElementById("addSlotBtn").addEventListener("click", addSlot);
+  document.getElementById("removeSlotBtn").addEventListener("click", removeSlot);
+  document.getElementById("saveBtn").addEventListener("click", saveBracelet);
+  goldToggle.addEventListener("change", applyGoldToggle);
+
+  updatePriceAndCount();
+</script>
