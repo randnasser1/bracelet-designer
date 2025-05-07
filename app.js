@@ -1,99 +1,112 @@
 document.addEventListener('DOMContentLoaded', () => {
-  let totalPrice = 8.00; // Starting price with the silver bracelet base
-  let charmCount = 0;
-
   const priceDisplay = document.getElementById('priceDisplay');
   const countDisplay = document.getElementById('countDisplay');
   const braceletSlots = document.querySelectorAll('.slot');
-  const charmPool = document.getElementById('charm-pool'); // Updated to match HTML
-  const rareCharmPool = document.getElementById('rare-charm-pool'); // Updated to match HTML
-  const goldToggle = document.getElementById('gold-toggle'); // Updated to match HTML
-  const addSlotBtn = document.getElementById('add-slot-btn'); // Updated to match HTML
-  const removeSlotBtn = document.getElementById('remove-slot-btn'); // Updated to match HTML
-  const saveBtn = document.getElementById('save-btn'); // Updated to match HTML
+  const charmPool = document.getElementById('charm-pool');
+  const rareCharmPool = document.getElementById('rare-charm-pool');
+  const goldToggle = document.getElementById('gold-toggle');
+  const addSlotBtn = document.getElementById('add-slot-btn');
+  const removeSlotBtn = document.getElementById('remove-slot-btn');
+  const saveBtn = document.getElementById('save-btn');
 
-  // Helper function to update price display
+  let basePrice = 8.00; // Silver bracelet base
+  let charmCount = 0;
+  let totalPrice = basePrice;
+
+  // Initialize with filled slots from HTML
+  braceletSlots.forEach(slot => {
+    const charm = slot.querySelector('img');
+    if (charm) {
+      charmCount += 1;
+      const price = parseFloat(charm.getAttribute('data-price')) || 0;
+      totalPrice += price;
+    }
+  });
+
   const updatePrice = () => {
     priceDisplay.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
     countDisplay.textContent = `${charmCount} / 18 charms`;
   };
 
-  // Helper function to update the bracelet with a new charm
-  const updateBracelet = (charm) => {
-    const slot = document.querySelector('.slot.dragover');
-    if (slot) {
-      // Ensure slot is empty before adding a new charm
-      if (!slot.innerHTML) {
-        const img = charm.cloneNode();
-        slot.innerHTML = '';
-        slot.appendChild(img);
-        charmCount += 1;
-        totalPrice += parseFloat(charm.getAttribute('data-price'));
-        updatePrice();
-      }
+  const updateBracelet = (charm, targetSlot) => {
+    if (!targetSlot.innerHTML && charmCount < 18) {
+      const img = charm.cloneNode();
+      targetSlot.appendChild(img);
+      charmCount += 1;
+      totalPrice += parseFloat(img.getAttribute('data-price')) || 0;
+      updatePrice();
     }
   };
 
-  // Function to handle gold/silver toggle
   goldToggle.addEventListener('change', (e) => {
-    if (e.target.checked) {
-      totalPrice += 1; // Gold bracelet upgrade price
-    } else {
-      totalPrice -= 1; // Remove gold price if switching back to silver
-    }
+    const isGold = e.target.checked;
+    basePrice = isGold ? 9.00 : 8.00;
+    recalculateTotal();
+  });
+
+  const recalculateTotal = () => {
+    totalPrice = basePrice;
+    charmCount = 0;
+
+    braceletSlots.forEach(slot => {
+      const charm = slot.querySelector('img');
+      if (charm) {
+        charmCount += 1;
+        totalPrice += parseFloat(charm.getAttribute('data-price')) || 0;
+      }
+    });
+
     updatePrice();
-  });
+  };
 
-  // Function to handle charm pool interaction
   charmPool.addEventListener('click', (e) => {
-    const charm = e.target;
-    if (charm.tagName === 'IMG') {
-      updateBracelet(charm);
+    if (e.target.tagName === 'IMG') {
+      const slot = Array.from(braceletSlots).find(s => !s.innerHTML);
+      if (slot) updateBracelet(e.target, slot);
     }
   });
 
-  // Function to handle rare charm pool interaction
   rareCharmPool.addEventListener('click', (e) => {
-    const charm = e.target;
-    if (charm.tagName === 'IMG') {
-      updateBracelet(charm);
+    if (e.target.tagName === 'IMG') {
+      const slot = Array.from(braceletSlots).find(s => !s.innerHTML);
+      if (slot) updateBracelet(e.target, slot);
     }
   });
 
-  // Add a slot button functionality (to dynamically add a charm slot)
   addSlotBtn.addEventListener('click', () => {
     if (charmCount < 18) {
-      // Find an empty slot to add charm
-      const emptySlot = Array.from(braceletSlots).find((slot) => !slot.innerHTML);
+      const emptySlot = Array.from(braceletSlots).find(slot => !slot.innerHTML);
       if (emptySlot) {
-        emptySlot.innerHTML = `<img src="basecharms/silver.png" alt="Silver Charm" data-name="silver" data-price="0" data-type="base" draggable="false">`;
+        const silverCharm = document.createElement('img');
+        silverCharm.src = 'basecharms/silver.png';
+        silverCharm.alt = 'Silver Charm';
+        silverCharm.setAttribute('data-name', 'silver');
+        silverCharm.setAttribute('data-price', '0');
+        silverCharm.setAttribute('data-type', 'base');
+        silverCharm.draggable = false;
+        emptySlot.appendChild(silverCharm);
         charmCount += 1;
-        totalPrice += 0; // Adding silver base charm doesn't change price
         updatePrice();
       }
     }
   });
 
-  // Remove a slot button functionality (to dynamically remove a charm slot)
   removeSlotBtn.addEventListener('click', () => {
-    if (charmCount > 0) {
-      // Find a non-empty slot to remove charm
-      const filledSlot = Array.from(braceletSlots).find((slot) => slot.innerHTML);
-      if (filledSlot) {
-        filledSlot.innerHTML = ''; // Empty the slot
-        charmCount -= 1;
-        totalPrice -= parseFloat(filledSlot.firstChild.getAttribute('data-price')); // Subtract price of removed charm
-        updatePrice();
-      }
+    const filledSlot = Array.from(braceletSlots).reverse().find(slot => slot.innerHTML);
+    if (filledSlot) {
+      const price = parseFloat(filledSlot.firstChild?.getAttribute('data-price')) || 0;
+      filledSlot.innerHTML = '';
+      charmCount -= 1;
+      totalPrice -= price;
+      updatePrice();
     }
   });
 
-  // Save button functionality to show a simple alert with bracelet status
   saveBtn.addEventListener('click', () => {
     alert(`Your bracelet has been saved! Total price: ${totalPrice.toFixed(2)} JDs`);
   });
 
-  // Drag and drop interaction for charm slots
+  // Drag and Drop
   braceletSlots.forEach((slot) => {
     slot.addEventListener('dragover', (e) => {
       e.preventDefault();
@@ -106,23 +119,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     slot.addEventListener('drop', (e) => {
       e.preventDefault();
-      const charm = e.dataTransfer.getData('charm');
-      const selectedCharm = document.querySelector(`[data-name="${charm}"]`);
-      if (selectedCharm) {
-        updateBracelet(selectedCharm);
-        slot.classList.remove('dragover');
+      slot.classList.remove('dragover');
+      const charmHTML = e.dataTransfer.getData('text/html');
+      if (!slot.innerHTML && charmHTML) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = charmHTML;
+        const charm = tempDiv.firstChild;
+        updateBracelet(charm, slot);
       }
     });
   });
 
-  // Add event listeners for charm images to handle drag and drop
-  const charmImages = document.querySelectorAll('.charm-pool img'); // Updated to match HTML
-  charmImages.forEach((charm) => {
+  document.querySelectorAll('#charm-pool img, #rare-charm-pool img').forEach((charm) => {
     charm.addEventListener('dragstart', (e) => {
-      e.dataTransfer.setData('charm', charm.getAttribute('data-name'));
+      e.dataTransfer.setData('text/html', charm.outerHTML);
     });
   });
 
-  // Initialize the price display
   updatePrice();
 });
