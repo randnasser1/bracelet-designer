@@ -5,13 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const priceDisplay = document.getElementById('priceDisplay');
   const countDisplay = document.getElementById('countDisplay');
   const braceletSlots = document.querySelectorAll('.slot');
-  const charmPool = document.getElementById('charmPool');
-  const rareCharmPool = document.getElementById('rareCharmPool');
-  const goldToggle = document.getElementById('goldToggle');
-  const addSlotBtn = document.getElementById('addSlotBtn');
-  const removeSlotBtn = document.getElementById('removeSlotBtn');
-  const saveBtn = document.getElementById('saveBtn');
-
+  const charmPool = document.getElementById('charm-pool'); // Updated to match HTML
+  const rareCharmPool = document.getElementById('rare-charm-pool'); // Updated to match HTML
+  const goldToggle = document.getElementById('gold-toggle'); // Updated to match HTML
+  const addSlotBtn = document.getElementById('add-slot-btn'); // Updated to match HTML
+  const removeSlotBtn = document.getElementById('remove-slot-btn'); // Updated to match HTML
+  const saveBtn = document.getElementById('save-btn'); // Updated to match HTML
+  
   // Helper function to update price display
   const updatePrice = () => {
     priceDisplay.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
