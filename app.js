@@ -100,6 +100,14 @@ function setupDragDrop() {
       img.addEventListener('dragend',   () => img.classList.remove('dragging'));
     });
   });
+function setupGalleryClicks() {
+  // Make all normal and rare charms clickable
+  [charmPool, rareCharmPool].forEach(pool => {
+    pool.querySelectorAll('img').forEach(img => {
+      img.addEventListener('click', () => addCharmToBracelet(img));
+    });
+  });
+}
 
   bracelet.addEventListener('dragover', e => {
     if (e.target.classList.contains('slot')) {
