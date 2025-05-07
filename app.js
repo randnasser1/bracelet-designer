@@ -1,4 +1,4 @@
->
+
     document.addEventListener('DOMContentLoaded', () => {
       const priceDisplay = document.getElementById('priceDisplay');
       const countDisplay = document.getElementById('countDisplay');
