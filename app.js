@@ -1,89 +1,142 @@
-<script>
-  const bracelet = document.getElementById("bracelet");
-  const priceDisplay = document.getElementById("priceDisplay");
-  const countDisplay = document.getElementById("countDisplay");
-  const goldToggle = document.getElementById("goldToggle");
+// grab everything
+const bracelet      = document.getElementById('bracelet');
+const goldToggle    = document.getElementById('goldToggle');
+const priceDisplay  = document.getElementById('priceDisplay');
+const countDisplay  = document.getElementById('countDisplay');
+const charmPool     = document.getElementById('charmPool');
+const rareCharmPool = document.getElementById('rareCharmPool');
 
-  const BASE_SILVER = { src: "basecharms/silver.png", name: "silver", price: 0, type: "base" };
-  const BASE_GOLD = { src: "basecharms/gold.png", name: "gold", price: 1, type: "base" };
-  const BRACELET_BASE_PRICE = { silver: 8.0, gold: 9.0 };
-  const MAX_SLOTS = 18;
+const MAX_SLOTS   = 18;
+const BASE_SILVER = { src: 'basecharms/silver.png', name: 'Silver Base', price: 0 };
+const BASE_GOLD   = { src: 'basecharms/gold.png',   name: 'Gold Base',   price: 0 };
 
-  function getCharmData(img) {
-    return {
-      src: img.src,
-      name: img.dataset.name,
-      price: parseFloat(img.dataset.price),
-      type: img.dataset.type,
-    };
+// (Re)build the 18 slots
+function initializeBracelet() {
+  bracelet.innerHTML = '';
+  const baseCharm = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
+
+  for (let i = 0; i < MAX_SLOTS; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'slot empty';
+
+    const img = document.createElement('img');
+    img.src         = baseCharm.src;
+    img.alt         = baseCharm.name;
+    img.title       = baseCharm.name;
+    img.dataset.name  = baseCharm.name;
+    img.dataset.price = '0';
+    img.dataset.type  = 'base';
+
+    slot.appendChild(img);
+    bracelet.appendChild(slot);
   }
 
-  function updatePriceAndCount() {
-    let total = goldToggle.checked ? BRACELET_BASE_PRICE.gold : BRACELET_BASE_PRICE.silver;
-    let count = 0;
+  updatePrice();
+}
 
-    document.querySelectorAll("#bracelet .slot img").forEach((img) => {
-      const type = img.dataset.type;
-      if (type === "plain" || type === "special" || type === "rare") {
-        total += parseFloat(img.dataset.price);
-        count++;
-      }
-    });
-
-    priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
-    countDisplay.textContent = `${count} / ${MAX_SLOTS} charms`;
-  }
-
-  function addSlot() {
-    const currentSlots = bracelet.querySelectorAll(".slot").length;
-    if (currentSlots < MAX_SLOTS) {
-      const slot = document.createElement("div");
-      slot.className = "slot";
-      slot.dataset.base = "true";
-      const base = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
-      slot.innerHTML = `<img src="${base.src}" alt="${base.name}" data-name="${base.name}" data-price="${base.price}" data-type="base">`;
-      bracelet.appendChild(slot);
-      updatePriceAndCount();
+// add a clicked or dragged charm into the first empty slot
+function addCharmToBracelet(charmImg) {
+  const slots = bracelet.querySelectorAll('.slot');
+  for (const slot of slots) {
+    const img = slot.querySelector('img');
+    if (img.dataset.type === 'base') {
+      const newImg = charmImg.cloneNode();
+      newImg.dataset.type = charmImg.dataset.type;
+      slot.innerHTML = '';
+      slot.appendChild(newImg);
+      slot.classList.remove('empty');
+      updatePrice();
+      return;
     }
   }
+  alert('All slots are filled!');
+}
 
-  function removeSlot() {
-    const slots = bracelet.querySelectorAll(".slot");
-    if (slots.length > 0) {
-      slots[slots.length - 1].remove();
-      updatePriceAndCount();
+// recalc total & count
+function updatePrice() {
+  let total = goldToggle.checked ? 9 : 8;
+  let count = 0;
+  bracelet.querySelectorAll('.slot img').forEach(img => {
+    if (img.dataset.type !== 'base') {
+      total += parseFloat(img.dataset.price);
+      count++;
     }
-  }
+  });
+  priceDisplay.textContent = `Total: ${total.toFixed(2)} JDs`;
+  countDisplay.textContent = `${count} / ${MAX_SLOTS} charms`;
+}
+goldToggle.addEventListener('change', () => {
+  const base = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
 
-  function applyGoldToggle() {
-    const base = goldToggle.checked ? BASE_GOLD : BASE_SILVER;
-    bracelet.querySelectorAll(".slot").forEach((slot) => {
-      const img = slot.querySelector("img");
-      if (img.dataset.type === "base") {
-        img.src = base.src;
-        img.alt = base.name;
+  bracelet
+    .querySelectorAll('.slot img')
+    .forEach(img => {
+      if (img.dataset.type === 'base') {
+        img.src   = base.src;
+        img.alt   = base.name;
+        img.title = base.name;
         img.dataset.name = base.name;
-        img.dataset.price = base.price;
-        img.dataset.type = "base";
       }
     });
-    updatePriceAndCount();
-  }
 
-  function saveBracelet() {
-    const data = Array.from(bracelet.querySelectorAll(".slot img")).map((img) => ({
-      name: img.dataset.name,
-      price: img.dataset.price,
-      type: img.dataset.type,
-    }));
-    localStorage.setItem("savedBracelet", JSON.stringify(data));
-    alert("Bracelet saved!");
-  }
+  // Now update the total (8→9 JDs base):
+  updatePrice();
+});
+// wire up clicks
+// grab gallery containers
+const charmPool      = document.getElementById('charmPool');
+const rareCharmPool  = document.getElementById('rareCharmPool');
 
-  document.getElementById("addSlotBtn").addEventListener("click", addSlot);
-  document.getElementById("removeSlotBtn").addEventListener("click", removeSlot);
-  document.getElementById("saveBtn").addEventListener("click", saveBracelet);
-  goldToggle.addEventListener("change", applyGoldToggle);
+// on any click inside either pool, if it's an IMG, add it:
+function setupGalleryClicks() {
+  [charmPool, rareCharmPool].forEach(pool => {
+    pool.addEventListener('click', e => {
+      if (e.target.tagName === 'IMG') {
+        addCharmToBracelet(e.target);
+      }
+    });
+  });
+}
 
-  updatePriceAndCount();
-</script>
+document.addEventListener('DOMContentLoaded', () => {
+  initializeBracelet();
+  setupGalleryClicks();
+  setupDragDrop();
+  
+});
+
+// drag/drop onto slots
+function setupDragDrop() {
+  bracelet.addEventListener('dragover', e => {
+    if (e.target.classList.contains('slot')) {
+      e.preventDefault();
+      e.target.classList.add('dragover');
+    }
+  });
+  bracelet.addEventListener('dragleave', e => {
+    if (e.target.classList.contains('slot')) {
+      e.target.classList.remove('dragover');
+    }
+  });
+  bracelet.addEventListener('drop', e => {
+    if (e.target.classList.contains('slot')) {
+      e.preventDefault();
+      const dragImg = document.querySelector('img.dragging');
+      if (dragImg && e.target.classList.contains('empty')) {
+        e.target.classList.remove('empty','dragover');
+        e.target.innerHTML = '';
+        e.target.appendChild(dragImg);
+        dragImg.classList.remove('dragging');
+        updatePrice();
+      }
+    }
+  });
+}
+
+// when the page loads…
+document.addEventListener('DOMContentLoaded', () => {
+  initializeBracelet();
+  bindCharmClicks();
+  setupDragDrop();
+  goldToggle.addEventListener('change', initializeBracelet);
+});
