@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const priceDisplay = document.getElementById('priceDisplay');
   const countDisplay = document.getElementById('countDisplay');
   const braceletSlots = document.querySelectorAll('.slot');
-  const charmPool = document.getElementById('charm-pool');
-  const rareCharmPool = document.getElementById('rare-charm-pool');
+  const charmPool = document.getElementById('charmPool');
+  const rareCharmPool = document.getElementById('rareCharmPool');
   const goldToggle = document.getElementById('gold-toggle');
   const addSlotBtn = document.getElementById('add-slot-btn');
   const removeSlotBtn = document.getElementById('remove-slot-btn');
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  document.querySelectorAll('#charm-pool img, #rare-charm-pool img').forEach(charm => {
+  document.querySelectorAll('#charmPool img, #rareCharmPool img').forEach(charm => {
     charm.addEventListener('dragstart', (e) => {
       e.dataTransfer.setData('text/html', charm.outerHTML);
     });
