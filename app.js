@@ -1,4 +1,5 @@
- document.addEventListener('DOMContentLoaded', () => {
+>
+    document.addEventListener('DOMContentLoaded', () => {
       const priceDisplay = document.getElementById('priceDisplay');
       const countDisplay = document.getElementById('countDisplay');
       const bracelet = document.getElementById('bracelet');
@@ -13,7 +14,7 @@
       let totalPrice = basePrice;
       let lastClickedCharm = null;
 
-      // Create the 18 slots dynamically
+      // Create the 18 base charms slots dynamically
       for (let i = 0; i < 18; i++) {
         const slot = document.createElement('div');
         slot.classList.add('slot');
@@ -88,40 +89,31 @@
         if (emptySlot && charmCount < 18) {
           const isGold = goldToggle.checked;
           const baseCharm = document.createElement('img');
-          baseCharm.src
+          baseCharm.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+          baseCharm.setAttribute('data-price', basePrice);
+          baseCharm.setAttribute('data-type', 'base');
+          baseCharm.setAttribute('data-name', isGold ? 'gold' : 'silver');
+          emptySlot.appendChild(baseCharm);
+          charmCount++;
+          totalPrice += basePrice;
+          updatePrice();
+        }
+      });
 
+      // Remove charm slot
+      removeSlotBtn.addEventListener('click', () => {
+        const filledSlot = Array.from(document.querySelectorAll('.slot')).find(slot => slot.innerHTML);
+        if (filledSlot) {
+          const removedCharm = filledSlot.querySelector('img');
+          totalPrice -= parseFloat(removedCharm.getAttribute('data-price'));
+          charmCount--;
+          filledSlot.innerHTML = '';
+          updatePrice();
+        }
+      });
 
-
-
-
-ChatGPT said:
-= isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-baseCharm.setAttribute('data-price', basePrice);
-baseCharm.setAttribute('data-type', 'base');
-baseCharm.setAttribute('data-name', isGold ? 'gold' : 'silver');
-emptySlot.appendChild(baseCharm);
-charmCount++;
-totalPrice += basePrice;
-updatePrice();
-}
-});
-
-javascript
-Copy code
-  // Remove charm slot
-  removeSlotBtn.addEventListener('click', () => {
-    const filledSlot = Array.from(document.querySelectorAll('.slot')).find(slot => slot.innerHTML);
-    if (filledSlot) {
-      const removedCharm = filledSlot.querySelector('img');
-      totalPrice -= parseFloat(removedCharm.getAttribute('data-price'));
-      charmCount--;
-      filledSlot.innerHTML = '';
-      updatePrice();
-    }
-  });
-
-  // Save bracelet (optional)
-  saveBtn.addEventListener('click', () => {
-    alert('Bracelet saved!');
-  });
-});
+      // Save bracelet (optional)
+      saveBtn.addEventListener('click', () => {
+        alert('Bracelet saved!');
+      });
+    });
