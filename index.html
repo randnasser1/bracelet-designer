@@ -128,7 +128,7 @@
   <h1>Charm Bracelet Designer</h1>
   <div class="controls">
     <label>
-      <input type="checkbox" id="goldToggle"/> Gold Bracelet?
+      <input type="checkbox" id="gold-toggle"/> Gold Bracelet?
     </label>
     <button class="btn" id="saveBtn">Save Bracelet</button>
     <button class="btn" id="addSlotBtn">Add Charm</button>
@@ -242,7 +242,7 @@
       }
     });
 
-    document.getElementById('goldToggle').addEventListener('change', (e) => {
+    document.getElementById('gold-toggle').addEventListener('change', (e) => {
       if (e.target.checked) {
         totalPrice += 1; // Gold bracelet upgrade
       } else {
