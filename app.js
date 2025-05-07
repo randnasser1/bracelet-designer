@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const addSlotBtn = document.getElementById('add-slot-btn'); // Updated to match HTML
   const removeSlotBtn = document.getElementById('remove-slot-btn'); // Updated to match HTML
   const saveBtn = document.getElementById('save-btn'); // Updated to match HTML
-  
+
   // Helper function to update price display
   const updatePrice = () => {
     priceDisplay.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Add event listeners for charm images to handle drag and drop
-  const charmImages = document.querySelectorAll('.charm-pool img');
+  const charmImages = document.querySelectorAll('.charm-pool img'); // Updated to match HTML
   charmImages.forEach((charm) => {
     charm.addEventListener('dragstart', (e) => {
       e.dataTransfer.setData('charm', charm.getAttribute('data-name'));
