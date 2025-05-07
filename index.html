@@ -135,13 +135,7 @@
     <button class="btn" id="remove-slot-btn">Remove Charm</button>
   </div>
 
-  <div id="bracelet">
-    <script>
-      for (let i = 0; i < 18; i++) {
-        document.write(`<div class="slot" data-base="true"><img src="basecharms/silver.png" alt="Silver Charm" data-name="silver" data-price="0" data-type="base"></div>`);
-      }
-    </script>
-  </div>
+  <div id="bracelet"></div>
 
   <div class="price-info" id="priceDisplay">Total: 8.00 JDs</div>
   <div class="price-info" id="countDisplay">0 / 18 charms</div>
@@ -201,58 +195,4 @@
     <img src="rares/img_6061.png" alt="img_6061.png" title="img_6061.png" data-name="img_6061.png" data-price="2" data-type="rare">
   </div>
 
-  <script>
-    let totalPrice = 8.00;
-    let charmCount = 0;
-
-    const updatePrice = () => {
-      document.getElementById('priceDisplay').textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
-      document.getElementById('countDisplay').textContent = `${charmCount} / 18 charms`;
-    };
-
-    const braceletSlots = document.querySelectorAll('.slot');
-    const charmPool = document.querySelector('#charmPool');
-    const rareCharmPool = document.querySelector('#rareCharmPool');
-
-    const updateBracelet = (charm, isRare) => {
-      const slot = document.querySelector('.slot.dragover');
-      if (slot) {
-        const img = charm.cloneNode();
-        slot.innerHTML = '';
-        slot.appendChild(img);
-        charmCount += 1;
-        totalPrice += parseFloat(charm.getAttribute('data-price'));
-        updatePrice();
-        img.classList.add('dragged');
-        img.setAttribute('draggable', 'false');
-      }
-    };
-
-    charmPool.addEventListener('click', (event) => {
-      const charm = event.target;
-      if (charm.tagName === 'IMG') {
-        updateBracelet(charm, false);
-      }
-    });
-
-    rareCharmPool.addEventListener('click', (event) => {
-      const charm = event.target;
-      if (charm.tagName === 'IMG') {
-        updateBracelet(charm, true);
-      }
-    });
-
-    document.getElementById('gold-toggle').addEventListener('change', (e) => {
-      if (e.target.checked) {
-        totalPrice += 1; // Gold bracelet upgrade
-      } else {
-        totalPrice -= 1;
-      }
-      updatePrice();
-    });
-
-    // Additional button functionality for adding/removing slots could be implemented here.
-  <script src="app.js"></script>
-
-</body>
-</html>
+  <script
