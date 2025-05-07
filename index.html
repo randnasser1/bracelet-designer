@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title> Charm Bracelet Designer</title>
+  <title>Charm Bracelet Designer</title>
   <style>
-    /* === Bubblegum theme + sizing (from previous step) === */
+    /* === Bubblegum theme + sizing === */
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
     body {
@@ -66,9 +66,7 @@
       margin-bottom: 1rem;
     }
 
-    /* apply to both .slot and .bracelet-slot just in case */
-    .slot,
-    .bracelet-slot {
+    .slot {
       width: 50px;
       height: 50px;
       border: 2px dashed #f5a0c2;
@@ -79,6 +77,7 @@
       justify-content: center;
       transition: background 0.2s ease, border-color 0.2s ease;
     }
+
     .slot.dragover {
       background: #ffd6e8;
       border-color: #ff85b3;
@@ -116,7 +115,7 @@
       object-fit: contain;
       display: block;
     }
-    img { max-width: 100%; height: auto; }
+
     .slot img:active,
     .charm-pool img:active {
       transform: scale(1.1);
@@ -126,7 +125,7 @@
 </head>
 <body>
 
-  <h1> Charm Bracelet Designer</h1>
+  <h1>Charm Bracelet Designer</h1>
   <div class="controls">
     <label>
       <input type="checkbox" id="goldToggle"/> Gold Bracelet?
@@ -147,9 +146,8 @@
   <div class="price-info" id="priceDisplay">Total: 8.00 JDs</div>
   <div class="price-info" id="countDisplay">0 / 18 charms</div>
 
-
   <!-- Normal Charms -->
-<div id="charmPool"   class="normal-charms charm-pool">
+  <div id="charmPool" class="normal-charms charm-pool">
     <img src="charms/img_5957.png" alt="img_5957.png" title="img_5957.png" data-name="img_5957.png" data-price="1.5" data-type="normal">
     <img src="charms/img_5958.png" alt="img_5958.png" title="img_5958.png" data-name="img_5958.png" data-price="1.5" data-type="normal">
     <img src="charms/img_5959.png" alt="img_5959.png" title="img_5959.png" data-name="img_5959.png" data-price="1.5" data-type="normal">
@@ -188,7 +186,7 @@
   </div>
 
   <!-- Rare Charms -->
-<div id="rareCharmPool" class="rare-charms charm-pool">
+  <div id="rareCharmPool" class="rare-charms charm-pool">
     <img src="rares/img_6035.png" alt="img_6035.png" title="img_6035.png" data-name="img_6035.png" data-price="2" data-type="rare">
     <img src="rares/img_6036.png" alt="img_6036.png" title="img_6036.png" data-name="img_6036.png" data-price="2" data-type="rare">
     <img src="rares/img_6038.png" alt="img_6038.png" title="img_6038.png" data-name="img_6038.png" data-price="2" data-type="rare">
@@ -203,7 +201,58 @@
     <img src="rares/img_6061.png" alt="img_6061.png" title="img_6061.png" data-name="img_6061.png" data-price="2" data-type="rare">
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-  <script src="app.js"></script>
+  <script>
+    let totalPrice = 8.00;
+    let charmCount = 0;
+
+    const updatePrice = () => {
+      document.getElementById('priceDisplay').textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
+      document.getElementById('countDisplay').textContent = `${charmCount} / 18 charms`;
+    };
+
+    const braceletSlots = document.querySelectorAll('.slot');
+    const charmPool = document.querySelector('#charmPool');
+    const rareCharmPool = document.querySelector('#rareCharmPool');
+
+    const updateBracelet = (charm, isRare) => {
+      const slot = document.querySelector('.slot.dragover');
+      if (slot) {
+        const img = charm.cloneNode();
+        slot.innerHTML = '';
+        slot.appendChild(img);
+        charmCount += 1;
+        totalPrice += parseFloat(charm.getAttribute('data-price'));
+        updatePrice();
+        img.classList.add('dragged');
+        img.setAttribute('draggable', 'false');
+      }
+    };
+
+    charmPool.addEventListener('click', (event) => {
+      const charm = event.target;
+      if (charm.tagName === 'IMG') {
+        updateBracelet(charm, false);
+      }
+    });
+
+    rareCharmPool.addEventListener('click', (event) => {
+      const charm = event.target;
+      if (charm.tagName === 'IMG') {
+        updateBracelet(charm, true);
+      }
+    });
+
+    document.getElementById('goldToggle').addEventListener('change', (e) => {
+      if (e.target.checked) {
+        totalPrice += 1; // Gold bracelet upgrade
+      } else {
+        totalPrice -= 1;
+      }
+      updatePrice();
+    });
+
+    // Additional button functionality for adding/removing slots could be implemented here.
+  </script>
+
 </body>
 </html>
