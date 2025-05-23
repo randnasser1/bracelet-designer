@@ -13,28 +13,26 @@
       color: #333;
       margin: 0;
       padding: 1rem;
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 1rem;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
     h1, h2 {
       color: #d6336c;
       margin-bottom: 1rem;
-      grid-column: 1 / -1;
+      text-align: center;
     }
 
     .main-content {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      max-width: 1000px;
+      margin: 0 auto;
     }
 
     .product-selector {
       display: flex;
       justify-content: center;
       gap: 1rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
     }
 
     .product-btn {
@@ -59,7 +57,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 0.8rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
     }
 
     .control-group {
@@ -88,6 +86,13 @@
       background: #ff5fa3;
     }
 
+    .bracelet-container {
+      width: 100%;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 1rem;
+    }
+
     #jewelry-piece {
       display: flex;
       gap: 8px;
@@ -96,22 +101,21 @@
       border-radius: 16px;
       background: #fff0f5;
       min-height: 80px;
-      overflow-x: auto;
-      scrollbar-width: thin;
-      scrollbar-color: #ff85b3 #fff0f5;
-      margin-bottom: 0.5rem;
+      width: max-content;
+      min-width: 100%;
     }
 
-    #jewelry-piece::-webkit-scrollbar {
+    /* Custom scrollbar for bracelet */
+    .bracelet-container::-webkit-scrollbar {
       height: 6px;
     }
 
-    #jewelry-piece::-webkit-scrollbar-track {
+    .bracelet-container::-webkit-scrollbar-track {
       background: #fff0f5;
       border-radius: 3px;
     }
 
-    #jewelry-piece::-webkit-scrollbar-thumb {
+    .bracelet-container::-webkit-scrollbar-thumb {
       background: #ff85b3;
       border-radius: 3px;
     }
@@ -148,12 +152,14 @@
       font-weight: 600;
       color: #d6336c;
       margin: 0.5rem 0;
+      text-align: center;
     }
 
     .charm-pools {
       display: flex;
       flex-direction: column;
       gap: 1rem;
+      margin-top: 1rem;
     }
 
     .charm-pool {
@@ -168,6 +174,7 @@
       margin-top: 0;
       font-size: 1rem;
       margin-bottom: 0.5rem;
+      text-align: center;
     }
 
     .charms-grid {
@@ -204,15 +211,15 @@
       padding: 1rem;
       border-radius: 10px;
       font-size: 0.8rem;
-      height: fit-content;
-      position: sticky;
-      top: 1rem;
+      margin: 1rem auto;
+      max-width: 600px;
     }
 
     .pricing-info h3 {
       color: #d6336c;
       margin-top: 0;
       font-size: 1rem;
+      text-align: center;
     }
 
     .pricing-info ul {
@@ -264,16 +271,6 @@
     .material-option.mix {
       background: linear-gradient(135deg, #e0e0e0 50%, #ffd700 50%);
     }
-
-    @media (max-width: 768px) {
-      body {
-        grid-template-columns: 1fr;
-      }
-      .pricing-info {
-        position: static;
-        margin-top: 1rem;
-      }
-    }
   </style>
 </head>
 <body>
@@ -300,12 +297,29 @@
       </div>
     </div>
 
-    <div id="jewelry-piece"></div>
+    <div class="bracelet-container">
+      <div id="jewelry-piece"></div>
+    </div>
 
     <div class="price-display">
       <div id="base-price">Base Price: 10 JDs</div>
       <div id="charm-price">Charms: 0 JDs</div>
       <div id="total-price">Total: 10 JDs</div>
+    </div>
+
+    <div class="pricing-info">
+      <h3>Pricing Information</h3>
+      <ul>
+        <li><span class="highlight">Bracelet:</span> 10 JDs (18 slots)</li>
+        <li><span class="highlight">Anklet:</span> 15 JDs (23 slots)</li>
+        <li><span class="highlight">Necklace:</span> 22 JDs (34 slots)</li>
+        <li>Gold: +1 JD</li>
+        <li>Mix: +2.5 JDs</li>
+        <li>Special charm: +2 JDs</li>
+        <li>Rare charm: +3 JDs</li>
+        <li><span class="highlight">Full Glam:</span> All special (29 JDs bracelet)</li>
+      </ul>
+      <p>⚠️ Limited stock! DM to order.</p>
     </div>
 
     <div class="charm-pools">
@@ -323,21 +337,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="pricing-info">
-    <h3>Pricing Information</h3>
-    <ul>
-      <li><span class="highlight">Bracelet:</span> 10 JDs (18 slots)</li>
-      <li><span class="highlight">Anklet:</span> 15 JDs (23 slots)</li>
-      <li><span class="highlight">Necklace:</span> 22 JDs (34 slots)</li>
-      <li>Gold: +1 JD</li>
-      <li>Mix: +2.5 JDs</li>
-      <li>Special charm: +2 JDs</li>
-      <li>Rare charm: +3 JDs</li>
-      <li><span class="highlight">Full Glam:</span> All special (29 JDs bracelet)</li>
-    </ul>
-    <p>⚠️ Limited stock! DM to order.</p>
   </div>
 
   <script>
