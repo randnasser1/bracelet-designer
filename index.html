@@ -12,20 +12,29 @@
       background: #ffe6f0;
       color: #333;
       margin: 0;
-      padding: 2rem;
-      text-align: center;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 1rem;
     }
 
     h1, h2 {
       color: #d6336c;
       margin-bottom: 1rem;
+      grid-column: 1 / -1;
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
     .product-selector {
       display: flex;
       justify-content: center;
       gap: 1rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 0.5rem;
     }
 
     .product-btn {
@@ -33,10 +42,11 @@
       color: white;
       border: none;
       border-radius: 8px;
-      padding: 0.8rem 1.5rem;
+      padding: 0.6rem 1rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
+      font-size: 0.9rem;
     }
 
     .product-btn.active {
@@ -48,17 +58,18 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      gap: 0.8rem;
+      margin-bottom: 0.5rem;
     }
 
     .control-group {
       background: rgba(255, 255, 255, 0.7);
-      padding: 0.8rem;
+      padding: 0.6rem;
       border-radius: 10px;
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      font-size: 0.9rem;
     }
 
     .btn {
@@ -66,10 +77,11 @@
       color: white;
       border: none;
       border-radius: 8px;
-      padding: 0.6rem 1.2rem;
+      padding: 0.5rem 1rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
+      font-size: 0.9rem;
     }
 
     .btn:hover {
@@ -78,20 +90,34 @@
 
     #jewelry-piece {
       display: flex;
-      flex-wrap: wrap;
       gap: 8px;
-      justify-content: center;
-      padding: 1.5rem;
+      padding: 1rem;
       border: 2px dashed #f5a0c2;
       border-radius: 16px;
       background: #fff0f5;
-      min-height: 120px;
-      margin: 0 auto 1.5rem;
-      max-width: 800px;
+      min-height: 80px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #ff85b3 #fff0f5;
+      margin-bottom: 0.5rem;
+    }
+
+    #jewelry-piece::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    #jewelry-piece::-webkit-scrollbar-track {
+      background: #fff0f5;
+      border-radius: 3px;
+    }
+
+    #jewelry-piece::-webkit-scrollbar-thumb {
+      background: #ff85b3;
+      border-radius: 3px;
     }
 
     .slot {
-      width: 50px;
+      flex: 0 0 50px;
       height: 50px;
       border: 2px dashed #f5a0c2;
       border-radius: 10px;
@@ -118,42 +144,42 @@
     }
 
     .price-display {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       font-weight: 600;
       color: #d6336c;
-      margin: 1rem 0;
+      margin: 0.5rem 0;
     }
 
     .charm-pools {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
-      max-width: 800px;
-      margin: 0 auto;
+      gap: 1rem;
     }
 
     .charm-pool {
       background: #fff0f5;
       border: 1px solid #f5a0c2;
       border-radius: 16px;
-      padding: 1rem;
+      padding: 0.8rem;
     }
 
     .charm-pool h3 {
       color: #a61e4d;
       margin-top: 0;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
     }
 
     .charms-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
       justify-content: center;
     }
 
     .charm {
-      width: 50px;
-      height: 50px;
+      width: 45px;
+      height: 45px;
       cursor: pointer;
       transition: transform 0.2s;
       object-fit: contain;
@@ -177,17 +203,26 @@
       background: white;
       padding: 1rem;
       border-radius: 10px;
-      margin: 1.5rem auto;
-      max-width: 600px;
-      text-align: left;
+      font-size: 0.8rem;
+      height: fit-content;
+      position: sticky;
+      top: 1rem;
+    }
+
+    .pricing-info h3 {
+      color: #d6336c;
+      margin-top: 0;
+      font-size: 1rem;
     }
 
     .pricing-info ul {
       padding-left: 1.2rem;
+      margin: 0.5rem 0;
     }
 
     .pricing-info li {
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.3rem;
+      line-height: 1.3;
     }
 
     .highlight {
@@ -205,11 +240,12 @@
     }
 
     .material-option {
-      padding: 0.5rem 1rem;
+      padding: 0.4rem 0.8rem;
       border-radius: 8px;
       cursor: pointer;
       border: 2px solid transparent;
       transition: all 0.2s;
+      font-size: 0.8rem;
     }
 
     .material-option.selected {
@@ -228,68 +264,80 @@
     .material-option.mix {
       background: linear-gradient(135deg, #e0e0e0 50%, #ffd700 50%);
     }
+
+    @media (max-width: 768px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+      .pricing-info {
+        position: static;
+        margin-top: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Jewelry Designer</h1>
-  
-  <div class="product-selector">
-    <button class="product-btn active" data-type="bracelet">Bracelet</button>
-    <button class="product-btn" data-type="anklet">Anklet</button>
-    <button class="product-btn" data-type="necklace">Necklace</button>
-  </div>
+  <div class="main-content">
+    <h1>Jewelry Designer</h1>
+    
+    <div class="product-selector">
+      <button class="product-btn active" data-type="bracelet">Bracelet</button>
+      <button class="product-btn" data-type="anklet">Anklet</button>
+      <button class="product-btn" data-type="necklace">Necklace</button>
+    </div>
 
-  <div class="controls">
-    <div class="control-group">
-      <span>Material:</span>
-      <div class="material-selector">
-        <div class="material-option silver selected" data-material="silver">Silver</div>
-        <div class="material-option gold" data-material="gold">Gold (+1 JD)</div>
-        <div class="material-option mix" data-material="mix">Mix (+2.5 JDs)</div>
+    <div class="controls">
+      <div class="control-group">
+        <span>Material:</span>
+        <div class="material-selector">
+          <div class="material-option silver selected" data-material="silver">Silver</div>
+          <div class="material-option gold" data-material="gold">Gold (+1 JD)</div>
+          <div class="material-option mix" data-material="mix">Mix (+2.5 JDs)</div>
+        </div>
+      </div>
+      <div class="control-group">
+        <button class="btn" id="full-glam-btn">Full Glam Look</button>
       </div>
     </div>
-    <div class="control-group">
-      <button class="btn" id="full-glam-btn">Full Glam Look</button>
+
+    <div id="jewelry-piece"></div>
+
+    <div class="price-display">
+      <div id="base-price">Base Price: 10 JDs</div>
+      <div id="charm-price">Charms: 0 JDs</div>
+      <div id="total-price">Total: 10 JDs</div>
     </div>
-  </div>
 
-  <div id="jewelry-piece"></div>
-
-  <div class="price-display">
-    <div id="base-price">Base Price: 10 JDs</div>
-    <div id="charm-price">Charms: 0 JDs</div>
-    <div id="total-price">Total: 10 JDs</div>
+    <div class="charm-pools">
+      <div class="charm-pool">
+        <h3>Special Charms (+2 JDs each)</h3>
+        <div class="charms-grid" id="special-charms">
+          <!-- Special charms will be added here by JS -->
+        </div>
+      </div>
+      
+      <div class="charm-pool">
+        <h3>Rare Charms (+3 JDs each)</h3>
+        <div class="charms-grid" id="rare-charms">
+          <!-- Rare charms will be added here by JS -->
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="pricing-info">
-    <h3>Pricing Information:</h3>
+    <h3>Pricing Information</h3>
     <ul>
-      <li><span class="highlight">Bracelet:</span> 10 JDs (18 slots with base charms)</li>
-      <li><span class="highlight">Anklet:</span> 15 JDs (23 slots with base charms)</li>
-      <li><span class="highlight">Necklace:</span> 22 JDs (34 slots with base charms)</li>
-      <li>Gold version: +1 JD</li>
-      <li>Mix version: +2.5 JDs (alternating gold/silver)</li>
-      <li>Special charm: +2 JDs each</li>
-      <li>Rare charm: +3 JDs each</li>
-      <li><span class="highlight">Full Glam:</span> All charms special (29 JDs for bracelet)</li>
+      <li><span class="highlight">Bracelet:</span> 10 JDs (18 slots)</li>
+      <li><span class="highlight">Anklet:</span> 15 JDs (23 slots)</li>
+      <li><span class="highlight">Necklace:</span> 22 JDs (34 slots)</li>
+      <li>Gold: +1 JD</li>
+      <li>Mix: +2.5 JDs</li>
+      <li>Special charm: +2 JDs</li>
+      <li>Rare charm: +3 JDs</li>
+      <li><span class="highlight">Full Glam:</span> All special (29 JDs bracelet)</li>
     </ul>
-    <p>⚠️ Limited stock! DM to see designs or order now!</p>
-  </div>
-
-  <div class="charm-pools">
-    <div class="charm-pool">
-      <h3>Special Charms (+2 JDs each)</h3>
-      <div class="charms-grid" id="special-charms">
-        <!-- Special charms will be added here by JS -->
-      </div>
-    </div>
-    
-    <div class="charm-pool">
-      <h3>Rare Charms (+3 JDs each)</h3>
-      <div class="charms-grid" id="rare-charms">
-        <!-- Rare charms will be added here by JS -->
-      </div>
-    </div>
+    <p>⚠️ Limited stock! DM to order.</p>
   </div>
 
   <script>
