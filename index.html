@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Charm Bracelet Designer</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jewelry Designer</title>
   <style>
-    /* === Bubblegum theme + sizing === */
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
     body {
@@ -17,26 +16,46 @@
       text-align: center;
     }
 
-    h1 {
-      font-size: 2.5rem;
+    h1, h2 {
       color: #d6336c;
       margin-bottom: 1rem;
+    }
+
+    .product-selector {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .product-btn {
+      background: #ff85b3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.8rem 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .product-btn.active {
+      background: #d6336c;
+      box-shadow: 0 0 0 2px white, 0 0 0 4px #d6336c;
     }
 
     .controls {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 1rem;
       margin-bottom: 1.5rem;
     }
 
-    .controls label {
-      font-weight: 600;
-      color: #a61e4d;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
+    .control-group {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 0.8rem;
+      border-radius: 10px;
     }
 
     .btn {
@@ -47,23 +66,25 @@
       padding: 0.6rem 1.2rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: all 0.2s ease;
     }
+
     .btn:hover {
       background: #ff5fa3;
     }
 
-    #bracelet {
+    #jewelry-piece {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px;
+      gap: 8px;
       justify-content: center;
-      padding: 1rem;
+      padding: 1.5rem;
       border: 2px dashed #f5a0c2;
-      border-radius: 12px;
+      border-radius: 16px;
       background: #fff0f5;
       min-height: 120px;
-      margin-bottom: 1rem;
+      margin: 0 auto 1.5rem;
+      max-width: 800px;
     }
 
     .slot {
@@ -71,128 +92,349 @@
       height: 50px;
       border: 2px dashed #f5a0c2;
       border-radius: 10px;
-      background: transparent;
+      background: rgba(255, 160, 195, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s ease, border-color 0.2s ease;
+      position: relative;
+      cursor: pointer;
     }
 
-    .slot.dragover {
-      background: #ffd6e8;
-      border-color: #ff85b3;
-    }
-
-    .price-info {
+    .slot:empty::after {
+      content: "+";
+      position: absolute;
+      color: #d6336c;
       font-size: 1.2rem;
-      margin: 0.5rem 0;
+      opacity: 0.5;
+    }
+
+    .slot img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .price-display {
+      font-size: 1.3rem;
       font-weight: 600;
       color: #d6336c;
+      margin: 1rem 0;
     }
 
-    .charmPool,
-    .normal-charms,
-    .rare-charms {
+    .charm-pools {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .charm-pool {
+      background: #fff0f5;
+      border: 1px solid #f5a0c2;
+      border-radius: 16px;
+      padding: 1rem;
+    }
+
+    .charm-pool h3 {
+      color: #a61e4d;
+      margin-top: 0;
+    }
+
+    .charms-grid {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       justify-content: center;
-      margin-top: 2rem;
-      padding: 1rem;
-      background: #fff0f5;
-      border: 1px solid #f5a0c2;
-      border-radius: 12px;
-      max-height: 200px;
-      overflow-y: auto;
     }
 
-    .slot img,
-    .charmPool img,
-    .normal-charms img,
-    .rare-charms img {
-      width: 40px !important;
-      height: 40px !important;
-      object-fit: contain;
-      display: block;
+    .charm {
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      transition: transform 0.2s;
     }
 
-    .slot img:active,
-    .charmPool img:active {
+    .charm:hover {
       transform: scale(1.1);
-      box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
+    }
+
+    .special {
+      border: 2px solid gold;
+      border-radius: 8px;
+    }
+
+    .rare {
+      border: 2px solid purple;
+      border-radius: 8px;
+    }
+
+    .pricing-info {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      margin: 1.5rem auto;
+      max-width: 600px;
+      text-align: left;
+    }
+
+    .pricing-info ul {
+      padding-left: 1.2rem;
+    }
+
+    .pricing-info li {
+      margin-bottom: 0.5rem;
+    }
+
+    .highlight {
+      color: #d6336c;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
+  <h1>Jewelry Designer</h1>
+  
+  <div class="product-selector">
+    <button class="product-btn active" data-type="bracelet">Bracelet</button>
+    <button class="product-btn" data-type="anklet">Anklet</button>
+    <button class="product-btn" data-type="necklace">Necklace</button>
+  </div>
 
-  <h1>Charm Bracelet Designer</h1>
   <div class="controls">
-    <label>
-      <input type="checkbox" id="gold-toggle"/> Gold Bracelet?
-    </label>
-    <button class="btn" id="save-btn">Save Bracelet</button>
-    <button class="btn" id="add-slot-btn">Add Charm</button>
-    <button class="btn" id="remove-slot-btn">Remove Charm</button>
+    <div class="control-group">
+      <label>
+        <input type="checkbox" id="gold-toggle"> Gold Version (+1 JD)
+      </label>
+    </div>
+    <div class="control-group">
+      <button class="btn" id="full-glam-btn">Full Glam Look</button>
+    </div>
   </div>
 
-  <div id="bracelet"></div>
+  <div id="jewelry-piece"></div>
 
-  <div class="price-info" id="priceDisplay">Total: 8.00 JDs</div>
-  <div class="price-info" id="countDisplay">0 / 18 charms</div>
-
-  <!-- Normal Charms -->
-  <div id="charmPool" class="normal-charms charmPool">
-    <img src="charms/img_5957.png" alt="img_5957.png" title="img_5957.png" data-name="img_5957.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5958.png" alt="img_5958.png" title="img_5958.png" data-name="img_5958.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5959.png" alt="img_5959.png" title="img_5959.png" data-name="img_5959.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5960.png" alt="img_5960.png" title="img_5960.png" data-name="img_5960.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5961.png" alt="img_5961.png" title="img_5961.png" data-name="img_5961.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5962.png" alt="img_5962.png" title="img_5962.png" data-name="img_5962.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5963.png" alt="img_5963.png" title="img_5963.png" data-name="img_5963.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5965.png" alt="img_5965.png" title="img_5965.png" data-name="img_5965.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5968.png" alt="img_5968.png" title="img_5968.png" data-name="img_5968.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5969.png" alt="img_5969.png" title="img_5969.png" data-name="img_5969.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5970.png" alt="img_5970.png" title="img_5970.png" data-name="img_5970.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5971.png" alt="img_5971.png" title="img_5971.png" data-name="img_5971.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5983.png" alt="img_5983.png" title="img_5983.png" data-name="img_5983.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5992.png" alt="img_5992.png" title="img_5992.png" data-name="img_5992.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_5999.png" alt="img_5999.png" title="img_5999.png" data-name="img_5999.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6001.png" alt="img_6001.png" title="img_6001.png" data-name="img_6001.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6005.png" alt="img_6005.png" title="img_6005.png" data-name="img_6005.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6009.png" alt="img_6009.png" title="img_6009.png" data-name="img_6009.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6010.png" alt="img_6010.png" title="img_6010.png" data-name="img_6010.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6011.png" alt="img_6011.png" title="img_6011.png" data-name="img_6011.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6012.png" alt="img_6012.png" title="img_6012.png" data-name="img_6012.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6013.png" alt="img_6013.png" title="img_6013.png" data-name="img_6013.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6014.png" alt="img_6014.png" title="img_6014.png" data-name="img_6014.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6016.png" alt="img_6016.png" title="img_6016.png" data-name="img_6016.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6018.png" alt="img_6018.png" title="img_6018.png" data-name="img_6018.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6019.png" alt="img_6019.png" title="img_6019.png" data-name="img_6019.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6020.png" alt="img_6020.png" title="img_6020.png" data-name="img_6020.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6021.png" alt="img_6021.png" title="img_6021.png" data-name="img_6021.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6023.png" alt="img_6023.png" title="img_6023.png" data-name="img_6023.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6024.png" alt="img_6024.png" title="img_6024.png" data-name="img_6024.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6025.png" alt="img_6025.png" title="img_6025.png" data-name="img_6025.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6028.png" alt="img_6028.png" title="img_6028.png" data-name="img_6028.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6030.png" alt="img_6030.png" title="img_6030.png" data-name="img_6030.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6031.png" alt="img_6031.png" title="img_6031.png" data-name="img_6031.png" data-price="1.5" data-type="normal">
-    <img src="charms/img_6032.png" alt="img_6032.png" title="img_6032.png" data-name="img_6032.png" data-price="1.5" data-type="normal">
+  <div class="price-display">
+    <div id="base-price">Base Price: 10 JDs</div>
+    <div id="charm-price">Charms: 0 JDs</div>
+    <div id="total-price">Total: 10 JDs</div>
   </div>
 
-  <!-- Rare Charms -->
-  <div id="rareCharmPool" class="rare-charms charmPool">
-    <img src="rares/img_6035.png" alt="img_6035.png" title="img_6035.png" data-name="img_6035.png" data-price="2" data-type="rare">
-    <img src="rares/img_6036.png" alt="img_6036.png" title="img_6036.png" data-name="img_6036.png" data-price="2" data-type="rare">
-    <img src="rares/img_6038.png" alt="img_6038.png" title="img_6038.png" data-name="img_6038.png" data-price="2" data-type="rare">
-    <img src="rares/img_6040.png" alt="img_6040.png" title="img_6040.png" data-name="img_6040.png" data-price="2" data-type="rare">
-    <img src="rares/img_6041.png" alt="img_6041.png" title="img_6041.png" data-name="img_6041.png" data-price="2" data-type="rare">
-    <img src="rares/img_6045.png" alt="img_6045.png" title="img_6045.png" data-name="img_6045.png" data-price="2" data-type="rare">
-    <img src="rares/img_6049.png" alt="img_6049.png" title="img_6049.png" data-name="img_6049.png" data-price="2" data-type="rare">
-    <img src="rares/img_6050.png" alt="img_6050.png" title="img_6050.png" data-name="img_6050.png" data-price="2" data-type="rare">
-    <img src="rares/img_6052.png" alt="img_6052.png" title="img_6052.png" data-name="img_6052.png" data-price="2" data-type="rare">
-    <img src="rares/img_6057.png" alt="img_6057.png" title="img_6057.png" data-name="img_6057.png" data-price="2" data-type="rare">
-    <img src="rares/img_6060.png" alt="img_6060.png" title="img_6060.png" data-name="img_6060.png" data-price="2" data-type="rare">
-    <img src="rares/img_6061.png" alt="img_6061.png" title="img_6061.png" data-name="img_6061.png" data-price="2" data-type="rare">
+  <div class="pricing-info">
+    <h3>Pricing Information:</h3>
+    <ul>
+      <li><span class="highlight">Bracelet:</span> 10 JDs (18 slots - 2 special + 16 plain included)</li>
+      <li><span class="highlight">Anklet:</span> 15 JDs (23 slots - 2 special included)</li>
+      <li><span class="highlight">Necklace:</span> 22 JDs (34 slots - 2 special included)</li>
+      <li>Gold version: +1 JD</li>
+      <li>Additional plain charm: +0.5 JD</li>
+      <li>Additional special charm: +2 JDs</li>
+      <li>Rare charm: +3 JDs</li>
+      <li><span class="highlight">Full Glam:</span> All charms special (29 JDs for bracelet, excludes rare)</li>
+    </ul>
+    <p>⚠️ Limited stock! DM to see designs or order now!</p>
   </div>
 
-  <script
+  <div class="charm-pools">
+    <div class="charm-pool">
+      <h3>Plain Charms (+0.5 JD)</h3>
+      <div class="charms-grid" id="plain-charms">
+        <!-- Plain charms will be added here by JS -->
+      </div>
+    </div>
+    
+    <div class="charm-pool">
+      <h3>Special Charms (+2 JDs)</h3>
+      <div class="charms-grid" id="special-charms">
+        <!-- Special charms will be added here by JS -->
+      </div>
+    </div>
+    
+    <div class="charm-pool">
+      <h3>Rare Charms (+3 JDs)</h3>
+      <div class="charms-grid" id="rare-charms">
+        <!-- Rare charms will be added here by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // DOM Elements
+      const jewelryPiece = document.getElementById('jewelry-piece');
+      const goldToggle = document.getElementById('gold-toggle');
+      const fullGlamBtn = document.getElementById('full-glam-btn');
+      const productBtns = document.querySelectorAll('.product-btn');
+      const basePriceDisplay = document.getElementById('base-price');
+      const charmPriceDisplay = document.getElementById('charm-price');
+      const totalPriceDisplay = document.getElementById('total-price');
+      const plainCharmsGrid = document.getElementById('plain-charms');
+      const specialCharmsGrid = document.getElementById('special-charms');
+      const rareCharmsGrid = document.getElementById('rare-charms');
+
+      // Product configurations
+      const products = {
+        bracelet: { basePrice: 10, slots: 18, includedSpecial: 2, fullGlam: 29 },
+        anklet: { basePrice: 15, slots: 23, includedSpecial: 2, fullGlam: 42 },
+        necklace: { basePrice: 22, slots: 34, includedSpecial: 2, fullGlam: 64 }
+      };
+
+      // Current state
+      let currentProduct = 'bracelet';
+      let selectedCharm = null;
+      let isGold = false;
+      let charmCount = 0;
+      let specialCount = 0;
+      let rareCount = 0;
+
+      // Initialize
+      initProduct(currentProduct);
+      initCharms();
+
+      // Product selection
+      productBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          productBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentProduct = btn.dataset.type;
+          initProduct(currentProduct);
+          calculatePrice();
+        });
+      });
+
+      // Gold toggle
+      goldToggle.addEventListener('change', (e) => {
+        isGold = e.target.checked;
+        calculatePrice();
+      });
+
+      // Full glam button
+      fullGlamBtn.addEventListener('click', () => {
+        if (confirm(`Set all charms to special for ${products[currentProduct].fullGlam} JDs?`)) {
+          // Clear all slots
+          jewelryPiece.innerHTML = '';
+          createSlots(currentProduct);
+          
+          // Fill all slots with special charms (implementation depends on your charm system)
+          // This is a placeholder - you'll need to implement based on your actual charm images
+          specialCount = products[currentProduct].slots;
+          calculatePrice();
+        }
+      });
+
+      // Initialize product slots
+      function initProduct(product) {
+        jewelryPiece.innerHTML = '';
+        createSlots(product);
+        calculatePrice();
+      }
+
+      // Create slots for the product
+      function createSlots(product) {
+        const config = products[product];
+        for (let i = 0; i < config.slots; i++) {
+          const slot = document.createElement('div');
+          slot.className = 'slot';
+          slot.dataset.index = i;
+          
+          // First slots get special charms by default
+          if (i < config.includedSpecial) {
+            // This would be replaced with actual special charm image
+            slot.innerHTML = '<img src="special-charm.png" alt="Special Charm" data-type="special">';
+            specialCount++;
+          } else if (i < config.includedSpecial + (config.slots - config.includedSpecial)) {
+            // This would be replaced with actual plain charm image
+            slot.innerHTML = '<img src="plain-charm.png" alt="Plain Charm" data-type="plain">';
+          }
+          
+          slot.addEventListener('click', () => {
+            if (selectedCharm) {
+              // Replace the charm in this slot
+              slot.innerHTML = '';
+              const img = document.createElement('img');
+              img.src = selectedCharm.src;
+              img.alt = selectedCharm.alt;
+              img.dataset.type = selectedCharm.dataset.type;
+              slot.appendChild(img);
+              
+              // Update counts
+              const prevType = slot.dataset.prevType;
+              if (prevType === 'special') specialCount--;
+              if (prevType === 'rare') rareCount--;
+              
+              if (selectedCharm.dataset.type === 'special') specialCount++;
+              if (selectedCharm.dataset.type === 'rare') rareCount++;
+              
+              slot.dataset.prevType = selectedCharm.dataset.type;
+              calculatePrice();
+            }
+          });
+          
+          jewelryPiece.appendChild(slot);
+        }
+        charmCount = config.slots;
+      }
+
+      // Initialize charms in the pools
+      function initCharms() {
+        // Plain charms (0.5 JD)
+        for (let i = 1; i <= 20; i++) {
+          const charm = createCharm(`plain-charm-${i}.png`, 'Plain Charm', 'plain');
+          plainCharmsGrid.appendChild(charm);
+        }
+        
+        // Special charms (2 JDs)
+        for (let i = 1; i <= 12; i++) {
+          const charm = createCharm(`special-charm-${i}.png`, 'Special Charm', 'special');
+          specialCharmsGrid.appendChild(charm);
+        }
+        
+        // Rare charms (3 JDs)
+        for (let i = 1; i <= 8; i++) {
+          const charm = createCharm(`rare-charm-${i}.png`, 'Rare Charm', 'rare');
+          rareCharmsGrid.appendChild(charm);
+        }
+      }
+
+      // Create a charm element
+      function createCharm(src, alt, type) {
+        const charm = document.createElement('img');
+        charm.className = `charm ${type}`;
+        charm.src = src;
+        charm.alt = alt;
+        charm.dataset.type = type;
+        
+        charm.addEventListener('click', () => {
+          document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
+          charm.classList.add('selected');
+          selectedCharm = charm;
+        });
+        
+        return charm;
+      }
+
+      // Calculate and update price display
+      function calculatePrice() {
+        const config = products[currentProduct];
+        let basePrice = config.basePrice;
+        if (isGold) basePrice += 1;
+        
+        // Calculate charm costs
+        const includedPlain = config.slots - config.includedSpecial;
+        const additionalSpecial = Math.max(0, specialCount - config.includedSpecial);
+        const plainCost = 0; // Included in base price
+        const specialCost = additionalSpecial * 2;
+        const rareCost = rareCount * 3;
+        
+        const totalCharmCost = specialCost + rareCost;
+        const total = basePrice + totalCharmCost;
+        
+        // Update displays
+        basePriceDisplay.textContent = `Base Price: ${basePrice} JDs`;
+        charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs`;
+        totalPriceDisplay.textContent = `Total: ${total} JDs`;
+      }
+    });
+  </script>
+</body>
+</html>
