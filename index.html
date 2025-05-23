@@ -233,13 +233,13 @@
   <div class="pricing-info">
     <h3>Pricing Information:</h3>
     <ul>
-      <li><span class="highlight">Bracelet:</span> 10 JDs (18 slots - 2 special included)</li>
-      <li><span class="highlight">Anklet:</span> 15 JDs (23 slots - 2 special included)</li>
-      <li><span class="highlight">Necklace:</span> 22 JDs (34 slots - 2 special included)</li>
+      <li><span class="highlight">Bracelet:</span> 10 JDs (18 slots with base charms)</li>
+      <li><span class="highlight">Anklet:</span> 15 JDs (23 slots with base charms)</li>
+      <li><span class="highlight">Necklace:</span> 22 JDs (34 slots with base charms)</li>
       <li>Gold version: +1 JD</li>
       <li>Base charm: Included in price</li>
-      <li>Additional special charm: +2 JDs</li>
-      <li>Rare charm: +3 JDs</li>
+      <li>Special charm: +2 JDs each</li>
+      <li>Rare charm: +3 JDs each</li>
       <li><span class="highlight">Full Glam:</span> All charms special (29 JDs for bracelet)</li>
     </ul>
     <p>⚠️ Limited stock! DM to see designs or order now!</p>
@@ -254,14 +254,14 @@
     </div>
     
     <div class="charm-pool">
-      <h3>Special Charms (+2 JDs)</h3>
+      <h3>Special Charms (+2 JDs each)</h3>
       <div class="charms-grid" id="special-charms">
         <!-- Special charms will be added here by JS -->
       </div>
     </div>
     
     <div class="charm-pool">
-      <h3>Rare Charms (+3 JDs)</h3>
+      <h3>Rare Charms (+3 JDs each)</h3>
       <div class="charms-grid" id="rare-charms">
         <!-- Rare charms will be added here by JS -->
       </div>
@@ -284,9 +284,9 @@
 
       // Product configurations
       const products = {
-        bracelet: { basePrice: 10, slots: 18, includedSpecial: 2, fullGlam: 29 },
-        anklet: { basePrice: 15, slots: 23, includedSpecial: 2, fullGlam: 42 },
-        necklace: { basePrice: 22, slots: 34, includedSpecial: 2, fullGlam: 64 }
+        bracelet: { basePrice: 10, slots: 18, fullGlam: 29 },
+        anklet: { basePrice: 15, slots: 23, fullGlam: 42 },
+        necklace: { basePrice: 22, slots: 34, fullGlam: 64 }
       };
 
       // Charm image lists
@@ -336,6 +336,7 @@
         // Update all base charms in slots
         document.querySelectorAll('.slot img[data-type="base"]').forEach(img => {
           img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+          img.alt = isGold ? 'Gold Base' : 'Silver Base';
         });
         calculatePrice();
       });
@@ -383,22 +384,12 @@
           slot.className = 'slot';
           slot.dataset.index = i;
           
-          // First slots get special charms by default
-          if (i < config.includedSpecial) {
-            const img = document.createElement('img');
-            img.src = 'charms/' + specialCharms[i % specialCharms.length];
-            img.alt = 'Special Charm';
-            img.dataset.type = 'special';
-            slot.appendChild(img);
-            specialCount++;
-          } else {
-            // Base charm slot
-            const img = document.createElement('img');
-            img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-            img.alt = isGold ? 'Gold Base' : 'Silver Base';
-            img.dataset.type = 'base';
-            slot.appendChild(img);
-          }
+          // Add base charm to slot
+          const img = document.createElement('img');
+          img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+          img.alt = isGold ? 'Gold Base' : 'Silver Base';
+          img.dataset.type = 'base';
+          slot.appendChild(img);
           
           slot.addEventListener('click', () => {
             if (selectedCharm) {
@@ -410,11 +401,11 @@
               if (prevType === 'rare') rareCount--;
               
               slot.innerHTML = '';
-              const img = document.createElement('img');
-              img.src = selectedCharm.src;
-              img.alt = selectedCharm.alt;
-              img.dataset.type = selectedCharm.dataset.type;
-              slot.appendChild(img);
+              const newImg = document.createElement('img');
+              newImg.src = selectedCharm.src;
+              newImg.alt = selectedCharm.alt;
+              newImg.dataset.type = selectedCharm.dataset.type;
+              slot.appendChild(newImg);
               
               if (selectedCharm.dataset.type === 'special') specialCount++;
               if (selectedCharm.dataset.type === 'rare') rareCount++;
@@ -477,8 +468,7 @@
         if (isGold) basePrice += 1;
         
         // Calculate charm costs
-        const additionalSpecial = Math.max(0, specialCount - config.includedSpecial);
-        const specialCost = additionalSpecial * 2;
+        const specialCost = specialCount * 2;
         const rareCost = rareCount * 3;
         
         const totalCharmCost = specialCost + rareCost;
