@@ -56,6 +56,9 @@
       background: rgba(255, 255, 255, 0.7);
       padding: 0.8rem;
       border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .btn {
@@ -196,9 +199,34 @@
       box-shadow: 0 0 0 3px #d6336c;
     }
 
-    .base-charm {
-      border: 2px solid #ccc;
+    .material-selector {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .material-option {
+      padding: 0.5rem 1rem;
       border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .material-option.selected {
+      border-color: #d6336c;
+      background: rgba(214, 51, 108, 0.1);
+    }
+
+    .material-option.silver {
+      background: #e0e0e0;
+    }
+
+    .material-option.gold {
+      background: linear-gradient(135deg, #ffd700, #daa520);
+    }
+
+    .material-option.mix {
+      background: linear-gradient(135deg, #e0e0e0 50%, #ffd700 50%);
     }
   </style>
 </head>
@@ -213,9 +241,12 @@
 
   <div class="controls">
     <div class="control-group">
-      <label>
-        <input type="checkbox" id="gold-toggle"> Gold Version (+1 JD)
-      </label>
+      <span>Material:</span>
+      <div class="material-selector">
+        <div class="material-option silver selected" data-material="silver">Silver</div>
+        <div class="material-option gold" data-material="gold">Gold (+1 JD)</div>
+        <div class="material-option mix" data-material="mix">Mix (+2.5 JDs)</div>
+      </div>
     </div>
     <div class="control-group">
       <button class="btn" id="full-glam-btn">Full Glam Look</button>
@@ -237,7 +268,7 @@
       <li><span class="highlight">Anklet:</span> 15 JDs (23 slots with base charms)</li>
       <li><span class="highlight">Necklace:</span> 22 JDs (34 slots with base charms)</li>
       <li>Gold version: +1 JD</li>
-      <li>Base charm: Included in price</li>
+      <li>Mix version: +2.5 JDs (alternating gold/silver)</li>
       <li>Special charm: +2 JDs each</li>
       <li>Rare charm: +3 JDs each</li>
       <li><span class="highlight">Full Glam:</span> All charms special (29 JDs for bracelet)</li>
@@ -246,13 +277,6 @@
   </div>
 
   <div class="charm-pools">
-    <div class="charm-pool">
-      <h3>Base Charms (Included)</h3>
-      <div class="charms-grid" id="base-charms">
-        <!-- Base charms will be added here by JS -->
-      </div>
-    </div>
-    
     <div class="charm-pool">
       <h3>Special Charms (+2 JDs each)</h3>
       <div class="charms-grid" id="special-charms">
@@ -272,13 +296,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       // DOM Elements
       const jewelryPiece = document.getElementById('jewelry-piece');
-      const goldToggle = document.getElementById('gold-toggle');
       const fullGlamBtn = document.getElementById('full-glam-btn');
       const productBtns = document.querySelectorAll('.product-btn');
+      const materialOptions = document.querySelectorAll('.material-option');
       const basePriceDisplay = document.getElementById('base-price');
       const charmPriceDisplay = document.getElementById('charm-price');
       const totalPriceDisplay = document.getElementById('total-price');
-      const baseCharmsGrid = document.getElementById('base-charms');
       const specialCharmsGrid = document.getElementById('special-charms');
       const rareCharmsGrid = document.getElementById('rare-charms');
 
@@ -311,7 +334,7 @@
       // Current state
       let currentProduct = 'bracelet';
       let selectedCharm = null;
-      let isGold = false;
+      let materialType = 'silver';
       let specialCount = 0;
       let rareCount = 0;
 
@@ -330,16 +353,34 @@
         });
       });
 
-      // Gold toggle
-      goldToggle.addEventListener('change', (e) => {
-        isGold = e.target.checked;
-        // Update all base charms in slots
-        document.querySelectorAll('.slot img[data-type="base"]').forEach(img => {
-          img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-          img.alt = isGold ? 'Gold Base' : 'Silver Base';
+      // Material selection
+      materialOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          materialOptions.forEach(o => o.classList.remove('selected'));
+          option.classList.add('selected');
+          materialType = option.dataset.material;
+          updateBaseCharms();
+          calculatePrice();
         });
-        calculatePrice();
       });
+
+      // Update base charms based on material selection
+      function updateBaseCharms() {
+        const slots = document.querySelectorAll('.slot img[data-type="base"]');
+        slots.forEach((slot, index) => {
+          if (materialType === 'silver') {
+            slot.src = 'basecharms/silver.png';
+            slot.alt = 'Silver Base';
+          } else if (materialType === 'gold') {
+            slot.src = 'basecharms/gold.png';
+            slot.alt = 'Gold Base';
+          } else if (materialType === 'mix') {
+            const isGold = index % 2 === 0;
+            slot.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+            slot.alt = isGold ? 'Gold Base' : 'Silver Base';
+          }
+        });
+      }
 
       // Full glam button
       fullGlamBtn.addEventListener('click', () => {
@@ -386,8 +427,17 @@
           
           // Add base charm to slot
           const img = document.createElement('img');
-          img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-          img.alt = isGold ? 'Gold Base' : 'Silver Base';
+          if (materialType === 'silver') {
+            img.src = 'basecharms/silver.png';
+            img.alt = 'Silver Base';
+          } else if (materialType === 'gold') {
+            img.src = 'basecharms/gold.png';
+            img.alt = 'Gold Base';
+          } else if (materialType === 'mix') {
+            const isGold = i % 2 === 0;
+            img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+            img.alt = isGold ? 'Gold Base' : 'Silver Base';
+          }
           img.dataset.type = 'base';
           slot.appendChild(img);
           
@@ -420,15 +470,6 @@
 
       // Initialize charms in the pools
       function initCharms() {
-        // Base charms
-        const silverBase = createCharm('basecharms/silver.png', 'Silver Base', 'base');
-        silverBase.classList.add('base-charm');
-        baseCharmsGrid.appendChild(silverBase);
-        
-        const goldBase = createCharm('basecharms/gold.png', 'Gold Base', 'base');
-        goldBase.classList.add('base-charm');
-        baseCharmsGrid.appendChild(goldBase);
-        
         // Special charms
         specialCharms.forEach((charm, index) => {
           const charmEl = createCharm('charms/' + charm, 'Special Charm ' + (index+1), 'special');
@@ -465,7 +506,10 @@
       function calculatePrice() {
         const config = products[currentProduct];
         let basePrice = config.basePrice;
-        if (isGold) basePrice += 1;
+        
+        // Add material cost
+        if (materialType === 'gold') basePrice += 1;
+        if (materialType === 'mix') basePrice += 2.5;
         
         // Calculate charm costs
         const specialCost = specialCount * 2;
