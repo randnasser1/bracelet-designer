@@ -153,6 +153,7 @@
       height: 50px;
       cursor: pointer;
       transition: transform 0.2s;
+      object-fit: contain;
     }
 
     .charm:hover {
@@ -160,7 +161,7 @@
     }
 
     .special {
-      border: 2px solid gold;
+      border: 2px solid #ff85b3;
       border-radius: 8px;
     }
 
@@ -189,6 +190,10 @@
     .highlight {
       color: #d6336c;
       font-weight: 600;
+    }
+
+    .selected {
+      box-shadow: 0 0 0 3px #d6336c;
     }
   </style>
 </head>
@@ -279,6 +284,25 @@
         necklace: { basePrice: 22, slots: 34, includedSpecial: 2, fullGlam: 64 }
       };
 
+      // Charm image lists
+      const plainCharms = [
+        'img_5957.png', 'img_5958.png', 'img_5959.png', 'img_5960.png',
+        'img_5961.png', 'img_5962.png', 'img_5963.png', 'img_5965.png',
+        'img_5968.png', 'img_5969.png', 'img_5970.png', 'img_5971.png',
+        'img_5983.png', 'img_5992.png', 'img_5999.png', 'img_6001.png',
+        'img_6005.png', 'img_6009.png', 'img_6010.png', 'img_6011.png',
+        'img_6012.png', 'img_6013.png', 'img_6014.png', 'img_6016.png',
+        'img_6018.png', 'img_6019.png', 'img_6020.png', 'img_6021.png',
+        'img_6023.png', 'img_6024.png', 'img_6025.png', 'img_6028.png',
+        'img_6030.png', 'img_6031.png', 'img_6032.png'
+      ];
+
+      const rareCharms = [
+        'img_6035.png', 'img_6036.png', 'img_6038.png', 'img_6040.png',
+        'img_6041.png', 'img_6045.png', 'img_6049.png', 'img_6050.png',
+        'img_6052.png', 'img_6057.png', 'img_6060.png', 'img_6061.png'
+      ];
+
       // Current state
       let currentProduct = 'bracelet';
       let selectedCharm = null;
@@ -310,14 +334,25 @@
 
       // Full glam button
       fullGlamBtn.addEventListener('click', () => {
-        if (confirm(`Set all charms to special for ${products[currentProduct].fullGlam} JDs?`)) {
+        const price = products[currentProduct].fullGlam;
+        if (confirm(`Set all charms to special for ${price} JDs?`)) {
           // Clear all slots
           jewelryPiece.innerHTML = '';
           createSlots(currentProduct);
           
-          // Fill all slots with special charms (implementation depends on your charm system)
-          // This is a placeholder - you'll need to implement based on your actual charm images
+          // Fill all slots with special charms
+          const slots = document.querySelectorAll('.slot');
+          slots.forEach(slot => {
+            slot.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = 'charms/' + plainCharms[0]; // Using first plain charm as special for demo
+            img.alt = 'Special Charm';
+            img.dataset.type = 'special';
+            slot.appendChild(img);
+          });
+          
           specialCount = products[currentProduct].slots;
+          rareCount = 0;
           calculatePrice();
         }
       });
@@ -332,6 +367,9 @@
       // Create slots for the product
       function createSlots(product) {
         const config = products[product];
+        specialCount = 0;
+        rareCount = 0;
+        
         for (let i = 0; i < config.slots; i++) {
           const slot = document.createElement('div');
           slot.className = 'slot';
@@ -339,28 +377,32 @@
           
           // First slots get special charms by default
           if (i < config.includedSpecial) {
-            // This would be replaced with actual special charm image
-            slot.innerHTML = '<img src="special-charm.png" alt="Special Charm" data-type="special">';
+            const img = document.createElement('img');
+            img.src = 'charms/' + plainCharms[i % plainCharms.length];
+            img.alt = 'Special Charm';
+            img.dataset.type = 'special';
+            slot.appendChild(img);
             specialCount++;
-          } else if (i < config.includedSpecial + (config.slots - config.includedSpecial)) {
-            // This would be replaced with actual plain charm image
-            slot.innerHTML = '<img src="plain-charm.png" alt="Plain Charm" data-type="plain">';
+          } else {
+            // Empty slot
+            slot.dataset.prevType = 'plain';
           }
           
           slot.addEventListener('click', () => {
             if (selectedCharm) {
               // Replace the charm in this slot
+              const prevImg = slot.querySelector('img');
+              const prevType = prevImg ? prevImg.dataset.type : slot.dataset.prevType;
+              
+              if (prevType === 'special') specialCount--;
+              if (prevType === 'rare') rareCount--;
+              
               slot.innerHTML = '';
               const img = document.createElement('img');
               img.src = selectedCharm.src;
               img.alt = selectedCharm.alt;
               img.dataset.type = selectedCharm.dataset.type;
               slot.appendChild(img);
-              
-              // Update counts
-              const prevType = slot.dataset.prevType;
-              if (prevType === 'special') specialCount--;
-              if (prevType === 'rare') rareCount--;
               
               if (selectedCharm.dataset.type === 'special') specialCount++;
               if (selectedCharm.dataset.type === 'rare') rareCount++;
@@ -378,22 +420,24 @@
       // Initialize charms in the pools
       function initCharms() {
         // Plain charms (0.5 JD)
-        for (let i = 1; i <= 20; i++) {
-          const charm = createCharm(`plain-charm-${i}.png`, 'Plain Charm', 'plain');
-          plainCharmsGrid.appendChild(charm);
-        }
+        plainCharms.forEach((charm, index) => {
+          if (index < 16) { // Only show first 16 plain charms
+            const charmEl = createCharm('charms/' + charm, 'Plain Charm ' + (index+1), 'plain');
+            plainCharmsGrid.appendChild(charmEl);
+          }
+        });
         
-        // Special charms (2 JDs)
-        for (let i = 1; i <= 12; i++) {
-          const charm = createCharm(`special-charm-${i}.png`, 'Special Charm', 'special');
-          specialCharmsGrid.appendChild(charm);
-        }
+        // Special charms (2 JDs) - using plain charms as special for demo
+        plainCharms.slice(16).forEach((charm, index) => {
+          const charmEl = createCharm('charms/' + charm, 'Special Charm ' + (index+1), 'special');
+          specialCharmsGrid.appendChild(charmEl);
+        });
         
         // Rare charms (3 JDs)
-        for (let i = 1; i <= 8; i++) {
-          const charm = createCharm(`rare-charm-${i}.png`, 'Rare Charm', 'rare');
-          rareCharmsGrid.appendChild(charm);
-        }
+        rareCharms.forEach((charm, index) => {
+          const charmEl = createCharm('rares/' + charm, 'Rare Charm ' + (index+1), 'rare');
+          rareCharmsGrid.appendChild(charmEl);
+        });
       }
 
       // Create a charm element
@@ -420,7 +464,7 @@
         if (isGold) basePrice += 1;
         
         // Calculate charm costs
-        const includedPlain = config.slots - config.includedSpecial;
+        const includedPlain = Math.max(0, config.slots - config.includedSpecial - rareCount);
         const additionalSpecial = Math.max(0, specialCount - config.includedSpecial);
         const plainCost = 0; // Included in base price
         const specialCost = additionalSpecial * 2;
