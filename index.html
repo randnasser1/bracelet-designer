@@ -90,7 +90,7 @@
       overflow-x: auto;
       padding-bottom: 10px;
       margin-bottom: 1rem;
-      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+      -webkit-overflow-scrolling: touch;
     }
 
     #jewelry-piece {
@@ -105,7 +105,6 @@
       min-width: 100%;
     }
 
-    /* Custom scrollbar for bracelet */
     .bracelet-container::-webkit-scrollbar {
       height: 6px;
     }
@@ -193,29 +192,6 @@
       position: relative;
     }
 
-    .charm.sold-out {
-      opacity: 0.5;
-      cursor: not-allowed;
-      position: relative;
-    }
-
-    .charm.sold-out::after {
-      content: "X";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(214, 51, 108, 0.7);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 1.2rem;
-      border-radius: 8px;
-    }
-
     .charm:hover {
       transform: scale(1.1);
     }
@@ -228,6 +204,24 @@
     .rare {
       border: 2px solid purple;
       border-radius: 8px;
+    }
+
+    .charm.sold-out {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .sold-out-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(214, 51, 108, 0.8);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: bold;
     }
 
     .pricing-info {
@@ -343,7 +337,7 @@
 
     <div class="price-display">
       <div id="base-price">Base Price: 10 JDs</div>
-      <div id="charm-price">Charms: 0 JDs</div>
+      <div id="charm-price">Charms: 0 JDs (0/2 free specials used)</div>
       <div id="total-price">Total: 10 JDs</div>
     </div>
 
@@ -399,11 +393,11 @@
         necklace: { basePrice: 22, slots: 34, includedSpecial: 2, fullGlam: 64 }
       };
 
-      // Charm image lists
+      // Charm image lists with sold out status
       const specialCharms = [
         { src: 'img_5957.png', soldOut: false },
         { src: 'img_5958.png', soldOut: false },
-        { src: 'img_5959.png', soldOut: true },
+        { src: 'img_5959.png', soldOut: false },
         { src: 'img_5960.png', soldOut: false },
         { src: 'img_5961.png', soldOut: false },
         { src: 'img_5962.png', soldOut: false },
@@ -437,10 +431,10 @@
         { src: 'img_6031.png', soldOut: false },
         { src: 'img_6032.png', soldOut: false }
       ];
-      
+
       const rareCharms = [
         { src: 'img_6035.png', soldOut: false },
-        { src: 'img_6036.png', soldOut: true },
+        { src: 'img_6036.png', soldOut: false },
         { src: 'img_6038.png', soldOut: false },
         { src: 'img_6040.png', soldOut: false },
         { src: 'img_6041.png', soldOut: false },
@@ -452,7 +446,6 @@
         { src: 'img_6060.png', soldOut: false },
         { src: 'img_6061.png', soldOut: false }
       ];
-
 
       // Current state
       let currentProduct = 'bracelet';
@@ -519,7 +512,7 @@
           slots.forEach((slot, index) => {
             slot.innerHTML = '';
             const img = document.createElement('img');
-            img.src = 'charms/' + specialCharms[index % specialCharms.length];
+            img.src = 'charms/' + specialCharms[index % specialCharms.length].src;
             img.alt = 'Special Charm';
             img.dataset.type = 'special';
             slot.appendChild(img);
@@ -540,47 +533,6 @@
       }
 
       // Create slots for the product
-      function handleSlotClick() {
-        if (selectedCharm) {
-          // Don't allow selecting sold out charms
-          if (selectedCharm.classList.contains('sold-out')) {
-            alert('This charm is sold out!');
-            return;
-          }
-
-          // Replace the charm in this slot
-          const prevImg = this.querySelector('img');
-          const prevType = prevImg.dataset.type;
-          
-          if (prevType === 'special') {
-            specialCount--;
-            if (includedSpecialUsed > 0) includedSpecialUsed--;
-          }
-          if (prevType === 'rare') {
-            rareCount--;
-          }
-          
-          this.innerHTML = '';
-          const newImg = selectedCharm.cloneNode();
-          newImg.classList.remove('selected');
-          this.appendChild(newImg);
-          
-          if (selectedCharm.dataset.type === 'special') {
-            if (includedSpecialUsed < products[currentProduct].includedSpecial) {
-              includedSpecialUsed++;
-            } else {
-              specialCount++;
-            }
-          }
-          if (selectedCharm.dataset.type === 'rare') {
-            rareCount++;
-          }
-          
-          calculatePrice();
-        }
-      }
-
-      // Update createSlots to use new click handler
       function createSlots(product) {
         const config = products[product];
         specialCount = 0;
@@ -608,30 +560,85 @@
           img.dataset.type = 'base';
           slot.appendChild(img);
           
-          slot.addEventListener('click', handleSlotClick);
+          slot.addEventListener('click', function() {
+            if (selectedCharm) {
+              // Don't allow selecting sold out charms
+              if (selectedCharm.classList.contains('sold-out')) {
+                alert('This charm is sold out!');
+                return;
+              }
+
+              // Replace the charm in this slot
+              const prevImg = this.querySelector('img');
+              const prevType = prevImg.dataset.type;
+              
+              if (prevType === 'special') {
+                specialCount--;
+                if (includedSpecialUsed > 0) includedSpecialUsed--;
+              }
+              if (prevType === 'rare') {
+                rareCount--;
+              }
+              
+              this.innerHTML = '';
+              const newImg = selectedCharm.cloneNode();
+              newImg.classList.remove('selected');
+              this.appendChild(newImg);
+              
+              if (selectedCharm.dataset.type === 'special') {
+                if (includedSpecialUsed < products[currentProduct].includedSpecial) {
+                  includedSpecialUsed++;
+                } else {
+                  specialCount++;
+                }
+              }
+              if (selectedCharm.dataset.type === 'rare') {
+                rareCount++;
+              }
+              
+              calculatePrice();
+            }
+          });
+          
           jewelryPiece.appendChild(slot);
         }
       }
 
       // Initialize charms in the pools
       function initCharms() {
+        // Clear existing charms
+        specialCharmsGrid.innerHTML = '';
+        rareCharmsGrid.innerHTML = '';
+
         // Special charms
         specialCharms.forEach((charm, index) => {
           const charmEl = createCharm('charms/' + charm.src, 'Special Charm ' + (index+1), 'special');
           charmEl.classList.add('special');
+          
           if (charm.soldOut) {
             charmEl.classList.add('sold-out');
+            const soldOutLabel = document.createElement('div');
+            soldOutLabel.className = 'sold-out-label';
+            soldOutLabel.textContent = 'Sold Out';
+            charmEl.appendChild(soldOutLabel);
           }
+          
           specialCharmsGrid.appendChild(charmEl);
         });
         
         // Rare charms
-         rareCharms.forEach((charm, index) => {
+        rareCharms.forEach((charm, index) => {
           const charmEl = createCharm('rares/' + charm.src, 'Rare Charm ' + (index+1), 'rare');
           charmEl.classList.add('rare');
+          
           if (charm.soldOut) {
             charmEl.classList.add('sold-out');
+            const soldOutLabel = document.createElement('div');
+            soldOutLabel.className = 'sold-out-label';
+            soldOutLabel.textContent = 'Sold Out';
+            charmEl.appendChild(soldOutLabel);
           }
+          
           rareCharmsGrid.appendChild(charmEl);
         });
       }
@@ -654,46 +661,7 @@
         
         return charm;
       }
-    
-    function handleSlotClick() {
-        if (selectedCharm) {
-          // Don't allow selecting sold out charms
-          if (selectedCharm.classList.contains('sold-out')) {
-            alert('This charm is sold out!');
-            return;
-          }
 
-          // Replace the charm in this slot
-          const prevImg = this.querySelector('img');
-          const prevType = prevImg.dataset.type;
-          
-          if (prevType === 'special') {
-            specialCount--;
-            if (includedSpecialUsed > 0) includedSpecialUsed--;
-          }
-          if (prevType === 'rare') {
-            rareCount--;
-          }
-          
-          this.innerHTML = '';
-          const newImg = selectedCharm.cloneNode();
-          newImg.classList.remove('selected');
-          this.appendChild(newImg);
-          
-          if (selectedCharm.dataset.type === 'special') {
-            if (includedSpecialUsed < products[currentProduct].includedSpecial) {
-              includedSpecialUsed++;
-            } else {
-              specialCount++;
-            }
-          }
-          if (selectedCharm.dataset.type === 'rare') {
-            rareCount++;
-          }
-          
-          calculatePrice();
-        }
-      }
       // Calculate and update price display
       function calculatePrice() {
         const config = products[currentProduct];
@@ -712,7 +680,7 @@
         
         // Update displays
         basePriceDisplay.textContent = `Base Price: ${basePrice} JDs`;
-        charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs (${includedSpecialUsed}/2 free specials used)`;
+        charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs (${includedSpecialUsed}/${products[currentProduct].includedSpecial} free specials used)`;
         totalPriceDisplay.textContent = `Total: ${total} JDs`;
       }
     });
