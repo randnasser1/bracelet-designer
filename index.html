@@ -211,6 +211,27 @@
       cursor: not-allowed;
     }
 
+    .charm.used {
+      opacity: 0.5;
+      position: relative;
+    }
+
+    .charm.used::after {
+      content: "✓";
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #d6336c;
+      color: white;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+
     .sold-out-label {
       position: absolute;
       top: 50%;
@@ -305,6 +326,52 @@
         gap: 6px;
       }
     }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 300px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-btn {
+      padding: 8px 16px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .modal-btn.confirm {
+      background-color: #d6336c;
+      color: white;
+    }
+
+    .modal-btn.cancel {
+      background-color: #e0e0e0;
+    }
   </style>
 </head>
 <body>
@@ -373,6 +440,17 @@
     </div>
   </div>
 
+  <!-- Modal for charm removal confirmation -->
+  <div class="modal" id="remove-charm-modal">
+    <div class="modal-content">
+      <p>Remove this charm?</p>
+      <div class="modal-buttons">
+        <button class="modal-btn confirm" id="confirm-remove">Remove</button>
+        <button class="modal-btn cancel" id="cancel-remove">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // DOM Elements
@@ -385,6 +463,9 @@
       const totalPriceDisplay = document.getElementById('total-price');
       const specialCharmsGrid = document.getElementById('special-charms');
       const rareCharmsGrid = document.getElementById('rare-charms');
+      const removeCharmModal = document.getElementById('remove-charm-modal');
+      const confirmRemoveBtn = document.getElementById('confirm-remove');
+      const cancelRemoveBtn = document.getElementById('cancel-remove');
 
       // Product configurations
       const products = {
@@ -454,6 +535,8 @@
       let specialCount = 0;
       let rareCount = 0;
       let includedSpecialUsed = 0;
+      let usedCharms = new Set(); // Track used charm filenames
+      let slotToRemove = null; // Track which slot is being considered for removal
 
       // Initialize
       initProduct(currentProduct);
@@ -503,19 +586,26 @@
       fullGlamBtn.addEventListener('click', () => {
         const price = products[currentProduct].fullGlam;
         if (confirm(`Set all charms to special for ${price} JDs?`)) {
-          // Clear all slots
+          // Clear all slots and used charms
           jewelryPiece.innerHTML = '';
+          usedCharms = new Set();
           createSlots(currentProduct);
           
           // Fill all slots with special charms
           const slots = document.querySelectorAll('.slot');
           slots.forEach((slot, index) => {
             slot.innerHTML = '';
+            const charm = specialCharms[index % specialCharms.length];
             const img = document.createElement('img');
-            img.src = 'charms/' + specialCharms[index % specialCharms.length].src;
+            img.src = 'charms/' + charm.src;
             img.alt = 'Special Charm';
             img.dataset.type = 'special';
+            img.dataset.charm = charm.src;
             slot.appendChild(img);
+            
+            // Mark charm as used
+            usedCharms.add(charm.src);
+            updateCharmUsage();
           });
           
           specialCount = products[currentProduct].slots;
@@ -528,7 +618,9 @@
       // Initialize product slots
       function initProduct(product) {
         jewelryPiece.innerHTML = '';
+        usedCharms = new Set();
         createSlots(product);
+        updateCharmUsage();
         calculatePrice();
       }
 
@@ -561,47 +653,131 @@
           slot.appendChild(img);
           
           slot.addEventListener('click', function() {
-            if (selectedCharm) {
-              // Don't allow selecting sold out charms
-              if (selectedCharm.classList.contains('sold-out')) {
-                alert('This charm is sold out!');
-                return;
-              }
-
-              // Replace the charm in this slot
-              const prevImg = this.querySelector('img');
-              const prevType = prevImg.dataset.type;
-              
-              if (prevType === 'special') {
-                specialCount--;
-                if (includedSpecialUsed > 0) includedSpecialUsed--;
-              }
-              if (prevType === 'rare') {
-                rareCount--;
-              }
-              
-              this.innerHTML = '';
-              const newImg = selectedCharm.cloneNode();
-              newImg.classList.remove('selected');
-              this.appendChild(newImg);
-              
-              if (selectedCharm.dataset.type === 'special') {
-                if (includedSpecialUsed < products[currentProduct].includedSpecial) {
-                  includedSpecialUsed++;
-                } else {
-                  specialCount++;
-                }
-              }
-              if (selectedCharm.dataset.type === 'rare') {
-                rareCount++;
-              }
-              
-              calculatePrice();
-            }
+            handleSlotClick(this);
           });
           
           jewelryPiece.appendChild(slot);
         }
+      }
+
+      // Handle slot click events
+      function handleSlotClick(slot) {
+        const currentCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"]');
+        
+        // If there's a charm in the slot, ask to remove it
+        if (currentCharm && !selectedCharm) {
+          slotToRemove = slot;
+          removeCharmModal.style.display = 'flex';
+          return;
+        }
+        
+        // If we have a selected charm, try to add it
+        if (selectedCharm) {
+          addCharmToSlot(slot);
+        }
+      }
+
+      // Add a charm to a slot
+      function addCharmToSlot(slot) {
+        // Don't allow selecting sold out charms
+        if (selectedCharm.classList.contains('sold-out')) {
+          alert('This charm is sold out!');
+          return;
+        }
+
+        // Don't allow using the same charm twice
+        const charmSrc = selectedCharm.src.split('/').pop();
+        if (usedCharms.has(charmSrc)) {
+          alert('This charm is already used on the bracelet!');
+          return;
+        }
+
+        // Get info about previous charm (if any)
+        const prevImg = slot.querySelector('img[data-type="special"], img[data-type="rare"]');
+        let prevType = null;
+        let prevCharmSrc = null;
+        
+        if (prevImg) {
+          prevType = prevImg.dataset.type;
+          prevCharmSrc = prevImg.dataset.charm;
+        }
+
+        // Get info about new charm
+        const newType = selectedCharm.dataset.type;
+        const newCharmSrc = selectedCharm.src.split('/').pop();
+
+        // Remove previous charm if exists
+        if (prevImg) {
+          slot.removeChild(prevImg);
+          usedCharms.delete(prevCharmSrc);
+          
+          // Update counts for previous charm
+          if (prevType === 'special') {
+            specialCount--;
+            if (includedSpecialUsed > 0) includedSpecialUsed--;
+          } else if (prevType === 'rare') {
+            rareCount--;
+          }
+        }
+
+        // Add new charm
+        const newImg = selectedCharm.cloneNode();
+        newImg.classList.remove('selected');
+        newImg.dataset.charm = newCharmSrc;
+        slot.appendChild(newImg);
+        usedCharms.add(newCharmSrc);
+
+        // Update counts for new charm
+        if (newType === 'special') {
+          if (includedSpecialUsed < products[currentProduct].includedSpecial) {
+            includedSpecialUsed++;
+          } else {
+            specialCount++;
+          }
+        } else if (newType === 'rare') {
+          rareCount++;
+          
+          // Special case: rare replacing special
+          if (prevType === 'special') {
+            specialCount++;
+          }
+        }
+        
+        // Special case: special replacing rare
+        if (newType === 'special' && prevType === 'rare') {
+          rareCount--;
+        }
+
+        // Update UI and price
+        updateCharmUsage();
+        calculatePrice();
+        selectedCharm = null;
+        document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
+      }
+
+      // Remove charm from slot
+      function removeCharmFromSlot(slot) {
+        const charmImg = slot.querySelector('img[data-type="special"], img[data-type="rare"]');
+        if (!charmImg) return;
+
+        const charmType = charmImg.dataset.type;
+        const charmSrc = charmImg.dataset.charm;
+
+        // Remove the charm
+        slot.removeChild(charmImg);
+        usedCharms.delete(charmSrc);
+
+        // Update counts
+        if (charmType === 'special') {
+          specialCount--;
+          if (includedSpecialUsed > 0) includedSpecialUsed--;
+        } else if (charmType === 'rare') {
+          rareCount--;
+        }
+
+        // Update UI and price
+        updateCharmUsage();
+        calculatePrice();
       }
 
       // Initialize charms in the pools
@@ -614,6 +790,7 @@
         specialCharms.forEach((charm, index) => {
           const charmEl = createCharm('charms/' + charm.src, 'Special Charm ' + (index+1), 'special');
           charmEl.classList.add('special');
+          charmEl.dataset.charm = charm.src;
           
           if (charm.soldOut) {
             charmEl.classList.add('sold-out');
@@ -630,6 +807,7 @@
         rareCharms.forEach((charm, index) => {
           const charmEl = createCharm('rares/' + charm.src, 'Rare Charm ' + (index+1), 'rare');
           charmEl.classList.add('rare');
+          charmEl.dataset.charm = charm.src;
           
           if (charm.soldOut) {
             charmEl.classList.add('sold-out');
@@ -662,6 +840,22 @@
         return charm;
       }
 
+      // Update charm usage indicators
+      function updateCharmUsage() {
+        // Clear all used indicators
+        document.querySelectorAll('.charm').forEach(charm => {
+          charm.classList.remove('used');
+        });
+
+        // Mark used charms
+        usedCharms.forEach(charmSrc => {
+          const charmEl = document.querySelector(`.charm[src$="${charmSrc}"]`);
+          if (charmEl) {
+            charmEl.classList.add('used');
+          }
+        });
+      }
+
       // Calculate and update price display
       function calculatePrice() {
         const config = products[currentProduct];
@@ -683,6 +877,28 @@
         charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs (${includedSpecialUsed}/${products[currentProduct].includedSpecial} free specials used)`;
         totalPriceDisplay.textContent = `Total: ${total} JDs`;
       }
+
+      // Modal event handlers
+      confirmRemoveBtn.addEventListener('click', () => {
+        if (slotToRemove) {
+          removeCharmFromSlot(slotToRemove);
+          slotToRemove = null;
+        }
+        removeCharmModal.style.display = 'none';
+      });
+
+      cancelRemoveBtn.addEventListener('click', () => {
+        slotToRemove = null;
+        removeCharmModal.style.display = 'none';
+      });
+
+      // Close modal when clicking outside
+      window.addEventListener('click', (event) => {
+        if (event.target === removeCharmModal) {
+          slotToRemove = null;
+          removeCharmModal.style.display = 'none';
+        }
+      });
     });
   </script>
 </body>
