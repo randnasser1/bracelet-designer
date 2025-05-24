@@ -13,8 +13,6 @@
       color: #333;
       margin: 0;
       padding: 1rem;
-      min-height: 100vh;
-      overflow-x: hidden;
     }
 
     h1, h2 {
@@ -33,6 +31,7 @@
       justify-content: center;
       gap: 1rem;
       margin-bottom: 1rem;
+      flex-wrap: wrap;
     }
 
     .product-btn {
@@ -91,6 +90,7 @@
       overflow-x: auto;
       padding-bottom: 10px;
       margin-bottom: 1rem;
+      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
 
     #jewelry-piece {
@@ -244,6 +244,7 @@
     .material-selector {
       display: flex;
       gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
     .material-option {
@@ -270,6 +271,21 @@
 
     .material-option.mix {
       background: linear-gradient(135deg, #e0e0e0 50%, #ffd700 50%);
+    }
+
+    @media (max-width: 480px) {
+      .slot {
+        flex: 0 0 45px;
+        height: 45px;
+      }
+      .slot img {
+        width: 38px;
+        height: 38px;
+      }
+      #jewelry-piece {
+        padding: 0.8rem;
+        gap: 6px;
+      }
     }
   </style>
 </head>
@@ -310,12 +326,12 @@
     <div class="pricing-info">
       <h3>Pricing Information</h3>
       <ul>
-        <li><span class="highlight">Bracelet:</span> 10 JDs (18 slots)</li>
-        <li><span class="highlight">Anklet:</span> 15 JDs (23 slots)</li>
-        <li><span class="highlight">Necklace:</span> 22 JDs (34 slots)</li>
+        <li><span class="highlight">Bracelet:</span> 10 JDs (18 slots) - 2 special charms included</li>
+        <li><span class="highlight">Anklet:</span> 15 JDs (23 slots) - 2 special charms included</li>
+        <li><span class="highlight">Necklace:</span> 22 JDs (34 slots) - 2 special charms included</li>
         <li>Gold: +1 JD</li>
         <li>Mix: +2.5 JDs</li>
-        <li>Special charm: +2 JDs</li>
+        <li>Additional special charm: +2 JDs</li>
         <li>Rare charm: +3 JDs</li>
         <li><span class="highlight">Full Glam:</span> All special (29 JDs bracelet)</li>
       </ul>
@@ -324,7 +340,7 @@
 
     <div class="charm-pools">
       <div class="charm-pool">
-        <h3>Special Charms (+2 JDs each)</h3>
+        <h3>Special Charms (+2 JDs each after first 2)</h3>
         <div class="charms-grid" id="special-charms">
           <!-- Special charms will be added here by JS -->
         </div>
@@ -354,9 +370,9 @@
 
       // Product configurations
       const products = {
-        bracelet: { basePrice: 10, slots: 18, fullGlam: 29 },
-        anklet: { basePrice: 15, slots: 23, fullGlam: 42 },
-        necklace: { basePrice: 22, slots: 34, fullGlam: 64 }
+        bracelet: { basePrice: 10, slots: 18, includedSpecial: 2, fullGlam: 29 },
+        anklet: { basePrice: 15, slots: 23, includedSpecial: 2, fullGlam: 42 },
+        necklace: { basePrice: 22, slots: 34, includedSpecial: 2, fullGlam: 64 }
       };
 
       // Charm image lists
@@ -384,6 +400,7 @@
       let materialType = 'silver';
       let specialCount = 0;
       let rareCount = 0;
+      let includedSpecialUsed = 0;
 
       // Initialize
       initProduct(currentProduct);
@@ -449,6 +466,7 @@
           });
           
           specialCount = products[currentProduct].slots;
+          includedSpecialUsed = products[currentProduct].includedSpecial;
           rareCount = 0;
           calculatePrice();
         }
@@ -466,6 +484,7 @@
         const config = products[product];
         specialCount = 0;
         rareCount = 0;
+        includedSpecialUsed = 0;
         
         for (let i = 0; i < config.slots; i++) {
           const slot = document.createElement('div');
@@ -494,7 +513,10 @@
               const prevImg = slot.querySelector('img');
               const prevType = prevImg.dataset.type;
               
-              if (prevType === 'special') specialCount--;
+              if (prevType === 'special') {
+                specialCount--;
+                if (includedSpecialUsed > 0) includedSpecialUsed--;
+              }
               if (prevType === 'rare') rareCount--;
               
               slot.innerHTML = '';
@@ -504,7 +526,13 @@
               newImg.dataset.type = selectedCharm.dataset.type;
               slot.appendChild(newImg);
               
-              if (selectedCharm.dataset.type === 'special') specialCount++;
+              if (selectedCharm.dataset.type === 'special') {
+                if (includedSpecialUsed < products[currentProduct].includedSpecial) {
+                  includedSpecialUsed++;
+                } else {
+                  specialCount++;
+                }
+              }
               if (selectedCharm.dataset.type === 'rare') rareCount++;
               
               calculatePrice();
@@ -558,8 +586,8 @@
         if (materialType === 'gold') basePrice += 1;
         if (materialType === 'mix') basePrice += 2.5;
         
-        // Calculate charm costs
-        const specialCost = specialCount * 2;
+        // Calculate charm costs (only charge for special charms beyond the included ones)
+        const specialCost = Math.max(0, specialCount) * 2;
         const rareCost = rareCount * 3;
         
         const totalCharmCost = specialCost + rareCost;
@@ -567,7 +595,7 @@
         
         // Update displays
         basePriceDisplay.textContent = `Base Price: ${basePrice} JDs`;
-        charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs`;
+        charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs (${includedSpecialUsed}/2 free specials used)`;
         totalPriceDisplay.textContent = `Total: ${total} JDs`;
       }
     });
