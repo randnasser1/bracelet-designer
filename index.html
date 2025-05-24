@@ -132,7 +132,7 @@
       cursor: pointer;
     }
 
-    .slot.empty::after {
+    .slot:empty::after {
       content: "+";
       position: absolute;
       color: #d6336c;
@@ -359,12 +359,16 @@
     <div class="charm-pools">
       <div class="charm-pool">
         <h3>Special Charms (+2 JDs each after first 2)</h3>
-        <div class="charms-grid" id="special-charms"></div>
+        <div class="charms-grid" id="special-charms">
+          <!-- Special charms will be added here by JS -->
+        </div>
       </div>
       
       <div class="charm-pool">
         <h3>Rare Charms (+3 JDs each)</h3>
-        <div class="charms-grid" id="rare-charms"></div>
+        <div class="charms-grid" id="rare-charms">
+          <!-- Rare charms will be added here by JS -->
+        </div>
       </div>
     </div>
   </div>
@@ -450,18 +454,10 @@
       let specialCount = 0;
       let rareCount = 0;
       let includedSpecialUsed = 0;
-      let totalPrice = products.bracelet.basePrice;
-
-      // Track used charms
-      const usedCharms = {
-        special: new Set(),
-        rare: new Set()
-      };
 
       // Initialize
       initProduct(currentProduct);
       initCharms();
-      calculatePrice();
 
       // Product selection
       productBtns.forEach(btn => {
@@ -469,7 +465,6 @@
           productBtns.forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           currentProduct = btn.dataset.type;
-          totalPrice = products[currentProduct].basePrice;
           initProduct(currentProduct);
           calculatePrice();
         });
@@ -508,53 +503,24 @@
       fullGlamBtn.addEventListener('click', () => {
         const price = products[currentProduct].fullGlam;
         if (confirm(`Set all charms to special for ${price} JDs?`)) {
-          // Clear all slots and used charms
+          // Clear all slots
           jewelryPiece.innerHTML = '';
-          usedCharms.special.clear();
-          usedCharms.rare.clear();
-          
-          // Create new slots with special charms
           createSlots(currentProduct);
           
           // Fill all slots with special charms
           const slots = document.querySelectorAll('.slot');
-          let usedSpecials = 0;
-          
           slots.forEach((slot, index) => {
-            const charmIndex = index % specialCharms.length;
-            const charm = specialCharms[charmIndex];
-            
-            if (charm.soldOut) {
-              // Find next available charm
-              let nextAvailable = (charmIndex + 1) % specialCharms.length;
-              while (specialCharms[nextAvailable].soldOut && nextAvailable !== charmIndex) {
-                nextAvailable = (nextAvailable + 1) % specialCharms.length;
-              }
-              if (!specialCharms[nextAvailable].soldOut) {
-                charm = specialCharms[nextAvailable];
-              }
-            }
-            
-            if (!charm.soldOut) {
-              slot.innerHTML = '';
-              const img = document.createElement('img');
-              img.src = 'charms/' + charm.src;
-              img.alt = 'Special Charm';
-              img.dataset.type = 'special';
-              slot.appendChild(img);
-              slot.classList.remove('empty');
-              
-              usedCharms.special.add(charm.src);
-              usedSpecials++;
-            }
+            slot.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = 'charms/' + specialCharms[index % specialCharms.length].src;
+            img.alt = 'Special Charm';
+            img.dataset.type = 'special';
+            slot.appendChild(img);
           });
           
-          specialCount = Math.max(0, usedSpecials - products[currentProduct].includedSpecial);
-          includedSpecialUsed = Math.min(usedSpecials, products[currentProduct].includedSpecial);
+          specialCount = products[currentProduct].slots;
+          includedSpecialUsed = products[currentProduct].includedSpecial;
           rareCount = 0;
-          
-          // Set full glam price
-          totalPrice = products[currentProduct].fullGlam;
           calculatePrice();
         }
       });
@@ -572,125 +538,70 @@
         specialCount = 0;
         rareCount = 0;
         includedSpecialUsed = 0;
-        usedCharms.special.clear();
-        usedCharms.rare.clear();
         
         for (let i = 0; i < config.slots; i++) {
           const slot = document.createElement('div');
-          slot.className = 'slot empty';
+          slot.className = 'slot';
           slot.dataset.index = i;
+          
+          // Add base charm to slot
+          const img = document.createElement('img');
+          if (materialType === 'silver') {
+            img.src = 'basecharms/silver.png';
+            img.alt = 'Silver Base';
+          } else if (materialType === 'gold') {
+            img.src = 'basecharms/gold.png';
+            img.alt = 'Gold Base';
+          } else if (materialType === 'mix') {
+            const isGold = i % 2 === 0;
+            img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+            img.alt = isGold ? 'Gold Base' : 'Silver Base';
+          }
+          img.dataset.type = 'base';
+          slot.appendChild(img);
           
           slot.addEventListener('click', function() {
             if (selectedCharm) {
-              handleSlotClick(this);
-            } else {
-              // Remove charm if clicked with no selection
-              const currentImg = this.querySelector('img');
-              if (currentImg) {
-                if (confirm('Remove this charm?')) {
-                  removeCharm(this, currentImg);
+              // Don't allow selecting sold out charms
+              if (selectedCharm.classList.contains('sold-out')) {
+                alert('This charm is sold out!');
+                return;
+              }
+
+              // Replace the charm in this slot
+              const prevImg = this.querySelector('img');
+              const prevType = prevImg.dataset.type;
+              
+              if (prevType === 'special') {
+                specialCount--;
+                if (includedSpecialUsed > 0) includedSpecialUsed--;
+              }
+              if (prevType === 'rare') {
+                rareCount--;
+              }
+              
+              this.innerHTML = '';
+              const newImg = selectedCharm.cloneNode();
+              newImg.classList.remove('selected');
+              this.appendChild(newImg);
+              
+              if (selectedCharm.dataset.type === 'special') {
+                if (includedSpecialUsed < products[currentProduct].includedSpecial) {
+                  includedSpecialUsed++;
+                } else {
+                  specialCount++;
                 }
               }
+              if (selectedCharm.dataset.type === 'rare') {
+                rareCount++;
+              }
+              
+              calculatePrice();
             }
           });
           
           jewelryPiece.appendChild(slot);
         }
-      }
-
-      function handleSlotClick(slot) {
-        const charmType = selectedCharm.dataset.type;
-        const charmSrc = selectedCharm.src.split('/').pop();
-        
-        // Check if charm is sold out
-        const charmData = charmType === 'special' ? 
-          specialCharms.find(c => c.src === charmSrc) :
-          rareCharms.find(c => c.src === charmSrc);
-          
-        if (charmData.soldOut) {
-          alert('This charm is sold out!');
-          return;
-        }
-        
-        // Check if charm is already used
-        if (usedCharms[charmType].has(charmSrc)) {
-          alert('This charm is already used!');
-          return;
-        }
-
-        const currentImg = slot.querySelector('img');
-        let priceChange = 0;
-
-        if (currentImg) {
-          // Replacing existing charm
-          const currentType = currentImg.dataset.type;
-          const currentSrc = currentImg.src.split('/').pop();
-          
-          // Remove old charm from used set
-          usedCharms[currentType].delete(currentSrc);
-          
-          // Calculate price change
-          if (currentType === 'special' && charmType === 'rare') {
-            priceChange = 1; // +1 JD (special to rare)
-          } else if (currentType === 'rare' && charmType === 'special') {
-            priceChange = -1; // -1 JD (rare to special)
-          }
-          // No change for special->special or rare->rare
-          
-          // Update counts
-          if (currentType === 'special') {
-            specialCount--;
-            if (includedSpecialUsed > 0) includedSpecialUsed--;
-          } else {
-            rareCount--;
-          }
-        }
-
-        // Add new charm
-        slot.innerHTML = '';
-        slot.classList.remove('empty');
-        const newImg = selectedCharm.cloneNode();
-        newImg.dataset.type = charmType;
-        slot.appendChild(newImg);
-        usedCharms[charmType].add(charmSrc);
-        
-        // Update counts
-        if (charmType === 'special') {
-          if (includedSpecialUsed < products[currentProduct].includedSpecial) {
-            includedSpecialUsed++;
-          } else {
-            specialCount++;
-          }
-        } else {
-          rareCount++;
-        }
-        
-        // Update price with the change
-        totalPrice += priceChange;
-        calculatePrice();
-      }
-
-      function removeCharm(slot, img) {
-        const charmType = img.dataset.type;
-        const charmSrc = img.src.split('/').pop();
-        
-        // Remove from used set
-        usedCharms[charmType].delete(charmSrc);
-        
-        // Update counts
-        if (charmType === 'special') {
-          specialCount--;
-          if (includedSpecialUsed > 0) includedSpecialUsed--;
-        } else {
-          rareCount--;
-        }
-        
-        // Clear slot
-        slot.innerHTML = '';
-        slot.classList.add('empty');
-        
-        // Update price
-        calculatePrice();
       }
 
       // Initialize charms in the pools
