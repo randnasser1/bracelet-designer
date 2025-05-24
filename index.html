@@ -190,6 +190,30 @@
       cursor: pointer;
       transition: transform 0.2s;
       object-fit: contain;
+      position: relative;
+    }
+
+    .charm.sold-out {
+      opacity: 0.5;
+      cursor: not-allowed;
+      position: relative;
+    }
+
+    .charm.sold-out::after {
+      content: "X";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(214, 51, 108, 0.7);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      border-radius: 8px;
     }
 
     .charm:hover {
@@ -377,22 +401,58 @@
 
       // Charm image lists
       const specialCharms = [
-        'img_5957.png', 'img_5958.png', 'img_5959.png', 'img_5960.png',
-        'img_5961.png', 'img_5962.png', 'img_5963.png', 'img_5965.png',
-        'img_5968.png', 'img_5969.png', 'img_5970.png', 'img_5971.png',
-        'img_5983.png', 'img_5992.png', 'img_5999.png', 'img_6001.png',
-        'img_6005.png', 'img_6009.png', 'img_6010.png', 'img_6011.png',
-        'img_6012.png', 'img_6013.png', 'img_6014.png', 'img_6016.png',
-        'img_6018.png', 'img_6019.png', 'img_6020.png', 'img_6021.png',
-        'img_6023.png', 'img_6024.png', 'img_6025.png', 'img_6028.png',
-        'img_6030.png', 'img_6031.png', 'img_6032.png'
+        { src: 'img_5957.png', soldOut: false },
+        { src: 'img_5958.png', soldOut: false },
+        { src: 'img_5959.png', soldOut: true },
+        { src: 'img_5960.png', soldOut: false },
+        { src: 'img_5961.png', soldOut: false },
+        { src: 'img_5962.png', soldOut: false },
+        { src: 'img_5963.png', soldOut: false },
+        { src: 'img_5965.png', soldOut: false },
+        { src: 'img_5968.png', soldOut: false },
+        { src: 'img_5969.png', soldOut: false },
+        { src: 'img_5970.png', soldOut: false },
+        { src: 'img_5971.png', soldOut: false },
+        { src: 'img_5983.png', soldOut: false },
+        { src: 'img_5992.png', soldOut: false },
+        { src: 'img_5999.png', soldOut: false },
+        { src: 'img_6001.png', soldOut: false },
+        { src: 'img_6005.png', soldOut: false },
+        { src: 'img_6009.png', soldOut: false },
+        { src: 'img_6010.png', soldOut: false },
+        { src: 'img_6011.png', soldOut: false },
+        { src: 'img_6012.png', soldOut: false },
+        { src: 'img_6013.png', soldOut: false },
+        { src: 'img_6014.png', soldOut: false },
+        { src: 'img_6016.png', soldOut: false },
+        { src: 'img_6018.png', soldOut: false },
+        { src: 'img_6019.png', soldOut: false },
+        { src: 'img_6020.png', soldOut: false },
+        { src: 'img_6021.png', soldOut: false },
+        { src: 'img_6023.png', soldOut: false },
+        { src: 'img_6024.png', soldOut: false },
+        { src: 'img_6025.png', soldOut: false },
+        { src: 'img_6028.png', soldOut: false },
+        { src: 'img_6030.png', soldOut: false },
+        { src: 'img_6031.png', soldOut: false },
+        { src: 'img_6032.png', soldOut: false }
+      ];
+      
+      const rareCharms = [
+        { src: 'img_6035.png', soldOut: false },
+        { src: 'img_6036.png', soldOut: true },
+        { src: 'img_6038.png', soldOut: false },
+        { src: 'img_6040.png', soldOut: false },
+        { src: 'img_6041.png', soldOut: false },
+        { src: 'img_6045.png', soldOut: false },
+        { src: 'img_6049.png', soldOut: false },
+        { src: 'img_6050.png', soldOut: false },
+        { src: 'img_6052.png', soldOut: false },
+        { src: 'img_6057.png', soldOut: false },
+        { src: 'img_6060.png', soldOut: false },
+        { src: 'img_6061.png', soldOut: false }
       ];
 
-      const rareCharms = [
-        'img_6035.png', 'img_6036.png', 'img_6038.png', 'img_6040.png',
-        'img_6041.png', 'img_6045.png', 'img_6049.png', 'img_6050.png',
-        'img_6052.png', 'img_6057.png', 'img_6060.png', 'img_6061.png'
-      ];
 
       // Current state
       let currentProduct = 'bracelet';
@@ -480,6 +540,47 @@
       }
 
       // Create slots for the product
+      function handleSlotClick() {
+        if (selectedCharm) {
+          // Don't allow selecting sold out charms
+          if (selectedCharm.classList.contains('sold-out')) {
+            alert('This charm is sold out!');
+            return;
+          }
+
+          // Replace the charm in this slot
+          const prevImg = this.querySelector('img');
+          const prevType = prevImg.dataset.type;
+          
+          if (prevType === 'special') {
+            specialCount--;
+            if (includedSpecialUsed > 0) includedSpecialUsed--;
+          }
+          if (prevType === 'rare') {
+            rareCount--;
+          }
+          
+          this.innerHTML = '';
+          const newImg = selectedCharm.cloneNode();
+          newImg.classList.remove('selected');
+          this.appendChild(newImg);
+          
+          if (selectedCharm.dataset.type === 'special') {
+            if (includedSpecialUsed < products[currentProduct].includedSpecial) {
+              includedSpecialUsed++;
+            } else {
+              specialCount++;
+            }
+          }
+          if (selectedCharm.dataset.type === 'rare') {
+            rareCount++;
+          }
+          
+          calculatePrice();
+        }
+      }
+
+      // Update createSlots to use new click handler
       function createSlots(product) {
         const config = products[product];
         specialCount = 0;
@@ -507,38 +608,7 @@
           img.dataset.type = 'base';
           slot.appendChild(img);
           
-          slot.addEventListener('click', () => {
-            if (selectedCharm) {
-              // Replace the charm in this slot
-              const prevImg = slot.querySelector('img');
-              const prevType = prevImg.dataset.type;
-              
-              if (prevType === 'special') {
-                specialCount--;
-                if (includedSpecialUsed > 0) includedSpecialUsed--;
-              }
-              if (prevType === 'rare') rareCount--;
-              
-              slot.innerHTML = '';
-              const newImg = document.createElement('img');
-              newImg.src = selectedCharm.src;
-              newImg.alt = selectedCharm.alt;
-              newImg.dataset.type = selectedCharm.dataset.type;
-              slot.appendChild(newImg);
-              
-              if (selectedCharm.dataset.type === 'special') {
-                if (includedSpecialUsed < products[currentProduct].includedSpecial) {
-                  includedSpecialUsed++;
-                } else {
-                  specialCount++;
-                }
-              }
-              if (selectedCharm.dataset.type === 'rare') rareCount++;
-              
-              calculatePrice();
-            }
-          });
-          
+          slot.addEventListener('click', handleSlotClick);
           jewelryPiece.appendChild(slot);
         }
       }
@@ -547,15 +617,21 @@
       function initCharms() {
         // Special charms
         specialCharms.forEach((charm, index) => {
-          const charmEl = createCharm('charms/' + charm, 'Special Charm ' + (index+1), 'special');
+          const charmEl = createCharm('charms/' + charm.src, 'Special Charm ' + (index+1), 'special');
           charmEl.classList.add('special');
+          if (charm.soldOut) {
+            charmEl.classList.add('sold-out');
+          }
           specialCharmsGrid.appendChild(charmEl);
         });
         
         // Rare charms
-        rareCharms.forEach((charm, index) => {
-          const charmEl = createCharm('rares/' + charm, 'Rare Charm ' + (index+1), 'rare');
+         rareCharms.forEach((charm, index) => {
+          const charmEl = createCharm('rares/' + charm.src, 'Rare Charm ' + (index+1), 'rare');
           charmEl.classList.add('rare');
+          if (charm.soldOut) {
+            charmEl.classList.add('sold-out');
+          }
           rareCharmsGrid.appendChild(charmEl);
         });
       }
@@ -568,15 +644,56 @@
         charm.alt = alt;
         charm.dataset.type = type;
         
-        charm.addEventListener('click', () => {
+        charm.addEventListener('click', function() {
+          if (this.classList.contains('sold-out')) return;
+          
           document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
-          charm.classList.add('selected');
-          selectedCharm = charm;
+          this.classList.add('selected');
+          selectedCharm = this;
         });
         
         return charm;
       }
+    
+    function handleSlotClick() {
+        if (selectedCharm) {
+          // Don't allow selecting sold out charms
+          if (selectedCharm.classList.contains('sold-out')) {
+            alert('This charm is sold out!');
+            return;
+          }
 
+          // Replace the charm in this slot
+          const prevImg = this.querySelector('img');
+          const prevType = prevImg.dataset.type;
+          
+          if (prevType === 'special') {
+            specialCount--;
+            if (includedSpecialUsed > 0) includedSpecialUsed--;
+          }
+          if (prevType === 'rare') {
+            rareCount--;
+          }
+          
+          this.innerHTML = '';
+          const newImg = selectedCharm.cloneNode();
+          newImg.classList.remove('selected');
+          this.appendChild(newImg);
+          
+          if (selectedCharm.dataset.type === 'special') {
+            if (includedSpecialUsed < products[currentProduct].includedSpecial) {
+              includedSpecialUsed++;
+            } else {
+              specialCount++;
+            }
+          }
+          if (selectedCharm.dataset.type === 'rare') {
+            rareCount++;
+          }
+          
+          calculatePrice();
+        }
+      }
       // Calculate and update price display
       function calculatePrice() {
         const config = products[currentProduct];
