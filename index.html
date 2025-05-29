@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Design your custom jewelry with charms">
   <title>Jewelry Designer</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
@@ -209,10 +210,11 @@
     .charm.sold-out {
       opacity: 0.5;
       cursor: not-allowed;
+      filter: grayscale(100%);
     }
 
     .charm.used {
-      opacity: 0.5;
+      opacity: 0.7;
       position: relative;
     }
 
@@ -327,7 +329,7 @@
       }
     }
 
-    /* Modal styles */
+    /* Improved Modal styles */
     .modal {
       display: none;
       position: fixed;
@@ -343,10 +345,11 @@
 
     .modal-content {
       background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 300px;
-      width: 100%;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      max-width: 90%;
+      width: 400px;
       text-align: center;
     }
 
@@ -362,6 +365,8 @@
       border-radius: 5px;
       border: none;
       cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
     }
 
     .modal-btn.confirm {
@@ -369,7 +374,16 @@
       color: white;
     }
 
+    .modal-btn.confirm:hover {
+      background-color: #c2255b;
+    }
+
     .modal-btn.cancel {
+      background-color: #f1f1f1;
+      color: #333;
+    }
+
+    .modal-btn.cancel:hover {
       background-color: #e0e0e0;
     }
   </style>
@@ -379,22 +393,22 @@
     <h1>Jewelry Designer</h1>
     
     <div class="product-selector">
-      <button class="product-btn active" data-type="bracelet">Bracelet</button>
-      <button class="product-btn" data-type="anklet">Anklet</button>
-      <button class="product-btn" data-type="necklace">Necklace</button>
+      <button class="product-btn active" data-type="bracelet" aria-label="Select bracelet">Bracelet</button>
+      <button class="product-btn" data-type="anklet" aria-label="Select anklet">Anklet</button>
+      <button class="product-btn" data-type="necklace" aria-label="Select necklace">Necklace</button>
     </div>
 
     <div class="controls">
       <div class="control-group">
         <span>Material:</span>
         <div class="material-selector">
-          <div class="material-option silver selected" data-material="silver">Silver</div>
-          <div class="material-option gold" data-material="gold">Gold (+1 JD)</div>
-          <div class="material-option mix" data-material="mix">Mix (+2.5 JDs)</div>
+          <div class="material-option silver selected" data-material="silver" aria-label="Silver material">Silver</div>
+          <div class="material-option gold" data-material="gold" aria-label="Gold material">Gold (+1 JD)</div>
+          <div class="material-option mix" data-material="mix" aria-label="Mixed material">Mix (+2.5 JDs)</div>
         </div>
       </div>
       <div class="control-group">
-        <button class="btn" id="full-glam-btn">Full Glam Look</button>
+        <button class="btn" id="full-glam-btn" aria-label="Apply full glam look">Full Glam Look</button>
       </div>
     </div>
 
@@ -426,14 +440,14 @@
     <div class="charm-pools">
       <div class="charm-pool">
         <h3>Special Charms (+2 JDs each after first 2)</h3>
-        <div class="charms-grid" id="special-charms">
+        <div class="charms-grid" id="special-charms" role="list" aria-label="Special charms selection">
           <!-- Special charms will be added here by JS -->
         </div>
       </div>
       
       <div class="charm-pool">
         <h3>Rare Charms (+3 JDs each)</h3>
-        <div class="charms-grid" id="rare-charms">
+        <div class="charms-grid" id="rare-charms" role="list" aria-label="Rare charms selection">
           <!-- Rare charms will be added here by JS -->
         </div>
       </div>
@@ -476,56 +490,56 @@
 
       // Charm image lists with sold out status
       const specialCharms = [
-        { src: 'img_5957.png', soldOut: false },
-        { src: 'img_5958.png', soldOut: false },
-        { src: 'img_5959.png', soldOut: false },
-        { src: 'img_5960.png', soldOut: false },
-        { src: 'img_5961.png', soldOut: false },
-        { src: 'img_5962.png', soldOut: false },
-        { src: 'img_5963.png', soldOut: false },
-        { src: 'img_5965.png', soldOut: false },
-        { src: 'img_5968.png', soldOut: false },
-        { src: 'img_5969.png', soldOut: false },
-        { src: 'img_5970.png', soldOut: false },
-        { src: 'img_5971.png', soldOut: false },
-        { src: 'img_5983.png', soldOut: false },
-        { src: 'img_5992.png', soldOut: false },
-        { src: 'img_5999.png', soldOut: false },
-        { src: 'img_6001.png', soldOut: false },
-        { src: 'img_6005.png', soldOut: false },
-        { src: 'img_6009.png', soldOut: false },
-        { src: 'img_6010.png', soldOut: false },
-        { src: 'img_6011.png', soldOut: false },
-        { src: 'img_6012.png', soldOut: false },
-        { src: 'img_6013.png', soldOut: false },
-        { src: 'img_6014.png', soldOut: false },
-        { src: 'img_6016.png', soldOut: false },
-        { src: 'img_6018.png', soldOut: false },
-        { src: 'img_6019.png', soldOut: false },
-        { src: 'img_6020.png', soldOut: false },
-        { src: 'img_6021.png', soldOut: false },
-        { src: 'img_6023.png', soldOut: false },
-        { src: 'img_6024.png', soldOut: false },
-        { src: 'img_6025.png', soldOut: false },
-        { src: 'img_6028.png', soldOut: false },
-        { src: 'img_6030.png', soldOut: false },
-        { src: 'img_6031.png', soldOut: false },
-        { src: 'img_6032.png', soldOut: false }
+        { src: 'charms/img_5957.png', soldOut: false },
+        { src: 'charms/img_5958.png', soldOut: false },
+        { src: 'charms/img_5959.png', soldOut: false },
+        { src: 'charms/img_5960.png', soldOut: false },
+        { src: 'charms/img_5961.png', soldOut: false },
+        { src: 'charms/img_5962.png', soldOut: false },
+        { src: 'charms/img_5963.png', soldOut: false },
+        { src: 'charms/img_5965.png', soldOut: false },
+        { src: 'charms/img_5968.png', soldOut: false },
+        { src: 'charms/img_5969.png', soldOut: false },
+        { src: 'charms/img_5970.png', soldOut: false },
+        { src: 'charms/img_5971.png', soldOut: false },
+        { src: 'charms/img_5983.png', soldOut: false },
+        { src: 'charms/img_5992.png', soldOut: false },
+        { src: 'charms/img_5999.png', soldOut: false },
+        { src: 'charms/img_6001.png', soldOut: false },
+        { src: 'charms/img_6005.png', soldOut: false },
+        { src: 'charms/img_6009.png', soldOut: false },
+        { src: 'charms/img_6010.png', soldOut: false },
+        { src: 'charms/img_6011.png', soldOut: false },
+        { src: 'charms/img_6012.png', soldOut: false },
+        { src: 'charms/img_6013.png', soldOut: false },
+        { src: 'charms/img_6014.png', soldOut: false },
+        { src: 'charms/img_6016.png', soldOut: false },
+        { src: 'charms/img_6018.png', soldOut: false },
+        { src: 'charms/img_6019.png', soldOut: false },
+        { src: 'charms/img_6020.png', soldOut: false },
+        { src: 'charms/img_6021.png', soldOut: false },
+        { src: 'charms/img_6023.png', soldOut: false },
+        { src: 'charms/img_6024.png', soldOut: false },
+        { src: 'charms/img_6025.png', soldOut: false },
+        { src: 'charms/img_6028.png', soldOut: false },
+        { src: 'charms/img_6030.png', soldOut: false },
+        { src: 'charms/img_6031.png', soldOut: false },
+        { src: 'charms/img_6032.png', soldOut: false }
       ];
 
       const rareCharms = [
-        { src: 'img_6035.png', soldOut: false },
-        { src: 'img_6036.png', soldOut: false },
-        { src: 'img_6038.png', soldOut: false },
-        { src: 'img_6040.png', soldOut: false },
-        { src: 'img_6041.png', soldOut: false },
-        { src: 'img_6045.png', soldOut: false },
-        { src: 'img_6049.png', soldOut: false },
-        { src: 'img_6050.png', soldOut: false },
-        { src: 'img_6052.png', soldOut: false },
-        { src: 'img_6057.png', soldOut: false },
-        { src: 'img_6060.png', soldOut: false },
-        { src: 'img_6061.png', soldOut: false }
+        { src: 'rares/img_6035.png', soldOut: false },
+        { src: 'rares/img_6036.png', soldOut: false },
+        { src: 'rares/img_6038.png', soldOut: false },
+        { src: 'rares/img_6040.png', soldOut: false },
+        { src: 'rares/img_6041.png', soldOut: false },
+        { src: 'rares/img_6045.png', soldOut: false },
+        { src: 'rares/img_6049.png', soldOut: false },
+        { src: 'rares/img_6050.png', soldOut: false },
+        { src: 'rares/img_6052.png', soldOut: false },
+        { src: 'rares/img_6057.png', soldOut: false },
+        { src: 'rares/img_6060.png', soldOut: false },
+        { src: 'rares/img_6061.png', soldOut: false }
       ];
 
       // Current state
@@ -535,8 +549,8 @@
       let specialCount = 0;
       let rareCount = 0;
       let includedSpecialUsed = 0;
-      let usedCharms = new Set(); // Track used charm filenames
-      let slotToRemove = null; // Track which slot is being considered for removal
+      let usedCharms = new Set();
+      let slotToRemove = null;
 
       // Initialize
       initProduct(currentProduct);
@@ -586,25 +600,22 @@
       fullGlamBtn.addEventListener('click', () => {
         const price = products[currentProduct].fullGlam;
         if (confirm(`Set all charms to special for ${price} JDs?`)) {
-          // Clear all slots and used charms
           jewelryPiece.innerHTML = '';
           usedCharms = new Set();
           createSlots(currentProduct);
           
-          // Fill all slots with special charms
           const slots = document.querySelectorAll('.slot');
           slots.forEach((slot, index) => {
             slot.innerHTML = '';
             const charm = specialCharms[index % specialCharms.length];
             const img = document.createElement('img');
-            img.src = 'charms/' + charm.src;
+            img.src = charm.src;
             img.alt = 'Special Charm';
             img.dataset.type = 'special';
-            img.dataset.charm = charm.src;
+            img.dataset.charm = charm.src.split('/').pop();
             slot.appendChild(img);
             
-            // Mark charm as used
-            usedCharms.add(charm.src);
+            usedCharms.add(charm.src.split('/').pop());
             updateCharmUsage();
           });
           
@@ -636,7 +647,6 @@
           slot.className = 'slot';
           slot.dataset.index = i;
           
-          // Add base charm to slot
           const img = document.createElement('img');
           if (materialType === 'silver') {
             img.src = 'basecharms/silver.png';
@@ -664,14 +674,12 @@
       function handleSlotClick(slot) {
         const currentCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"]');
         
-        // If there's a charm in the slot, ask to remove it
         if (currentCharm && !selectedCharm) {
           slotToRemove = slot;
           removeCharmModal.style.display = 'flex';
           return;
         }
         
-        // If we have a selected charm, try to add it
         if (selectedCharm) {
           addCharmToSlot(slot);
         }
@@ -679,55 +687,43 @@
 
       // Add a charm to a slot
       function addCharmToSlot(slot) {
-        // Don't allow selecting sold out charms
         if (selectedCharm.classList.contains('sold-out')) {
           alert('This charm is sold out!');
           return;
         }
 
-        // Don't allow using the same charm twice
         const charmSrc = selectedCharm.src.split('/').pop();
         if (usedCharms.has(charmSrc)) {
           alert('This charm is already used on the bracelet!');
           return;
         }
 
-        // Get info about previous charm (if any)
-        const prevImg = slot.querySelector('img[data-type="special"], img[data-type="rare"]');
-        let prevType = null;
-        let prevCharmSrc = null;
-        
-        if (prevImg) {
-          prevType = prevImg.dataset.type;
-          prevCharmSrc = prevImg.dataset.charm;
+        // Clear the slot and add base charm
+        slot.innerHTML = '';
+        const baseImg = document.createElement('img');
+        if (materialType === 'silver') {
+          baseImg.src = 'basecharms/silver.png';
+          baseImg.alt = 'Silver Base';
+        } else if (materialType === 'gold') {
+          baseImg.src = 'basecharms/gold.png';
+          baseImg.alt = 'Gold Base';
+        } else if (materialType === 'mix') {
+          const isGold = parseInt(slot.dataset.index) % 2 === 0;
+          baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+          baseImg.alt = isGold ? 'Gold Base' : 'Silver Base';
         }
+        baseImg.dataset.type = 'base';
+        slot.appendChild(baseImg);
 
-        // Get info about new charm
-        const newType = selectedCharm.dataset.type;
-        const newCharmSrc = selectedCharm.src.split('/').pop();
-
-        // Remove previous charm if exists
-        if (prevImg) {
-          slot.removeChild(prevImg);
-          usedCharms.delete(prevCharmSrc);
-          
-          // Update counts for previous charm
-          if (prevType === 'special') {
-            specialCount--;
-            if (includedSpecialUsed > 0) includedSpecialUsed--;
-          } else if (prevType === 'rare') {
-            rareCount--;
-          }
-        }
-
-        // Add new charm
+        // Add the selected charm
         const newImg = selectedCharm.cloneNode();
         newImg.classList.remove('selected');
-        newImg.dataset.charm = newCharmSrc;
+        newImg.dataset.charm = charmSrc;
         slot.appendChild(newImg);
-        usedCharms.add(newCharmSrc);
+        usedCharms.add(charmSrc);
 
-        // Update counts for new charm
+        // Update counts
+        const newType = selectedCharm.dataset.type;
         if (newType === 'special') {
           if (includedSpecialUsed < products[currentProduct].includedSpecial) {
             includedSpecialUsed++;
@@ -736,19 +732,8 @@
           }
         } else if (newType === 'rare') {
           rareCount++;
-          
-          // Special case: rare replacing special
-          if (prevType === 'special') {
-            specialCount++;
-          }
-        }
-        
-        // Special case: special replacing rare
-        if (newType === 'special' && prevType === 'rare') {
-          rareCount--;
         }
 
-        // Update UI and price
         updateCharmUsage();
         calculatePrice();
         selectedCharm = null;
@@ -763,11 +748,9 @@
         const charmType = charmImg.dataset.type;
         const charmSrc = charmImg.dataset.charm;
 
-        // Remove the charm
         slot.removeChild(charmImg);
         usedCharms.delete(charmSrc);
 
-        // Update counts
         if (charmType === 'special') {
           specialCount--;
           if (includedSpecialUsed > 0) includedSpecialUsed--;
@@ -775,22 +758,19 @@
           rareCount--;
         }
 
-        // Update UI and price
         updateCharmUsage();
         calculatePrice();
       }
 
       // Initialize charms in the pools
       function initCharms() {
-        // Clear existing charms
         specialCharmsGrid.innerHTML = '';
         rareCharmsGrid.innerHTML = '';
 
-        // Special charms
         specialCharms.forEach((charm, index) => {
-          const charmEl = createCharm('charms/' + charm.src, 'Special Charm ' + (index+1), 'special');
+          const charmEl = createCharm(charm.src, `Special Charm ${index+1}`, 'special');
           charmEl.classList.add('special');
-          charmEl.dataset.charm = charm.src;
+          charmEl.dataset.charm = charm.src.split('/').pop();
           
           if (charm.soldOut) {
             charmEl.classList.add('sold-out');
@@ -803,11 +783,10 @@
           specialCharmsGrid.appendChild(charmEl);
         });
         
-        // Rare charms
         rareCharms.forEach((charm, index) => {
-          const charmEl = createCharm('rares/' + charm.src, 'Rare Charm ' + (index+1), 'rare');
+          const charmEl = createCharm(charm.src, `Rare Charm ${index+1}`, 'rare');
           charmEl.classList.add('rare');
-          charmEl.dataset.charm = charm.src;
+          charmEl.dataset.charm = charm.src.split('/').pop();
           
           if (charm.soldOut) {
             charmEl.classList.add('sold-out');
@@ -830,7 +809,10 @@
         charm.dataset.type = type;
         
         charm.addEventListener('click', function() {
-          if (this.classList.contains('sold-out')) return;
+          if (this.classList.contains('sold-out')) {
+            alert('This charm is sold out!');
+            return;
+          }
           
           document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
           this.classList.add('selected');
@@ -842,12 +824,10 @@
 
       // Update charm usage indicators
       function updateCharmUsage() {
-        // Clear all used indicators
         document.querySelectorAll('.charm').forEach(charm => {
           charm.classList.remove('used');
         });
 
-        // Mark used charms
         usedCharms.forEach(charmSrc => {
           const charmEl = document.querySelector(`.charm[src$="${charmSrc}"]`);
           if (charmEl) {
@@ -861,18 +841,15 @@
         const config = products[currentProduct];
         let basePrice = config.basePrice;
         
-        // Add material cost
         if (materialType === 'gold') basePrice += 1;
         if (materialType === 'mix') basePrice += 2.5;
         
-        // Calculate charm costs (only charge for special charms beyond the included ones)
         const specialCost = Math.max(0, specialCount) * 2;
         const rareCost = rareCount * 3;
         
         const totalCharmCost = specialCost + rareCost;
         const total = basePrice + totalCharmCost;
         
-        // Update displays
         basePriceDisplay.textContent = `Base Price: ${basePrice} JDs`;
         charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs (${includedSpecialUsed}/${products[currentProduct].includedSpecial} free specials used)`;
         totalPriceDisplay.textContent = `Total: ${total} JDs`;
@@ -892,7 +869,6 @@
         removeCharmModal.style.display = 'none';
       });
 
-      // Close modal when clicking outside
       window.addEventListener('click', (event) => {
         if (event.target === removeCharmModal) {
           slotToRemove = null;
