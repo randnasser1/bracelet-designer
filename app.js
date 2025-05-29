@@ -1,119 +1,119 @@
+// In the addCharmToSlot function, replace with this:
+function addCharmToSlot(slot) {
+  // Don't allow selecting sold out charms
+  if (selectedCharm.classList.contains('sold-out')) {
+    alert('This charm is sold out!');
+    return;
+  }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const priceDisplay = document.getElementById('priceDisplay');
-      const countDisplay = document.getElementById('countDisplay');
-      const bracelet = document.getElementById('bracelet');
-      const charmPool = document.getElementById('charmPool');
-      const goldToggle = document.getElementById('gold-toggle');
-      const addSlotBtn = document.getElementById('add-slot-btn');
-      const removeSlotBtn = document.getElementById('remove-slot-btn');
-      const saveBtn = document.getElementById('save-btn');
+  const charmSrc = selectedCharm.src.split('/').pop();
+  if (usedCharms.has(charmSrc)) {
+    alert('This charm is already used on the bracelet!');
+    return;
+  }
 
-      let basePrice = 8.00;
-      let charmCount = 0;
-      let totalPrice = basePrice;
-      let lastClickedCharm = null;
+  // Clear the slot completely first
+  slot.innerHTML = '';
 
-      // Create the 18 base charms slots dynamically
-      for (let i = 0; i < 18; i++) {
-        const slot = document.createElement('div');
-        slot.classList.add('slot');
-        slot.dataset.base = 'true';
-        const img = document.createElement('img');
-        img.src = 'basecharms/silver.png';
-        img.alt = 'Silver Charm';
-        img.setAttribute('data-name', 'silver');
-        img.setAttribute('data-price', '0');
-        img.setAttribute('data-type', 'base');
-        img.draggable = false;
-        slot.appendChild(img);
-        bracelet.appendChild(slot);
-      }
+  // Add base charm to slot first
+  const baseImg = document.createElement('img');
+  if (materialType === 'silver') {
+    baseImg.src = 'basecharms/silver.png';
+    baseImg.alt = 'Silver Base';
+  } else if (materialType === 'gold') {
+    baseImg.src = 'basecharms/gold.png';
+    baseImg.alt = 'Gold Base';
+  } else if (materialType === 'mix') {
+    const isGold = parseInt(slot.dataset.index) % 2 === 0;
+    baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+    baseImg.alt = isGold ? 'Gold Base' : 'Silver Base';
+  }
+  baseImg.dataset.type = 'base';
+  slot.appendChild(baseImg);
 
-      // Update the price display
-      const updatePrice = () => {
-        priceDisplay.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
-        countDisplay.textContent = `${charmCount} / 18 charms`;
-      };
+  // Then add the selected charm
+  const newImg = selectedCharm.cloneNode();
+  newImg.classList.remove('selected');
+  newImg.dataset.charm = charmSrc;
+  slot.appendChild(newImg);
+  usedCharms.add(charmSrc);
 
-      // Update the bracelet with a charm
-      const updateBracelet = (charm, targetSlot) => {
-        if (!targetSlot.innerHTML && charmCount < 18) {
-          const img = charm.cloneNode();
-          img.draggable = false;
-          targetSlot.appendChild(img);
-          charmCount += 1;
-          totalPrice += parseFloat(img.getAttribute('data-price')) || 0;
-          updatePrice();
-        }
-      };
+  // Update counts
+  const newType = selectedCharm.dataset.type;
+  if (newType === 'special') {
+    if (includedSpecialUsed < products[currentProduct].includedSpecial) {
+      includedSpecialUsed++;
+    } else {
+      specialCount++;
+    }
+  } else if (newType === 'rare') {
+    rareCount++;
+  }
 
-      // Toggle gold charms
-      const toggleGold = (isGold) => {
-        document.querySelectorAll('.slot img').forEach(img => {
-          if (img.getAttribute('data-name') === 'silver') {
-            img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-          }
-        });
-      };
+  updateCharmUsage();
+  calculatePrice();
+  selectedCharm = null;
+  document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
+}
 
-      goldToggle.addEventListener('change', (e) => {
-        const isGold = e.target.checked;
-        basePrice = isGold ? 9.00 : 8.00;
-        toggleGold(isGold);
-        recalculateTotal();
-      });
+// In the initCharms function, update the sold-out styling:
+function initCharms() {
+  specialCharmsGrid.innerHTML = '';
+  rareCharmsGrid.innerHTML = '';
 
-      // Recalculate the total price
-      const recalculateTotal = () => {
-        totalPrice = basePrice;
-        charmCount = 0;
+  specialCharms.forEach((charm, index) => {
+    const charmEl = createCharm('charms/' + charm.src, 'Special Charm ' + (index+1), 'special');
+    charmEl.classList.add('special');
+    charmEl.dataset.charm = charm.src;
+    
+    if (charm.soldOut) {
+      charmEl.classList.add('sold-out');
+      charmEl.style.opacity = '0.5'; // Add this line
+      const soldOutLabel = document.createElement('div');
+      soldOutLabel.className = 'sold-out-label';
+      soldOutLabel.textContent = 'Sold Out';
+      charmEl.appendChild(soldOutLabel);
+    }
+    
+    specialCharmsGrid.appendChild(charmEl);
+  });
+  
+  rareCharms.forEach((charm, index) => {
+    const charmEl = createCharm('rares/' + charm.src, 'Rare Charm ' + (index+1), 'rare');
+    charmEl.classList.add('rare');
+    charmEl.dataset.charm = charm.src;
+    
+    if (charm.soldOut) {
+      charmEl.classList.add('sold-out');
+      charmEl.style.opacity = '0.5'; // Add this line
+      const soldOutLabel = document.createElement('div');
+      soldOutLabel.className = 'sold-out-label';
+      soldOutLabel.textContent = 'Sold Out';
+      charmEl.appendChild(soldOutLabel);
+    }
+    
+    rareCharmsGrid.appendChild(charmEl);
+  });
+}
 
-        document.querySelectorAll('#bracelet .slot img').forEach(img => {
-          charmCount += 1;
-          totalPrice += parseFloat(img.getAttribute('data-price')) || 0;
-        });
-
-        updatePrice();
-      };
-
-      charmPool.addEventListener('click', (e) => {
-        if (e.target.tagName === 'IMG') {
-          lastClickedCharm = e.target;
-        }
-      });
-
-      // Add charm slot
-      addSlotBtn.addEventListener('click', () => {
-        const emptySlot = Array.from(document.querySelectorAll('.slot')).find(slot => !slot.innerHTML);
-        if (emptySlot && charmCount < 18) {
-          const isGold = goldToggle.checked;
-          const baseCharm = document.createElement('img');
-          baseCharm.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-          baseCharm.setAttribute('data-price', basePrice);
-          baseCharm.setAttribute('data-type', 'base');
-          baseCharm.setAttribute('data-name', isGold ? 'gold' : 'silver');
-          emptySlot.appendChild(baseCharm);
-          charmCount++;
-          totalPrice += basePrice;
-          updatePrice();
-        }
-      });
-
-      // Remove charm slot
-      removeSlotBtn.addEventListener('click', () => {
-        const filledSlot = Array.from(document.querySelectorAll('.slot')).find(slot => slot.innerHTML);
-        if (filledSlot) {
-          const removedCharm = filledSlot.querySelector('img');
-          totalPrice -= parseFloat(removedCharm.getAttribute('data-price'));
-          charmCount--;
-          filledSlot.innerHTML = '';
-          updatePrice();
-        }
-      });
-
-      // Save bracelet (optional)
-      saveBtn.addEventListener('click', () => {
-        alert('Bracelet saved!');
-      });
-    });
+// Also update the createCharm function to handle sold-out charms:
+function createCharm(src, alt, type) {
+  const charm = document.createElement('img');
+  charm.className = 'charm';
+  charm.src = src;
+  charm.alt = alt;
+  charm.dataset.type = type;
+  
+  charm.addEventListener('click', function() {
+    if (this.classList.contains('sold-out')) {
+      alert('This charm is sold out!');
+      return;
+    }
+    
+    document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
+    this.classList.add('selected');
+    selectedCharm = this;
+  });
+  
+  return charm;
+}
