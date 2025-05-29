@@ -116,21 +116,22 @@ h1 {
   transform: scale(1.05);
 }
 
-/* This ensures charms in bracelet slots are always fully visible */
-#bracelet .slot img,
-#bracelet .bracelet-slot img {
-  opacity: 1 !important;
+/* ---------- FIXED OPACITY RULES ---------- */
+/* Only fade SOLD-OUT charms in bracelet */
+#bracelet .slot img.sold-out,
+#bracelet .bracelet-slot img.sold-out {
+  opacity: 0.5;
+  filter: grayscale(50%);
 }
 
-/* This makes used charms in the gallery appear faded */
+/* Used charms in gallery get checkmark but stay visible */
 .charm-pool img.used,
 .normal-charms img.used,
 .rare-charms img.used {
-  opacity: 0.5;
   position: relative;
 }
 
-/* Checkmark for used charms in gallery only */
+/* Checkmark for used charms in gallery */
 .charm-pool img.used::after,
 .normal-charms img.used::after,
 .rare-charms img.used::after {
@@ -148,6 +149,14 @@ h1 {
   justify-content: center;
   font-size: 10px;
 }
+
+/* Force full visibility for all non-sold-out bracelet charms */
+#bracelet .slot img:not(.sold-out),
+#bracelet .bracelet-slot img:not(.sold-out) {
+  opacity: 1 !important;
+  filter: none !important;
+}
+/* ---------------------------------------- */
 
 .price-info {
   font-size: 1.3rem;
