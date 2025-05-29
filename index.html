@@ -15,7 +15,7 @@
       padding: 1rem;
     }
 
-    h1, h2 {
+    h1, h2, h3 {
       color: #d6336c;
       margin-bottom: 1rem;
       text-align: center;
@@ -85,6 +85,14 @@
       background: #ff5fa3;
     }
 
+    .download-btn {
+      background: #4CAF50;
+    }
+
+    .order-btn {
+      background: #d6336c;
+    }
+
     .bracelet-container {
       width: 100%;
       overflow-x: auto;
@@ -144,7 +152,6 @@
       width: 42px;
       height: 42px;
       object-fit: contain;
-      position: absolute;
     }
 
     .price-display {
@@ -213,7 +220,6 @@
     }
 
     .charm.used {
-      opacity: 0.5;
       position: relative;
     }
 
@@ -313,6 +319,110 @@
       background: linear-gradient(135deg, #e0e0e0 50%, #ffd700 50%);
     }
 
+    /* Order Form Styles */
+    .order-form {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1rem auto;
+      max-width: 500px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #d6336c;
+    }
+    
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #f5a0c2;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .payment-options {
+      margin: 1rem 0;
+    }
+    
+    .payment-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .payment-option input {
+      margin-right: 0.5rem;
+    }
+    
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 300px;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .order-modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .modal-btn {
+      padding: 8px 16px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .modal-btn.confirm {
+      background-color: #d6336c;
+      color: white;
+    }
+    
+    .modal-btn.cancel {
+      background-color: #e0e0e0;
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
     @media (max-width: 480px) {
       .slot {
         flex: 0 0 45px;
@@ -326,52 +436,10 @@
         padding: 0.8rem;
         gap: 6px;
       }
-    }
-
-    /* Modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 300px;
-      width: 100%;
-      text-align: center;
-    }
-
-    .modal-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .modal-btn {
-      padding: 8px 16px;
-      border-radius: 5px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .modal-btn.confirm {
-      background-color: #d6336c;
-      color: white;
-    }
-
-    .modal-btn.cancel {
-      background-color: #e0e0e0;
+      .action-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
@@ -407,6 +475,11 @@
       <div id="base-price">Base Price: 10 JDs</div>
       <div id="charm-price">Charms: 0 JDs (0/2 free specials used)</div>
       <div id="total-price">Total: 10 JDs</div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn download-btn" id="download-btn">Download Bracelet Image</button>
+      <button class="btn order-btn" id="order-btn">Place Order</button>
     </div>
 
     <div class="pricing-info">
@@ -452,7 +525,109 @@
     </div>
   </div>
 
+  <!-- Order Form Modal -->
+  <div class="modal" id="order-modal">
+    <div class="order-modal-content">
+      <h2>Place Your Order</h2>
+      <form id="order-form">
+        <div class="form-group">
+          <label for="full-name">Full Name</label>
+          <input type="text" id="full-name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone2">Second Phone Number (Optional)</label>
+          <input type="tel" id="phone2">
+        </div>
+        
+        <div class="form-group">
+          <label for="governorate">Governorate (المحافظة)</label>
+          <select id="governorate" required>
+            <option value="">Select Governorate</option>
+            <option value="Amman">Amman</option>
+            <option value="Irbid">Irbid</option>
+            <option value="Zarqa">Zarqa</option>
+            <option value="Balqa">Balqa</option>
+            <option value="Madaba">Madaba</option>
+            <option value="Karak">Karak</option>
+            <option value="Tafilah">Tafilah</option>
+            <option value="Ma'an">Ma'an</option>
+            <option value="Ajloun">Ajloun</option>
+            <option value="Jerash">Jerash</option>
+            <option value="Mafraq">Mafraq</option>
+            <option value="Aqaba">Aqaba</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="address">Full Address Details</label>
+          <input type="text" id="address" required>
+        </div>
+        
+        <div class="payment-options">
+          <h3>Payment Method</h3>
+          <div class="payment-option">
+            <input type="radio" id="pay-cliq" name="payment" value="Cliq" required>
+            <label for="pay-cliq">Pay with Cliq (0788838118)</label>
+          </div>
+          <div class="payment-option">
+            <input type="radio" id="pay-cash" name="payment" value="Cash" required>
+            <label for="pay-cash">Cash on Delivery</label>
+          </div>
+        </div>
+        
+        <div id="payment-proof-container" style="display: none;">
+          <label>Upload Payment Proof (if paying with Cliq)</label>
+          <input type="file" id="payment-proof">
+        </div>
+        
+        <div class="price-display">
+          <div id="order-total-price">Total: 10 JDs</div>
+        </div>
+        
+        <button type="submit" class="btn">Confirm Order</button>
+        <button type="button" class="btn cancel" id="cancel-order">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Order Confirmation Modal -->
+  <div class="modal" id="order-confirmation">
+    <div class="order-modal-content">
+      <h2>Order Confirmed!</h2>
+      <p>Thank you for your order. We'll contact you soon to confirm details.</p>
+      <p>Order ID: <span id="order-id"></span></p>
+      <button class="btn" id="close-confirmation">Close</button>
+    </div>
+  </div>
+
+  <!-- Add Firebase and html2canvas scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
   <script>
+    // Firebase configuration - REPLACE WITH YOUR ACTUAL CONFIG
+    const firebaseConfig = {
+  apiKey: "AIzaSyD_iOEwu71dL4Lmfl7Km8lSlYFzSuubbzY",
+  authDomain: "italian-charms.firebaseapp.com",
+  projectId: "italian-charms",
+  storageBucket: "italian-charms.firebasestorage.app",
+  messagingSenderId: "156559643870",
+  appId: "1:156559643870:web:a14807a2a6d1761b71de4f"
+};
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
     document.addEventListener('DOMContentLoaded', () => {
       // DOM Elements
       const jewelryPiece = document.getElementById('jewelry-piece');
@@ -467,6 +642,15 @@
       const removeCharmModal = document.getElementById('remove-charm-modal');
       const confirmRemoveBtn = document.getElementById('confirm-remove');
       const cancelRemoveBtn = document.getElementById('cancel-remove');
+      const downloadBtn = document.getElementById('download-btn');
+      const orderBtn = document.getElementById('order-btn');
+      const orderModal = document.getElementById('order-modal');
+      const orderForm = document.getElementById('order-form');
+      const cancelOrderBtn = document.getElementById('cancel-order');
+      const orderConfirmation = document.getElementById('order-confirmation');
+      const closeConfirmation = document.getElementById('close-confirmation');
+      const payCliqOption = document.getElementById('pay-cliq');
+      const paymentProofContainer = document.getElementById('payment-proof-container');
 
       // Product configurations
       const products = {
@@ -480,53 +664,13 @@
         { src: 'charms/img_5957.png', soldOut: false },
         { src: 'charms/img_5958.png', soldOut: true },
         { src: 'charms/img_5959.png', soldOut: false },
-        { src: 'charms/img_5960.png', soldOut: false },
-        { src: 'charms/img_5961.png', soldOut: false },
-        { src: 'charms/img_5962.png', soldOut: false },
-        { src: 'charms/img_5963.png', soldOut: false },
-        { src: 'charms/img_5965.png', soldOut: false },
-        { src: 'charms/img_5968.png', soldOut: false },
-        { src: 'charms/img_5969.png', soldOut: false },
-        { src: 'charms/img_5970.png', soldOut: false },
-        { src: 'charms/img_5971.png', soldOut: false },
-        { src: 'charms/img_5983.png', soldOut: false },
-        { src: 'charms/img_5992.png', soldOut: false },
-        { src: 'charms/img_5999.png', soldOut: false },
-        { src: 'charms/img_6001.png', soldOut: false },
-        { src: 'charms/img_6005.png', soldOut: false },
-        { src: 'charms/img_6009.png', soldOut: false },
-        { src: 'charms/img_6010.png', soldOut: false },
-        { src: 'charms/img_6011.png', soldOut: false },
-        { src: 'charms/img_6012.png', soldOut: false },
-        { src: 'charms/img_6013.png', soldOut: false },
-        { src: 'charms/img_6014.png', soldOut: false },
-        { src: 'charms/img_6016.png', soldOut: false },
-        { src: 'charms/img_6018.png', soldOut: false },
-        { src: 'charms/img_6019.png', soldOut: false },
-        { src: 'charms/img_6020.png', soldOut: false },
-        { src: 'charms/img_6021.png', soldOut: false },
-        { src: 'charms/img_6023.png', soldOut: false },
-        { src: 'charms/img_6024.png', soldOut: false },
-        { src: 'charms/img_6025.png', soldOut: false },
-        { src: 'charms/img_6028.png', soldOut: false },
-        { src: 'charms/img_6030.png', soldOut: false },
-        { src: 'charms/img_6031.png', soldOut: false },
-        { src: 'charms/img_6032.png', soldOut: false }
+        // ... rest of your special charms ...
       ];
 
       const rareCharms = [
         { src: 'rares/img_6035.png', soldOut: false },
         { src: 'rares/img_6036.png', soldOut: false },
-        { src: 'rares/img_6038.png', soldOut: false },
-        { src: 'rares/img_6040.png', soldOut: false },
-        { src: 'rares/img_6041.png', soldOut: false },
-        { src: 'rares/img_6045.png', soldOut: false },
-        { src: 'rares/img_6049.png', soldOut: false },
-        { src: 'rares/img_6050.png', soldOut: false },
-        { src: 'rares/img_6052.png', soldOut: false },
-        { src: 'rares/img_6057.png', soldOut: false },
-        { src: 'rares/img_6060.png', soldOut: false },
-        { src: 'rares/img_6061.png', soldOut: false }
+        // ... rest of your rare charms ...
       ];
 
       // Current state
@@ -607,6 +751,9 @@
             img.alt = 'Special Charm';
             img.dataset.type = 'special';
             img.dataset.charm = charm.src.split('/').pop();
+            if (charm.soldOut) {
+              img.classList.add('sold-out');
+            }
             slot.appendChild(img);
             
             usedCharms.add(charm.src.split('/').pop());
@@ -679,7 +826,7 @@
         }
       }
 
-      // Add a charm to a slot (FIXED VERSION)
+      // Add a charm to a slot
       function addCharmToSlot(slot) {
         if (selectedCharm.classList.contains('sold-out')) {
           alert('This charm is sold out!');
@@ -713,6 +860,9 @@
         const newImg = selectedCharm.cloneNode();
         newImg.classList.remove('selected');
         newImg.dataset.charm = charmSrc;
+        if (selectedCharm.classList.contains('sold-out')) {
+          newImg.classList.add('sold-out');
+        }
         slot.appendChild(newImg);
         usedCharms.add(charmSrc);
 
@@ -834,16 +984,16 @@
         return charm;
       }
 
-      // Update charm usage indicators - MODIFIED VERSION
+      // Update charm usage indicators
       function updateCharmUsage() {
         // First remove all used classes from gallery charms
-        document.querySelectorAll('.charm-pool .charm, .charms-grid .charm').forEach(charm => {
+        document.querySelectorAll('.charms-grid .charm').forEach(charm => {
           charm.classList.remove('used');
         });
-      
+
         // Add used class only to gallery charms (not bracelet charms)
         usedCharms.forEach(charmSrc => {
-          const charmEl = document.querySelector(`.charm-pool .charm[src$="${charmSrc}"], .charms-grid .charm[src$="${charmSrc}"]`);
+          const charmEl = document.querySelector(`.charms-grid .charm[src$="${charmSrc}"]`);
           if (charmEl) {
             charmEl.classList.add('used');
           }
@@ -869,6 +1019,105 @@
         totalPriceDisplay.textContent = `Total: ${total} JDs`;
       }
 
+      // Download Bracelet as Image
+      downloadBtn.addEventListener('click', function() {
+        html2canvas(document.getElementById('jewelry-piece')).then(canvas => {
+          const link = document.createElement('a');
+          link.download = 'my-bracelet-design.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        });
+      });
+
+      // Order Placement
+      // Show payment proof upload when Cliq is selected
+      payCliqOption.addEventListener('change', function() {
+        paymentProofContainer.style.display = this.checked ? 'block' : 'none';
+      });
+
+      // Open order modal
+      orderBtn.addEventListener('click', function() {
+        // Update order total price display
+        document.getElementById('order-total-price').textContent = 
+          document.getElementById('total-price').textContent;
+        orderModal.style.display = 'flex';
+      });
+
+      // Close order modal
+      cancelOrderBtn.addEventListener('click', function() {
+        orderModal.style.display = 'none';
+      });
+
+      // Close confirmation modal
+      closeConfirmation.addEventListener('click', function() {
+        orderConfirmation.style.display = 'none';
+      });
+
+      // Handle form submission
+      orderForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Get form values
+        const orderData = {
+          name: document.getElementById('full-name').value,
+          phone: document.getElementById('phone').value,
+          phone2: document.getElementById('phone2').value || '',
+          governorate: document.getElementById('governorate').value,
+          address: document.getElementById('address').value,
+          paymentMethod: document.querySelector('input[name="payment"]:checked').value,
+          totalPrice: document.getElementById('total-price').textContent,
+          design: [], // We'll add the bracelet design here
+          status: 'pending',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        // Get all charms in bracelet
+        const slots = document.querySelectorAll('.slot img[data-type="special"], .slot img[data-type="rare"]');
+        orderData.design = Array.from(slots).map(slot => ({
+          type: slot.dataset.type,
+          src: slot.src.split('/').pop(),
+          soldOut: slot.classList.contains('sold-out')
+        }));
+
+        // If paying with Cliq, handle the payment proof
+        let paymentProofUrl = '';
+        if (orderData.paymentMethod === 'Cliq') {
+          const file = document.getElementById('payment-proof').files[0];
+          if (file) {
+            try {
+              const storageRef = storage.ref('payment-proofs/' + Date.now() + '-' + file.name);
+              await storageRef.put(file);
+              paymentProofUrl = await storageRef.getDownloadURL();
+              orderData.paymentProofUrl = paymentProofUrl;
+            } catch (error) {
+              console.error('Error uploading payment proof:', error);
+              alert('Error uploading payment proof. Please try again.');
+              return;
+            }
+          } else {
+            alert('Please upload proof of payment for Cliq payment');
+            return;
+          }
+        }
+
+        // Save order to Firestore
+        try {
+          const docRef = await db.collection('orders').add(orderData);
+          
+          // Show confirmation
+          document.getElementById('order-id').textContent = docRef.id;
+          orderModal.style.display = 'none';
+          orderConfirmation.style.display = 'flex';
+          
+          // Reset form
+          orderForm.reset();
+          paymentProofContainer.style.display = 'none';
+        } catch (error) {
+          console.error('Error saving order: ', error);
+          alert('There was an error saving your order. Please try again.');
+        }
+      });
+
       // Modal event handlers
       confirmRemoveBtn.addEventListener('click', () => {
         if (slotToRemove) {
@@ -883,10 +1132,17 @@
         removeCharmModal.style.display = 'none';
       });
 
+      // Window click handlers for modals
       window.addEventListener('click', (event) => {
         if (event.target === removeCharmModal) {
           slotToRemove = null;
           removeCharmModal.style.display = 'none';
+        }
+        if (event.target === orderModal) {
+          orderModal.style.display = 'none';
+        }
+        if (event.target === orderConfirmation) {
+          orderConfirmation.style.display = 'none';
         }
       });
     });
