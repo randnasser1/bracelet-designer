@@ -834,14 +834,16 @@
         return charm;
       }
 
-      // Update charm usage indicators
+      // Update charm usage indicators - MODIFIED VERSION
       function updateCharmUsage() {
-        document.querySelectorAll('.charm').forEach(charm => {
+        // First remove all used classes from gallery charms
+        document.querySelectorAll('.charm-pool .charm, .charms-grid .charm').forEach(charm => {
           charm.classList.remove('used');
         });
-
+      
+        // Add used class only to gallery charms (not bracelet charms)
         usedCharms.forEach(charmSrc => {
-          const charmEl = document.querySelector(`.charm[src$="${charmSrc}"]`);
+          const charmEl = document.querySelector(`.charm-pool .charm[src$="${charmSrc}"], .charms-grid .charm[src$="${charmSrc}"]`);
           if (charmEl) {
             charmEl.classList.add('used');
           }
