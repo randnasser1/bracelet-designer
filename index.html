@@ -1117,37 +1117,48 @@
         });
 
         // Material selection
-        materialOptions.forEach(option => {
-          option.addEventListener('click', () => {
-            materialOptions.forEach(o => o.classList.remove('selected'));
-            option.classList.add('selected');
-            materialType = option.dataset.material;
-            updateBaseCharms();
-            calculatePrice();
-          });
-        });
+       materialOptions.forEach(option => {
+  option.addEventListener('click', () => {
+    materialOptions.forEach(o => o.classList.remove('selected'));
+    option.classList.add('selected');
+    materialType = option.dataset.material;
+    updateBaseCharms(); // Update charm visuals immediately
+    calculatePrice(); // Update price immediately
+  });
+});
 
         // Full glam button
         fullGlamBtn.addEventListener('click', () => {
-          if (isFullGlam) {
-            // Toggle off Full Glam
-            isFullGlam = false;
-            includedSpecialUsed = 0;
-            fullGlamBtn.textContent = 'Full Glam Look';
-            calculatePrice();
-          } else {
-            // Activate Full Glam
-            const price = products[currentProduct].fullGlam;
-            if (confirm(`Full Glam Look gives you 18 FREE special charms (${price} JDs total).\n\nYou can still add rare charms (+3 JDs each) or custom charms (+3.5 JDs each).`)) {
-              isFullGlam = true;
-              fullGlamSpecialCount = 0;
-              includedSpecialUsed = products[currentProduct].includedSpecial; // Set to 18 free specials
-              fullGlamBtn.textContent = 'Exit Full Glam';
-              calculatePrice();
-            }
-          }
-        });
+  if (isFullGlam) {
+    isFullGlam = false;
+    includedSpecialUsed = 0;
+    fullGlamBtn.textContent = 'Full Glam Look';
+  } else {
+    isFullGlam = true;
+    includedSpecialUsed = products[currentProduct].includedSpecial;
+    fullGlamBtn.textContent = 'Exit Full Glam';
+  }
+  calculatePrice(); // Update price immediately
+  updateBaseCharms(); // Update charm visuals if needed
+});
 
+        // Updated updateBaseCharms function
+function updateBaseCharms() {
+  const slots = document.querySelectorAll('.slot');
+  slots.forEach((slot, index) => {
+    const baseImg = slot.querySelector('img[data-type="base"]');
+    if (baseImg) {
+      if (materialType === 'silver') {
+        baseImg.src = 'basecharms/silver.png';
+      } else if (materialType === 'gold') {
+        baseImg.src = 'basecharms/gold.png';
+      } else if (materialType === 'mix') {
+        const isGold = index % 2 === 0;
+        baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+      }
+    }
+  });
+}
         // Size selection
         sizeSelect.addEventListener('change', function() {
           const sizeValue = this.value;
