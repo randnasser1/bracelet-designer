@@ -546,6 +546,58 @@
   height: 20px;
   cursor: pointer;
 }
+
+  .cart-summary {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      margin: 1rem 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .cart-item-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    
+    .receipt {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: 1rem auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .receipt-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed #eee;
+    }
+    
+    .receipt-total {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      border-top: 2px solid #d6336c;
+      padding-top: 0.5rem;
+    }
+    
+    .charm-counter {
+      display: inline-block;
+      background: #d6336c;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      line-height: 20px;
+      font-size: 0.8rem;
+      margin-left: 5px;
+    }
 </style>
 </head>
 <body>
@@ -1188,11 +1240,13 @@
       // Full glam button
       fullGlamBtn.addEventListener('click', () => {
         if (isFullGlam) {
+          // Exiting Full Glam - recalculate counts
           isFullGlam = false;
           includedSpecialUsed = Math.min(fullGlamSpecialCount, products[currentProduct].includedSpecial);
           specialCount = Math.max(0, fullGlamSpecialCount - includedSpecialUsed);
           fullGlamBtn.textContent = 'Full Glam Look';
         } else {
+          // Entering Full Glam
           isFullGlam = true;
           fullGlamSpecialCount = Array.from(document.querySelectorAll('.slot img[data-type="special"]')).length;
           fullGlamBtn.textContent = 'Exit Full Glam';
@@ -1423,7 +1477,32 @@
           submitBtn.disabled = false;
         }
       });
-
+      const orderTotal = cart.reduce((total, item) => total + item.price, 0);
+        
+        orderConfirmation.innerHTML = `
+          <h2>Order Confirmed!</h2>
+          <p>Thank you for your order. We'll contact you soon to confirm details.</p>
+          <p>Order ID: <strong>${docRef.id}</strong></p>
+          
+          <div class="receipt">
+            <h3>Receipt</h3>
+            ${cart.map(item => `
+              <div class="receipt-item">
+                <div>
+                  <strong>${item.productType.toUpperCase()}</strong><br>
+                  <small>${item.materialType} | ${item.size}</small>
+                </div>
+                <div>${item.price} JDs</div>
+              </div>
+            `).join('')}
+            <div class="receipt-total">
+              <span>Total:</span>
+              <span>${orderTotal} JDs</span>
+            </div>
+          </div>
+          
+          <button class="btn" id="close-confirmation">Close</button>
+        `;
       // Modal handlers
       confirmRemoveBtn.addEventListener('click', () => {
         if (slotToRemove) {
@@ -1596,17 +1675,15 @@
         document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
       }
 
-    function removeCharmFromSlot(slot) {
-      const charmImg = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
-      if (!charmImg) return;
+   function removeCharmFromSlot(slot) {
+        const charmImg = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
+        if (!charmImg) return;
 
-      const charmType = charmImg.dataset.type;
-      const charmSrc = charmImg.dataset.charm;
+        const charmType = charmImg.dataset.type;
+        const charmSrc = charmImg.src.split('/').pop();
 
-      // Remove the decorative charm
-      slot.removeChild(charmImg);
-      usedCharms.delete(charmSrc);
-
+        // Remove from used charms
+        usedCharms.delete(charmSrc);
       // Update counts
       if (charmType === 'special') {
         if (isFullGlam) {
@@ -1718,31 +1795,43 @@
       });
     }
 
-    function calculatePrice() {
-      let price = 0;
-      
-      if (isFullGlam) {
-        price = products[currentProduct].fullGlam;
-        price += rareCount * 3;
-        price += customCount * 3.5;
-      } else {
-        price = products[currentProduct].basePrice;
+     function calculatePrice() {
+        let price = 0;
+        let charmCost = 0;
         
-        if (materialType === 'gold') price += 1;
-        if (materialType === 'mix') price += 2.5;
+        if (isFullGlam) {
+          price = 29; // Full Glam base price
+          // Only count rare and custom charms beyond the included 18 specials
+          charmCost = (rareCount * 3) + (customCount * 3.5);
+        } else {
+          price = products[currentProduct].basePrice;
+          if (materialType === 'gold') price += 1;
+          if (materialType === 'mix') price += 2.5;
+          
+          // Calculate charm costs
+          const specialCharged = Math.max(0, specialCount - products[currentProduct].includedSpecial);
+          charmCost = (specialCharged * 2) + (rareCount * 3) + (customCount * 3.5);
+        }
         
-        price += Math.max(0, specialCount - products[currentProduct].includedSpecial) * 2;
-        price += rareCount * 3;
-        price += customCount * 3.5;
+        price += sizePriceAdjustment;
+        const total = price + charmCost;
+        
+        // Update displays
+        basePriceDisplay.textContent = `Base Price: ${price} JDs`;
+        charmPriceDisplay.textContent = `Charms: ${charmCost} JDs`;
+        
+        if (isFullGlam) {
+          charmPriceDisplay.textContent += ` (${fullGlamSpecialCount}/18 free specials used)`;
+        } else {
+          charmPriceDisplay.textContent += ` (${includedSpecialUsed}/${products[currentProduct].includedSpecial} free specials used)`;
+        }
+        
+        totalPriceDisplay.textContent = `Current Item: ${total} JDs`;
+        
+        // Update current design price
+        currentDesign.price = total;
+        updateCartDisplay();
       }
-      
-      price += sizePriceAdjustment;
-      
-      basePriceDisplay.textContent = `Base Price: ${products[currentProduct].basePrice} JDs`;
-      charmPriceDisplay.textContent = `Charms: ${price - products[currentProduct].basePrice} JDs (${includedSpecialUsed}/${products[currentProduct].includedSpecial} free specials used)`;
-      totalPriceDisplay.textContent = `Total: ${price} JDs`;
-    }
-
     function saveCurrentDesign() {
       return html2canvas(document.getElementById('jewelry-piece')).then(canvas => {
         currentDesign.imageData = canvas.toDataURL('image/png');
@@ -1756,39 +1845,76 @@
     }
 
     function addToCart() {
-      saveCurrentDesign().then(design => {
-        cart.push({
-          ...design,
-          id: Date.now()
+        saveCurrentDesign().then(design => {
+          design.id = Date.now();
+          design.timestamp = new Date().toLocaleString();
+          cart.push(design);
+          updateCartDisplay();
+          initProduct(design.productType);
+          alert('Added to cart!');
         });
-        updateCartDisplay();
-        initProduct(design.productType);
-      });
-    }
+      }
 
     function updateCartDisplay() {
-      const cartItemsEl = document.getElementById('cart-items');
-      cartItemsEl.innerHTML = '';
-      
-      cart.forEach((item, index) => {
-        const itemEl = document.createElement('div');
-        itemEl.className = 'cart-item';
-        itemEl.innerHTML = `
-          <img src="${item.imageData}" alt="${item.productType}">
-          <div>${item.productType.charAt(0).toUpperCase() + item.productType.slice(1)}</div>
-          <button class="remove-item" data-index="${index}">×</button>
-        `;
-        cartItemsEl.appendChild(itemEl);
-      });
-
-      document.querySelectorAll('.remove-item').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const index = e.target.dataset.index;
-          cart.splice(index, 1);
-          updateCartDisplay();
+        const cartItemsEl = document.getElementById('cart-items');
+        cartItemsEl.innerHTML = '';
+        
+        if (cart.length === 0) {
+          cartItemsEl.innerHTML = '<p>Your cart is empty</p>';
+          return;
+        }
+        
+        let cartTotal = 0;
+        
+        // Create cart summary
+        const summary = document.createElement('div');
+        summary.className = 'cart-summary';
+        
+        cart.forEach((item, index) => {
+          // Add item to display
+          const itemEl = document.createElement('div');
+          itemEl.className = 'cart-item';
+          itemEl.innerHTML = `
+            <img src="${item.imageData}" alt="${item.productType}" style="width:80px;height:auto;">
+            <div>
+              <strong>${item.productType.charAt(0).toUpperCase() + item.productType.slice(1)}</strong><br>
+              ${item.materialType} | ${item.size}<br>
+              Price: ${item.price} JDs
+            </div>
+            <button class="remove-item" data-index="${index}">×</button>
+          `;
+          cartItemsEl.appendChild(itemEl);
+          
+          // Add to summary
+          cartTotal += item.price;
         });
-      });
-    }
+        
+        // Add total to summary
+        summary.innerHTML = `
+          <h3>Cart Summary</h3>
+          ${cart.map((item, index) => `
+            <div class="cart-item-details">
+              <span>${index+1}. ${item.productType}</span>
+              <span>${item.price} JDs</span>
+            </div>
+          `).join('')}
+          <div class="cart-item-details" style="font-weight:bold;margin-top:10px;">
+            <span>Total:</span>
+            <span>${cartTotal} JDs</span>
+          </div>
+        `;
+        
+        cartItemsEl.prepend(summary);
+        
+        // Add remove item functionality
+        document.querySelectorAll('.remove-item').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const index = e.target.dataset.index;
+            cart.splice(index, 1);
+            updateCartDisplay();
+          });
+        });
+      }
 
     function updateBaseCharms() {
       const slots = document.querySelectorAll('.slot');
@@ -1805,7 +1931,12 @@
           }
         }
       });
+      
     }
+     // Reset cart after order
+        cart = [];
+        updateCartDisplay();
+      });
   });
 </script>
 </body>
