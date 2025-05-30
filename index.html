@@ -782,6 +782,16 @@
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
       <script>
+        const firebaseConfig = {
+      apiKey: "AIzaSyD_iOEwu71dL4Lmfl7Km8lSlYFzSuubbzY",
+      authDomain: "italian-charms.firebaseapp.com",
+      projectId: "italian-charms",
+      storageBucket: "italian-charms.appspot.com",
+      messagingSenderId: "156559643870",
+      appId: "1:156559643870:web:a14807a2a6d1761b71de4f"
+    };
+
+    
   // Current state
   let cart = [];
   let currentDesign = {
@@ -793,10 +803,11 @@
     imageData: null
   };
   
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const storage = firebase.storage();
+// Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
 
   document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
@@ -1531,62 +1542,59 @@
       }
     }
 
-    function addCharmToSlot(slot) {
-      if (!selectedCharm) return;
-      
-      if (selectedCharm.classList.contains('sold-out')) {
-        alert('This charm is sold out!');
-        return;
-      }
+   function addCharmToSlot(slot) {
+        if (!selectedCharm) return;
+        
+        if (selectedCharm.classList.contains('sold-out')) {
+          alert('This charm is sold out!');
+          return;
+        }
 
-      const charmSrc = selectedCharm.src.split('/').pop();
-      if (usedCharms.has(charmSrc) {
-        alert('This charm is already used on the bracelet!');
-        return;
-      }
+        const charmSrc = selectedCharm.src.split('/').pop();
+        if (usedCharms.has(charmSrc)) {  // Fixed the missing parenthesis here
+          alert('This charm is already used on the bracelet!');
+          return;
+        }
 
       // Remove any existing decorative charm first
       const existingCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
-      if (existingCharm) {
-        removeCharmFromSlot(slot);
-      }
-
+        if (existingCharm) {
+          removeCharmFromSlot(slot);
+        }
       // Clear the slot completely
       slot.innerHTML = '';
-
-      // Add the new decorative charm
-      const newImg = selectedCharm.cloneNode();
-      newImg.classList.remove('selected');
-      newImg.dataset.charm = charmSrc;
-      if (selectedCharm.classList.contains('sold-out')) {
-        newImg.classList.add('sold-out');
-      }
-      slot.appendChild(newImg);
-      usedCharms.add(charmSrc);
-
-      // Update counts
-      const newType = selectedCharm.dataset.type;
-      if (newType === 'special') {
-        if (isFullGlam) {
-          fullGlamSpecialCount++;
-        } else {
-          if (includedSpecialUsed < products[currentProduct].includedSpecial) {
-            includedSpecialUsed++;
-          } else {
-            specialCount++;
-          }
+        const newImg = selectedCharm.cloneNode();
+        newImg.classList.remove('selected');
+        newImg.dataset.charm = charmSrc;
+        if (selectedCharm.classList.contains('sold-out')) {
+          newImg.classList.add('sold-out');
         }
-      } else if (newType === 'rare') {
-        rareCount++;
-      } else if (newType === 'custom') {
-        customCount++;
-      }
+        slot.appendChild(newImg);
+        usedCharms.add(charmSrc);
 
-      updateCharmUsage();
-      calculatePrice();
-      selectedCharm = null;
-      document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
-    }
+        // Update counts
+        const newType = selectedCharm.dataset.type;
+        if (newType === 'special') {
+          if (isFullGlam) {
+            fullGlamSpecialCount++;
+          } else {
+            if (includedSpecialUsed < products[currentProduct].includedSpecial) {
+              includedSpecialUsed++;
+            } else {
+              specialCount++;
+            }
+          }
+        } else if (newType === 'rare') {
+          rareCount++;
+        } else if (newType === 'custom') {
+          customCount++;
+        }
+
+        updateCharmUsage();
+        calculatePrice();
+        selectedCharm = null;
+        document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
+      }
 
     function removeCharmFromSlot(slot) {
       const charmImg = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
