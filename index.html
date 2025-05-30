@@ -1547,18 +1547,18 @@ function updateBaseCharms() {
         usedCharms.add(charmSrc);
 
         // Update counts for new charm
-        const newType = selectedCharm.dataset.type;
-        if (newType === 'special') {
-          if (includedSpecialUsed < products[currentProduct].includedSpecial) {
-            includedSpecialUsed++;
-          } else {
-            specialCount++;
-          }
-        } else if (newType === 'rare') {
-          rareCount++;
-        } else if (newType === 'custom') {
-          customCount++;
-        }
+       const newType = selectedCharm.dataset.type;
+  if (newType === 'special') {
+    if (isFullGlam) {
+      fullGlamSpecialCount++;
+    } else {
+      if (includedSpecialUsed < products[currentProduct].includedSpecial) {
+        includedSpecialUsed++;
+      } else {
+        specialCount++;
+      }
+    }
+  } 
 
         updateCharmUsage();
         calculatePrice();
@@ -1717,10 +1717,18 @@ function updateBaseCharms() {
       }
 
       function calculatePrice() {
-        if (isFullGlam) {
-          // For full glam, we don't calculate - it's a fixed price
-          return;
-        }
+      if (isFullGlam) {
+        // Fixed price for Full Glam (29 JDs) plus any rare/custom charms
+        const fullGlamPrice = products[currentProduct].fullGlam;
+        const rareCost = rareCount * 3;
+        const customCost = customCount * 3.5;
+        const total = fullGlamPrice + rareCost + customCost + sizePriceAdjustment;
+        
+        basePriceDisplay.textContent = `Base Price: ${fullGlamPrice} JDs (Full Glam)`;
+        charmPriceDisplay.textContent = `Charms: ${rareCost + customCost} JDs (${fullGlamSpecialCount}/18 free specials used)`;
+        totalPriceDisplay.textContent = `Total: ${total} JDs`;
+        return;
+      }
         
         const config = products[currentProduct];
         let basePrice = config.basePrice;
