@@ -1679,19 +1679,21 @@ orderForm.addEventListener('submit', async function(e) {
       }
     
       function handleSlotClick(slot) {
-      const currentCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
-      
-      if (currentCharm && !selectedCharm) {
-        slotToRemove = slot;
-        removeCharmModal.style.display = 'flex';
-        return;
-      }
-      
-      if (selectedCharm) {
-        addCharmToSlot(slot);
-      }
-    }
-
+  console.log('Slot clicked'); // Check if this appears in console when clicking
+  const currentCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
+  
+  if (currentCharm && !selectedCharm) {
+    console.log('Existing charm clicked');
+    slotToRemove = slot;
+    removeCharmModal.style.display = 'flex';
+    return;
+  }
+  
+  if (selectedCharm) {
+    console.log('Adding charm to slot');
+    addCharmToSlot(slot);
+  }
+}
       function addCharmToSlot(slot) {
   if (selectedCharm.classList.contains('sold-out')) {
     alert('This charm is sold out!');
