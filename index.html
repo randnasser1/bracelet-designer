@@ -1130,16 +1130,18 @@
         // Full glam button
         fullGlamBtn.addEventListener('click', () => {
   if (isFullGlam) {
+    // Exit Full Glam - convert back to normal pricing
     isFullGlam = false;
-    includedSpecialUsed = 0;
+    includedSpecialUsed = Math.min(fullGlamSpecialCount, products[currentProduct].includedSpecial);
+    specialCount = Math.max(0, fullGlamSpecialCount - includedSpecialUsed);
     fullGlamBtn.textContent = 'Full Glam Look';
   } else {
+    // Enter Full Glam
     isFullGlam = true;
-    includedSpecialUsed = products[currentProduct].includedSpecial;
+    fullGlamSpecialCount = Array.from(document.querySelectorAll('.slot img[data-type="special"]')).length;
     fullGlamBtn.textContent = 'Exit Full Glam';
   }
-  calculatePrice(); // Update price immediately
-  updateBaseCharms(); // Update charm visuals if needed
+  calculatePrice(); // Always recalculate when toggling
 });
 
         // Updated updateBaseCharms function
@@ -1512,7 +1514,20 @@ function updateBaseCharms() {
           alert('This charm is already used on the bracelet!');
           return;
         }
-
+         const charmType = charmImg.dataset.type;
+          if (charmType === 'special') {
+            if (isFullGlam) {
+              fullGlamSpecialCount--;
+            } else {
+              if (includedSpecialUsed > 0) includedSpecialUsed--;
+              else specialCount--;
+            }
+          } else if (charmType === 'rare') {
+            rareCount--; // This will now affect Full Glam price
+          } else if (charmType === 'custom') {
+            customCount--; // This will now affect Full Glam price
+          }
+         calculatePrice();
         // Remove any existing decorative charm first
         const existingCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
         if (existingCharm) {
@@ -1547,21 +1562,21 @@ function updateBaseCharms() {
         usedCharms.add(charmSrc);
 
         const newType = selectedCharm.dataset.type;
-  if (newType === 'special') {
-    if (isFullGlam) {
-      fullGlamSpecialCount++;
-    } else {
-      if (includedSpecialUsed < products[currentProduct].includedSpecial) {
-        includedSpecialUsed++;
-      } else {
-        specialCount++;
-      }
-    }
-  } else if (newType === 'rare') {
-    rareCount++;
-  } else if (newType === 'custom') {
-    customCount++;
-  }
+        if (newType === 'special') {
+          if (isFullGlam) {
+            fullGlamSpecialCount++;
+          } else {
+            if (includedSpecialUsed < products[currentProduct].includedSpecial) {
+              includedSpecialUsed++;
+            } else {
+              specialCount++;
+            }
+          }
+        } else if (newType === 'rare') {
+          rareCount++;
+        } else if (newType === 'custom') {
+          customCount++;
+        }
 
         updateCharmUsage();
         calculatePrice();
@@ -1725,17 +1740,19 @@ function updateBaseCharms() {
 
      function calculatePrice() {
       if (isFullGlam) {
-        // Full Glam base price plus rare/custom charm costs
-        const fullGlamBase = products[currentProduct].fullGlam;
-        const rareCost = rareCount * 3;       // +3 JDs per rare charm
-        const customCost = customCount * 3.5; // +3.5 JDs per custom charm
-        const total = fullGlamBase + rareCost + customCost + sizePriceAdjustment;
-        
-        basePriceDisplay.textContent = `Base Price: ${fullGlamBase} JDs (Full Glam)`;
-        charmPriceDisplay.textContent = `Charms: ${rareCost + customCost} JDs (${fullGlamSpecialCount}/18 free specials used)`;
-        totalPriceDisplay.textContent = `Total: ${total} JDs`;
-        return;
-      }
+    const fullGlamBase = products[currentProduct].fullGlam;
+    // Only first 18 special charms are free in Full Glam
+    const extraSpecialCost = Math.max(0, fullGlamSpecialCount - 18) * 2;
+    const rareCost = rareCount * 3;
+    const customCost = customCount * 3.5;
+    const total = fullGlamBase + extraSpecialCost + rareCost + customCost + sizePriceAdjustment;
+    
+    basePriceDisplay.textContent = `Base Price: ${fullGlamBase} JDs (Full Glam)`;
+    charmPriceDisplay.textContent = `Charms: ${extraSpecialCost + rareCost + customCost} JDs (${Math.min(fullGlamSpecialCount, 18)}/18 free specials used)`;
+    totalPriceDisplay.textContent = `Total: ${total} JDs`;
+    return;
+  }
+
         
            // Rest of normal pricing calculation...
       const config = products[currentProduct];
