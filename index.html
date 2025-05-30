@@ -1,5 +1,4 @@
-
-     <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -551,7 +550,7 @@
 
     <div class="price-display">
       <div id="base-price">Base Price: 10 JDs</div>
-      <div id="charm-price">Charms: 0 JDs (0/2 free specials used)</div>
+      <div id="charm-price">Charms: 0 JDs (0/18 free specials used)</div>
       <div id="total-price">Total: 10 JDs</div>
     </div>
 
@@ -567,15 +566,15 @@
     <div class="pricing-info">
       <h3>Pricing Information</h3>
       <ul>
-        <li><span class="highlight">Bracelet:</span> 10 JDs (18 slots) - 2 special charms included</li>
-        <li><span class="highlight">Anklet:</span> 15 JDs (23 slots) - 2 special charms included</li>
-        <li><span class="highlight">Necklace:</span> 22 JDs (34 slots) - 2 special charms included</li>
+        <li><span class="highlight">Bracelet:</span> 10 JDs (18 slots) - 18 special charms included in Full Glam</li>
+        <li><span class="highlight">Anklet:</span> 15 JDs (23 slots) - 18 special charms included in Full Glam</li>
+        <li><span class="highlight">Necklace:</span> 22 JDs (34 slots) - 18 special charms included in Full Glam</li>
         <li>Gold: +1 JD</li>
         <li>Mix: +2.5 JDs</li>
         <li>Additional special charm: +2 JDs</li>
         <li>Rare charm: +3 JDs</li>
         <li><span class="highlight">Custom charm:</span> +3.5 JDs (upload your own image)</li>
-        <li><span class="highlight">Full Glam:</span> Fixed 29 JDs (18 special charms included)</li>
+        <li><span class="highlight">Full Glam:</span> Fixed 29 JDs (18 special charms included) + rare/custom charms extra</li>
         <li><span class="highlight">Size Upgrades:</span></li>
         <li>16.2-17.1cm: +0.5 JDs (19 charms)</li>
         <li>17.1-18.1cm: +1 JD (20 charms)</li>
@@ -602,7 +601,7 @@
     <div class="charm-pools">
       <!-- Special Charms -->
       <div class="charm-pool">
-        <h3>Special Charms (+2 JDs each after first 2)</h3>
+        <h3>Special Charms (+2 JDs each after first 18 in Full Glam)</h3>
         <div class="category-tabs" id="special-categories">
           <button class="category-tab active" data-category="all">All</button>
           <button class="category-tab" data-category="teddy">Teddy Bears</button>
@@ -782,308 +781,304 @@
       const customCharmUpload = document.getElementById('custom-charm-upload');
       const customCharmPreview = document.getElementById('custom-charm-preview');
       const addCustomCharmBtn = document.getElementById('add-custom-charm');
-      const specialCategoryTabs = document.querySelectorAll('#special-categories .category-tab');
-      const rareCategoryTabs = document.querySelectorAll('#rare-categories .category-tab');
       const pricingToggle = document.getElementById('pricing-toggle');
       const pricingInfo = document.querySelector('.pricing-info');
       const sizeSelect = document.getElementById('size');
 
       // Product configurations
       const products = {
-        bracelet: { basePrice: 10, slots: 18, includedSpecial: 2, fullGlam: 29 },
-        anklet: { basePrice: 15, slots: 23, includedSpecial: 2, fullGlam: 42 },
-        necklace: { basePrice: 22, slots: 34, includedSpecial: 2, fullGlam: 64 }
+        bracelet: { basePrice: 10, slots: 18, includedSpecial: 18, fullGlam: 29 },
+        anklet: { basePrice: 15, slots: 23, includedSpecial: 18, fullGlam: 42 },
+        necklace: { basePrice: 22, slots: 34, includedSpecial: 18, fullGlam: 64 }
       };
 
-      
-     
       // Charm image lists with categories and sold out status
-      // Special charms
-const specialCharms = [
-  // 8 Ball charms
-  { src: 'special/8ball/38.png', category: '8ball', soldOut: false },
-  { src: 'special/8ball/39.png', category: '8ball', soldOut: false },
-  { src: 'special/8ball/40.png', category: '8ball', soldOut: false },
-  { src: 'special/8ball/41.png', category: '8ball', soldOut: false },
-  { src: 'special/8ball/42.png', category: '8ball', soldOut: false },
-  { src: 'special/8ball/43.png', category: '8ball', soldOut: false },
-  { src: 'special/8ball/44.png', category: '8ball', soldOut: false },
-  { src: 'special/8ball/45.png', category: '8ball', soldOut: false },
-  { src: 'special/8ball/46.png', category: '8ball', soldOut: false },
-  { src: 'special/8ball/48.png', category: '8ball', soldOut: false },
-  { src: 'special/8ball/49.png', category: '8ball', soldOut: false },
-  { src: 'special/8ball/50.png', category: '8ball', soldOut: false },
+      const specialCharms = [
+        // 8 Ball charms
+        { src: 'special/8ball/38.png', category: '8ball', soldOut: false },
+        { src: 'special/8ball/39.png', category: '8ball', soldOut: false },
+        { src: 'special/8ball/40.png', category: '8ball', soldOut: false },
+        { src: 'special/8ball/41.png', category: '8ball', soldOut: false },
+        { src: 'special/8ball/42.png', category: '8ball', soldOut: false },
+        { src: 'special/8ball/43.png', category: '8ball', soldOut: false },
+        { src: 'special/8ball/44.png', category: '8ball', soldOut: false },
+        { src: 'special/8ball/45.png', category: '8ball', soldOut: false },
+        { src: 'special/8ball/46.png', category: '8ball', soldOut: false },
+        { src: 'special/8ball/48.png', category: '8ball', soldOut: false },
+        { src: 'special/8ball/49.png', category: '8ball', soldOut: false },
+        { src: 'special/8ball/50.png', category: '8ball', soldOut: false },
 
-  // Beach charms
-  { src: 'special/beach/beach.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach1.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach2.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach3.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach4.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach5.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach6.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach7.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach8.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach9.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach10.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach11.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach12.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach13.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach14.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach15.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach16.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach17.png', category: 'beach', soldOut: false },
-  { src: 'special/beach/beach18.png', category: 'beach', soldOut: false },
+        // Beach charms
+        { src: 'special/beach/beach.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach1.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach2.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach3.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach4.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach5.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach6.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach7.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach8.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach9.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach10.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach11.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach12.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach13.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach14.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach15.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach16.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach17.png', category: 'beach', soldOut: false },
+        { src: 'special/beach/beach18.png', category: 'beach', soldOut: false },
 
-  // Bows charms
-  { src: 'special/bows/beige.png', category: 'bows', soldOut: false },
-  { src: 'special/bows/black.png', category: 'bows', soldOut: false },
-  { src: 'special/bows/dark pink.png', category: 'bows', soldOut: false },
-  { src: 'special/bows/navy.png', category: 'bows', soldOut: false },
-  { src: 'special/bows/pink.png', category: 'bows', soldOut: false },
-  { src: 'special/bows/purple.png', category: 'bows', soldOut: false },
-  { src: 'special/bows/red.png', category: 'bows', soldOut: false },
-  { src: 'special/bows/wwhite.png', category: 'bows', soldOut: false },
+        // Bows charms
+        { src: 'special/bows/beige.png', category: 'bows', soldOut: false },
+        { src: 'special/bows/black.png', category: 'bows', soldOut: false },
+        { src: 'special/bows/dark pink.png', category: 'bows', soldOut: false },
+        { src: 'special/bows/navy.png', category: 'bows', soldOut: false },
+        { src: 'special/bows/pink.png', category: 'bows', soldOut: false },
+        { src: 'special/bows/purple.png', category: 'bows', soldOut: false },
+        { src: 'special/bows/red.png', category: 'bows', soldOut: false },
+        { src: 'special/bows/wwhite.png', category: 'bows', soldOut: false },
 
-  // Cute and Simple charms
-  { src: 'special/cute and simple/1.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/2.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/3.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/4.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/5.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/6.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/7.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/8.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/9.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/10.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/11.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/12.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/13.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/14.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/15.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/16.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/17.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/18.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/19.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/20.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/21.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/22.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/23.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/24.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/25.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/26.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/27.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/28.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/29.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/30.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/31.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/32.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/33.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/34.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/35.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/36.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/37.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/c1.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/c2.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/c3.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/c4.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/c5.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/c6.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/c7.png', category: 'simple', soldOut: false },
-  { src: 'special/cute and simple/c8.png', category: 'simple', soldOut: false },
+        // Cute and Simple charms
+        { src: 'special/cute and simple/1.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/2.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/3.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/4.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/5.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/6.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/7.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/8.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/9.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/10.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/11.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/12.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/13.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/14.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/15.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/16.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/17.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/18.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/19.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/20.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/21.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/22.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/23.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/24.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/25.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/26.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/27.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/28.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/29.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/30.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/31.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/32.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/33.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/34.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/35.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/36.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/37.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/c1.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/c2.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/c3.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/c4.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/c5.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/c6.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/c7.png', category: 'simple', soldOut: false },
+        { src: 'special/cute and simple/c8.png', category: 'simple', soldOut: false },
 
-  // Cute Specials charms
-  { src: 'special/cute specials/so cute.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special girly.png', category: 'cute', soldOut: false },
-  { src: 'special/cute specials/special.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special2.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special3.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special4.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special5.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special6.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special7.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special8.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special9.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special10.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special11.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special12.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special13.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special14.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special15.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special16.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special17.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special18.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special19.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special20.png', category: 'cutespecials', soldOut: false },
-  { src: 'special/cute specials/special21.png', category: 'cutespecials', soldOut: false },
+        // Cute Specials charms
+        { src: 'special/cute specials/so cute.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special girly.png', category: 'cute', soldOut: false },
+        { src: 'special/cute specials/special.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special2.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special3.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special4.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special5.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special6.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special7.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special8.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special9.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special10.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special11.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special12.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special13.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special14.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special15.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special16.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special17.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special18.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special19.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special20.png', category: 'cutespecials', soldOut: false },
+        { src: 'special/cute specials/special21.png', category: 'cutespecials', soldOut: false },
 
-  // Cute charms
-  { src: 'special/cute/cute.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute2.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute3.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute4.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute5.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute6.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute7.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute8.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute9.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute10.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute11.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute12.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute13.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute14.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute15.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute16.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute17.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute18.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute19.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute20.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute21.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute22.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute23.png', category: 'cute', soldOut: false },
-  { src: 'special/cute/cute24.png', category: 'cute', soldOut: false },
+        // Cute charms
+        { src: 'special/cute/cute.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute2.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute3.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute4.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute5.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute6.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute7.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute8.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute9.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute10.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute11.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute12.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute13.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute14.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute15.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute16.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute17.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute18.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute19.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute20.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute21.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute22.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute23.png', category: 'cute', soldOut: false },
+        { src: 'special/cute/cute24.png', category: 'cute', soldOut: false },
 
-  // Mushrooms charms
-  { src: 'special/mushrooms/mushroom.png', category: 'mushrooms', soldOut: false },
-  { src: 'special/mushrooms/mushroom1.png', category: 'mushrooms', soldOut: false },
-  { src: 'special/mushrooms/mushroom2.png', category: 'mushrooms', soldOut: false },
-  { src: 'special/mushrooms/mushroom3.png', category: 'mushrooms', soldOut: false },
-  { src: 'special/mushrooms/mushroom4.png', category: 'mushrooms', soldOut: false },
+        // Mushrooms charms
+        { src: 'special/mushrooms/mushroom.png', category: 'mushrooms', soldOut: false },
+        { src: 'special/mushrooms/mushroom1.png', category: 'mushrooms', soldOut: false },
+        { src: 'special/mushrooms/mushroom2.png', category: 'mushrooms', soldOut: false },
+        { src: 'special/mushrooms/mushroom3.png', category: 'mushrooms', soldOut: false },
+        { src: 'special/mushrooms/mushroom4.png', category: 'mushrooms', soldOut: false },
 
-  // Red charms
-  { src: 'special/red/red.png', category: 'red', soldOut: false },
-  { src: 'special/red/red1.png', category: 'red', soldOut: false },
-  { src: 'special/red/red2.png', category: 'red', soldOut: false },
-  { src: 'special/red/red3.png', category: 'red', soldOut: false },
-  { src: 'special/red/red4.png', category: 'red', soldOut: false },
-  { src: 'special/red/red5.png', category: 'red', soldOut: false },
-  { src: 'special/red/red6.png', category: 'red', soldOut: false },
-  { src: 'special/red/red7.png', category: 'red', soldOut: false },
-  { src: 'special/red/red8.png', category: 'red', soldOut: false },
-  { src: 'special/red/red9.png', category: 'red', soldOut: false },
-  { src: 'special/red/red10.png', category: 'red', soldOut: false },
-  { src: 'special/red/red11.png', category: 'red', soldOut: false },
-  { src: 'special/red/red12.png', category: 'red', soldOut: false },
+        // Red charms
+        { src: 'special/red/red.png', category: 'red', soldOut: false },
+        { src: 'special/red/red1.png', category: 'red', soldOut: false },
+        { src: 'special/red/red2.png', category: 'red', soldOut: false },
+        { src: 'special/red/red3.png', category: 'red', soldOut: false },
+        { src: 'special/red/red4.png', category: 'red', soldOut: false },
+        { src: 'special/red/red5.png', category: 'red', soldOut: false },
+        { src: 'special/red/red6.png', category: 'red', soldOut: false },
+        { src: 'special/red/red7.png', category: 'red', soldOut: false },
+        { src: 'special/red/red8.png', category: 'red', soldOut: false },
+        { src: 'special/red/red9.png', category: 'red', soldOut: false },
+        { src: 'special/red/red10.png', category: 'red', soldOut: false },
+        { src: 'special/red/red11.png', category: 'red', soldOut: false },
+        { src: 'special/red/red12.png', category: 'red', soldOut: false },
 
-  // Teddy charms
-  { src: 'special/teddy/teddy.png', category: 'teddy', soldOut: false },
-  { src: 'special/teddy/teddy2.png', category: 'teddy', soldOut: false },
-  { src: 'special/teddy/teddy3.png', category: 'teddy', soldOut: false },
-  { src: 'special/teddy/teddy4.png', category: 'teddy', soldOut: false },
-  { src: 'special/teddy/teddy5.png', category: 'teddy', soldOut: false },
-  { src: 'special/teddy/teddy6.png', category: 'teddy', soldOut: false }
-];
-// Rare charms
-const rareCharms = [
-  // Dangly charms
-  { src: 'rares/dangly/dangly.png', category: 'dangly', soldOut: false },
+        // Teddy charms
+        { src: 'special/teddy/teddy.png', category: 'teddy', soldOut: false },
+        { src: 'special/teddy/teddy2.png', category: 'teddy', soldOut: false },
+        { src: 'special/teddy/teddy3.png', category: 'teddy', soldOut: false },
+        { src: 'special/teddy/teddy4.png', category: 'teddy', soldOut: false },
+        { src: 'special/teddy/teddy5.png', category: 'teddy', soldOut: false },
+        { src: 'special/teddy/teddy6.png', category: 'teddy', soldOut: false }
+      ];
 
-  // Disney charms
-  { src: 'rares/disney/bluemonster.png', category: 'disney', soldOut: false },
-  { src: 'rares/disney/bunny.png', category: 'disney', soldOut: false },
-  { src: 'rares/disney/disneycat pink.png', category: 'disney', soldOut: false },
-  { src: 'rares/disney/disneycat.png', category: 'disney', soldOut: false },
-  { src: 'rares/disney/fox.png', category: 'disney', soldOut: false },
-  { src: 'rares/disney/greenmonster.png', category: 'disney', soldOut: false },
-  { src: 'rares/disney/pinkstitch.png', category: 'disney', soldOut: false },
-  { src: 'rares/disney/snjab.png', category: 'disney', soldOut: false },
-  { src: 'rares/disney/stitch.png', category: 'disney', soldOut: false },
+      // Rare charms
+      const rareCharms = [
+        // Dangly charms
+        { src: 'rares/dangly/dangly.png', category: 'dangly', soldOut: false },
 
-  // Gold charms
-  { src: 'rares/gold/gold.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold2.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold3.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold4.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold5.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold6.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold7.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold8.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold9.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold10.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold11.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold12.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold13.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold14.png', category: 'gold', soldOut: false },
-  { src: 'rares/gold/gold15.png', category: 'gold', soldOut: false },
+        // Disney charms
+        { src: 'rares/disney/bluemonster.png', category: 'disney', soldOut: false },
+        { src: 'rares/disney/bunny.png', category: 'disney', soldOut: false },
+        { src: 'rares/disney/disneycat pink.png', category: 'disney', soldOut: false },
+        { src: 'rares/disney/disneycat.png', category: 'disney', soldOut: false },
+        { src: 'rares/disney/fox.png', category: 'disney', soldOut: false },
+        { src: 'rares/disney/greenmonster.png', category: 'disney', soldOut: false },
+        { src: 'rares/disney/pinkstitch.png', category: 'disney', soldOut: false },
+        { src: 'rares/disney/snjab.png', category: 'disney', soldOut: false },
+        { src: 'rares/disney/stitch.png', category: 'disney', soldOut: false },
 
-  // Graduation charms
-  { src: 'rares/graduation/grad.png', category: 'graduation', soldOut: false },
-  { src: 'rares/graduation/grad.webp', category: 'graduation', soldOut: false },
+        // Gold charms
+        { src: 'rares/gold/gold.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold2.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold3.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold4.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold5.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold6.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold7.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold8.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold9.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold10.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold11.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold12.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold13.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold14.png', category: 'gold', soldOut: false },
+        { src: 'rares/gold/gold15.png', category: 'gold', soldOut: false },
 
-  // HGS charms
-  { src: 'rares/hgs/hgs.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs2.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs3.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs4.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs5.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs6.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs7.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs8.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs9.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs10.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs11.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs12.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs13.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs14.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs15.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs16.png', category: 'hgs', soldOut: false },
-  { src: 'rares/hgs/hgs17.png', category: 'hgs', soldOut: false },
+        // Graduation charms
+        { src: 'rares/graduation/grad.png', category: 'graduation', soldOut: false },
+        { src: 'rares/graduation/grad.webp', category: 'graduation', soldOut: false },
 
-  // Long charms
-  { src: 'rares/long/long.png', category: 'long', soldOut: false },
-  { src: 'rares/long/long2.png', category: 'long', soldOut: false },
+        // HGS charms
+        { src: 'rares/hgs/hgs.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs2.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs3.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs4.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs5.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs6.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs7.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs8.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs9.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs10.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs11.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs12.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs13.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs14.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs15.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs16.png', category: 'hgs', soldOut: false },
+        { src: 'rares/hgs/hgs17.png', category: 'hgs', soldOut: false },
 
-  // Love charms
-  { src: 'rares/love/best.png', category: 'love', soldOut: false },
-  { src: 'rares/love/ends.png', category: 'love', soldOut: false },
-  { src: 'rares/love/fri.png', category: 'love', soldOut: false },
-  { src: 'rares/love/heart2.png', category: 'love', soldOut: false },
-  { src: 'rares/love/love.png', category: 'love', soldOut: false },
-  { src: 'rares/love/love2.png', category: 'love', soldOut: false },
-  { src: 'rares/love/love3.png', category: 'love', soldOut: false },
-  { src: 'rares/love/love4.png', category: 'love', soldOut: false },
-  { src: 'rares/love/love5.png', category: 'love', soldOut: false },
-  { src: 'rares/love/love6.png', category: 'love', soldOut: false },
-  { src: 'rares/love/love7.png', category: 'love', soldOut: false },
-  { src: 'rares/love/love8.png', category: 'love', soldOut: false },
-  { src: 'rares/love/love9.png', category: 'love', soldOut: false },
-  { src: 'rares/love/love10.png', category: 'love', soldOut: false },
-  { src: 'rares/love/love11.png', category: 'love', soldOut: false },
-  { src: 'rares/love/mrmrs1.png', category: 'love', soldOut: false },
-  { src: 'rares/love/mrmrs2.png', category: 'love', soldOut: false },
+        // Long charms
+        { src: 'rares/long/long.png', category: 'long', soldOut: false },
+        { src: 'rares/long/long2.png', category: 'long', soldOut: false },
 
-  // Sanrio charms
-  { src: 'rares/sanrio/51.png', category: 'sanrio', soldOut: false },
-  { src: 'rares/sanrio/52.png', category: 'sanrio', soldOut: false },
-  { src: 'rares/sanrio/53.png', category: 'sanrio', soldOut: false },
-  { src: 'rares/sanrio/54.png', category: 'sanrio', soldOut: false },
-  { src: 'rares/sanrio/55.png', category: 'sanrio', soldOut: false },
-  { src: 'rares/sanrio/56.png', category: 'sanrio', soldOut: false },
-  { src: 'rares/sanrio/57.png', category: 'sanrio', soldOut: false },
-  { src: 'rares/sanrio/58.png', category: 'sanrio', soldOut: false },
-  { src: 'rares/sanrio/59.png', category: 'sanrio', soldOut: false },
-  { src: 'rares/sanrio/60.png', category: 'sanrio', soldOut: false },
-  { src: 'rares/sanrio/61.png', category: 'sanrio', soldOut: false },
-  { src: 'rares/sanrio/62.png', category: 'sanrio', soldOut: false },
-  { src: 'rares/sanrio/metalkitty.png', category: 'sanrio', soldOut: false },
+        // Love charms
+        { src: 'rares/love/best.png', category: 'love', soldOut: false },
+        { src: 'rares/love/ends.png', category: 'love', soldOut: false },
+        { src: 'rares/love/fri.png', category: 'love', soldOut: false },
+        { src: 'rares/love/heart2.png', category: 'love', soldOut: false },
+        { src: 'rares/love/love.png', category: 'love', soldOut: false },
+        { src: 'rares/love/love2.png', category: 'love', soldOut: false },
+        { src: 'rares/love/love3.png', category: 'love', soldOut: false },
+        { src: 'rares/love/love4.png', category: 'love', soldOut: false },
+        { src: 'rares/love/love5.png', category: 'love', soldOut: false },
+        { src: 'rares/love/love6.png', category: 'love', soldOut: false },
+        { src: 'rares/love/love7.png', category: 'love', soldOut: false },
+        { src: 'rares/love/love8.png', category: 'love', soldOut: false },
+        { src: 'rares/love/love9.png', category: 'love', soldOut: false },
+        { src: 'rares/love/love10.png', category: 'love', soldOut: false },
+        { src: 'rares/love/love11.png', category: 'love', soldOut: false },
+        { src: 'rares/love/mrmrs1.png', category: 'love', soldOut: false },
+        { src: 'rares/love/mrmrs2.png', category: 'love', soldOut: false },
 
-  // Sporty charms
-  { src: 'rares/sporty/sporty.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty2.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty3.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty4.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty5.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty6.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty7.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty8.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty9.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty10.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty11.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty12.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty13.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty14.png', category: 'sporty', soldOut: false },
-  { src: 'rares/sporty/sporty15.png', category: 'sporty', soldOut: false }
-];
+        // Sanrio charms
+        { src: 'rares/sanrio/51.png', category: 'sanrio', soldOut: false },
+        { src: 'rares/sanrio/52.png', category: 'sanrio', soldOut: false },
+        { src: 'rares/sanrio/53.png', category: 'sanrio', soldOut: false },
+        { src: 'rares/sanrio/54.png', category: 'sanrio', soldOut: false },
+        { src: 'rares/sanrio/55.png', category: 'sanrio', soldOut: false },
+        { src: 'rares/sanrio/56.png', category: 'sanrio', soldOut: false },
+        { src: 'rares/sanrio/57.png', category: 'sanrio', soldOut: false },
+        { src: 'rares/sanrio/58.png', category: 'sanrio', soldOut: false },
+        { src: 'rares/sanrio/59.png', category: 'sanrio', soldOut: false },
+        { src: 'rares/sanrio/60.png', category: 'sanrio', soldOut: false },
+        { src: 'rares/sanrio/61.png', category: 'sanrio', soldOut: false },
+        { src: 'rares/sanrio/62.png', category: 'sanrio', soldOut: false },
+        { src: 'rares/sanrio/metalkitty.png', category: 'sanrio', soldOut: false },
+
+        // Sporty charms
+        { src: 'rares/sporty/sporty.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty2.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty3.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty4.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty5.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty6.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty7.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty8.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty9.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty10.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty11.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty12.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty13.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty14.png', category: 'sporty', soldOut: false },
+        { src: 'rares/sporty/sporty15.png', category: 'sporty', soldOut: false }
+      ];
 
       // Current state
       let currentProduct = 'bracelet';
@@ -1100,6 +1095,7 @@ const rareCharms = [
       let customCharmImage = null;
       let sizePriceAdjustment = 0;
       let isFullGlam = false;
+      let fullGlamSpecialCount = 0;
 
       // Initialize
       initProduct(currentProduct);
@@ -1133,21 +1129,22 @@ const rareCharms = [
 
         // Full glam button
         fullGlamBtn.addEventListener('click', () => {
-          const price = products[currentProduct].fullGlam;
-          if (confirm(`Full Glam Look includes 18 special charms for ${price} JDs. You'll get 18 special charms for free. Continue?`)) {
-            isFullGlam = true;
-            jewelryPiece.innerHTML = '';
-            usedCharms = new Set();
-            createSlots(products[currentProduct].slots);
-            
-            // Reset counts - full glam has fixed pricing
-            specialCount = 0;
-            includedSpecialUsed = products[currentProduct].slots; // All special charms are free
-            rareCount = 0;
-            customCount = 0;
-            
-            // Set full glam price
-            totalPriceDisplay.textContent = `Total: ${price} JDs (Full Glam Special)`;
+          if (isFullGlam) {
+            // Toggle off Full Glam
+            isFullGlam = false;
+            includedSpecialUsed = 0;
+            fullGlamBtn.textContent = 'Full Glam Look';
+            calculatePrice();
+          } else {
+            // Activate Full Glam
+            const price = products[currentProduct].fullGlam;
+            if (confirm(`Full Glam Look gives you 18 FREE special charms (${price} JDs total).\n\nYou can still add rare charms (+3 JDs each) or custom charms (+3.5 JDs each).`)) {
+              isFullGlam = true;
+              fullGlamSpecialCount = 0;
+              includedSpecialUsed = products[currentProduct].includedSpecial; // Set to 18 free specials
+              fullGlamBtn.textContent = 'Exit Full Glam';
+              calculatePrice();
+            }
           }
         });
 
@@ -1159,6 +1156,7 @@ const rareCharms = [
           // Reset to base slots first
           jewelryPiece.innerHTML = '';
           isFullGlam = false;
+          fullGlamBtn.textContent = 'Full Glam Look';
           createSlots(baseSlots);
           
           // Adjust slots and price based on size
@@ -1203,7 +1201,207 @@ const rareCharms = [
             : 'Show Pricing Info';
         });
 
-        // ... [rest of your event listeners]
+        // Category tabs - SPECIAL
+        document.querySelectorAll('#special-categories .category-tab').forEach(tab => {
+          tab.addEventListener('click', function() {
+            document.querySelectorAll('#special-categories .category-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            currentSpecialCategory = this.dataset.category;
+            updateSpecialCharmsDisplay();
+          });
+        });
+
+        // Category tabs - RARE
+        document.querySelectorAll('#rare-categories .category-tab').forEach(tab => {
+          tab.addEventListener('click', function() {
+            document.querySelectorAll('#rare-categories .category-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            currentRareCategory = this.dataset.category;
+            updateRareCharmsDisplay();
+          });
+        });
+
+        // Download Bracelet as Image
+        downloadBtn.addEventListener('click', function() {
+          html2canvas(document.getElementById('jewelry-piece')).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'my-bracelet-design.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+          });
+        });
+
+        // Custom charm upload handling
+        customCharmUpload.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+              customCharmPreview.innerHTML = '';
+              const img = document.createElement('img');
+              img.src = event.target.result;
+              customCharmPreview.appendChild(img);
+              customCharmImage = img;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        // Add custom charm button
+        addCustomCharmBtn.addEventListener('click', function() {
+          if (!customCharmImage) {
+            alert('Please upload an image first');
+            return;
+          }
+
+          // Create a temporary custom charm element
+          const tempCharm = document.createElement('img');
+          tempCharm.src = customCharmImage.src;
+          tempCharm.alt = 'Custom Charm';
+          tempCharm.dataset.type = 'custom';
+          tempCharm.dataset.charm = 'custom-' + Date.now();
+          tempCharm.classList.add('charm');
+          
+          // Set as selected charm
+          document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
+          tempCharm.classList.add('selected');
+          selectedCharm = tempCharm;
+          
+          // Reset upload
+          customCharmUpload.value = '';
+          customCharmPreview.innerHTML = '<span>Preview</span>';
+          customCharmImage = null;
+        });
+
+        // Show payment proof upload when Cliq is selected
+        payCliqOption.addEventListener('change', function() {
+          paymentProofContainer.style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Open order modal
+        orderBtn.addEventListener('click', function() {
+          document.getElementById('order-total-price').textContent = 
+            document.getElementById('total-price').textContent;
+          orderModal.style.display = 'flex';
+        });
+
+        // Close order modal
+        cancelOrderBtn.addEventListener('click', function() {
+          orderModal.style.display = 'none';
+        });
+
+        // Close confirmation modal
+        closeConfirmation.addEventListener('click', function() {
+          orderConfirmation.style.display = 'none';
+        });
+
+        // Handle form submission
+        orderForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          // Show loading state
+          const submitBtn = orderForm.querySelector('button[type="submit"]');
+          const originalBtnText = submitBtn.textContent;
+          submitBtn.textContent = 'Processing...';
+          submitBtn.disabled = true;
+
+          try {
+            // Get form values
+            const orderData = {
+              name: document.getElementById('full-name').value,
+              phone: document.getElementById('phone').value,
+              phone2: document.getElementById('phone2').value || '',
+              governorate: document.getElementById('governorate').value,
+              address: document.getElementById('address').value,
+              paymentMethod: document.querySelector('input[name="payment"]:checked').value,
+              totalPrice: document.getElementById('total-price').textContent.replace('Total: ', ''),
+              productType: currentProduct,
+              materialType: materialType,
+              size: sizeSelect.value,
+              isFullGlam: isFullGlam,
+              design: [],
+              status: 'pending',
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            // Get all charms in bracelet
+            const slots = document.querySelectorAll('.slot img[data-type="special"], .slot img[data-type="rare"], .slot img[data-type="custom"]');
+            orderData.design = Array.from(slots).map(slot => ({
+              type: slot.dataset.type,
+              src: slot.src.split('/').pop(),
+              charmName: slot.dataset.charm || 'custom'
+            }));
+
+            // If paying with Cliq, handle the payment proof
+            if (orderData.paymentMethod === 'Cliq') {
+              const file = document.getElementById('payment-proof').files[0];
+              if (file) {
+                try {
+                  const storageRef = storage.ref('payment-proofs/' + Date.now() + '-' + file.name);
+                  await storageRef.put(file);
+                  orderData.paymentProofUrl = await storageRef.getDownloadURL();
+                } catch (error) {
+                  console.error('Error uploading payment proof:', error);
+                  alert('Error uploading payment proof. Please try again.');
+                  submitBtn.textContent = originalBtnText;
+                  submitBtn.disabled = false;
+                  return;
+                }
+              } else {
+                alert('Please upload proof of payment for Cliq payment');
+                submitBtn.textContent = originalBtnText;
+                submitBtn.disabled = false;
+                return;
+              }
+            }
+
+            // Save order to Firestore
+            const docRef = await db.collection('orders').add(orderData);
+            
+            // Show confirmation
+            document.getElementById('order-id').textContent = docRef.id;
+            orderModal.style.display = 'none';
+            orderConfirmation.style.display = 'flex';
+            
+            // Reset form
+            orderForm.reset();
+            paymentProofContainer.style.display = 'none';
+          } catch (error) {
+            console.error('Error saving order: ', error);
+            alert('Error saving order: ' + error.message);
+          } finally {
+            submitBtn.textContent = originalBtnText;
+            submitBtn.disabled = false;
+          }
+        });
+
+        // Modal event handlers
+        confirmRemoveBtn.addEventListener('click', () => {
+          if (slotToRemove) {
+            removeCharmFromSlot(slotToRemove);
+            slotToRemove = null;
+          }
+          removeCharmModal.style.display = 'none';
+        });
+
+        cancelRemoveBtn.addEventListener('click', () => {
+          slotToRemove = null;
+          removeCharmModal.style.display = 'none';
+        });
+
+        // Window click handlers for modals
+        window.addEventListener('click', (event) => {
+          if (event.target === removeCharmModal) {
+            slotToRemove = null;
+            removeCharmModal.style.display = 'none';
+          }
+          if (event.target === orderModal) {
+            orderModal.style.display = 'none';
+          }
+          if (event.target === orderConfirmation) {
+            orderConfirmation.style.display = 'none';
+          }
+        });
       }
 
       function addExtraSlots(extraCount) {
@@ -1240,6 +1438,8 @@ const rareCharms = [
         customCount = 0;
         includedSpecialUsed = 0;
         isFullGlam = false;
+        fullGlamSpecialCount = 0;
+        fullGlamBtn.textContent = 'Full Glam Look';
         sizePriceAdjustment = 0;
         sizeSelect.value = '15.2-16.2';
         createSlots(products[product].slots);
@@ -1291,11 +1491,6 @@ const rareCharms = [
       }
 
       function addCharmToSlot(slot) {
-        if (isFullGlam) {
-          alert('For Full Glam look, all charms must be special. Please remove Full Glam option first if you want to customize.');
-          return;
-        }
-        
         if (selectedCharm.classList.contains('sold-out')) {
           alert('This charm is sold out!');
           return;
@@ -1314,8 +1509,12 @@ const rareCharms = [
           
           // Update counts for previous charm
           if (existingCharm.dataset.type === 'special') {
-            specialCount--;
-            if (includedSpecialUsed > 0) includedSpecialUsed--;
+            if (isFullGlam) {
+              fullGlamSpecialCount--;
+            } else {
+              specialCount--;
+              if (includedSpecialUsed > 0) includedSpecialUsed--;
+            }
           } else if (existingCharm.dataset.type === 'rare') {
             rareCount--;
           } else if (existingCharm.dataset.type === 'custom') {
