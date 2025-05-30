@@ -286,3 +286,28 @@ h1 {
     height: 36px !important;
   }
 }
+
+
+.pricing-info {
+  display: none;
+  /* rest of your existing pricing-info styles */
+}
+
+.pricing-info.visible {
+  display: block;
+}
+
+.pricing-toggle {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.pricing-toggle-btn {
+  background: #d6336c;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
