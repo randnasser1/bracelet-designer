@@ -434,7 +434,7 @@
       gap: 1rem;
       margin: 1rem 0;
     }
-
+    
     /* Subcategory styles */
     .category-tabs {
       display: flex;
@@ -505,6 +505,48 @@
       }
     }
   </style>
+
+  <div class="cart-section">
+  <button class="btn" id="add-to-cart-btn">Add to Cart</button>
+  <div id="cart-items" class="cart-items"></div>
+</div>
+
+<style>
+.cart-section {
+  margin: 1rem 0;
+  text-align: center;
+}
+.cart-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.cart-item {
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: relative;
+}
+.cart-item img {
+  width: 100px;
+  height: auto;
+}
+.remove-item {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+</style>
 </head>
 <body>
   <div class="main-content">
@@ -515,7 +557,7 @@
       <button class="product-btn" data-type="anklet">Anklet</button>
       <button class="product-btn" data-type="necklace">Necklace</button>
     </div>
-
+    
     <div class="controls">
       <div class="control-group">
         <span>Material:</span>
@@ -740,6 +782,16 @@
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
   <script>
+    // Add to your current state variables
+    let cart = [];
+    let currentDesign = {
+      productType: 'bracelet',
+      materialType: 'silver',
+      size: '15.2-16.2',
+      isFullGlam: false,
+      charms: [],
+      imageData: null
+    };
     // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyD_iOEwu71dL4Lmfl7Km8lSlYFzSuubbzY",
@@ -1105,31 +1157,36 @@
       pricingToggle.textContent = 'Show Pricing Info';
 
       function setupEventListeners() {
-        // Product selection
+       document.getElementById('add-to-cart-btn').addEventListener('click', addToCart);
+
+        // Update download button
+        downloadBtn.addEventListener('click', downloadAllDesigns);
+        
+        // Update product selection to modify current design
         productBtns.forEach(btn => {
           btn.addEventListener('click', () => {
             productBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentProduct = btn.dataset.type;
+            currentDesign.productType = currentProduct;
             initProduct(currentProduct);
+          });
+        });
+        
+        // Update material selection
+        materialOptions.forEach(option => {
+          option.addEventListener('click', () => {
+            materialOptions.forEach(o => o.classList.remove('selected'));
+            option.classList.add('selected');
+            materialType = option.dataset.material;
+            currentDesign.materialType = materialType;
+            updateBaseCharms();
             calculatePrice();
           });
         });
-
-        // Material selection
-       materialOptions.forEach(option => {
-  option.addEventListener('click', () => {
-    materialOptions.forEach(o => o.classList.remove('selected'));
-    option.classList.add('selected');
-    materialType = option.dataset.material;
-    updateBaseCharms(); // Update charm visuals immediately
-    calculatePrice(); // Update price immediately
-  });
-});
-
         // Full glam button
         fullGlamBtn.addEventListener('click', () => {
-  if (isFullGlam) {
+        if (isFullGlam) {
     // Exit Full Glam - convert back to normal pricing
     isFullGlam = false;
     includedSpecialUsed = Math.min(fullGlamSpecialCount, products[currentProduct].includedSpecial);
@@ -1416,7 +1473,135 @@ function updateBaseCharms() {
           }
         });
       }
+      // Add these new functions
+function saveCurrentDesign() {
+  return html2canvas(document.getElementById('jewelry-piece')).then(canvas => {
+    currentDesign.imageData = canvas.toDataURL('image/png');
+    currentDesign.charms = Array.from(document.querySelectorAll('#jewelry-piece .slot img[data-type="special"], #jewelry-piece .slot img[data-type="rare"], #jewelry-piece .slot img[data-type="custom"]'))
+      .map(img => ({
+        type: img.dataset.type,
+        src: img.src.split('/').pop()
+      }));
+    return currentDesign;
+  });
+}
 
+function addToCart() {
+  saveCurrentDesign().then(design => {
+    cart.push({
+      ...design,
+      id: Date.now() // Unique ID for each item
+    });
+    updateCartDisplay();
+    // Reset for new design
+    initProduct(design.productType);
+  });
+}
+
+function updateCartDisplay() {
+  const cartItemsEl = document.getElementById('cart-items');
+  cartItemsEl.innerHTML = '';
+  
+  cart.forEach((item, index) => {
+    const itemEl = document.createElement('div');
+    itemEl.className = 'cart-item';
+    itemEl.innerHTML = `
+      <img src="${item.imageData}" alt="${item.productType}">
+      <div>${item.productType.charAt(0).toUpperCase() + item.productType.slice(1)}</div>
+      <button class="remove-item" data-index="${index}">×</button>
+    `;
+    cartItemsEl.appendChild(itemEl);
+  });
+
+  // Add remove item functionality
+  document.querySelectorAll('.remove-item').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const index = e.target.dataset.index;
+      cart.splice(index, 1);
+      updateCartDisplay();
+    });
+  });
+}
+
+// Modify your existing download function
+function downloadAllDesigns() {
+  if (cart.length === 0) {
+    alert('Your cart is empty!');
+    return;
+  }
+
+  cart.forEach((item, index) => {
+    const link = document.createElement('a');
+    link.download = `my-${item.productType}-design-${index+1}.png`;
+    link.href = item.imageData;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+}
+
+// Update order form submission
+orderForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  if (cart.length === 0) {
+    alert('Your cart is empty!');
+    return;
+  }
+
+  // Show loading state
+  const submitBtn = orderForm.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.textContent;
+  submitBtn.textContent = 'Processing...';
+  submitBtn.disabled = true;
+
+  try {
+    const orderData = {
+      name: document.getElementById('full-name').value,
+      phone: document.getElementById('phone').value,
+      phone2: document.getElementById('phone2').value || '',
+      governorate: document.getElementById('governorate').value,
+      address: document.getElementById('address').value,
+      paymentMethod: document.querySelector('input[name="payment"]:checked').value,
+      items: cart.map(item => ({
+        productType: item.productType,
+        materialType: item.materialType,
+        size: item.size,
+        isFullGlam: item.isFullGlam,
+        charms: item.charms
+      })),
+      status: 'pending',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    // Handle payment proof if needed
+    if (orderData.paymentMethod === 'Cliq') {
+      const file = document.getElementById('payment-proof').files[0];
+      if (file) {
+        const storageRef = storage.ref('payment-proofs/' + Date.now() + '-' + file.name);
+        await storageRef.put(file);
+        orderData.paymentProofUrl = await storageRef.getDownloadURL();
+      }
+    }
+
+    const docRef = await db.collection('orders').add(orderData);
+    document.getElementById('order-id').textContent = docRef.id;
+    orderModal.style.display = 'none';
+    orderConfirmation.style.display = 'flex';
+    
+    // Clear cart after successful order
+    cart = [];
+    updateCartDisplay();
+    orderForm.reset();
+    paymentProofContainer.style.display = 'none';
+  } catch (error) {
+    console.error('Error saving order: ', error);
+    alert('Error saving order: ' + error.message);
+  } finally {
+    submitBtn.textContent = originalBtnText;
+    submitBtn.disabled = false;
+  }
+});
       function addExtraSlots(extraCount) {
         for (let i = 0; i < extraCount; i++) {
           const slot = document.createElement('div');
@@ -1714,21 +1899,62 @@ function updateBaseCharms() {
         });
       }
 
-     function calculatePrice() {
-      if (isFullGlam) {
-    const fullGlamBase = products[currentProduct].fullGlam;
-    // Only first 18 special charms are free in Full Glam
-    const extraSpecialCost = Math.max(0, fullGlamSpecialCount - 18) * 2;
-    const rareCost = rareCount * 3;
-    const customCost = customCount * 3.5;
-    const total = fullGlamBase + extraSpecialCost + rareCost + customCost + sizePriceAdjustment;
+   function calculatePrice() {
+  let price = 0;
+  
+  if (isFullGlam) {
+    price = products[currentProduct].fullGlam;
+    // Add extra costs for rare/custom charms in Full Glam
+    price += rareCount * 3;
+    price += customCount * 3.5;
+  } else {
+    price = products[currentProduct].basePrice;
     
-    basePriceDisplay.textContent = `Base Price: ${fullGlamBase} JDs (Full Glam)`;
-    charmPriceDisplay.textContent = `Charms: ${extraSpecialCost + rareCost + customCost} JDs (${Math.min(fullGlamSpecialCount, 18)}/18 free specials used)`;
-    totalPriceDisplay.textContent = `Total: ${total} JDs`;
-    return;
+    // Material costs
+    if (materialType === 'gold') price += 1;
+    if (materialType === 'mix') price += 2.5;
+    
+    // Charm costs
+    price += Math.max(0, specialCount - products[currentProduct].includedSpecial) * 2;
+    price += rareCount * 3;
+    price += customCount * 3.5;
   }
+  
+  // Size adjustment
+  price += sizePriceAdjustment;
+  
+  totalPriceDisplay.textContent = `Current Design: ${price} JDs`;
+  if (cart.length > 0) {
+    totalPriceDisplay.textContent += ` | Cart Total: ${calculateCartTotal()} JDs`;
+  }
+}
 
+function calculateCartTotal() {
+  return cart.reduce((total, item) => {
+    let itemPrice = item.isFullGlam ? 
+      products[item.productType].fullGlam :
+      products[item.productType].basePrice;
+    
+    // Add material costs
+    if (item.materialType === 'gold') itemPrice += 1;
+    if (item.materialType === 'mix') itemPrice += 2.5;
+    
+    // Add charm costs (simplified - you might want to store the calculated price instead)
+    const specialCount = item.charms.filter(c => c.type === 'special').length;
+    const rareCount = item.charms.filter(c => c.type === 'rare').length;
+    const customCount = item.charms.filter(c => c.type === 'custom').length;
+    
+    if (!item.isFullGlam) {
+      itemPrice += Math.max(0, specialCount - products[item.productType].includedSpecial) * 2;
+    }
+    itemPrice += rareCount * 3;
+    itemPrice += customCount * 3.5;
+    
+    // Add size adjustment (you'll need to store this in your cart items)
+    
+    return total + itemPrice;
+  }, 0);
+}
         
            // Rest of normal pricing calculation...
       const config = products[currentProduct];
