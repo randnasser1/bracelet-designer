@@ -781,70 +781,61 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-  <script>
-    // Add to your current state variables
-    let cart = [];
-    let currentDesign = {
-      productType: 'bracelet',
-      materialType: 'silver',
-      size: '15.2-16.2',
-      isFullGlam: false,
-      charms: [],
-      imageData: null
-    };
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyD_iOEwu71dL4Lmfl7Km8lSlYFzSuubbzY",
-      authDomain: "italian-charms.firebaseapp.com",
-      projectId: "italian-charms",
-      storageBucket: "italian-charms.appspot.com",
-      messagingSenderId: "156559643870",
-      appId: "1:156559643870:web:a14807a2a6d1761b71de4f"
-    };
+      <script>
+  // Current state
+  let cart = [];
+  let currentDesign = {
+    productType: 'bracelet',
+    materialType: 'silver',
+    size: '15.2-16.2',
+    isFullGlam: false,
+    charms: [],
+    imageData: null
+  };
+  
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const storage = firebase.storage();
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const storage = firebase.storage();
+  document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
+    const jewelryPiece = document.getElementById('jewelry-piece');
+    const fullGlamBtn = document.getElementById('full-glam-btn');
+    const productBtns = document.querySelectorAll('.product-btn');
+    const materialOptions = document.querySelectorAll('.material-option');
+    const basePriceDisplay = document.getElementById('base-price');
+    const charmPriceDisplay = document.getElementById('charm-price');
+    const totalPriceDisplay = document.getElementById('total-price');
+    const specialCharmsGrid = document.getElementById('special-charms');
+    const rareCharmsGrid = document.getElementById('rare-charms');
+    const removeCharmModal = document.getElementById('remove-charm-modal');
+    const confirmRemoveBtn = document.getElementById('confirm-remove');
+    const cancelRemoveBtn = document.getElementById('cancel-remove');
+    const downloadBtn = document.getElementById('download-btn');
+    const orderBtn = document.getElementById('order-btn');
+    const orderModal = document.getElementById('order-modal');
+    const orderForm = document.getElementById('order-form');
+    const cancelOrderBtn = document.getElementById('cancel-order');
+    const orderConfirmation = document.getElementById('order-confirmation');
+    const closeConfirmation = document.getElementById('close-confirmation');
+    const payCliqOption = document.getElementById('pay-cliq');
+    const paymentProofContainer = document.getElementById('payment-proof-container');
+    const customCharmUpload = document.getElementById('custom-charm-upload');
+    const customCharmPreview = document.getElementById('custom-charm-preview');
+    const addCustomCharmBtn = document.getElementById('add-custom-charm');
+    const pricingToggle = document.getElementById('pricing-toggle');
+    const pricingInfo = document.querySelector('.pricing-info');
+    const sizeSelect = document.getElementById('size');
+    const addToCartBtn = document.getElementById('add-to-cart-btn');
 
-    document.addEventListener('DOMContentLoaded', () => {
-      // DOM Elements
-      const jewelryPiece = document.getElementById('jewelry-piece');
-      const fullGlamBtn = document.getElementById('full-glam-btn');
-      const productBtns = document.querySelectorAll('.product-btn');
-      const materialOptions = document.querySelectorAll('.material-option');
-      const basePriceDisplay = document.getElementById('base-price');
-      const charmPriceDisplay = document.getElementById('charm-price');
-      const totalPriceDisplay = document.getElementById('total-price');
-      const specialCharmsGrid = document.getElementById('special-charms');
-      const rareCharmsGrid = document.getElementById('rare-charms');
-      const removeCharmModal = document.getElementById('remove-charm-modal');
-      const confirmRemoveBtn = document.getElementById('confirm-remove');
-      const cancelRemoveBtn = document.getElementById('cancel-remove');
-      const downloadBtn = document.getElementById('download-btn');
-      const orderBtn = document.getElementById('order-btn');
-      const orderModal = document.getElementById('order-modal');
-      const orderForm = document.getElementById('order-form');
-      const cancelOrderBtn = document.getElementById('cancel-order');
-      const orderConfirmation = document.getElementById('order-confirmation');
-      const closeConfirmation = document.getElementById('close-confirmation');
-      const payCliqOption = document.getElementById('pay-cliq');
-      const paymentProofContainer = document.getElementById('payment-proof-container');
-      const customCharmUpload = document.getElementById('custom-charm-upload');
-      const customCharmPreview = document.getElementById('custom-charm-preview');
-      const addCustomCharmBtn = document.getElementById('add-custom-charm');
-      const pricingToggle = document.getElementById('pricing-toggle');
-      const pricingInfo = document.querySelector('.pricing-info');
-      const sizeSelect = document.getElementById('size');
-
-      // Product configurations
-      const products = {
+    // Product configurations
+    const products = {
       bracelet: { basePrice: 10, slots: 18, includedSpecial: 2, fullGlam: 29 },
       anklet: { basePrice: 15, slots: 23, includedSpecial: 2, fullGlam: 42 },
       necklace: { basePrice: 22, slots: 34, includedSpecial: 2, fullGlam: 64 }
     };
-
-      // Charm image lists with categories and sold out status
+    // Charm image lists with categories and sold out status
       const specialCharms = [
         // 8 Ball charms
         { src: 'special/8ball/38.png', category: '8ball', soldOut: false },
@@ -1132,853 +1123,682 @@
         { src: 'rares/sporty/sporty15.png', category: 'sporty', soldOut: false }
       ];
 
-      // Current state
-      let currentProduct = 'bracelet';
-      let selectedCharm = null;
-      let materialType = 'silver';
-      let specialCount = 0;
-      let rareCount = 0;
-      let customCount = 0;
-      let includedSpecialUsed = 0;
-      let usedCharms = new Set();
-      let slotToRemove = null;
-      let currentSpecialCategory = 'all';
-      let currentRareCategory = 'all';
-      let customCharmImage = null;
-      let sizePriceAdjustment = 0;
-      let isFullGlam = false;
-      let fullGlamSpecialCount = 0;
+    // Current state
+    let currentProduct = 'bracelet';
+    let selectedCharm = null;
+    let materialType = 'silver';
+    let specialCount = 0;
+    let rareCount = 0;
+    let customCount = 0;
+    let includedSpecialUsed = 0;
+    let usedCharms = new Set();
+    let slotToRemove = null;
+    let currentSpecialCategory = 'all';
+    let currentRareCategory = 'all';
+    let customCharmImage = null;
+    let sizePriceAdjustment = 0;
+    let isFullGlam = false;
+    let fullGlamSpecialCount = 0;
 
-      // Initialize
-      initProduct(currentProduct);
-      initCharms();
-      setupEventListeners();
-      pricingInfo.classList.remove('visible');
-      pricingToggle.textContent = 'Show Pricing Info';
+    // Initialize
+    initProduct(currentProduct);
+    initCharms();
+    setupEventListeners();
+    pricingInfo.classList.remove('visible');
+    pricingToggle.textContent = 'Show Pricing Info';
 
-      function setupEventListeners() {
-       document.getElementById('add-to-cart-btn').addEventListener('click', addToCart);
+    function setupEventListeners() {
+      // Add to cart button
+      addToCartBtn.addEventListener('click', addToCart);
 
-        // Update download button
-        downloadBtn.addEventListener('click', downloadAllDesigns);
-        
-        // Update product selection to modify current design
-        productBtns.forEach(btn => {
-          btn.addEventListener('click', () => {
-            productBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentProduct = btn.dataset.type;
-            currentDesign.productType = currentProduct;
-            initProduct(currentProduct);
-          });
+      // Product selection
+      productBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          productBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentProduct = btn.dataset.type;
+          currentDesign.productType = currentProduct;
+          initProduct(currentProduct);
         });
-        
-        // Update material selection
-        materialOptions.forEach(option => {
-          option.addEventListener('click', () => {
-            materialOptions.forEach(o => o.classList.remove('selected'));
-            option.classList.add('selected');
-            materialType = option.dataset.material;
-            currentDesign.materialType = materialType;
-            updateBaseCharms();
-            calculatePrice();
-          });
-        });
-        // Full glam button
-        fullGlamBtn.addEventListener('click', () => {
-        if (isFullGlam) {
-    // Exit Full Glam - convert back to normal pricing
-    isFullGlam = false;
-    includedSpecialUsed = Math.min(fullGlamSpecialCount, products[currentProduct].includedSpecial);
-    specialCount = Math.max(0, fullGlamSpecialCount - includedSpecialUsed);
-    fullGlamBtn.textContent = 'Full Glam Look';
-  } else {
-    // Enter Full Glam
-    isFullGlam = true;
-    fullGlamSpecialCount = Array.from(document.querySelectorAll('.slot img[data-type="special"]')).length;
-    fullGlamBtn.textContent = 'Exit Full Glam';
-  }
-  calculatePrice(); // Always recalculate when toggling
-});
+      });
 
-        // Updated updateBaseCharms function
-function updateBaseCharms() {
-  const slots = document.querySelectorAll('.slot');
-  slots.forEach((slot, index) => {
-    const baseImg = slot.querySelector('img[data-type="base"]');
-    if (baseImg) {
-      if (materialType === 'silver') {
-        baseImg.src = 'basecharms/silver.png';
-      } else if (materialType === 'gold') {
-        baseImg.src = 'basecharms/gold.png';
-      } else if (materialType === 'mix') {
-        const isGold = index % 2 === 0;
-        baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-      }
-    }
-  });
-}
-        // Size selection
-        sizeSelect.addEventListener('change', function() {
-          const sizeValue = this.value;
-          const baseSlots = products[currentProduct].slots;
-          
-          // Reset to base slots first
-          jewelryPiece.innerHTML = '';
-          isFullGlam = false;
-          fullGlamBtn.textContent = 'Full Glam Look';
-          createSlots(baseSlots);
-          
-          // Adjust slots and price based on size
-          switch(sizeValue) {
-            case '15.2-16.2':
-              sizePriceAdjustment = 0;
-              break;
-            case '16.2-17.1':
-              sizePriceAdjustment = 0.5;
-              addExtraSlots(1); // 19 charms total
-              break;
-            case '17.1-18.1':
-              sizePriceAdjustment = 1;
-              addExtraSlots(2); // 20 charms total
-              break;
-            case '18.1-19.2':
-              sizePriceAdjustment = 1.5;
-              addExtraSlots(3); // 21 charms total
-              break;
-            case '19.2-20':
-              sizePriceAdjustment = 2;
-              addExtraSlots(4); // 22 charms total
-              break;
-            case '20-21':
-              sizePriceAdjustment = 2.5;
-              addExtraSlots(5); // 23 charms total
-              break;
-            case '21-22':
-              sizePriceAdjustment = 3;
-              addExtraSlots(6); // 24 charms total
-              break;
-          }
-          
+      // Material selection
+      materialOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          materialOptions.forEach(o => o.classList.remove('selected'));
+          option.classList.add('selected');
+          materialType = option.dataset.material;
+          currentDesign.materialType = materialType;
+          updateBaseCharms();
           calculatePrice();
         });
+      });
 
-        // Pricing info toggle
-        pricingToggle.addEventListener('click', () => {
-          pricingInfo.classList.toggle('visible');
-          pricingToggle.textContent = pricingInfo.classList.contains('visible') 
-            ? 'Hide Pricing Info' 
-            : 'Show Pricing Info';
-        });
-
-        // Category tabs - SPECIAL
-        document.querySelectorAll('#special-categories .category-tab').forEach(tab => {
-          tab.addEventListener('click', function() {
-            document.querySelectorAll('#special-categories .category-tab').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            currentSpecialCategory = this.dataset.category;
-            updateSpecialCharmsDisplay();
-          });
-        });
-
-        // Category tabs - RARE
-        document.querySelectorAll('#rare-categories .category-tab').forEach(tab => {
-          tab.addEventListener('click', function() {
-            document.querySelectorAll('#rare-categories .category-tab').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            currentRareCategory = this.dataset.category;
-            updateRareCharmsDisplay();
-          });
-        });
-
-        // Download Bracelet as Image
-        downloadBtn.addEventListener('click', function() {
-          html2canvas(document.getElementById('jewelry-piece')).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'my-bracelet-design.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-          });
-        });
-
-        // Custom charm upload handling
-        customCharmUpload.addEventListener('change', function(e) {
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-              customCharmPreview.innerHTML = '';
-              const img = document.createElement('img');
-              img.src = event.target.result;
-              customCharmPreview.appendChild(img);
-              customCharmImage = img;
-            };
-            reader.readAsDataURL(file);
-          }
-        });
-
-        // Add custom charm button
-        addCustomCharmBtn.addEventListener('click', function() {
-          if (!customCharmImage) {
-            alert('Please upload an image first');
-            return;
-          }
-
-          // Create a temporary custom charm element
-          const tempCharm = document.createElement('img');
-          tempCharm.src = customCharmImage.src;
-          tempCharm.alt = 'Custom Charm';
-          tempCharm.dataset.type = 'custom';
-          tempCharm.dataset.charm = 'custom-' + Date.now();
-          tempCharm.classList.add('charm');
-          
-          // Set as selected charm
-          document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
-          tempCharm.classList.add('selected');
-          selectedCharm = tempCharm;
-          
-          // Reset upload
-          customCharmUpload.value = '';
-          customCharmPreview.innerHTML = '<span>Preview</span>';
-          customCharmImage = null;
-        });
-
-        // Show payment proof upload when Cliq is selected
-        payCliqOption.addEventListener('change', function() {
-          paymentProofContainer.style.display = this.checked ? 'block' : 'none';
-        });
-
-        // Open order modal
-        orderBtn.addEventListener('click', function() {
-          document.getElementById('order-total-price').textContent = 
-            document.getElementById('total-price').textContent;
-          orderModal.style.display = 'flex';
-        });
-
-        // Close order modal
-        cancelOrderBtn.addEventListener('click', function() {
-          orderModal.style.display = 'none';
-        });
-
-        // Close confirmation modal
-        closeConfirmation.addEventListener('click', function() {
-          orderConfirmation.style.display = 'none';
-        });
-
-        // Handle form submission
-        orderForm.addEventListener('submit', async function(e) {
-          e.preventDefault();
-          
-          // Show loading state
-          const submitBtn = orderForm.querySelector('button[type="submit"]');
-          const originalBtnText = submitBtn.textContent;
-          submitBtn.textContent = 'Processing...';
-          submitBtn.disabled = true;
-
-          try {
-            // Get form values
-            const orderData = {
-              name: document.getElementById('full-name').value,
-              phone: document.getElementById('phone').value,
-              phone2: document.getElementById('phone2').value || '',
-              governorate: document.getElementById('governorate').value,
-              address: document.getElementById('address').value,
-              paymentMethod: document.querySelector('input[name="payment"]:checked').value,
-              totalPrice: document.getElementById('total-price').textContent.replace('Total: ', ''),
-              productType: currentProduct,
-              materialType: materialType,
-              size: sizeSelect.value,
-              isFullGlam: isFullGlam,
-              design: [],
-              status: 'pending',
-              timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            // Get all charms in bracelet
-            const slots = document.querySelectorAll('.slot img[data-type="special"], .slot img[data-type="rare"], .slot img[data-type="custom"]');
-            orderData.design = Array.from(slots).map(slot => ({
-              type: slot.dataset.type,
-              src: slot.src.split('/').pop(),
-              charmName: slot.dataset.charm || 'custom'
-            }));
-
-            // If paying with Cliq, handle the payment proof
-            if (orderData.paymentMethod === 'Cliq') {
-              const file = document.getElementById('payment-proof').files[0];
-              if (file) {
-                try {
-                  const storageRef = storage.ref('payment-proofs/' + Date.now() + '-' + file.name);
-                  await storageRef.put(file);
-                  orderData.paymentProofUrl = await storageRef.getDownloadURL();
-                } catch (error) {
-                  console.error('Error uploading payment proof:', error);
-                  alert('Error uploading payment proof. Please try again.');
-                  submitBtn.textContent = originalBtnText;
-                  submitBtn.disabled = false;
-                  return;
-                }
-              } else {
-                alert('Please upload proof of payment for Cliq payment');
-                submitBtn.textContent = originalBtnText;
-                submitBtn.disabled = false;
-                return;
-              }
-            }
-
-            // Save order to Firestore
-            const docRef = await db.collection('orders').add(orderData);
-            
-            // Show confirmation
-            document.getElementById('order-id').textContent = docRef.id;
-            orderModal.style.display = 'none';
-            orderConfirmation.style.display = 'flex';
-            
-            // Reset form
-            orderForm.reset();
-            paymentProofContainer.style.display = 'none';
-          } catch (error) {
-            console.error('Error saving order: ', error);
-            alert('Error saving order: ' + error.message);
-          } finally {
-            submitBtn.textContent = originalBtnText;
-            submitBtn.disabled = false;
-          }
-        });
-
-        // Modal event handlers
-        confirmRemoveBtn.addEventListener('click', () => {
-          if (slotToRemove) {
-            removeCharmFromSlot(slotToRemove);
-            slotToRemove = null;
-          }
-          removeCharmModal.style.display = 'none';
-        });
-
-        cancelRemoveBtn.addEventListener('click', () => {
-          slotToRemove = null;
-          removeCharmModal.style.display = 'none';
-        });
-
-        // Window click handlers for modals
-        window.addEventListener('click', (event) => {
-          if (event.target === removeCharmModal) {
-            slotToRemove = null;
-            removeCharmModal.style.display = 'none';
-          }
-          if (event.target === orderModal) {
-            orderModal.style.display = 'none';
-          }
-          if (event.target === orderConfirmation) {
-            orderConfirmation.style.display = 'none';
-          }
-        });
-      }
-      // Add these new functions
-function saveCurrentDesign() {
-  return html2canvas(document.getElementById('jewelry-piece')).then(canvas => {
-    currentDesign.imageData = canvas.toDataURL('image/png');
-    currentDesign.charms = Array.from(document.querySelectorAll('#jewelry-piece .slot img[data-type="special"], #jewelry-piece .slot img[data-type="rare"], #jewelry-piece .slot img[data-type="custom"]'))
-      .map(img => ({
-        type: img.dataset.type,
-        src: img.src.split('/').pop()
-      }));
-    return currentDesign;
-  });
-}
-
-function addToCart() {
-  saveCurrentDesign().then(design => {
-    cart.push({
-      ...design,
-      id: Date.now() // Unique ID for each item
-    });
-    updateCartDisplay();
-    // Reset for new design
-    initProduct(design.productType);
-  });
-}
-
-function updateCartDisplay() {
-  const cartItemsEl = document.getElementById('cart-items');
-  cartItemsEl.innerHTML = '';
-  
-  cart.forEach((item, index) => {
-    const itemEl = document.createElement('div');
-    itemEl.className = 'cart-item';
-    itemEl.innerHTML = `
-      <img src="${item.imageData}" alt="${item.productType}">
-      <div>${item.productType.charAt(0).toUpperCase() + item.productType.slice(1)}</div>
-      <button class="remove-item" data-index="${index}">×</button>
-    `;
-    cartItemsEl.appendChild(itemEl);
-  });
-
-  // Add remove item functionality
-  document.querySelectorAll('.remove-item').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const index = e.target.dataset.index;
-      cart.splice(index, 1);
-      updateCartDisplay();
-    });
-  });
-}
-
-// Modify your existing download function
-function downloadAllDesigns() {
-  if (cart.length === 0) {
-    alert('Your cart is empty!');
-    return;
-  }
-
-  cart.forEach((item, index) => {
-    const link = document.createElement('a');
-    link.download = `my-${item.productType}-design-${index+1}.png`;
-    link.href = item.imageData;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  });
-}
-
-// Update order form submission
-orderForm.addEventListener('submit', async function(e) {
-  e.preventDefault();
-  
-  if (cart.length === 0) {
-    alert('Your cart is empty!');
-    return;
-  }
-
-  // Show loading state
-  const submitBtn = orderForm.querySelector('button[type="submit"]');
-  const originalBtnText = submitBtn.textContent;
-  submitBtn.textContent = 'Processing...';
-  submitBtn.disabled = true;
-
-  try {
-    const orderData = {
-      name: document.getElementById('full-name').value,
-      phone: document.getElementById('phone').value,
-      phone2: document.getElementById('phone2').value || '',
-      governorate: document.getElementById('governorate').value,
-      address: document.getElementById('address').value,
-      paymentMethod: document.querySelector('input[name="payment"]:checked').value,
-      items: cart.map(item => ({
-        productType: item.productType,
-        materialType: item.materialType,
-        size: item.size,
-        isFullGlam: item.isFullGlam,
-        charms: item.charms
-      })),
-      status: 'pending',
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    // Handle payment proof if needed
-    if (orderData.paymentMethod === 'Cliq') {
-      const file = document.getElementById('payment-proof').files[0];
-      if (file) {
-        const storageRef = storage.ref('payment-proofs/' + Date.now() + '-' + file.name);
-        await storageRef.put(file);
-        orderData.paymentProofUrl = await storageRef.getDownloadURL();
-      }
-    }
-
-    const docRef = await db.collection('orders').add(orderData);
-    document.getElementById('order-id').textContent = docRef.id;
-    orderModal.style.display = 'none';
-    orderConfirmation.style.display = 'flex';
-    
-    // Clear cart after successful order
-    cart = [];
-    updateCartDisplay();
-    orderForm.reset();
-    paymentProofContainer.style.display = 'none';
-  } catch (error) {
-    console.error('Error saving order: ', error);
-    alert('Error saving order: ' + error.message);
-  } finally {
-    submitBtn.textContent = originalBtnText;
-    submitBtn.disabled = false;
-  }
-});
-      function addExtraSlots(extraCount) {
-        for (let i = 0; i < extraCount; i++) {
-          const slot = document.createElement('div');
-          slot.className = 'slot';
-          slot.dataset.index = jewelryPiece.children.length;
-          
-          const img = document.createElement('img');
-          if (materialType === 'silver') {
-            img.src = 'basecharms/silver.png';
-          } else if (materialType === 'gold') {
-            img.src = 'basecharms/gold.png';
-          } else if (materialType === 'mix') {
-            const isGold = jewelryPiece.children.length % 2 === 0;
-            img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-          }
-          img.dataset.type = 'base';
-          slot.appendChild(img);
-          
-          slot.addEventListener('click', function() {
-            handleSlotClick(this);
-          });
-          
-          jewelryPiece.appendChild(slot);
+      // Full glam button
+      fullGlamBtn.addEventListener('click', () => {
+        if (isFullGlam) {
+          isFullGlam = false;
+          includedSpecialUsed = Math.min(fullGlamSpecialCount, products[currentProduct].includedSpecial);
+          specialCount = Math.max(0, fullGlamSpecialCount - includedSpecialUsed);
+          fullGlamBtn.textContent = 'Full Glam Look';
+        } else {
+          isFullGlam = true;
+          fullGlamSpecialCount = Array.from(document.querySelectorAll('.slot img[data-type="special"]')).length;
+          fullGlamBtn.textContent = 'Exit Full Glam';
         }
-      }
+        calculatePrice();
+      });
 
-      function initProduct(product) {
-  jewelryPiece.innerHTML = '';
-  usedCharms = new Set();
-  specialCount = 0;
-  rareCount = 0;
-  customCount = 0;
-  includedSpecialUsed = 0;
-  isFullGlam = false;
-  fullGlamSpecialCount = 0;
-  fullGlamBtn.textContent = 'Full Glam Look';
-  sizePriceAdjustment = 0;
-  sizeSelect.value = '15.2-16.2';
-  
-  // Update product-specific elements
-  downloadBtn.textContent = `Download ${product.charAt(0).toUpperCase() + product.slice(1)} Image`;
-  
-  createSlots(products[product].slots);
-  updateCharmUsage();
-  calculatePrice();
-}
-
-      function createSlots(slotCount) {
-        for (let i = 0; i < slotCount; i++) {
-          const slot = document.createElement('div');
-          slot.className = 'slot';
-          slot.dataset.index = i;
-          
-          const img = document.createElement('img');
-          if (materialType === 'silver') {
-            img.src = 'basecharms/silver.png';
-            img.alt = 'Silver Base';
-          } else if (materialType === 'gold') {
-            img.src = 'basecharms/gold.png';
-            img.alt = 'Gold Base';
-          } else if (materialType === 'mix') {
-            const isGold = i % 2 === 0;
-            img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-            img.alt = isGold ? 'Gold Base' : 'Silver Base';
-          }
-          img.dataset.type = 'base';
-          slot.appendChild(img);
-          
-          slot.addEventListener('click', function() {
-            handleSlotClick(this);
-          });
-          
-          jewelryPiece.appendChild(slot);
+      // Size selection
+      sizeSelect.addEventListener('change', function() {
+        const sizeValue = this.value;
+        const baseSlots = products[currentProduct].slots;
+        
+        jewelryPiece.innerHTML = '';
+        isFullGlam = false;
+        fullGlamBtn.textContent = 'Full Glam Look';
+        createSlots(baseSlots);
+        
+        switch(sizeValue) {
+          case '15.2-16.2':
+            sizePriceAdjustment = 0;
+            break;
+          case '16.2-17.1':
+            sizePriceAdjustment = 0.5;
+            addExtraSlots(1);
+            break;
+          case '17.1-18.1':
+            sizePriceAdjustment = 1;
+            addExtraSlots(2);
+            break;
+          case '18.1-19.2':
+            sizePriceAdjustment = 1.5;
+            addExtraSlots(3);
+            break;
+          case '19.2-20':
+            sizePriceAdjustment = 2;
+            addExtraSlots(4);
+            break;
+          case '20-21':
+            sizePriceAdjustment = 2.5;
+            addExtraSlots(5);
+            break;
+          case '21-22':
+            sizePriceAdjustment = 3;
+            addExtraSlots(6);
+            break;
         }
-      }
-    
-      function handleSlotClick(slot) {
-  console.log('Slot clicked'); // Check if this appears in console when clicking
-  const currentCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
-  
-  if (currentCharm && !selectedCharm) {
-    console.log('Existing charm clicked');
-    slotToRemove = slot;
-    removeCharmModal.style.display = 'flex';
-    return;
-  }
-  
-  if (selectedCharm) {
-    console.log('Adding charm to slot');
-    addCharmToSlot(slot);
-  }
-}
-      function addCharmToSlot(slot) {
-  if (selectedCharm.classList.contains('sold-out')) {
-    alert('This charm is sold out!');
-    return;
-  }
+        
+        calculatePrice();
+      });
 
-  const charmSrc = selectedCharm.src.split('/').pop();
-  if (usedCharms.has(charmSrc) && selectedCharm.dataset.type !== 'custom') {
-    alert('This charm is already used on the bracelet!');
-    return;
-  }
+      // Pricing info toggle
+      pricingToggle.addEventListener('click', () => {
+        pricingInfo.classList.toggle('visible');
+        pricingToggle.textContent = pricingInfo.classList.contains('visible') 
+          ? 'Hide Pricing Info' 
+          : 'Show Pricing Info';
+      });
 
-  // Remove any existing decorative charm first
-  const existingCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
-  if (existingCharm) {
-    removeCharmFromSlot(slot); // This will handle decrementing counts
-  }
-
-  // Clear the slot completely (remove base charm too)
-  slot.innerHTML = '';
-
-  // Add the new decorative charm (don't add base charm back)
-  const newImg = selectedCharm.cloneNode();
-  newImg.classList.remove('selected');
-  newImg.dataset.charm = charmSrc;
-  if (selectedCharm.classList.contains('sold-out')) {
-    newImg.classList.add('sold-out');
-  }
-  slot.appendChild(newImg);
-  usedCharms.add(charmSrc);
-
-  // Update counts
-  const newType = selectedCharm.dataset.type;
-  if (newType === 'special') {
-    if (isFullGlam) {
-      fullGlamSpecialCount++;
-    } else {
-      if (includedSpecialUsed < products[currentProduct].includedSpecial) {
-        includedSpecialUsed++;
-      } else {
-        specialCount++;
-      }
-    }
-  } else if (newType === 'rare') {
-    rareCount++;
-  } else if (newType === 'custom') {
-    customCount++;
-  }
-
-  updateCharmUsage();
-  calculatePrice();
-  selectedCharm = null;
-  document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
-}
-      function removeCharmFromSlot(slot) {
-  const charmImg = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
-  if (!charmImg) return;
-
-  const charmType = charmImg.dataset.type;
-  const charmSrc = charmImg.dataset.charm;
-
-  // Remove the decorative charm
-  slot.removeChild(charmImg);
-  usedCharms.delete(charmSrc);
-
-  // Update counts
-  if (charmType === 'special') {
-    if (isFullGlam) {
-      fullGlamSpecialCount--;
-    } else {
-      if (includedSpecialUsed > 0) includedSpecialUsed--;
-      else specialCount--;
-    }
-  } else if (charmType === 'rare') {
-    rareCount--;
-  } else if (charmType === 'custom') {
-    customCount--;
-  }
-
-  // Add back the base charm
-  const baseImg = document.createElement('img');
-  if (materialType === 'silver') {
-    baseImg.src = 'basecharms/silver.png';
-    baseImg.alt = 'Silver Base';
-  } else if (materialType === 'gold') {
-    baseImg.src = 'basecharms/gold.png';
-    baseImg.alt = 'Gold Base';
-  } else if (materialType === 'mix') {
-    const isGold = parseInt(slot.dataset.index) % 2 === 0;
-    baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-    baseImg.alt = isGold ? 'Gold Base' : 'Silver Base';
-  }
-  baseImg.dataset.type = 'base';
-  slot.appendChild(baseImg);
-
-  updateCharmUsage();
-  calculatePrice();
-}
-      function initCharms() {
+      // Category tabs - SPECIAL (using event delegation)
+      document.getElementById('special-categories').addEventListener('click', function(e) {
+        const tab = e.target.closest('.category-tab');
+        if (!tab) return;
+        
+        document.querySelectorAll('#special-categories .category-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentSpecialCategory = tab.dataset.category;
         updateSpecialCharmsDisplay();
+      });
+
+      // Category tabs - RARE (using event delegation)
+      document.getElementById('rare-categories').addEventListener('click', function(e) {
+        const tab = e.target.closest('.category-tab');
+        if (!tab) return;
+        
+        document.querySelectorAll('#rare-categories .category-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentRareCategory = tab.dataset.category;
         updateRareCharmsDisplay();
-      }
+      });
 
-      function setupCategoryTabs() {
-        specialCategoryTabs.forEach(tab => {
-          tab.addEventListener('click', () => {
-            specialCategoryTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            currentSpecialCategory = tab.dataset.category;
-            updateSpecialCharmsDisplay();
-          });
-        });
-
-        rareCategoryTabs.forEach(tab => {
-          tab.addEventListener('click', () => {
-            rareCategoryTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            currentRareCategory = tab.dataset.category;
-            updateRareCharmsDisplay();
-          });
-        });
-      }
-
-      function updateSpecialCharmsDisplay() {
-        specialCharmsGrid.innerHTML = '';
-        
-        const filteredCharms = currentSpecialCategory === 'all' 
-          ? specialCharms 
-          : specialCharms.filter(charm => charm.category === currentSpecialCategory);
-        
-        filteredCharms.forEach((charm, index) => {
-          const charmEl = createCharm(charm.src, `Special Charm ${index+1}`, 'special');
-          charmEl.classList.add('special');
-          charmEl.dataset.charm = charm.src.split('/').pop();
-          charmEl.dataset.category = charm.category;
+      // Charm selection (using event delegation)
+      document.querySelectorAll('.charms-grid').forEach(grid => {
+        grid.addEventListener('click', function(e) {
+          const charm = e.target.closest('.charm');
+          if (!charm) return;
           
-          if (charm.soldOut) {
-            charmEl.classList.add('sold-out');
-            const soldOutLabel = document.createElement('div');
-            soldOutLabel.className = 'sold-out-label';
-            soldOutLabel.textContent = 'Sold Out';
-            charmEl.appendChild(soldOutLabel);
-          }
-          
-          specialCharmsGrid.appendChild(charmEl);
-        });
-      }
-
-      function updateRareCharmsDisplay() {
-        rareCharmsGrid.innerHTML = '';
-        
-        const filteredCharms = currentRareCategory === 'all' 
-          ? rareCharms 
-          : rareCharms.filter(charm => charm.category === currentRareCategory);
-        
-        filteredCharms.forEach((charm, index) => {
-          const charmEl = createCharm(charm.src, `Rare Charm ${index+1}`, 'rare');
-          charmEl.classList.add('rare');
-          charmEl.dataset.charm = charm.src.split('/').pop();
-          charmEl.dataset.category = charm.category;
-          
-          if (charm.soldOut) {
-            charmEl.classList.add('sold-out');
-            const soldOutLabel = document.createElement('div');
-            soldOutLabel.className = 'sold-out-label';
-            soldOutLabel.textContent = 'Sold Out';
-            charmEl.appendChild(soldOutLabel);
-          }
-          
-          rareCharmsGrid.appendChild(charmEl);
-        });
-      }
-
-      function createCharm(src, alt, type) {
-        const charm = document.createElement('img');
-        charm.className = 'charm';
-        charm.src = src;
-        charm.alt = alt;
-        charm.dataset.type = type;
-        
-        charm.addEventListener('click', function() {
-          if (this.classList.contains('sold-out')) {
+          if (charm.classList.contains('sold-out')) {
             alert('This charm is sold out!');
             return;
           }
           
           document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
-          this.classList.add('selected');
-          selectedCharm = this;
+          charm.classList.add('selected');
+          selectedCharm = charm;
         });
+      });
+
+      // Download button
+      downloadBtn.addEventListener('click', function() {
+        html2canvas(document.getElementById('jewelry-piece')).then(canvas => {
+          const link = document.createElement('a');
+          link.download = 'my-bracelet-design.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        });
+      });
+
+      // Custom charm upload
+      customCharmUpload.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            customCharmPreview.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = event.target.result;
+            customCharmPreview.appendChild(img);
+            customCharmImage = img;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Add custom charm
+      addCustomCharmBtn.addEventListener('click', function() {
+        if (!customCharmImage) {
+          alert('Please upload an image first');
+          return;
+        }
+
+        const tempCharm = document.createElement('img');
+        tempCharm.src = customCharmImage.src;
+        tempCharm.alt = 'Custom Charm';
+        tempCharm.dataset.type = 'custom';
+        tempCharm.dataset.charm = 'custom-' + Date.now();
+        tempCharm.classList.add('charm');
         
-        return charm;
-      }
+        document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
+        tempCharm.classList.add('selected');
+        selectedCharm = tempCharm;
+        
+        customCharmUpload.value = '';
+        customCharmPreview.innerHTML = '<span>Preview</span>';
+        customCharmImage = null;
+      });
 
-      function updateCharmUsage() {
-        document.querySelectorAll('.charms-grid .charm').forEach(charm => {
-          charm.classList.remove('used');
-        });
+      // Payment proof toggle
+      payCliqOption.addEventListener('change', function() {
+        paymentProofContainer.style.display = this.checked ? 'block' : 'none';
+      });
 
-        usedCharms.forEach(charmSrc => {
-          const charmEl = document.querySelector(`.charms-grid .charm[src$="${charmSrc}"]`);
-          if (charmEl) {
-            charmEl.classList.add('used');
+      // Order button
+      orderBtn.addEventListener('click', function() {
+        document.getElementById('order-total-price').textContent = 
+          document.getElementById('total-price').textContent;
+        orderModal.style.display = 'flex';
+      });
+
+      // Cancel order
+      cancelOrderBtn.addEventListener('click', function() {
+        orderModal.style.display = 'none';
+      });
+
+      // Close confirmation
+      closeConfirmation.addEventListener('click', function() {
+        orderConfirmation.style.display = 'none';
+      });
+
+      // Form submission
+      orderForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = orderForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.textContent = 'Processing...';
+        submitBtn.disabled = true;
+
+        try {
+          const orderData = {
+            name: document.getElementById('full-name').value,
+            phone: document.getElementById('phone').value,
+            phone2: document.getElementById('phone2').value || '',
+            governorate: document.getElementById('governorate').value,
+            address: document.getElementById('address').value,
+            paymentMethod: document.querySelector('input[name="payment"]:checked').value,
+            totalPrice: document.getElementById('total-price').textContent.replace('Total: ', ''),
+            productType: currentProduct,
+            materialType: materialType,
+            size: sizeSelect.value,
+            isFullGlam: isFullGlam,
+            design: [],
+            status: 'pending',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          };
+
+          const slots = document.querySelectorAll('.slot img[data-type="special"], .slot img[data-type="rare"], .slot img[data-type="custom"]');
+          orderData.design = Array.from(slots).map(slot => ({
+            type: slot.dataset.type,
+            src: slot.src.split('/').pop(),
+            charmName: slot.dataset.charm || 'custom'
+          }));
+
+          if (orderData.paymentMethod === 'Cliq') {
+            const file = document.getElementById('payment-proof').files[0];
+            if (file) {
+              const storageRef = storage.ref('payment-proofs/' + Date.now() + '-' + file.name);
+              await storageRef.put(file);
+              orderData.paymentProofUrl = await storageRef.getDownloadURL();
+            } else {
+              alert('Please upload proof of payment for Cliq payment');
+              submitBtn.textContent = originalBtnText;
+              submitBtn.disabled = false;
+              return;
+            }
           }
+
+          const docRef = await db.collection('orders').add(orderData);
+          document.getElementById('order-id').textContent = docRef.id;
+          orderModal.style.display = 'none';
+          orderConfirmation.style.display = 'flex';
+          orderForm.reset();
+          paymentProofContainer.style.display = 'none';
+        } catch (error) {
+          console.error('Error saving order: ', error);
+          alert('Error saving order: ' + error.message);
+        } finally {
+          submitBtn.textContent = originalBtnText;
+          submitBtn.disabled = false;
+        }
+      });
+
+      // Modal handlers
+      confirmRemoveBtn.addEventListener('click', () => {
+        if (slotToRemove) {
+          removeCharmFromSlot(slotToRemove);
+          slotToRemove = null;
+        }
+        removeCharmModal.style.display = 'none';
+      });
+
+      cancelRemoveBtn.addEventListener('click', () => {
+        slotToRemove = null;
+        removeCharmModal.style.display = 'none';
+      });
+
+      // Window click handlers for modals
+      window.addEventListener('click', (event) => {
+        if (event.target === removeCharmModal) {
+          slotToRemove = null;
+          removeCharmModal.style.display = 'none';
+        }
+        if (event.target === orderModal) {
+          orderModal.style.display = 'none';
+        }
+        if (event.target === orderConfirmation) {
+          orderConfirmation.style.display = 'none';
+        }
+      });
+    }
+
+    function addExtraSlots(extraCount) {
+      for (let i = 0; i < extraCount; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+        slot.dataset.index = jewelryPiece.children.length;
+        
+        const img = document.createElement('img');
+        if (materialType === 'silver') {
+          img.src = 'basecharms/silver.png';
+        } else if (materialType === 'gold') {
+          img.src = 'basecharms/gold.png';
+        } else if (materialType === 'mix') {
+          const isGold = jewelryPiece.children.length % 2 === 0;
+          img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+        }
+        img.dataset.type = 'base';
+        slot.appendChild(img);
+        
+        slot.addEventListener('click', function() {
+          handleSlotClick(this);
         });
+        
+        jewelryPiece.appendChild(slot);
+      }
+    }
+
+    function initProduct(product) {
+      jewelryPiece.innerHTML = '';
+      usedCharms = new Set();
+      specialCount = 0;
+      rareCount = 0;
+      customCount = 0;
+      includedSpecialUsed = 0;
+      isFullGlam = false;
+      fullGlamSpecialCount = 0;
+      fullGlamBtn.textContent = 'Full Glam Look';
+      sizePriceAdjustment = 0;
+      sizeSelect.value = '15.2-16.2';
+      
+      downloadBtn.textContent = `Download ${product.charAt(0).toUpperCase() + product.slice(1)} Image`;
+      
+      createSlots(products[product].slots);
+      updateCharmUsage();
+      calculatePrice();
+    }
+
+    function createSlots(slotCount) {
+      for (let i = 0; i < slotCount; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+        slot.dataset.index = i;
+        
+        const img = document.createElement('img');
+        if (materialType === 'silver') {
+          img.src = 'basecharms/silver.png';
+          img.alt = 'Silver Base';
+        } else if (materialType === 'gold') {
+          img.src = 'basecharms/gold.png';
+          img.alt = 'Gold Base';
+        } else if (materialType === 'mix') {
+          const isGold = i % 2 === 0;
+          img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+          img.alt = isGold ? 'Gold Base' : 'Silver Base';
+        }
+        img.dataset.type = 'base';
+        slot.appendChild(img);
+        
+        slot.addEventListener('click', function() {
+          handleSlotClick(this);
+        });
+        
+        jewelryPiece.appendChild(slot);
+      }
+    }
+  
+    function handleSlotClick(slot) {
+      const currentCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
+      
+      if (currentCharm && !selectedCharm) {
+        slotToRemove = slot;
+        removeCharmModal.style.display = 'flex';
+        return;
+      }
+      
+      if (selectedCharm) {
+        addCharmToSlot(slot);
+      }
+    }
+
+    function addCharmToSlot(slot) {
+      if (!selectedCharm) return;
+      
+      if (selectedCharm.classList.contains('sold-out')) {
+        alert('This charm is sold out!');
+        return;
       }
 
-   function calculatePrice() {
-  let price = 0;
-  
-  if (isFullGlam) {
-    price = products[currentProduct].fullGlam;
-    // Add extra costs for rare/custom charms in Full Glam
-    price += rareCount * 3;
-    price += customCount * 3.5;
-  } else {
-    price = products[currentProduct].basePrice;
-    
-    // Material costs
-    if (materialType === 'gold') price += 1;
-    if (materialType === 'mix') price += 2.5;
-    
-    // Charm costs
-    price += Math.max(0, specialCount - products[currentProduct].includedSpecial) * 2;
-    price += rareCount * 3;
-    price += customCount * 3.5;
-  }
-  
-  // Size adjustment
-  price += sizePriceAdjustment;
-  
-  totalPriceDisplay.textContent = `Current Design: ${price} JDs`;
-  if (cart.length > 0) {
-    totalPriceDisplay.textContent += ` | Cart Total: ${calculateCartTotal()} JDs`;
-  }
-}
+      const charmSrc = selectedCharm.src.split('/').pop();
+      if (usedCharms.has(charmSrc) {
+        alert('This charm is already used on the bracelet!');
+        return;
+      }
 
-function calculateCartTotal() {
-  return cart.reduce((total, item) => {
-    let itemPrice = item.isFullGlam ? 
-      products[item.productType].fullGlam :
-      products[item.productType].basePrice;
-    
-    // Add material costs
-    if (item.materialType === 'gold') itemPrice += 1;
-    if (item.materialType === 'mix') itemPrice += 2.5;
-    
-    // Add charm costs (simplified - you might want to store the calculated price instead)
-    const specialCount = item.charms.filter(c => c.type === 'special').length;
-    const rareCount = item.charms.filter(c => c.type === 'rare').length;
-    const customCount = item.charms.filter(c => c.type === 'custom').length;
-    
-    if (!item.isFullGlam) {
-      itemPrice += Math.max(0, specialCount - products[item.productType].includedSpecial) * 2;
+      // Remove any existing decorative charm first
+      const existingCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
+      if (existingCharm) {
+        removeCharmFromSlot(slot);
+      }
+
+      // Clear the slot completely
+      slot.innerHTML = '';
+
+      // Add the new decorative charm
+      const newImg = selectedCharm.cloneNode();
+      newImg.classList.remove('selected');
+      newImg.dataset.charm = charmSrc;
+      if (selectedCharm.classList.contains('sold-out')) {
+        newImg.classList.add('sold-out');
+      }
+      slot.appendChild(newImg);
+      usedCharms.add(charmSrc);
+
+      // Update counts
+      const newType = selectedCharm.dataset.type;
+      if (newType === 'special') {
+        if (isFullGlam) {
+          fullGlamSpecialCount++;
+        } else {
+          if (includedSpecialUsed < products[currentProduct].includedSpecial) {
+            includedSpecialUsed++;
+          } else {
+            specialCount++;
+          }
+        }
+      } else if (newType === 'rare') {
+        rareCount++;
+      } else if (newType === 'custom') {
+        customCount++;
+      }
+
+      updateCharmUsage();
+      calculatePrice();
+      selectedCharm = null;
+      document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
     }
-    itemPrice += rareCount * 3;
-    itemPrice += customCount * 3.5;
-    
-    // Add size adjustment (you'll need to store this in your cart items)
-    
-    return total + itemPrice;
-  }, 0);
-}
+
+    function removeCharmFromSlot(slot) {
+      const charmImg = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
+      if (!charmImg) return;
+
+      const charmType = charmImg.dataset.type;
+      const charmSrc = charmImg.dataset.charm;
+
+      // Remove the decorative charm
+      slot.removeChild(charmImg);
+      usedCharms.delete(charmSrc);
+
+      // Update counts
+      if (charmType === 'special') {
+        if (isFullGlam) {
+          fullGlamSpecialCount--;
+        } else {
+          if (includedSpecialUsed > 0) includedSpecialUsed--;
+          else specialCount--;
+        }
+      } else if (charmType === 'rare') {
+        rareCount--;
+      } else if (charmType === 'custom') {
+        customCount--;
+      }
+
+      // Add back the base charm
+      const baseImg = document.createElement('img');
+      if (materialType === 'silver') {
+        baseImg.src = 'basecharms/silver.png';
+        baseImg.alt = 'Silver Base';
+      } else if (materialType === 'gold') {
+        baseImg.src = 'basecharms/gold.png';
+        baseImg.alt = 'Gold Base';
+      } else if (materialType === 'mix') {
+        const isGold = parseInt(slot.dataset.index) % 2 === 0;
+        baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+        baseImg.alt = isGold ? 'Gold Base' : 'Silver Base';
+      }
+      baseImg.dataset.type = 'base';
+      slot.appendChild(baseImg);
+
+      updateCharmUsage();
+      calculatePrice();
+    }
+
+    function initCharms() {
+      updateSpecialCharmsDisplay();
+      updateRareCharmsDisplay();
+    }
+
+    function updateSpecialCharmsDisplay() {
+      specialCharmsGrid.innerHTML = '';
+      
+      const filteredCharms = currentSpecialCategory === 'all' 
+        ? specialCharms 
+        : specialCharms.filter(charm => charm.category === currentSpecialCategory);
+      
+      filteredCharms.forEach((charm, index) => {
+        const charmEl = createCharmElement(charm.src, `Special Charm ${index+1}`, 'special');
+        charmEl.classList.add('special');
+        charmEl.dataset.charm = charm.src.split('/').pop();
+        charmEl.dataset.category = charm.category;
         
-           // Rest of normal pricing calculation...
-      const config = products[currentProduct];
-      let basePrice = config.basePrice;
-      
-      if (materialType === 'gold') basePrice += 1;
-      if (materialType === 'mix') basePrice += 2.5;
-      
-      const specialCost = Math.max(0, specialCount) * 2;
-      const rareCost = rareCount * 3;
-      const customCost = customCount * 3.5;
-      
-      const totalCharmCost = specialCost + rareCost + customCost;
-      const total = basePrice + totalCharmCost + sizePriceAdjustment;
-      
-      basePriceDisplay.textContent = `Base Price: ${basePrice} JDs`;
-      charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs (${includedSpecialUsed}/${products[currentProduct].includedSpecial} free specials used)`;
-      totalPriceDisplay.textContent = `Total: ${total} JDs`;
+        if (charm.soldOut) {
+          charmEl.classList.add('sold-out');
+          const soldOutLabel = document.createElement('div');
+          soldOutLabel.className = 'sold-out-label';
+          soldOutLabel.textContent = 'Sold Out';
+          charmEl.appendChild(soldOutLabel);
+        }
+        
+        specialCharmsGrid.appendChild(charmEl);
+      });
     }
 
+    function updateRareCharmsDisplay() {
+      rareCharmsGrid.innerHTML = '';
+      
+      const filteredCharms = currentRareCategory === 'all' 
+        ? rareCharms 
+        : rareCharms.filter(charm => charm.category === currentRareCategory);
+      
+      filteredCharms.forEach((charm, index) => {
+        const charmEl = createCharmElement(charm.src, `Rare Charm ${index+1}`, 'rare');
+        charmEl.classList.add('rare');
+        charmEl.dataset.charm = charm.src.split('/').pop();
+        charmEl.dataset.category = charm.category;
+        
+        if (charm.soldOut) {
+          charmEl.classList.add('sold-out');
+          const soldOutLabel = document.createElement('div');
+          soldOutLabel.className = 'sold-out-label';
+          soldOutLabel.textContent = 'Sold Out';
+          charmEl.appendChild(soldOutLabel);
+        }
+        
+        rareCharmsGrid.appendChild(charmEl);
+      });
+    }
 
-    });
-  </script>
+    function createCharmElement(src, alt, type) {
+      const charm = document.createElement('img');
+      charm.className = 'charm';
+      charm.src = src;
+      charm.alt = alt;
+      charm.dataset.type = type;
+      return charm;
+    }
+
+    function updateCharmUsage() {
+      document.querySelectorAll('.charms-grid .charm').forEach(charm => {
+        charm.classList.remove('used');
+      });
+
+      usedCharms.forEach(charmSrc => {
+        const charmEl = document.querySelector(`.charms-grid .charm[src$="${charmSrc}"]`);
+        if (charmEl) {
+          charmEl.classList.add('used');
+        }
+      });
+    }
+
+    function calculatePrice() {
+      let price = 0;
+      
+      if (isFullGlam) {
+        price = products[currentProduct].fullGlam;
+        price += rareCount * 3;
+        price += customCount * 3.5;
+      } else {
+        price = products[currentProduct].basePrice;
+        
+        if (materialType === 'gold') price += 1;
+        if (materialType === 'mix') price += 2.5;
+        
+        price += Math.max(0, specialCount - products[currentProduct].includedSpecial) * 2;
+        price += rareCount * 3;
+        price += customCount * 3.5;
+      }
+      
+      price += sizePriceAdjustment;
+      
+      basePriceDisplay.textContent = `Base Price: ${products[currentProduct].basePrice} JDs`;
+      charmPriceDisplay.textContent = `Charms: ${price - products[currentProduct].basePrice} JDs (${includedSpecialUsed}/${products[currentProduct].includedSpecial} free specials used)`;
+      totalPriceDisplay.textContent = `Total: ${price} JDs`;
+    }
+
+    function saveCurrentDesign() {
+      return html2canvas(document.getElementById('jewelry-piece')).then(canvas => {
+        currentDesign.imageData = canvas.toDataURL('image/png');
+        currentDesign.charms = Array.from(document.querySelectorAll('#jewelry-piece .slot img[data-type="special"], #jewelry-piece .slot img[data-type="rare"], #jewelry-piece .slot img[data-type="custom"]'))
+          .map(img => ({
+            type: img.dataset.type,
+            src: img.src.split('/').pop()
+          }));
+        return currentDesign;
+      });
+    }
+
+    function addToCart() {
+      saveCurrentDesign().then(design => {
+        cart.push({
+          ...design,
+          id: Date.now()
+        });
+        updateCartDisplay();
+        initProduct(design.productType);
+      });
+    }
+
+    function updateCartDisplay() {
+      const cartItemsEl = document.getElementById('cart-items');
+      cartItemsEl.innerHTML = '';
+      
+      cart.forEach((item, index) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'cart-item';
+        itemEl.innerHTML = `
+          <img src="${item.imageData}" alt="${item.productType}">
+          <div>${item.productType.charAt(0).toUpperCase() + item.productType.slice(1)}</div>
+          <button class="remove-item" data-index="${index}">×</button>
+        `;
+        cartItemsEl.appendChild(itemEl);
+      });
+
+      document.querySelectorAll('.remove-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = e.target.dataset.index;
+          cart.splice(index, 1);
+          updateCartDisplay();
+        });
+      });
+    }
+
+    function updateBaseCharms() {
+      const slots = document.querySelectorAll('.slot');
+      slots.forEach((slot, index) => {
+        const baseImg = slot.querySelector('img[data-type="base"]');
+        if (baseImg) {
+          if (materialType === 'silver') {
+            baseImg.src = 'basecharms/silver.png';
+          } else if (materialType === 'gold') {
+            baseImg.src = 'basecharms/gold.png';
+          } else if (materialType === 'mix') {
+            const isGold = index % 2 === 0;
+            baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+          }
+        }
+      });
+    }
+  });
+</script>
 </body>
 </html>
