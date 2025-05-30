@@ -1546,8 +1546,7 @@ function updateBaseCharms() {
         slot.appendChild(newImg);
         usedCharms.add(charmSrc);
 
-        // Update counts for new charm
-       const newType = selectedCharm.dataset.type;
+        const newType = selectedCharm.dataset.type;
   if (newType === 'special') {
     if (isFullGlam) {
       fullGlamSpecialCount++;
@@ -1558,7 +1557,11 @@ function updateBaseCharms() {
         specialCount++;
       }
     }
-  } 
+  } else if (newType === 'rare') {
+    rareCount++;
+  } else if (newType === 'custom') {
+    customCount++;
+  }
 
         updateCharmUsage();
         calculatePrice();
@@ -1570,7 +1573,19 @@ function updateBaseCharms() {
         const charmImg = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
         if (!charmImg) return;
 
-        const charmType = charmImg.dataset.type;
+         const charmType = charmImg.dataset.type;
+          if (charmType === 'special') {
+            if (isFullGlam) {
+              fullGlamSpecialCount--;
+            } else {
+              if (includedSpecialUsed > 0) includedSpecialUsed--;
+              else specialCount--;
+            }
+          } else if (charmType === 'rare') {
+            rareCount--;
+          } else if (charmType === 'custom') {
+            customCount--;
+          }
         const charmSrc = charmImg.dataset.charm;
 
         // Remove the decorative charm
@@ -1593,15 +1608,7 @@ function updateBaseCharms() {
         baseImg.dataset.type = 'base';
         slot.appendChild(baseImg);
 
-        // Update counts
-        if (charmType === 'special') {
-          specialCount--;
-          if (includedSpecialUsed > 0) includedSpecialUsed--;
-        } else if (charmType === 'rare') {
-          rareCount--;
-        } else if (charmType === 'custom') {
-          customCount--;
-        }
+    
 
         updateCharmUsage();
         calculatePrice();
@@ -1716,38 +1723,38 @@ function updateBaseCharms() {
         });
       }
 
-      function calculatePrice() {
+     function calculatePrice() {
       if (isFullGlam) {
-        // Fixed price for Full Glam (29 JDs) plus any rare/custom charms
-        const fullGlamPrice = products[currentProduct].fullGlam;
-        const rareCost = rareCount * 3;
-        const customCost = customCount * 3.5;
-        const total = fullGlamPrice + rareCost + customCost + sizePriceAdjustment;
+        // Full Glam base price plus rare/custom charm costs
+        const fullGlamBase = products[currentProduct].fullGlam;
+        const rareCost = rareCount * 3;       // +3 JDs per rare charm
+        const customCost = customCount * 3.5; // +3.5 JDs per custom charm
+        const total = fullGlamBase + rareCost + customCost + sizePriceAdjustment;
         
-        basePriceDisplay.textContent = `Base Price: ${fullGlamPrice} JDs (Full Glam)`;
+        basePriceDisplay.textContent = `Base Price: ${fullGlamBase} JDs (Full Glam)`;
         charmPriceDisplay.textContent = `Charms: ${rareCost + customCost} JDs (${fullGlamSpecialCount}/18 free specials used)`;
         totalPriceDisplay.textContent = `Total: ${total} JDs`;
         return;
       }
         
-        const config = products[currentProduct];
-        let basePrice = config.basePrice;
-        
-        if (materialType === 'gold') basePrice += 1;
-        if (materialType === 'mix') basePrice += 2.5;
-        
-        const specialCost = Math.max(0, specialCount) * 2;
-        const rareCost = rareCount * 3;
-        const customCost = customCount * 3.5;
-        
-        const totalCharmCost = specialCost + rareCost + customCost;
-        const total = basePrice + totalCharmCost + sizePriceAdjustment;
-        
-        basePriceDisplay.textContent = `Base Price: ${basePrice} JDs`;
-        charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs (${includedSpecialUsed}/${products[currentProduct].includedSpecial} free specials used)`;
-        totalPriceDisplay.textContent = `Total: ${total} JDs`;
-      }
-
+           // Rest of normal pricing calculation...
+      const config = products[currentProduct];
+      let basePrice = config.basePrice;
+      
+      if (materialType === 'gold') basePrice += 1;
+      if (materialType === 'mix') basePrice += 2.5;
+      
+      const specialCost = Math.max(0, specialCount) * 2;
+      const rareCost = rareCount * 3;
+      const customCost = customCount * 3.5;
+      
+      const totalCharmCost = specialCost + rareCost + customCost;
+      const total = basePrice + totalCharmCost + sizePriceAdjustment;
+      
+      basePriceDisplay.textContent = `Base Price: ${basePrice} JDs`;
+      charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs (${includedSpecialUsed}/${products[currentProduct].includedSpecial} free specials used)`;
+      totalPriceDisplay.textContent = `Total: ${total} JDs`;
+    }
       // Download Bracelet as Image
       downloadBtn.addEventListener('click', function() {
         html2canvas(document.getElementById('jewelry-piece')).then(canvas => {
