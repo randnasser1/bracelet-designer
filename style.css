@@ -290,7 +290,13 @@ h1 {
 
 .pricing-info {
   display: none;
-  /* rest of your existing pricing-info styles */
+  background: #fff0f5;
+  border: 1px solid #f5a0c2;
+  border-radius: 16px;
+  padding: 1rem;
+  margin: 1rem auto;
+  max-width: 600px;
+  box-shadow: 0 2px 8px rgba(214, 51, 108, 0.1);
 }
 
 .pricing-info.visible {
@@ -303,11 +309,19 @@ h1 {
 }
 
 .pricing-toggle-btn {
-  background: #d6336c;
+  background: #ff85b3;
   color: white;
   border: none;
   border-radius: 20px;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.5rem;
   cursor: pointer;
   font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pricing-toggle-btn:hover {
+  background: #d6336c;
+  transform: translateY(-1px);
 }
