@@ -1845,15 +1845,16 @@
     }
 
     function addToCart() {
-        saveCurrentDesign().then(design => {
-          design.id = Date.now();
-          design.timestamp = new Date().toLocaleString();
-          cart.push(design);
-          updateCartDisplay();
-          initProduct(design.productType);
-          alert('Added to cart!');
-        });
-      }
+    saveCurrentDesign().then(design => {
+        design.id = Date.now();
+        design.timestamp = new Date().toLocaleString();
+        cart.push(design);
+        updateCartDisplay();
+        initProduct(design.productType);
+        alert('Added to cart!');
+    });
+} // This closing brace was missing
+
 
     function updateCartDisplay() {
         const cartItemsEl = document.getElementById('cart-items');
@@ -1933,11 +1934,7 @@
       });
       
     }
-     // Reset cart after order
-        cart = [];
-        updateCartDisplay();
-      });
-  });
+
 </script>
 </body>
 </html>
