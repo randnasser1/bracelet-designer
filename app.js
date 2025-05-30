@@ -44,7 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const pricingToggle = document.getElementById('pricing-toggle');
   const pricingInfo = document.querySelector('.pricing-info');
   const sizeSelect = document.getElementById('size');
-
+// Add this at the end of your DOMContentLoaded event listener
+// Initialize pricing info as hidden
+pricingInfo.classList.remove('visible');
+pricingToggle.textContent = 'Show Pricing Info';
   // Product configurations
   const products = {
     bracelet: { basePrice: 10, slots: 18, includedSpecial: 2, fullGlam: 29 },
@@ -108,85 +111,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Full glam button
     fullGlamBtn.addEventListener('click', () => {
-      const price = products[currentProduct].fullGlam;
-      if (confirm(`Full Glam Look includes all special charms for ${price} JDs. Regular special charm pricing doesn't apply. Continue?`)) {
-        isFullGlam = true;
-        jewelryPiece.innerHTML = '';
-        usedCharms = new Set();
-        createSlots(products[currentProduct].slots);
-        
-        const slots = document.querySelectorAll('.slot');
-        slots.forEach((slot, index) => {
-          slot.innerHTML = '';
-          const charm = specialCharms[index % specialCharms.length];
-          const img = document.createElement('img');
-          img.src = charm.src;
-          img.alt = 'Special Charm';
-          img.dataset.type = 'special';
-          img.dataset.charm = charm.src.split('/').pop();
-          if (charm.soldOut) {
-            img.classList.add('sold-out');
-          }
-          slot.appendChild(img);
-          
-          usedCharms.add(charm.src.split('/').pop());
-          updateCharmUsage();
-        });
-        
-        // Reset counts - full glam has its own pricing
-        specialCount = 0;
-        includedSpecialUsed = 0;
-        rareCount = 0;
-        customCount = 0;
-        
-        // Set full glam price
-        totalPriceDisplay.textContent = `Total: ${price} JDs (Full Glam Special)`;
-      }
-    });
-
+  const price = products[currentProduct].fullGlam;
+  if (confirm(`Full Glam Look includes 18 special charms for ${price} JDs. You'll get 18 special charms for free. Continue?`)) {
+    isFullGlam = true;
+    jewelryPiece.innerHTML = '';
+    usedCharms = new Set();
+    createSlots(products[currentProduct].slots);
+    
+    // Reset counts - full glam has fixed pricing
+    specialCount = 0;
+    includedSpecialUsed = products[currentProduct].slots; // All special charms are free
+    rareCount = 0;
+    customCount = 0;
+    
+    // Set full glam price
+    totalPriceDisplay.textContent = `Total: ${price} JDs (Full Glam Special)`;
+  }
+});
     // Size selection
-    sizeSelect.addEventListener('change', function() {
-      const sizeValue = this.value;
-      const config = products[currentProduct];
-      
-      // Reset to base slots first
-      jewelryPiece.innerHTML = '';
-      isFullGlam = false;
-      createSlots(config.slots);
-      
-      // Adjust price based on size
-      switch(sizeValue) {
-        case '15.2-16.2':
-          sizePriceAdjustment = 0;
-          break;
-        case '16.2-17.1':
-          sizePriceAdjustment = 0.5;
-          addExtraSlots(1);
-          break;
-        case '17.1-18.1':
-          sizePriceAdjustment = 1;
-          addExtraSlots(2);
-          break;
-        case '18.1-19.2':
-          sizePriceAdjustment = 1.5;
-          addExtraSlots(3);
-          break;
-        case '19.2-20':
-          sizePriceAdjustment = 2;
-          addExtraSlots(4);
-          break;
-        case '20-21':
-          sizePriceAdjustment = 2.5;
-          addExtraSlots(5);
-          break;
-        case '21-22':
-          sizePriceAdjustment = 3;
-          addExtraSlots(6);
-          break;
-      }
-      
-      calculatePrice();
-    });
+    // Update the size selection event handler
+sizeSelect.addEventListener('change', function() {
+  const sizeValue = this.value;
+  const baseSlots = products[currentProduct].slots;
+  
+  // Reset to base slots first
+  jewelryPiece.innerHTML = '';
+  isFullGlam = false;
+  createSlots(baseSlots);
+  
+  // Adjust slots and price based on size
+  switch(sizeValue) {
+    case '15.2-16.2':
+      sizePriceAdjustment = 0;
+      break;
+    case '16.2-17.1':
+      sizePriceAdjustment = 0.5;
+      addExtraSlots(1); // 19 charms total
+      break;
+    case '17.1-18.1':
+      sizePriceAdjustment = 1;
+      addExtraSlots(2); // 20 charms total
+      break;
+    case '18.1-19.2':
+      sizePriceAdjustment = 1.5;
+      addExtraSlots(3); // 21 charms total
+      break;
+    case '19.2-20':
+      sizePriceAdjustment = 2;
+      addExtraSlots(4); // 22 charms total
+      break;
+    case '20-21':
+      sizePriceAdjustment = 2.5;
+      addExtraSlots(5); // 23 charms total
+      break;
+    case '21-22':
+      sizePriceAdjustment = 3;
+      addExtraSlots(6); // 24 charms total
+      break;
+  }
+  
+  calculatePrice();
+});
 
     // Pricing info toggle
     pricingToggle.addEventListener('click', () => {
@@ -283,11 +268,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function addCharmToSlot(slot) {
-    if (selectedCharm.classList.contains('sold-out')) {
-      alert('This charm is sold out!');
-      return;
-    }
+ // Update addCharmToSlot to handle full glam
+function addCharmToSlot(slot) {
+  if (isFullGlam) {
+    alert('For Full Glam look, all charms must be special. Please remove Full Glam option first if you want to customize.');
+    return;
+  }
+  
+  // Rest of your existing addCharmToSlot code...
+}
 
     const charmSrc = selectedCharm.src.split('/').pop();
     if (usedCharms.has(charmSrc) && selectedCharm.dataset.type !== 'custom') {
@@ -495,25 +484,29 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function calculatePrice() {
-    if (isFullGlam) return; // Price is fixed for full glam
-    
-    const config = products[currentProduct];
-    let basePrice = config.basePrice;
-    
-    if (materialType === 'gold') basePrice += 1;
-    if (materialType === 'mix') basePrice += 2.5;
-    
-    const specialCost = Math.max(0, specialCount) * 2;
-    const rareCost = rareCount * 3;
-    const customCost = customCount * 3.5;
-    
-    const totalCharmCost = specialCost + rareCost + customCost;
-    const total = basePrice + totalCharmCost + sizePriceAdjustment;
-    
-    basePriceDisplay.textContent = `Base Price: ${basePrice} JDs`;
-    charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs (${includedSpecialUsed}/${products[currentProduct].includedSpecial} free specials used)`;
-    totalPriceDisplay.textContent = `Total: ${total} JDs`;
+  if (isFullGlam) {
+    // For full glam, we don't calculate - it's a fixed price
+    return;
   }
+  
+  const config = products[currentProduct];
+  let basePrice = config.basePrice;
+  
+  if (materialType === 'gold') basePrice += 1;
+  if (materialType === 'mix') basePrice += 2.5;
+  
+  const specialCost = Math.max(0, specialCount) * 2;
+  const rareCost = rareCount * 3;
+  const customCost = customCount * 3.5;
+  
+  const totalCharmCost = specialCost + rareCost + customCost;
+  const total = basePrice + totalCharmCost + sizePriceAdjustment;
+  
+  basePriceDisplay.textContent = `Base Price: ${basePrice} JDs`;
+  charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs (${includedSpecialUsed}/${products[currentProduct].includedSpecial} free specials used)`;
+  totalPriceDisplay.textContent = `Total: ${total} JDs`;
+}
+
 
   // Download Bracelet as Image
   downloadBtn.addEventListener('click', function() {
