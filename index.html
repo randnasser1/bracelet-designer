@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+     <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -253,29 +254,41 @@
     }
 
     .pricing-info {
-      background: white;
+      display: none;
+      background: #fff0f5;
+      border: 1px solid #f5a0c2;
+      border-radius: 16px;
       padding: 1rem;
-      border-radius: 10px;
-      font-size: 0.8rem;
       margin: 1rem auto;
       max-width: 600px;
+      box-shadow: 0 2px 8px rgba(214, 51, 108, 0.1);
     }
 
-    .pricing-info h3 {
-      color: #d6336c;
-      margin-top: 0;
-      font-size: 1rem;
+    .pricing-info.visible {
+      display: block;
+    }
+
+    .pricing-toggle {
       text-align: center;
+      margin: 1rem 0;
     }
 
-    .pricing-info ul {
-      padding-left: 1.2rem;
-      margin: 0.5rem 0;
+    .pricing-toggle-btn {
+      background: #ff85b3;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 0.5rem 1.5rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    .pricing-info li {
-      margin-bottom: 0.3rem;
-      line-height: 1.3;
+    .pricing-toggle-btn:hover {
+      background: #d6336c;
+      transform: translateY(-1px);
     }
 
     .highlight {
@@ -513,22 +526,23 @@
           <div class="material-option mix" data-material="mix">Mix (+2.5 JDs)</div>
         </div>
       </div>
+      
+      <div class="control-group">
+        <label for="size">Size:</label>
+        <select id="size" class="btn">
+          <option value="15.2-16.2">15.2cm - 16.2cm (18 charms)</option>
+          <option value="16.2-17.1">16.2cm - 17.1cm (+0.5 JDs, 19 charms)</option>
+          <option value="17.1-18.1">17.1cm - 18.1cm (+1 JD, 20 charms)</option>
+          <option value="18.1-19.2">18.1cm - 19.2cm (+1.5 JDs, 21 charms)</option>
+          <option value="19.2-20">19.2cm - 20cm (+2 JDs, 22 charms)</option>
+          <option value="20-21">20cm - 21cm (+2.5 JDs, 23 charms)</option>
+          <option value="21-22">21cm - 22cm (+3 JDs, 24 charms)</option>
+        </select>
+      </div>
+      
       <div class="control-group">
         <button class="btn" id="full-glam-btn">Full Glam Look</button>
       </div>
-
-      <div class="control-group">
-  <label for="size">Size:</label>
-  <select id="size" class="btn">
-    <option value="15.2-16.2">15.2cm - 16.2cm (18 charms)</option>
-    <option value="16.2-17.1">16.2cm - 17.1cm (+0.5 JDs, 19 charms)</option>
-    <option value="17.1-18.1">17.1cm - 18.1cm (+1 JD, 20 charms)</option>
-    <option value="18.1-19.2">18.1cm - 19.2cm (+1.5 JDs, 21 charms)</option>
-    <option value="19.2-20">19.2cm - 20cm (+2 JDs, 22 charms)</option>
-    <option value="20-21">20cm - 21cm (+2.5 JDs, 23 charms)</option>
-    <option value="21-22">21cm - 22cm (+3 JDs, 24 charms)</option>
-  </select>
-</div>
     </div>
 
     <div class="bracelet-container">
@@ -545,9 +559,11 @@
       <button class="btn download-btn" id="download-btn">Download Bracelet Image</button>
       <button class="btn order-btn" id="order-btn">Place Order</button>
     </div>
-  <div class="pricing-toggle">
-  <button class="pricing-toggle-btn" id="pricing-toggle">Show Pricing Info</button>
-</div>
+
+    <div class="pricing-toggle">
+      <button class="pricing-toggle-btn" id="pricing-toggle">Show Pricing Info</button>
+    </div>
+
     <div class="pricing-info">
       <h3>Pricing Information</h3>
       <ul>
@@ -559,7 +575,14 @@
         <li>Additional special charm: +2 JDs</li>
         <li>Rare charm: +3 JDs</li>
         <li><span class="highlight">Custom charm:</span> +3.5 JDs (upload your own image)</li>
-        <li><span class="highlight">Full Glam:</span> All special (29 JDs bracelet)</li>
+        <li><span class="highlight">Full Glam:</span> Fixed 29 JDs (18 special charms included)</li>
+        <li><span class="highlight">Size Upgrades:</span></li>
+        <li>16.2-17.1cm: +0.5 JDs (19 charms)</li>
+        <li>17.1-18.1cm: +1 JD (20 charms)</li>
+        <li>18.1-19.2cm: +1.5 JDs (21 charms)</li>
+        <li>19.2-20cm: +2 JDs (22 charms)</li>
+        <li>20-21cm: +2.5 JDs (23 charms)</li>
+        <li>21-22cm: +3 JDs (24 charms)</li>
       </ul>
       <p>⚠️ Limited stock! DM to order.</p>
     </div>
@@ -575,49 +598,48 @@
         <button class="btn" id="add-custom-charm">Add Custom Charm</button>
       </div>
     </div>
-<div class="charm-pools">
-  <!-- Special Charms -->
-  <div class="charm-pool">
-    <h3>Special Charms (+2 JDs each after first 2)</h3>
-    <div class="category-tabs" id="special-categories">
-      <button class="category-tab active" data-category="all">All</button>
-      <button class="category-tab" data-category="teddy">Teddy Bears</button>
-      <button class="category-tab" data-category="bows">Bows</button>
-      <button class="category-tab" data-category="beach">Beach</button>
-      <button class="category-tab" data-category="red">Red</button>
-      <button class="category-tab" data-category="cute">First collection</button>
-      <button class="category-tab" data-category="cutespecials">Cute</button>
-      <button class="category-tab" data-category="8ball">8 Ball</button>
-      <button class="category-tab" data-category="mushrooms">Mushrooms</button>
-      <button class="category-tab" data-category="simple">Simple & Cute</button>
-    </div>
-    <div class="charms-grid" id="special-charms">
-      <!-- Special charms will be added here by JS -->
-    </div>
-  </div>
 
-  <!-- Rare Charms -->
-  <div class="charm-pool">
-    <h3>Rare Charms (+3 JDs each)</h3>
-    <div class="category-tabs" id="rare-categories">
-      <button class="category-tab active" data-category="all">All</button>
-      <button class="category-tab" data-category="sanrio">Sanrio</button>
-      <button class="category-tab" data-category="hgs">Hot Girl Summer</button>
-      <button class="category-tab" data-category="sporty">Sporty</button>
-      <button class="category-tab" data-category="gold">Gold</button>
-      <button class="category-tab" data-category="disney">Disney</button>
-      <button class="category-tab" data-category="love">Love/Friends/Family</button>
-      <button class="category-tab" data-category="dangly">Dangly</button>
-      <button class="category-tab" data-category="graduation">Graduation</button>
-      <button class="category-tab" data-category="long">Long</button>
+    <div class="charm-pools">
+      <!-- Special Charms -->
+      <div class="charm-pool">
+        <h3>Special Charms (+2 JDs each after first 2)</h3>
+        <div class="category-tabs" id="special-categories">
+          <button class="category-tab active" data-category="all">All</button>
+          <button class="category-tab" data-category="teddy">Teddy Bears</button>
+          <button class="category-tab" data-category="bows">Bows</button>
+          <button class="category-tab" data-category="beach">Beach</button>
+          <button class="category-tab" data-category="red">Red</button>
+          <button class="category-tab" data-category="cute">First collection</button>
+          <button class="category-tab" data-category="cutespecials">Cute</button>
+          <button class="category-tab" data-category="8ball">8 Ball</button>
+          <button class="category-tab" data-category="mushrooms">Mushrooms</button>
+          <button class="category-tab" data-category="simple">Simple & Cute</button>
+        </div>
+        <div class="charms-grid" id="special-charms">
+          <!-- Special charms will be added here by JS -->
+        </div>
+      </div>
 
+      <!-- Rare Charms -->
+      <div class="charm-pool">
+        <h3>Rare Charms (+3 JDs each)</h3>
+        <div class="category-tabs" id="rare-categories">
+          <button class="category-tab active" data-category="all">All</button>
+          <button class="category-tab" data-category="sanrio">Sanrio</button>
+          <button class="category-tab" data-category="hgs">Hot Girl Summer</button>
+          <button class="category-tab" data-category="sporty">Sporty</button>
+          <button class="category-tab" data-category="gold">Gold</button>
+          <button class="category-tab" data-category="disney">Disney</button>
+          <button class="category-tab" data-category="love">Love/Friends/Family</button>
+          <button class="category-tab" data-category="dangly">Dangly</button>
+          <button class="category-tab" data-category="graduation">Graduation</button>
+          <button class="category-tab" data-category="long">Long</button>
+        </div>
+        <div class="charms-grid" id="rare-charms">
+          <!-- Rare charms will be added here by JS -->
+        </div>
+      </div>
     </div>
-    <div class="charms-grid" id="rare-charms">
-      <!-- Rare charms will be added here by JS -->
-    </div>
-  </div>
-</div>
-
   </div>
 
   <!-- Modal for charm removal confirmation -->
@@ -719,7 +741,7 @@
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
   <script>
-    // Firebase configuration - REPLACE WITH YOUR ACTUAL CONFIG
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyD_iOEwu71dL4Lmfl7Km8lSlYFzSuubbzY",
       authDomain: "italian-charms.firebaseapp.com",
@@ -762,6 +784,9 @@
       const addCustomCharmBtn = document.getElementById('add-custom-charm');
       const specialCategoryTabs = document.querySelectorAll('#special-categories .category-tab');
       const rareCategoryTabs = document.querySelectorAll('#rare-categories .category-tab');
+      const pricingToggle = document.getElementById('pricing-toggle');
+      const pricingInfo = document.querySelector('.pricing-info');
+      const sizeSelect = document.getElementById('size');
 
       // Product configurations
       const products = {
@@ -770,6 +795,8 @@
         necklace: { basePrice: 22, slots: 34, includedSpecial: 2, fullGlam: 64 }
       };
 
+      
+     
       // Charm image lists with categories and sold out status
       // Special charms
 const specialCharms = [
@@ -1057,6 +1084,7 @@ const rareCharms = [
   { src: 'rares/sporty/sporty14.png', category: 'sporty', soldOut: false },
   { src: 'rares/sporty/sporty15.png', category: 'sporty', soldOut: false }
 ];
+
       // Current state
       let currentProduct = 'bracelet';
       let selectedCharm = null;
@@ -1070,94 +1098,140 @@ const rareCharms = [
       let currentSpecialCategory = 'all';
       let currentRareCategory = 'all';
       let customCharmImage = null;
+      let sizePriceAdjustment = 0;
+      let isFullGlam = false;
 
       // Initialize
       initProduct(currentProduct);
       initCharms();
-      setupCategoryTabs();
+      setupEventListeners();
+      pricingInfo.classList.remove('visible');
+      pricingToggle.textContent = 'Show Pricing Info';
 
-      // Product selection
-      productBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          productBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentProduct = btn.dataset.type;
-          initProduct(currentProduct);
-          calculatePrice();
+      function setupEventListeners() {
+        // Product selection
+        productBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            productBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentProduct = btn.dataset.type;
+            initProduct(currentProduct);
+            calculatePrice();
+          });
         });
-      });
 
-      // Material selection
-      materialOptions.forEach(option => {
-        option.addEventListener('click', () => {
-          materialOptions.forEach(o => o.classList.remove('selected'));
-          option.classList.add('selected');
-          materialType = option.dataset.material;
-          updateBaseCharms();
-          calculatePrice();
+        // Material selection
+        materialOptions.forEach(option => {
+          option.addEventListener('click', () => {
+            materialOptions.forEach(o => o.classList.remove('selected'));
+            option.classList.add('selected');
+            materialType = option.dataset.material;
+            updateBaseCharms();
+            calculatePrice();
+          });
         });
-      });
 
-      // Update base charms based on material selection
-      function updateBaseCharms() {
-        const slots = document.querySelectorAll('.slot');
-        slots.forEach((slot, index) => {
-          // Only update if there's no decorative charm in the slot
-          if (!slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]')) {
-            slot.innerHTML = '';
-            const img = document.createElement('img');
-            if (materialType === 'silver') {
-              img.src = 'basecharms/silver.png';
-              img.alt = 'Silver Base';
-            } else if (materialType === 'gold') {
-              img.src = 'basecharms/gold.png';
-              img.alt = 'Gold Base';
-            } else if (materialType === 'mix') {
-              const isGold = index % 2 === 0;
-              img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-              img.alt = isGold ? 'Gold Base' : 'Silver Base';
-            }
-            img.dataset.type = 'base';
-            slot.appendChild(img);
+        // Full glam button
+        fullGlamBtn.addEventListener('click', () => {
+          const price = products[currentProduct].fullGlam;
+          if (confirm(`Full Glam Look includes 18 special charms for ${price} JDs. You'll get 18 special charms for free. Continue?`)) {
+            isFullGlam = true;
+            jewelryPiece.innerHTML = '';
+            usedCharms = new Set();
+            createSlots(products[currentProduct].slots);
+            
+            // Reset counts - full glam has fixed pricing
+            specialCount = 0;
+            includedSpecialUsed = products[currentProduct].slots; // All special charms are free
+            rareCount = 0;
+            customCount = 0;
+            
+            // Set full glam price
+            totalPriceDisplay.textContent = `Total: ${price} JDs (Full Glam Special)`;
           }
         });
+
+        // Size selection
+        sizeSelect.addEventListener('change', function() {
+          const sizeValue = this.value;
+          const baseSlots = products[currentProduct].slots;
+          
+          // Reset to base slots first
+          jewelryPiece.innerHTML = '';
+          isFullGlam = false;
+          createSlots(baseSlots);
+          
+          // Adjust slots and price based on size
+          switch(sizeValue) {
+            case '15.2-16.2':
+              sizePriceAdjustment = 0;
+              break;
+            case '16.2-17.1':
+              sizePriceAdjustment = 0.5;
+              addExtraSlots(1); // 19 charms total
+              break;
+            case '17.1-18.1':
+              sizePriceAdjustment = 1;
+              addExtraSlots(2); // 20 charms total
+              break;
+            case '18.1-19.2':
+              sizePriceAdjustment = 1.5;
+              addExtraSlots(3); // 21 charms total
+              break;
+            case '19.2-20':
+              sizePriceAdjustment = 2;
+              addExtraSlots(4); // 22 charms total
+              break;
+            case '20-21':
+              sizePriceAdjustment = 2.5;
+              addExtraSlots(5); // 23 charms total
+              break;
+            case '21-22':
+              sizePriceAdjustment = 3;
+              addExtraSlots(6); // 24 charms total
+              break;
+          }
+          
+          calculatePrice();
+        });
+
+        // Pricing info toggle
+        pricingToggle.addEventListener('click', () => {
+          pricingInfo.classList.toggle('visible');
+          pricingToggle.textContent = pricingInfo.classList.contains('visible') 
+            ? 'Hide Pricing Info' 
+            : 'Show Pricing Info';
+        });
+
+        // ... [rest of your event listeners]
       }
 
-      // Full glam button
-      fullGlamBtn.addEventListener('click', () => {
-        const price = products[currentProduct].fullGlam;
-        if (confirm(`Set all charms to special for ${price} JDs?`)) {
-          jewelryPiece.innerHTML = '';
-          usedCharms = new Set();
-          createSlots(currentProduct);
+      function addExtraSlots(extraCount) {
+        for (let i = 0; i < extraCount; i++) {
+          const slot = document.createElement('div');
+          slot.className = 'slot';
+          slot.dataset.index = jewelryPiece.children.length;
           
-          const slots = document.querySelectorAll('.slot');
-          slots.forEach((slot, index) => {
-            slot.innerHTML = '';
-            const charm = specialCharms[index % specialCharms.length];
-            const img = document.createElement('img');
-            img.src = charm.src;
-            img.alt = 'Special Charm';
-            img.dataset.type = 'special';
-            img.dataset.charm = charm.src.split('/').pop();
-            if (charm.soldOut) {
-              img.classList.add('sold-out');
-            }
-            slot.appendChild(img);
-            
-            usedCharms.add(charm.src.split('/').pop());
-            updateCharmUsage();
+          const img = document.createElement('img');
+          if (materialType === 'silver') {
+            img.src = 'basecharms/silver.png';
+          } else if (materialType === 'gold') {
+            img.src = 'basecharms/gold.png';
+          } else if (materialType === 'mix') {
+            const isGold = jewelryPiece.children.length % 2 === 0;
+            img.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+          }
+          img.dataset.type = 'base';
+          slot.appendChild(img);
+          
+          slot.addEventListener('click', function() {
+            handleSlotClick(this);
           });
           
-          specialCount = products[currentProduct].slots;
-          includedSpecialUsed = products[currentProduct].includedSpecial;
-          rareCount = 0;
-          customCount = 0;
-          calculatePrice();
+          jewelryPiece.appendChild(slot);
         }
-      });
+      }
 
-      // Initialize product slots
       function initProduct(product) {
         jewelryPiece.innerHTML = '';
         usedCharms = new Set();
@@ -1165,16 +1239,16 @@ const rareCharms = [
         rareCount = 0;
         customCount = 0;
         includedSpecialUsed = 0;
-        createSlots(product);
+        isFullGlam = false;
+        sizePriceAdjustment = 0;
+        sizeSelect.value = '15.2-16.2';
+        createSlots(products[product].slots);
         updateCharmUsage();
         calculatePrice();
       }
 
-      // Create slots for the product
-      function createSlots(product) {
-        const config = products[product];
-        
-        for (let i = 0; i < config.slots; i++) {
+      function createSlots(slotCount) {
+        for (let i = 0; i < slotCount; i++) {
           const slot = document.createElement('div');
           slot.className = 'slot';
           slot.dataset.index = i;
@@ -1202,7 +1276,6 @@ const rareCharms = [
         }
       }
 
-      // Handle slot click events
       function handleSlotClick(slot) {
         const currentCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
         
@@ -1217,8 +1290,12 @@ const rareCharms = [
         }
       }
 
-      // Add a charm to a slot
       function addCharmToSlot(slot) {
+        if (isFullGlam) {
+          alert('For Full Glam look, all charms must be special. Please remove Full Glam option first if you want to customize.');
+          return;
+        }
+        
         if (selectedCharm.classList.contains('sold-out')) {
           alert('This charm is sold out!');
           return;
@@ -1279,7 +1356,6 @@ const rareCharms = [
         document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
       }
 
-      // Remove charm from slot (restores base charm)
       function removeCharmFromSlot(slot) {
         const charmImg = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
         if (!charmImg) return;
@@ -1321,13 +1397,11 @@ const rareCharms = [
         calculatePrice();
       }
 
-      // Initialize charms in the pools
       function initCharms() {
         updateSpecialCharmsDisplay();
         updateRareCharmsDisplay();
       }
 
-      // Setup category tabs
       function setupCategoryTabs() {
         specialCategoryTabs.forEach(tab => {
           tab.addEventListener('click', () => {
@@ -1348,7 +1422,6 @@ const rareCharms = [
         });
       }
 
-      // Update displayed special charms based on selected category
       function updateSpecialCharmsDisplay() {
         specialCharmsGrid.innerHTML = '';
         
@@ -1374,7 +1447,6 @@ const rareCharms = [
         });
       }
 
-      // Update displayed rare charms based on selected category
       function updateRareCharmsDisplay() {
         rareCharmsGrid.innerHTML = '';
         
@@ -1400,7 +1472,6 @@ const rareCharms = [
         });
       }
 
-      // Create a charm element
       function createCharm(src, alt, type) {
         const charm = document.createElement('img');
         charm.className = 'charm';
@@ -1422,14 +1493,11 @@ const rareCharms = [
         return charm;
       }
 
-      // Update charm usage indicators
       function updateCharmUsage() {
-        // First remove all used classes from gallery charms
         document.querySelectorAll('.charms-grid .charm').forEach(charm => {
           charm.classList.remove('used');
         });
 
-        // Add used class only to gallery charms (not bracelet charms)
         usedCharms.forEach(charmSrc => {
           const charmEl = document.querySelector(`.charms-grid .charm[src$="${charmSrc}"]`);
           if (charmEl) {
@@ -1438,8 +1506,12 @@ const rareCharms = [
         });
       }
 
-      // Calculate and update price display
       function calculatePrice() {
+        if (isFullGlam) {
+          // For full glam, we don't calculate - it's a fixed price
+          return;
+        }
+        
         const config = products[currentProduct];
         let basePrice = config.basePrice;
         
@@ -1451,7 +1523,7 @@ const rareCharms = [
         const customCost = customCount * 3.5;
         
         const totalCharmCost = specialCost + rareCost + customCost;
-        const total = basePrice + totalCharmCost;
+        const total = basePrice + totalCharmCost + sizePriceAdjustment;
         
         basePriceDisplay.textContent = `Base Price: ${basePrice} JDs`;
         charmPriceDisplay.textContent = `Charms: ${totalCharmCost} JDs (${includedSpecialUsed}/${products[currentProduct].includedSpecial} free specials used)`;
@@ -1510,7 +1582,6 @@ const rareCharms = [
         customCharmImage = null;
       });
 
-      // Order Placement
       // Show payment proof upload when Cliq is selected
       payCliqOption.addEventListener('change', function() {
         paymentProofContainer.style.display = this.checked ? 'block' : 'none';
@@ -1518,7 +1589,6 @@ const rareCharms = [
 
       // Open order modal
       orderBtn.addEventListener('click', function() {
-        // Update order total price display
         document.getElementById('order-total-price').textContent = 
           document.getElementById('total-price').textContent;
         orderModal.style.display = 'flex';
@@ -1538,51 +1608,63 @@ const rareCharms = [
       orderForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // Get form values
-        const orderData = {
-          name: document.getElementById('full-name').value,
-          phone: document.getElementById('phone').value,
-          phone2: document.getElementById('phone2').value || '',
-          governorate: document.getElementById('governorate').value,
-          address: document.getElementById('address').value,
-          paymentMethod: document.querySelector('input[name="payment"]:checked').value,
-          totalPrice: document.getElementById('total-price').textContent,
-          design: [], // We'll add the bracelet design here
-          status: 'pending',
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        };
+        // Show loading state
+        const submitBtn = orderForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.textContent = 'Processing...';
+        submitBtn.disabled = true;
 
-        // Get all charms in bracelet
-        const slots = document.querySelectorAll('.slot img[data-type="special"], .slot img[data-type="rare"], .slot img[data-type="custom"]');
-        orderData.design = Array.from(slots).map(slot => ({
-          type: slot.dataset.type,
-          src: slot.src,
-          soldOut: slot.classList.contains('sold-out')
-        }));
+        try {
+          // Get form values
+          const orderData = {
+            name: document.getElementById('full-name').value,
+            phone: document.getElementById('phone').value,
+            phone2: document.getElementById('phone2').value || '',
+            governorate: document.getElementById('governorate').value,
+            address: document.getElementById('address').value,
+            paymentMethod: document.querySelector('input[name="payment"]:checked').value,
+            totalPrice: document.getElementById('total-price').textContent.replace('Total: ', ''),
+            productType: currentProduct,
+            materialType: materialType,
+            size: sizeSelect.value,
+            isFullGlam: isFullGlam,
+            design: [],
+            status: 'pending',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          };
 
-        // If paying with Cliq, handle the payment proof
-        let paymentProofUrl = '';
-        if (orderData.paymentMethod === 'Cliq') {
-          const file = document.getElementById('payment-proof').files[0];
-          if (file) {
-            try {
-              const storageRef = storage.ref('payment-proofs/' + Date.now() + '-' + file.name);
-              await storageRef.put(file);
-              paymentProofUrl = await storageRef.getDownloadURL();
-              orderData.paymentProofUrl = paymentProofUrl;
-            } catch (error) {
-              console.error('Error uploading payment proof:', error);
-              alert('Error uploading payment proof. Please try again.');
+          // Get all charms in bracelet
+          const slots = document.querySelectorAll('.slot img[data-type="special"], .slot img[data-type="rare"], .slot img[data-type="custom"]');
+          orderData.design = Array.from(slots).map(slot => ({
+            type: slot.dataset.type,
+            src: slot.src.split('/').pop(),
+            charmName: slot.dataset.charm || 'custom'
+          }));
+
+          // If paying with Cliq, handle the payment proof
+          if (orderData.paymentMethod === 'Cliq') {
+            const file = document.getElementById('payment-proof').files[0];
+            if (file) {
+              try {
+                const storageRef = storage.ref('payment-proofs/' + Date.now() + '-' + file.name);
+                await storageRef.put(file);
+                orderData.paymentProofUrl = await storageRef.getDownloadURL();
+              } catch (error) {
+                console.error('Error uploading payment proof:', error);
+                alert('Error uploading payment proof. Please try again.');
+                submitBtn.textContent = originalBtnText;
+                submitBtn.disabled = false;
+                return;
+              }
+            } else {
+              alert('Please upload proof of payment for Cliq payment');
+              submitBtn.textContent = originalBtnText;
+              submitBtn.disabled = false;
               return;
             }
-          } else {
-            alert('Please upload proof of payment for Cliq payment');
-            return;
           }
-        }
 
-        // Save order to Firestore
-        try {
+          // Save order to Firestore
           const docRef = await db.collection('orders').add(orderData);
           
           // Show confirmation
@@ -1595,7 +1677,10 @@ const rareCharms = [
           paymentProofContainer.style.display = 'none';
         } catch (error) {
           console.error('Error saving order: ', error);
-          alert('Error saving order. Please try again.');
+          alert('Error saving order: ' + error.message);
+        } finally {
+          submitBtn.textContent = originalBtnText;
+          submitBtn.disabled = false;
         }
       });
 
