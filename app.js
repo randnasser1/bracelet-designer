@@ -1,3 +1,80 @@
+orderForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  // Show loading state
+  const submitBtn = orderForm.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.textContent;
+  submitBtn.textContent = 'Processing...';
+  submitBtn.disabled = true;
+
+  try {
+    // Get form values
+    const orderData = {
+      name: document.getElementById('full-name').value,
+      phone: document.getElementById('phone').value,
+      phone2: document.getElementById('phone2').value || '',
+      governorate: document.getElementById('governorate').value,
+      address: document.getElementById('address').value,
+      paymentMethod: document.querySelector('input[name="payment"]:checked').value,
+      totalPrice: document.getElementById('total-price').textContent.replace('Total: ', ''),
+      productType: currentProduct,
+      materialType: materialType,
+      design: [], // We'll add the bracelet design here
+      status: 'pending',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    // Get all charms in bracelet
+    const slots = document.querySelectorAll('.slot img[data-type="special"], .slot img[data-type="rare"], .slot img[data-type="custom"]');
+    orderData.design = Array.from(slots).map(slot => ({
+      type: slot.dataset.type,
+      src: slot.src.split('/').pop(), // Store just the filename
+      charmName: slot.dataset.charm || 'custom'
+    }));
+
+    // If paying with Cliq, handle the payment proof
+    if (orderData.paymentMethod === 'Cliq') {
+      const file = document.getElementById('payment-proof').files[0];
+      if (file) {
+        try {
+          const storageRef = storage.ref('payment-proofs/' + Date.now() + '-' + file.name);
+          await storageRef.put(file);
+          orderData.paymentProofUrl = await storageRef.getDownloadURL();
+        } catch (error) {
+          console.error('Error uploading payment proof:', error);
+          alert('Error uploading payment proof. Please try again.');
+          submitBtn.textContent = originalBtnText;
+          submitBtn.disabled = false;
+          return;
+        }
+      } else {
+        alert('Please upload proof of payment for Cliq payment');
+        submitBtn.textContent = originalBtnText;
+        submitBtn.disabled = false;
+        return;
+      }
+    }
+
+    // Save order to Firestore
+    const docRef = await db.collection('orders').add(orderData);
+    
+    // Show confirmation
+    document.getElementById('order-id').textContent = docRef.id;
+    orderModal.style.display = 'none';
+    orderConfirmation.style.display = 'flex';
+    
+    // Reset form
+    orderForm.reset();
+    paymentProofContainer.style.display = 'none';
+  } catch (error) {
+    console.error('Error saving order: ', error);
+    alert('Error saving order: ' + error.message);
+  } finally {
+    submitBtn.textContent = originalBtnText;
+    submitBtn.disabled = false;
+  }
+});
+
 // In the addCharmToSlot function, replace with this:
 function addCharmToSlot(slot) {
   // Don't allow selecting sold out charms
