@@ -1257,7 +1257,20 @@
         }
         calculatePrice();
       });
+    // In setupEventListeners():
+removeCharmModal.addEventListener('click', function(e) {
+  if (e.target === this) {
+    this.style.display = 'none';
+    slotToRemove = null;
+  }
+});
 
+document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
+  btn.addEventListener('click', function() {
+    this.closest('.modal').style.display = 'none';
+    slotToRemove = null;
+  });
+});
       // Size selection
       sizeSelect.addEventListener('change', function() {
         const sizeValue = this.value;
@@ -1509,18 +1522,17 @@
         `;
       // Modal handlers
       confirmRemoveBtn.addEventListener('click', () => {
-        if (slotToRemove) {
-          removeCharmFromSlot(slotToRemove);
-          slotToRemove = null;
-        }
+      if (slotToRemove) {
+        removeCharmFromSlot(slotToRemove);
         removeCharmModal.style.display = 'none';
-      });
-
-      cancelRemoveBtn.addEventListener('click', () => {
         slotToRemove = null;
-        removeCharmModal.style.display = 'none';
-      });
-
+      }
+    });
+    
+    cancelRemoveBtn.addEventListener('click', () => {
+      removeCharmModal.style.display = 'none';
+      slotToRemove = null;
+    });
       // Window click handlers for modals
       window.addEventListener('click', (event) => {
         if (event.target === removeCharmModal) {
@@ -1562,7 +1574,7 @@
       }
     }
 
-    function initProduct(product) {
+   function initProduct(product) {
   jewelryPiece.innerHTML = '';
   usedCharms = new Set();
   specialCount = 0;
@@ -1579,7 +1591,12 @@
   updateCharmUsage();
   calculatePrice();
   
-  // Rebind slot click handlers
+  // Rebind all slot click handlers
+  document.querySelectorAll('.slot').forEach(slot => {
+    // Remove any existing listeners first
+    slot.replaceWith(slot.cloneNode(true));
+  });
+  
   document.querySelectorAll('.slot').forEach(slot => {
     slot.addEventListener('click', function() {
       handleSlotClick(this);
@@ -1615,22 +1632,22 @@
       }
     }
   
-    function handleSlotClick(slot) {
-  const currentCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
+  function handleSlotClick(slot) {
+  // Check if there's already a charm in the slot
+  const existingCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
   
-  // If there's a charm and no new charm selected, show remove modal
-  if (currentCharm && !selectedCharm) {
+  // If there's a charm and we're not trying to add a new one
+  if (existingCharm && !selectedCharm) {
     slotToRemove = slot;
     removeCharmModal.style.display = 'flex';
     return;
   }
   
-  // If a new charm is selected, add it to the slot
+  // If we're trying to add a new charm
   if (selectedCharm) {
     addCharmToSlot(slot);
   }
 }
-
 // Make sure this is in your setupEventListeners():
 document.querySelectorAll('.slot').forEach(slot => {
   slot.addEventListener('click', function() {
@@ -1692,48 +1709,42 @@ document.querySelectorAll('.slot').forEach(slot => {
         document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
       }
 
-   function removeCharmFromSlot(slot) {
+  function removeCharmFromSlot(slot) {
   const charmImg = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
   if (!charmImg) return;
 
   const charmType = charmImg.dataset.type;
   const charmSrc = charmImg.src.split('/').pop();
 
-  // Clear the slot completely first
+  // Clear the slot
   slot.innerHTML = '';
 
-  // Add back the base charm
+  // Add base charm back
   const baseImg = document.createElement('img');
   if (materialType === 'silver') {
     baseImg.src = 'basecharms/silver.png';
-    baseImg.alt = 'Silver Base';
   } else if (materialType === 'gold') {
     baseImg.src = 'basecharms/gold.png';
-    baseImg.alt = 'Gold Base';
-  } else if (materialType === 'mix') {
+  } else {
     const isGold = parseInt(slot.dataset.index) % 2 === 0;
     baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-    baseImg.alt = isGold ? 'Gold Base' : 'Silver Base';
   }
   baseImg.dataset.type = 'base';
   slot.appendChild(baseImg);
 
-  // Remove from used charms
-  usedCharms.delete(charmSrc);
-
   // Update counts
   if (charmType === 'special') {
-    if (isFullGlam) {
-      fullGlamSpecialCount--;
-    } else {
-      if (includedSpecialUsed > 0) includedSpecialUsed--;
-      else specialCount--;
-    }
+    if (isFullGlam) fullGlamSpecialCount--;
+    else if (includedSpecialUsed > 0) includedSpecialUsed--;
+    else specialCount--;
   } else if (charmType === 'rare') {
     rareCount--;
   } else if (charmType === 'custom') {
     customCount--;
   }
+
+  // Remove from used charms
+  usedCharms.delete(charmSrc);
 
   updateCharmUsage();
   calculatePrice();
@@ -1871,36 +1882,66 @@ document.querySelectorAll('.slot').forEach(slot => {
     return design;
   });
 }
-  function addToCart() {
-  // First create a snapshot of the current design
-  html2canvas(document.getElementById('jewelry-piece')).then(canvas => {
-    const design = {
-      productType: currentProduct,
-      materialType: materialType,
-      size: sizeSelect.value,
-      isFullGlam: isFullGlam,
-      price: calculateTotalPrice(),
-      imageData: canvas.toDataURL('image/png'),
-      charms: Array.from(document.querySelectorAll('#jewelry-piece .slot img[data-type="special"], #jewelry-piece .slot img[data-type="rare"], #jewelry-piece .slot img[data-type="custom"]'))
-        .map(img => ({
-          type: img.dataset.type,
-          src: img.src.split('/').pop()
-        })),
-      id: Date.now(),
-      timestamp: new Date().toLocaleString()
-    };
-    
-    // Add to cart
-    cart.push(design);
-    updateCartDisplay();
-    
-    // Reset current design
-    initProduct(currentProduct);
-    alert('Added to cart!');
-  }).catch(err => {
-    console.error('Error capturing design:', err);
-    alert('Error saving design. Please try again.');
-  });
+
+    function calculateTotalPrice() {
+  // Implement your price calculation logic here
+  // This should return the total price as a number
+  let price = products[currentProduct].basePrice;
+  
+  if (materialType === 'gold') price += 1;
+  if (materialType === 'mix') price += 2.5;
+  
+  if (isFullGlam) {
+    price = products[currentProduct].fullGlam;
+    // Add cost for rare and custom charms
+    price += (rareCount * 3) + (customCount * 3.5);
+  } else {
+    const specialCharged = Math.max(0, specialCount - products[currentProduct].includedSpecial);
+    price += (specialCharged * 2) + (rareCount * 3) + (customCount * 3.5);
+  }
+  
+  price += sizePriceAdjustment;
+  return price;
+}
+function addToCart() {
+  // First check if there are any charms added
+  const hasCharms = document.querySelectorAll('#jewelry-piece img[data-type="special"], #jewelry-piece img[data-type="rare"], #jewelry-piece img[data-type="custom"]').length > 0;
+  
+  if (!hasCharms) {
+    alert('Please add at least one charm before adding to cart!');
+    return;
+  }
+
+  try {
+    html2canvas(document.getElementById('jewelry-piece')).then(canvas => {
+      const design = {
+        productType: currentProduct,
+        materialType: materialType,
+        size: sizeSelect.value,
+        isFullGlam: isFullGlam,
+        price: calculateTotalPrice(),
+        imageData: canvas.toDataURL('image/png'),
+        charms: Array.from(document.querySelectorAll('#jewelry-piece .slot img[data-type="special"], #jewelry-piece .slot img[data-type="rare"], #jewelry-piece .slot img[data-type="custom"]'))
+          .map(img => ({
+            type: img.dataset.type,
+            src: img.src.split('/').pop()
+          })),
+        id: Date.now(),
+        timestamp: new Date().toLocaleString()
+      };
+      
+      cart.push(design);
+      updateCartDisplay();
+      initProduct(currentProduct);
+      alert('Added to cart successfully!');
+    }).catch(err => {
+      console.error('Canvas error:', err);
+      alert('Error capturing design image. Please try again.');
+    });
+  } catch (err) {
+    console.error('Add to cart error:', err);
+    alert('Error adding to cart. Please try again.');
+  }
 }
 
     function updateCartDisplay() {
