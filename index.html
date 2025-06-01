@@ -1213,7 +1213,11 @@
     function setupEventListeners() {
       // Add to cart button
       addToCartBtn.addEventListener('click', addToCart);
-
+      document.querySelectorAll('.slot').forEach(slot => {
+    slot.addEventListener('click', function() {
+      handleSlotClick(this);
+    });
+  });
       // Product selection
       productBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1559,25 +1563,29 @@
     }
 
     function initProduct(product) {
-      jewelryPiece.innerHTML = '';
-      usedCharms = new Set();
-      specialCount = 0;
-      rareCount = 0;
-      customCount = 0;
-      includedSpecialUsed = 0;
-      isFullGlam = false;
-      fullGlamSpecialCount = 0;
-      fullGlamBtn.textContent = 'Full Glam Look';
-      sizePriceAdjustment = 0;
-      sizeSelect.value = '15.2-16.2';
-      
-      downloadBtn.textContent = `Download ${product.charAt(0).toUpperCase() + product.slice(1)} Image`;
-      
-      createSlots(products[product].slots);
-      updateCharmUsage();
-      calculatePrice();
-    }
-
+  jewelryPiece.innerHTML = '';
+  usedCharms = new Set();
+  specialCount = 0;
+  rareCount = 0;
+  customCount = 0;
+  includedSpecialUsed = 0;
+  isFullGlam = false;
+  fullGlamSpecialCount = 0;
+  fullGlamBtn.textContent = 'Full Glam Look';
+  sizePriceAdjustment = 0;
+  sizeSelect.value = '15.2-16.2';
+  
+  createSlots(products[product].slots);
+  updateCharmUsage();
+  calculatePrice();
+  
+  // Rebind slot click handlers
+  document.querySelectorAll('.slot').forEach(slot => {
+    slot.addEventListener('click', function() {
+      handleSlotClick(this);
+    });
+  });
+}
     function createSlots(slotCount) {
       for (let i = 0; i < slotCount; i++) {
         const slot = document.createElement('div');
@@ -1608,18 +1616,27 @@
     }
   
     function handleSlotClick(slot) {
-      const currentCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
-      
-      if (currentCharm && !selectedCharm) {
-        slotToRemove = slot;
-        removeCharmModal.style.display = 'flex';
-        return;
-      }
-      
-      if (selectedCharm) {
-        addCharmToSlot(slot);
-      }
-    }
+  const currentCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
+  
+  // If there's a charm and no new charm selected, show remove modal
+  if (currentCharm && !selectedCharm) {
+    slotToRemove = slot;
+    removeCharmModal.style.display = 'flex';
+    return;
+  }
+  
+  // If a new charm is selected, add it to the slot
+  if (selectedCharm) {
+    addCharmToSlot(slot);
+  }
+}
+
+// Make sure this is in your setupEventListeners():
+document.querySelectorAll('.slot').forEach(slot => {
+  slot.addEventListener('click', function() {
+    handleSlotClick(this);
+  });
+});
 
    function addCharmToSlot(slot) {
         if (!selectedCharm) return;
@@ -1855,15 +1872,34 @@
   });
 }
   function addToCart() {
-  saveCurrentDesign().then(design => {
-    // Create a deep copy of the design object
-    const designCopy = JSON.parse(JSON.stringify(design));
-    designCopy.id = Date.now();
-    designCopy.timestamp = new Date().toLocaleString();
-    cart.push(designCopy);
+  // First create a snapshot of the current design
+  html2canvas(document.getElementById('jewelry-piece')).then(canvas => {
+    const design = {
+      productType: currentProduct,
+      materialType: materialType,
+      size: sizeSelect.value,
+      isFullGlam: isFullGlam,
+      price: calculateTotalPrice(),
+      imageData: canvas.toDataURL('image/png'),
+      charms: Array.from(document.querySelectorAll('#jewelry-piece .slot img[data-type="special"], #jewelry-piece .slot img[data-type="rare"], #jewelry-piece .slot img[data-type="custom"]'))
+        .map(img => ({
+          type: img.dataset.type,
+          src: img.src.split('/').pop()
+        })),
+      id: Date.now(),
+      timestamp: new Date().toLocaleString()
+    };
+    
+    // Add to cart
+    cart.push(design);
     updateCartDisplay();
-    initProduct(design.productType);
+    
+    // Reset current design
+    initProduct(currentProduct);
     alert('Added to cart!');
+  }).catch(err => {
+    console.error('Error capturing design:', err);
+    alert('Error saving design. Please try again.');
   });
 }
 
