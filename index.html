@@ -370,10 +370,6 @@
       margin-bottom: 0.5rem;
     }
     
-    .payment-option input {
-      margin-right: 0.5rem;
-    }
-    
     /* Modal styles */
     .modal {
       display: none;
@@ -395,6 +391,8 @@
       max-width: 300px;
       width: 100%;
       text-align: center;
+      position: relative;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
     
     .order-modal-content {
@@ -1536,8 +1534,8 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
       // Window click handlers for modals
       window.addEventListener('click', (event) => {
         if (event.target === removeCharmModal) {
-          slotToRemove = null;
           removeCharmModal.style.display = 'none';
+          slotToRemove = null;
         }
         if (event.target === orderModal) {
           orderModal.style.display = 'none';
@@ -1636,24 +1634,18 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
   // Check if there's already a charm in the slot
   const existingCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
   
-  // If there's a charm and we're not trying to add a new one
-  if (existingCharm && !selectedCharm) {
-    slotToRemove = slot;
-    removeCharmModal.style.display = 'flex';
-    return;
-  }
-  
   // If we're trying to add a new charm
   if (selectedCharm) {
     addCharmToSlot(slot);
+    return;
+  }
+  
+  // If there's a charm and we're not in the process of adding one
+  if (existingCharm) {
+    slotToRemove = slot;
+    removeCharmModal.style.display = 'flex';
   }
 }
-// Make sure this is in your setupEventListeners():
-document.querySelectorAll('.slot').forEach(slot => {
-  slot.addEventListener('click', function() {
-    handleSlotClick(this);
-  });
-});
 
    function addCharmToSlot(slot) {
         if (!selectedCharm) return;
@@ -1664,7 +1656,7 @@ document.querySelectorAll('.slot').forEach(slot => {
         }
 
         const charmSrc = selectedCharm.src.split('/').pop();
-        if (usedCharms.has(charmSrc)) {  // Fixed the missing parenthesis here
+        if (usedCharms.has(charmSrc)) {
           alert('This charm is already used on the bracelet!');
           return;
         }
@@ -1734,9 +1726,13 @@ document.querySelectorAll('.slot').forEach(slot => {
 
   // Update counts
   if (charmType === 'special') {
-    if (isFullGlam) fullGlamSpecialCount--;
-    else if (includedSpecialUsed > 0) includedSpecialUsed--;
-    else specialCount--;
+    if (isFullGlam) {
+      fullGlamSpecialCount--;
+    } else if (includedSpecialUsed > 0) {
+      includedSpecialUsed--;
+    } else {
+      specialCount--;
+    }
   } else if (charmType === 'rare') {
     rareCount--;
   } else if (charmType === 'custom') {
