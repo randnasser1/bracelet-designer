@@ -502,6 +502,22 @@
         align-items: center;
       }
     }
+
+    .btn.active {
+      background: #d6336c;
+      box-shadow: 0 0 0 2px white, 0 0 0 4px #d6336c;
+    }
+
+    #gold-variant-btn {
+      background: linear-gradient(135deg, #ffd700, #daa520);
+      color: #333;
+      font-weight: bold;
+    }
+
+    #gold-variant-btn.active {
+      background: linear-gradient(135deg, #daa520, #b8860b);
+      box-shadow: 0 0 0 2px white, 0 0 0 4px #daa520;
+    }
   </style>
 
   <div class="cart-section">
@@ -610,7 +626,13 @@
     
     <div class="controls">
       <div class="control-group">
-        <span>Material:</span>
+        <button id="full-glam-btn" class="btn">Full Glam Look</button>
+      </div>
+      <div class="control-group">
+        <button id="gold-variant-btn" class="btn">Show Gold Variants</button>
+      </div>
+      <div class="control-group">
+        <label>Material:</label>
         <div class="material-selector">
           <div class="material-option silver selected" data-material="silver">Silver</div>
           <div class="material-option gold" data-material="gold">Gold (+1 JD)</div>
@@ -629,10 +651,6 @@
           <option value="20-21">20cm - 21cm (+2.5 JDs, 23 charms)</option>
           <option value="21-22">21cm - 22cm (+3 JDs, 24 charms)</option>
         </select>
-      </div>
-      
-      <div class="control-group">
-        <button class="btn" id="full-glam-btn">Full Glam Look</button>
       </div>
     </div>
 
