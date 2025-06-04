@@ -1521,49 +1521,7 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
       // Modal handlers
       confirmRemoveBtn.addEventListener('click', () => {
       if (slotToRemove) {
-        const slot = slotToRemove;
-        const charmImg = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
-        if (!charmImg) return;
-
-        const charmType = charmImg.dataset.type;
-        const charmSrc = charmImg.src.split('/').pop();
-
-        // Clear the slot
-        slot.innerHTML = '';
-
-        // Add base charm back
-        const baseImg = document.createElement('img');
-        if (materialType === 'silver') {
-          baseImg.src = 'basecharms/silver.png';
-        } else if (materialType === 'gold') {
-          baseImg.src = 'basecharms/gold.png';
-        } else {
-          const isGold = parseInt(slot.dataset.index) % 2 === 0;
-          baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
-        }
-        baseImg.dataset.type = 'base';
-        slot.appendChild(baseImg);
-
-        // Update counts
-        if (charmType === 'special') {
-          if (isFullGlam) {
-            fullGlamSpecialCount--;
-          } else if (includedSpecialUsed > 0) {
-            includedSpecialUsed--;
-          } else {
-            specialCount--;
-          }
-        } else if (charmType === 'rare') {
-          rareCount--;
-        } else if (charmType === 'custom') {
-          customCount--;
-        }
-
-        // Remove from used charms
-        usedCharms.delete(charmSrc);
-
-        updateCharmUsage();
-        calculatePrice();
+        removeCharmFromSlot(slotToRemove);
         removeCharmModal.style.display = 'none';
         slotToRemove = null;
       }
@@ -1628,20 +1586,9 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
   sizeSelect.value = '15.2-16.2';
   
   createSlots(products[product].slots);
+  setupSlotEventListeners();
   updateCharmUsage();
   calculatePrice();
-  
-  // Rebind all slot click handlers
-  document.querySelectorAll('.slot').forEach(slot => {
-    // Remove any existing listeners first
-    slot.replaceWith(slot.cloneNode(true));
-  });
-  
-  document.querySelectorAll('.slot').forEach(slot => {
-    slot.addEventListener('click', function() {
-      handleSlotClick(this);
-    });
-  });
 }
     function createSlots(slotCount) {
       for (let i = 0; i < slotCount; i++) {
@@ -1673,17 +1620,17 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
     }
   
   function handleSlotClick(slot) {
-  // Check if there's already a charm in the slot
-  const existingCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
-  
-  // If we're trying to add a new charm
+  // If we have a selected charm, we're in "add charm" mode
   if (selectedCharm) {
     addCharmToSlot(slot);
     return;
   }
+
+  // Check if we clicked on a decorative charm (not a base charm)
+  const clickedCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
   
-  // Only show remove modal if clicking on an existing charm (not an empty slot or base charm)
-  if (existingCharm && existingCharm.dataset.type !== 'base') {
+  // Only show remove modal if we clicked on a decorative charm
+  if (clickedCharm) {
     slotToRemove = slot;
     removeCharmModal.style.display = 'flex';
   }
@@ -1703,19 +1650,17 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
           return;
         }
 
-      // Remove any existing decorative charm first
+      // Remove any existing charm first
       const existingCharm = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
         if (existingCharm) {
           removeCharmFromSlot(slot);
         }
-      // Clear the slot completely
+      // Clear the slot
       slot.innerHTML = '';
         const newImg = selectedCharm.cloneNode();
         newImg.classList.remove('selected');
         newImg.dataset.charm = charmSrc;
-        if (selectedCharm.classList.contains('sold-out')) {
-          newImg.classList.add('sold-out');
-        }
+        newImg.dataset.type = selectedCharm.dataset.type; // Make sure we copy the type
         slot.appendChild(newImg);
         usedCharms.add(charmSrc);
 
@@ -2057,6 +2002,20 @@ function addToCart() {
             baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
           }
         }
+      });
+    }
+
+    // Make sure we're binding the event listeners correctly
+    function setupSlotEventListeners() {
+      document.querySelectorAll('.slot').forEach(slot => {
+        // Remove any existing listeners first
+        const newSlot = slot.cloneNode(true);
+        slot.parentNode.replaceChild(newSlot, slot);
+        
+        // Add new click listener
+        newSlot.addEventListener('click', function() {
+          handleSlotClick(this);
+        });
       });
     }
   }); // This closes the DOMContentLoaded event listener
