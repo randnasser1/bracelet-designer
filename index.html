@@ -1521,7 +1521,49 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
       // Modal handlers
       confirmRemoveBtn.addEventListener('click', () => {
       if (slotToRemove) {
-        removeCharmFromSlot(slotToRemove);
+        const slot = slotToRemove;
+        const charmImg = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
+        if (!charmImg) return;
+
+        const charmType = charmImg.dataset.type;
+        const charmSrc = charmImg.src.split('/').pop();
+
+        // Clear the slot
+        slot.innerHTML = '';
+
+        // Add base charm back
+        const baseImg = document.createElement('img');
+        if (materialType === 'silver') {
+          baseImg.src = 'basecharms/silver.png';
+        } else if (materialType === 'gold') {
+          baseImg.src = 'basecharms/gold.png';
+        } else {
+          const isGold = parseInt(slot.dataset.index) % 2 === 0;
+          baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+        }
+        baseImg.dataset.type = 'base';
+        slot.appendChild(baseImg);
+
+        // Update counts
+        if (charmType === 'special') {
+          if (isFullGlam) {
+            fullGlamSpecialCount--;
+          } else if (includedSpecialUsed > 0) {
+            includedSpecialUsed--;
+          } else {
+            specialCount--;
+          }
+        } else if (charmType === 'rare') {
+          rareCount--;
+        } else if (charmType === 'custom') {
+          customCount--;
+        }
+
+        // Remove from used charms
+        usedCharms.delete(charmSrc);
+
+        updateCharmUsage();
+        calculatePrice();
         removeCharmModal.style.display = 'none';
         slotToRemove = null;
       }
@@ -1640,8 +1682,8 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
     return;
   }
   
-  // If there's a charm and we're not in the process of adding one
-  if (existingCharm) {
+  // Only show remove modal if clicking on an existing charm (not an empty slot or base charm)
+  if (existingCharm && existingCharm.dataset.type !== 'base') {
     slotToRemove = slot;
     removeCharmModal.style.display = 'flex';
   }
