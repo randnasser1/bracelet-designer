@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const lastFilledSlot = filledSlots[filledSlots.length - 1];
       const removedCharm = lastFilledSlot.querySelector('img');
       totalPrice -= parseFloat(removedCharm.getAttribute('data-price')) || 0;
-      charmCount--;
+      charmCount--; 
       lastFilledSlot.innerHTML = '';
       updatePrice();
     }
