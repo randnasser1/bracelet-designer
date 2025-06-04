@@ -1267,7 +1267,7 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
   btn.addEventListener('click', function() {
     this.closest('.modal').style.display = 'none';
     slotToRemove = null;
-  });
+  }
 });
       // Size selection
       sizeSelect.addEventListener('change', function() {
@@ -1519,13 +1519,13 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
           <button class="btn" id="close-confirmation">Close</button>
         `;
       // Modal handlers
-      confirmRemoveBtn.addEventListener('click', () => {
-      if (slotToRemove) {
-        removeCharmFromSlot(slotToRemove);
-        removeCharmModal.style.display = 'none';
-        slotToRemove = null;
-      }
-    });
+     confirmRemoveBtn.addEventListener('click', () => {
+  if (slotToRemove) {
+    removeCharmFromSlot(slotToRemove);
+    removeCharmModal.style.display = 'none';
+    slotToRemove = null;
+  }
+});
     
     cancelRemoveBtn.addEventListener('click', () => {
       removeCharmModal.style.display = 'none';
@@ -1571,8 +1571,7 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
         jewelryPiece.appendChild(slot);
       }
     }
-
-   function initProduct(product) {
+function initProduct(product) {
   jewelryPiece.innerHTML = '';
   usedCharms = new Set();
   specialCount = 0;
@@ -1586,7 +1585,7 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
   sizeSelect.value = '15.2-16.2';
   
   createSlots(products[product].slots);
-  setupSlotEventListeners();
+  setupSlotEventListeners(); // Make sure this is called
   updateCharmUsage();
   calculatePrice();
 }
@@ -1635,7 +1634,6 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
     removeCharmModal.style.display = 'flex';
   }
 }
-
    function addCharmToSlot(slot) {
         if (!selectedCharm) return;
         
@@ -1687,8 +1685,7 @@ document.querySelectorAll('.modal-btn.cancel').forEach(btn => {
         selectedCharm = null;
         document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
       }
-
-  function removeCharmFromSlot(slot) {
+function removeCharmFromSlot(slot) {
   const charmImg = slot.querySelector('img[data-type="special"], img[data-type="rare"], img[data-type="custom"]');
   if (!charmImg) return;
 
@@ -2005,19 +2002,18 @@ function addToCart() {
       });
     }
 
-    // Make sure we're binding the event listeners correctly
-    function setupSlotEventListeners() {
-      document.querySelectorAll('.slot').forEach(slot => {
-        // Remove any existing listeners first
-        const newSlot = slot.cloneNode(true);
-        slot.parentNode.replaceChild(newSlot, slot);
-        
-        // Add new click listener
-        newSlot.addEventListener('click', function() {
-          handleSlotClick(this);
-        });
-      });
-    }
+function setupSlotEventListeners() {
+  document.querySelectorAll('.slot').forEach(slot => {
+    // Remove any existing listeners first
+    const newSlot = slot.cloneNode(true);
+    slot.parentNode.replaceChild(newSlot, slot);
+    
+    // Add new click listener
+    newSlot.addEventListener('click', function() {
+      handleSlotClick(this);
+    });
+  });
+}
   }); // This closes the DOMContentLoaded event listener
 </script>
 </body>
