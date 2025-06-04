@@ -708,7 +708,7 @@ function addCharmToSlot(slot) {
   });
 
   // Window click handlers for modals
-  window.addEventListener('click', (event) => {
+  window.addEventListener('click', (event) => { 
     if (event.target === removeCharmModal) {
       slotToRemove = null;
       removeCharmModal.style.display = 'none';
