@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // DOM Elements
   const jewelryPiece = document.getElementById('jewelry-piece');
   const fullGlamBtn = document.getElementById('full-glam-btn');
+  const goldVariantBtn = document.getElementById('gold-variant-btn');
   const productBtns = document.querySelectorAll('.product-btn');
   const materialOptions = document.querySelectorAll('.material-option');
   const basePriceDisplay = document.getElementById('base-price');
@@ -54,15 +55,6 @@ pricingToggle.textContent = 'Show Pricing Info';
     necklace: { basePrice: 22, slots: 34, includedSpecial: 2, fullGlam: 64 }
   };
 
-  // Charm image lists with categories and sold out status
-  const specialCharms = [
-    // ... (your existing special charms array)
-  ];
-
-  const rareCharms = [
-    // ... (your existing rare charms array)
-  ];
-
   // Current state
   let currentProduct = 'bracelet';
   let selectedCharm = null;
@@ -78,6 +70,7 @@ pricingToggle.textContent = 'Show Pricing Info';
   let customCharmImage = null;
   let sizePriceAdjustment = 0;
   let isFullGlam = false;
+  let showGoldVariants = false;
 
   // Initialize
   initProduct(currentProduct);
@@ -178,6 +171,15 @@ sizeSelect.addEventListener('change', function() {
       pricingToggle.textContent = pricingInfo.classList.contains('visible') 
         ? 'Hide Pricing Info' 
         : 'Show Pricing Info';
+    });
+
+    // Add gold variant button listener
+    goldVariantBtn.addEventListener('click', () => {
+      showGoldVariants = !showGoldVariants;
+      goldVariantBtn.textContent = showGoldVariants ? 'Show Normal Charms' : 'Show Gold Variants';
+      goldVariantBtn.classList.toggle('active');
+      updateSpecialCharmsDisplay();
+      updateRareCharmsDisplay();
     });
 
     // ... (rest of your existing event listeners)
@@ -406,9 +408,24 @@ function addCharmToSlot(slot) {
       : specialCharms.filter(charm => charm.category === currentSpecialCategory);
     
     filteredCharms.forEach((charm, index) => {
+      // Check if there's a gold variant available
+      const charmName = charm.src.split('/').pop();
+      const baseCharmName = charmName.replace('-gold.png', '.png');
+      
+      // If showing gold variants and this is not a gold variant but has one, skip it
+      if (showGoldVariants && !charmName.includes('-gold.png') && 
+          specialCharms.some(c => c.src.includes(baseCharmName.replace('.png', '-gold.png')))) {
+        return;
+      }
+      
+      // If not showing gold variants and this is a gold variant, skip it
+      if (!showGoldVariants && charmName.includes('-gold.png')) {
+        return;
+      }
+
       const charmEl = createCharm(charm.src, `Special Charm ${index+1}`, 'special');
       charmEl.classList.add('special');
-      charmEl.dataset.charm = charm.src.split('/').pop();
+      charmEl.dataset.charm = charmName;
       charmEl.dataset.category = charm.category;
       
       if (charm.soldOut) {
@@ -431,9 +448,24 @@ function addCharmToSlot(slot) {
       : rareCharms.filter(charm => charm.category === currentRareCategory);
     
     filteredCharms.forEach((charm, index) => {
+      // Check if there's a gold variant available
+      const charmName = charm.src.split('/').pop();
+      const baseCharmName = charmName.replace('-gold.png', '.png');
+      
+      // If showing gold variants and this is not a gold variant but has one, skip it
+      if (showGoldVariants && !charmName.includes('-gold.png') && 
+          rareCharms.some(c => c.src.includes(baseCharmName.replace('.png', '-gold.png')))) {
+        return;
+      }
+      
+      // If not showing gold variants and this is a gold variant, skip it
+      if (!showGoldVariants && charmName.includes('-gold.png')) {
+        return;
+      }
+
       const charmEl = createCharm(charm.src, `Rare Charm ${index+1}`, 'rare');
       charmEl.classList.add('rare');
-      charmEl.dataset.charm = charm.src.split('/').pop();
+      charmEl.dataset.charm = charmName;
       charmEl.dataset.category = charm.category;
       
       if (charm.soldOut) {
