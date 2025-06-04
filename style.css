@@ -325,3 +325,25 @@ h1 {
   background: #d6336c;
   transform: translateY(-1px);
 }
+
+.gold-toggle-container {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.gold-toggle-container .btn {
+  background: #ffd700;
+  color: #333;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.gold-toggle-container .btn:hover {
+  background: #ffed4a;
+  transform: translateY(-1px);
+}
