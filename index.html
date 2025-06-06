@@ -7,6 +7,14 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Jewelry Designer</title>
+  <link href="styles.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" crossorigin="anonymous"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+  <script src="app.js" defer></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
@@ -106,6 +114,7 @@
 
     #jewelry-piece {
       display: flex;
+      flex-wrap: nowrap;
       gap: 8px;
       padding: 1rem;
       border: 2px dashed #f5a0c2;
@@ -132,6 +141,7 @@
 
     .slot {
       flex: 0 0 50px;
+      width: 50px;
       height: 50px;
       border: 2px dashed #f5a0c2;
       border-radius: 10px;
@@ -323,17 +333,33 @@
     }
 
     .material-option.silver {
-      background: #e0e0e0;
-    }
+  background: #e0e0e0;
+  color: #333;
+}
 
-    .material-option.gold {
-      background: linear-gradient(135deg, #ffd700, #daa520);
-    }
+.material-option.gold {
+  background: linear-gradient(135deg, #ffd700, #daa520);
+  color: #333;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+}
 
-    .material-option.mix {
-      background: linear-gradient(135deg, #e0e0e0 50%, #ffd700 50%);
-    }
+.material-option.mix {
+  background: linear-gradient(90deg, #e0e0e0 50%, #ffd700 50%);
+  color: #333;
+  position: relative;
+  overflow: hidden;
+}
 
+.material-option.mix::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: rgba(0,0,0,0.2);
+}: rgba(0,0,0,0.2);
+}
     /* Order Form Styles */
     .order-form {
       background: white;
@@ -521,103 +547,178 @@
       background: linear-gradient(135deg, #daa520, #b8860b);
       box-shadow: 0 0 0 2px white, 0 0 0 4px #daa520;
     }
-  </style>
 
-  <div class="cart-section">
-  <button class="btn" id="add-to-cart-btn">Add to Cart</button>
-  <div id="cart-items" class="cart-items"></div>
-</div>
+    /* Long Slot Styles */
+    .slot.long-slot {
+      flex: 0 0 108px;
+      width: 108px; /* 50px + 50px + 8px gap */
+    }
 
-<style>
-.cart-section {
-  margin: 1rem 0;
-  text-align: center;
-}
-.cart-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-  margin-top: 1rem;
-}
-.cart-item {
-  background: white;
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  position: relative;
-}
-.cart-item img {
-  width: 100px;
-  height: auto;
-}
-.remove-item {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-}
+    .slot.long-slot .long-charm {
+      width: 100px !important;  /* Match pool size */
+      height: 50px !important;
+      object-fit: contain;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
 
-  .cart-summary {
-      background: white;
-      padding: 1rem;
-      border-radius: 10px;
-      margin: 1rem 0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    /* Charm Pool Styles (unchanged) */
+    .charms-grid .long-charm {
+      width: 100px !important;
+      height: 50px !important;
     }
-    
-    .cart-item-details {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-    }
-    
-    .receipt {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 10px;
-      max-width: 500px;
-      margin: 1rem auto;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    .receipt-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px dashed #eee;
-    }
-    
-    .receipt-total {
-      font-weight: bold;
-      font-size: 1.2rem;
-      margin-top: 1rem;
-      border-top: 2px solid #d6336c;
-      padding-top: 0.5rem;
-    }
-    
-    .charm-counter {
-      display: inline-block;
+
+    /* Cart Styles */
+    .cart-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
       background: #d6336c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(214, 51, 108, 0.3);
+      z-index: 1000;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ff85b3;
       color: white;
       border-radius: 50%;
       width: 20px;
       height: 20px;
-      text-align: center;
-      line-height: 20px;
-      font-size: 0.8rem;
-      margin-left: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
     }
-</style>
+
+    .cart-preview {
+      display: none;
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      width: 300px;
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+
+    .cart-preview.active {
+      display: block;
+    }
+
+    .cart-preview-header {
+      padding: 1rem;
+      border-bottom: 1px solid #f5a0c2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cart-preview-header h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .cart-close-btn {
+      background: none;
+      border: none;
+      color: #d6336c;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .cart-items {
+      padding: 1rem;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem;
+      border-bottom: 1px solid #f5a0c2;
+      margin-bottom: 0.5rem;
+    }
+
+    .cart-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .empty-cart {
+      text-align: center;
+      color: #999;
+      padding: 1rem;
+    }
+
+    .cart-footer {
+      padding: 1rem;
+      border-top: 1px solid #f5a0c2;
+      background: #fff0f5;
+    }
+
+    .cart-total {
+      font-weight: bold;
+      color: #d6336c;
+      margin-bottom: 1rem;
+      text-align: right;
+    }
+
+    .remove-item {
+      background: none;
+      border: none;
+      color: #d6336c;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0.2rem 0.5rem;
+    }
+
+    .remove-item:hover {
+      color: #ff85b3;
+    }
+  </style>
 </head>
 <body>
+  <!-- Cart Button -->
+  <button id="cart-button" class="cart-button">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="cart-count">0</span>
+  </button>
+
+  <!-- Cart Preview Panel -->
+  <div id="cart-preview" class="cart-preview">
+    <div class="cart-preview-header">
+      <h3>Shopping Cart</h3>
+      <button class="cart-close-btn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div id="cart-items" class="cart-items">
+      <div class="empty-cart">Your cart is empty</div>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total">Total: 0 JDs</div>
+      <button id="order-btn">Place Order</button>
+
+    </div>
+  </div>
+
   <div class="main-content">
     <h1>Jewelry Designer</h1>
     
@@ -628,21 +729,6 @@
     </div>
     
     <div class="controls">
-      <div class="control-group">
-        <button id="full-glam-btn" class="btn">Full Glam Look</button>
-      </div>
-      <div class="control-group">
-        <button id="gold-variant-btn" class="btn">Show Gold Variants</button>
-      </div>
-      <div class="control-group">
-        <label>Material:</label>
-        <div class="material-selector">
-          <div class="material-option silver selected" data-material="silver">Silver</div>
-          <div class="material-option gold" data-material="gold">Gold (+1 JD)</div>
-          <div class="material-option mix" data-material="mix">Mix (+2.5 JDs)</div>
-        </div>
-      </div>
-      
       <div class="control-group">
         <label for="size">Size:</label>
         <select id="size" class="btn">
@@ -655,6 +741,14 @@
           <option value="21-22">21cm - 22cm (+3 JDs, 24 charms)</option>
         </select>
       </div>
+      <div class="control-group">
+        <label>Material:</label>
+        <button class="material-option selected" data-material="silver">Silver</button>
+        <button class="material-option gold" data-material="gold">Gold</button>
+        <button class="material-option mix" data-material="mix">Mix</button>
+      </div>
+      <button id="full-glam-btn" class="btn">Full Glam</button>
+      <button id="pricing-toggle" class="btn">Show Pricing Info</button>
     </div>
 
     <div class="bracelet-container">
@@ -663,14 +757,18 @@
 
     <div class="price-display">
       <div id="base-price">Base Price: 10 JDs</div>
-      <div id="charm-price">Charms: 0 JDs (0/18 free specials used)</div>
+        <div id="charm-price">Charms: 0 JDs (0/2 free specials used)</div>
       <div id="total-price">Total: 10 JDs</div>
     </div>
 
     <div class="action-buttons">
-      <button class="btn download-btn" id="download-btn">Download Bracelet Image</button>
-      <button class="btn order-btn" id="order-btn">Place Order</button>
-    </div>
+      <button class="btn download-btn" id="download-btn">
+          <i class="fas fa-download"></i> Download Bracelet
+      </button>
+      <button class="btn add-to-cart-btn" id="add-to-cart-bottom">
+          <i class="fas fa-cart-plus"></i> Add to Cart
+      </button>
+  </div>
 
     <div class="pricing-toggle">
       <button class="pricing-toggle-btn" id="pricing-toggle">Show Pricing Info</button>
@@ -712,45 +810,46 @@
     </div>
 
     <div class="charm-pools">
-      <!-- Special Charms -->
-      <div class="charm-pool">
-        <h3>Special Charms (+2 JDs each after first 18 in Full Glam)</h3>
-        <div class="category-tabs" id="special-categories">
-          <button class="category-tab" data-category="teddy">Teddy Bears</button>
-          <button class="category-tab" data-category="bows">Bows</button>
-          <button class="category-tab" data-category="beach">Beach</button>
-          <button class="category-tab" data-category="red">Red</button>
-          <button class="category-tab" data-category="cute">First collection</button>
-          <button class="category-tab" data-category="cutespecials">Cute</button>
-          <button class="category-tab" data-category="8ball">8 Ball</button>
-          <button class="category-tab" data-category="mushrooms">Mushrooms</button>
-          <button class="category-tab" data-category="simple">Simple & Cute</button>
-          <button class="category-tab active" data-category="all">All</button>
-        </div>
-        <div class="charms-grid" id="special-charms">
-          <!-- Special charms will be added here by JS -->
-        </div>
-      </div>
+        <!-- Special Charms -->
+        <div class="charm-pool">
+            <h3>Special Charms (+2 JDs each after first 18 in Full Glam)</h3>
+            <div class="category-tabs" id="special-categories">
+                <button class="category-tab" data-category="teddy">Teddy Bears</button>
+                <button class="category-tab" data-category="bows">Bows</button>
+                <button class="category-tab" data-category="beach">Beach</button>
+                <button class="category-tab" data-category="red">Red</button>
+                <button class="category-tab" data-category="cute">First collection</button>
+                <button class="category-tab" data-category="cutespecials">Cute</button>
+                <button class="category-tab" data-category="8ball">8 Ball</button>
+                <button class="category-tab" data-category="mushrooms">Mushrooms</button>
+                <button class="category-tab" data-category="simple">Simple & Cute</button>
+                <button class="category-tab active" data-category="all">All</button>
+            </div>
 
-      <!-- Rare Charms -->
-      <div class="charm-pool">
-        <h3>Rare Charms (+3 JDs each)</h3>
-        <div class="category-tabs" id="rare-categories">
-          <button class="category-tab" data-category="sanrio">Sanrio</button>
-          <button class="category-tab" data-category="hgs">Hot Girl Summer</button>
-          <button class="category-tab" data-category="sporty">Sporty</button>
-          <button class="category-tab" data-category="gold">Gold</button>
-          <button class="category-tab" data-category="disney">Disney</button>
-          <button class="category-tab" data-category="love">Love/Friends/Family</button>
-          <button class="category-tab" data-category="dangly">Dangly</button>
-          <button class="category-tab" data-category="graduation">Graduation</button>
-          <button class="category-tab" data-category="long">Long</button>
-          <button class="category-tab active" data-category="all">All</button>
+            <div class="charms-grid" id="special-charms">
+                <!-- Special charms will be added here by JS -->
+            </div>
         </div>
-        <div class="charms-grid" id="rare-charms">
-          <!-- Rare charms will be added here by JS -->
+
+        <!-- Rare Charms -->
+        <div class="charm-pool">
+            <h3>Rare Charms (+3 JDs each)</h3>
+            <div class="category-tabs" id="rare-categories">
+                <button class="category-tab" data-category="sanrio">Sanrio</button>
+                <button class="category-tab" data-category="hgs">Hot Girl Summer</button>
+                <button class="category-tab" data-category="sporty">Sporty</button>
+                <button class="category-tab" data-category="gold">Gold</button>
+                <button class="category-tab" data-category="disney">Disney</button>
+                <button class="category-tab" data-category="love">Love/Friends/Family</button>
+                <button class="category-tab" data-category="dangly">Dangly</button>
+                <button class="category-tab" data-category="graduation">Graduation</button>
+                <button class="category-tab" data-category="long">Long</button>
+                <button class="category-tab active" data-category="all">All</button>
+            </div>
+            <div class="charms-grid" id="rare-charms">
+                <!-- Rare charms will be added here by JS -->
+            </div>
         </div>
-      </div>
     </div>
   </div>
 
@@ -771,70 +870,76 @@
       <h2>Place Your Order</h2>
       <form id="order-form">
         <div class="form-group">
-          <label for="full-name">Full Name</label>
-          <input type="text" id="full-name" required>
+          <label for="full-name">Full Name*</label>
+          <input type="text" id="full-name" name="full-name" required>
         </div>
         
         <div class="form-group">
-          <label for="phone">Phone Number</label>
-          <input type="tel" id="phone" required>
+          <label for="phone">Phone Number*</label>
+          <input type="tel" id="phone" name="phone" required>
         </div>
         
         <div class="form-group">
           <label for="phone2">Second Phone Number (Optional)</label>
-          <input type="tel" id="phone2">
+          <input type="tel" id="phone2" name="phone2">
         </div>
         
         <div class="form-group">
-          <label for="governorate">Governorate (المحافظة)</label>
-          <select id="governorate" required>
-            <option value="">Select Governorate</option>
-            <option value="Amman">Amman</option>
-            <option value="Irbid">Irbid</option>
-            <option value="Zarqa">Zarqa</option>
-            <option value="Balqa">Balqa</option>
-            <option value="Madaba">Madaba</option>
-            <option value="Karak">Karak</option>
-            <option value="Tafilah">Tafilah</option>
-            <option value="Ma'an">Ma'an</option>
-            <option value="Ajloun">Ajloun</option>
-            <option value="Jerash">Jerash</option>
-            <option value="Mafraq">Mafraq</option>
-            <option value="Aqaba">Aqaba</option>
+          <label for="governorate">Governorate*</label>
+          <select id="governorate" name="governorate" required>
+              <option value="">Select Governorate</option>
+              <option value="Amman">Amman</option>
+              <option value="Irbid">Irbid</option>
+              <option value="Zarqa">Zarqa</option>
+              <option value="Balqa">Balqa</option>
+              <option value="Madaba">Madaba</option>
+              <option value="Jerash">Jerash</option>
+              <option value="Ajloun">Ajloun</option>
+              <option value="Aqaba">Aqaba</option>
+              <option value="Mafraq">Mafraq</option>
+              <option value="Tafilah">Tafilah</option>
+              <option value="Karak">Karak</option>
+              <option value="Ma'an">Ma'an</option>
           </select>
-        </div>
+      </div>
         
         <div class="form-group">
-          <label for="address">Full Address Details</label>
-          <input type="text" id="address" required>
+          <label for="address">Full Address Details*</label>
+          <input type="text" id="address" name="address" required>
         </div>
         
         <div class="payment-options">
-          <h3>Payment Method</h3>
+          <h3>Payment Method*</h3>
           <div class="payment-option">
             <input type="radio" id="pay-cliq" name="payment" value="Cliq" required>
-            <label for="pay-cliq">Pay with Cliq (0788838118)</label>
+            <label for="pay-cliq">Pay with Cliq (00962788838118)</label>
           </div>
           <div class="payment-option">
-            <input type="radio" id="pay-cash" name="payment" value="Cash" required>
+            <input type="radio" id="pay-cash" name="payment" value="Cash" required checked>
             <label for="pay-cash">Cash on Delivery</label>
           </div>
         </div>
         
         <div id="payment-proof-container" style="display: none;">
-          <label>Upload Payment Proof (if paying with Cliq)</label>
-          <input type="file" id="payment-proof">
+          <label for="payment-proof">Upload Payment Proof (required for Cliq)</label>
+          <input type="file" id="payment-proof" name="payment-proof" accept="image/*">
         </div>
         
-        <div class="price-display">
-          <div id="order-total-price">Total: 10 JDs</div>
+        <div class="order-total">
+          <h3>Order Total: <span id="order-total-price">0.00</span> JDs</h3>
         </div>
         
-        <button type="submit" class="btn">Confirm Order</button>
-        <button type="button" class="btn cancel" id="cancel-order">Cancel</button>
+        <div class="order-buttons">
+          <button type="submit" class="btn confirm-order-btn">
+            <i class="fas fa-check-circle"></i> Confirm Order
+          </button>
+          <button type="button" class="btn cancel-btn" id="cancel-order">
+            <i class="fas fa-times-circle"></i> Cancel
+          </button>
+        </div>
       </form>
     </div>
-  </div>
+</div>
 
   <!-- Order Confirmation Modal -->
   <div class="modal" id="order-confirmation">
@@ -851,46 +956,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="firebase-config.js"></script>
   <script src="charms.js"></script>
-  <script src="app.js"></script>
-  <script>
-    // Get DOM elements
-    const jewelryPiece = document.getElementById('jewelry-piece');
-    const fullGlamBtn = document.getElementById('full-glam-btn');
-    const goldVariantBtn = document.getElementById('gold-variant-btn');
-    const productBtns = document.querySelectorAll('.product-btn');
-    const materialOptions = document.querySelectorAll('.material-option');
-    const basePriceDisplay = document.getElementById('base-price');
-    const charmPriceDisplay = document.getElementById('charm-price');
-    const totalPriceDisplay = document.getElementById('total-price');
-    const specialCharmsGrid = document.getElementById('special-charms');
-    const rareCharmsGrid = document.getElementById('rare-charms');
-    const removeCharmModal = document.getElementById('remove-charm-modal');
-    const confirmRemoveBtn = document.getElementById('confirm-remove');
-    const cancelRemoveBtn = document.getElementById('cancel-remove');
-    const downloadBtn = document.getElementById('download-btn');
-    const orderBtn = document.getElementById('order-btn');
-    const orderModal = document.getElementById('order-modal');
-    const orderForm = document.getElementById('order-form');
-    const cancelOrderBtn = document.getElementById('cancel-order');
-    const orderConfirmation = document.getElementById('order-confirmation');
-    const closeConfirmation = document.getElementById('close-confirmation');
-    const payCliqOption = document.getElementById('pay-cliq');
-    const paymentProofContainer = document.getElementById('payment-proof-container');
-    const customCharmUpload = document.getElementById('custom-charm-upload');
-    const customCharmPreview = document.getElementById('custom-charm-preview');
-    const addCustomCharmBtn = document.getElementById('add-custom-charm');
-    const pricingToggle = document.getElementById('pricing-toggle');
-    const pricingInfo = document.querySelector('.pricing-info');
-    const sizeSelect = document.getElementById('size');
-    const addToCartBtn = document.getElementById('add-to-cart-btn');
-
-    // Product configurations
-    const products = {
-      bracelet: { basePrice: 10, slots: 18, includedSpecial: 2, fullGlam: 29 },
-      anklet: { basePrice: 15, slots: 23, includedSpecial: 2, fullGlam: 42 },
-      necklace: { basePrice: 22, slots: 34, includedSpecial: 2, fullGlam: 64 }
-    };
-  </script>
 </body>
 </html>
