@@ -379,6 +379,12 @@ function setupCartFunctionality() {
         cartElements.cartPreview.classList.remove('active');
     });
 
+    document.getElementById('order-btn').addEventListener('click', function() {
+  if (cart.length === 0) {
+    alert('Your cart is empty!');
+    return;
+  }
+
     /* UPDATED: Add to Cart Handler */
     document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
         const addToCartBtn = document.getElementById('add-to-cart-bottom');
@@ -448,10 +454,14 @@ if (placeOrderBtn) {
             alert('Your cart is empty!');
             return;
         }
-        
+
+        // Show the order modal
+          document.getElementById('order-modal').classList.add('active');
+          document.body.classList.add('modal-open');
+  
         // Update the order total in the form
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
+       const total = cart.reduce((sum, item) => sum + item.price, 0);
+  document.getElementById('order-total-price').textContent = total.toFixed(2) + ' JDs';
         
         // Show the order form modal
         document.body.classList.add('modal-open');
