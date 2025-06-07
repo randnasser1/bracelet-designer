@@ -532,21 +532,24 @@ body.modal-open {
     margin-top: 2rem;
 }
 
-#order-btn {
-    background: #d6336c;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 0.5rem;
+/* Add this to your CSS */
+.order-btn {
+  background: #d6336c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 0.5rem;
 }
 
-#order-btn:hover {
-    background: #c2255c;
+.order-btn:hover {
+  background: #c2255c;
 }
+
+
 
 .confirm-order-btn {
     background-color: #28a745;
