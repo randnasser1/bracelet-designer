@@ -174,23 +174,22 @@ function updateCartDisplay() {
     // Calculate total
     const total = cart.reduce((sum, item) => sum + item.price, 0);
     
-    // Update items list
     cartItemsContainer.innerHTML = cart.map(item => `
-        <div class="cart-item">
-            <div class="cart-item-preview">
-                <img src="${item.imageUrl}" alt="Bracelet Design" class="cart-item-image">
-                <div class="cart-item-details">
-                    <strong>${item.product.charAt(0).toUpperCase() + item.product.slice(1)}</strong>
-                    <div>Size: ${item.size}</div>
-                    <div>${item.isFullGlam ? 'Full Glam' : `${item.charms.length} charms`}</div>
-                    <div>${item.price.toFixed(2)} JDs</div>
-                </div>
-            </div>
-            <button class="remove-item" data-id="${item.id}">
-                <i class="fas fa-trash"></i>
-            </button>
+    <div class="cart-item">
+      <div class="cart-item-preview">
+        <img src="${item.imageUrl}" alt="Design Preview" class="cart-item-image">
+        <div class="cart-item-details">
+          <strong>${item.product.charAt(0).toUpperCase() + item.product.slice(1)}</strong>
+          <div>Size: ${item.size}</div>
+          <div>${item.isFullGlam ? 'Full Glam' : `${item.charms.length} charms`}</div>
+          <div>${item.price.toFixed(2)} JDs</div>
         </div>
-    `).join('');
+      </div>
+      <button class="remove-item" data-id="${item.id}">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  `).join('');
     
     // Update total and count
     cartTotalElement.textContent = `Total: ${total.toFixed(2)} JDs`;
