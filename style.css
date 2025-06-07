@@ -325,21 +325,23 @@ body {
 }
 
 .cart-item-preview {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 200px;
 }
 
 .cart-item-image {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    border: 1px solid #f5a0c2;
-    border-radius: 5px;
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border: 1px solid #f5a0c2;
+  border-radius: 5px;
 }
 
 .cart-item-details {
-    font-size: 0.9rem;
+  font-size: 0.9rem;
+  text-align: left;
 }
 
 .remove-item {
