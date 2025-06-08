@@ -963,9 +963,9 @@ function addCharmToSlot(slot, src, type, isSoldOut) {
       .map(img => img.dataset.charm);
     
     // Corrected line with proper parentheses:
-    const setCharmsPlaced = placedCharms.filter(placedSrc => 
-      charmSet.charms.some(charm => placedSrc.includes(charm))
-      .length;
+   const setCharmsPlaced = placedCharms
+  .filter(placedSrc => charmSet.charms.some(charm => placedSrc.includes(charm)))
+  .length;
     
     // Check if adding this charm would complete the set
     if (setCharmsPlaced + 1 === charmSet.requiredCount) {
