@@ -233,7 +233,60 @@ function updatePrice() {
         totalPrice.textContent = `Total: ${calculatePrice()} JDs`;
     }
 }
+function initProduct(product) {More actions
+    if (!PRODUCTS[product]) return;
 
+    currentProduct = product;
+
+    // Update size options based on product type
+    const sizeSelect = document.getElementById('size');
+    if (sizeSelect) {
+        sizeSelect.innerHTML = Object.entries(BRACELET_SIZES).map(([size, data]) => `
+            <option value="${size}">${data.display}</option>
+        `).join('');
+
+        // Reset to first size
+        currentSize = Object.keys(BRACELET_SIZES)[0];
+        sizeSelect.value = currentSize;
+    }
+
+    // Reset material to silver
+    materialType = 'silver';
+    document.querySelectorAll('.material-option').forEach(opt => {
+        opt.classList.remove('selected');
+        if (opt.dataset.material === 'silver') {
+            opt.classList.add('selected');
+        }
+    });
+
+    // Reset full glam
+    isFullGlam = false;
+    const fullGlamBtn = document.getElementById('full-glam-btn');
+    if (fullGlamBtn) {
+        fullGlamBtn.classList.remove('active');
+    }
+
+    // Clear all slots and create new ones
+    jewelryPiece.innerHTML = '';
+    maxSlots = PRODUCTS[product].slots;
+
+    for (let i = 0; i < maxSlots; i++) {
+        const slot = createBaseSlot();
+        jewelryPiece.appendChild(slot);
+    }
+
+    // Reset charm counts
+    specialCount = 0;
+    rareCount = 0;
+    customCount = 0;
+    includedSpecialUsed = 0;
+    usedCharms.clear();
+
+    // Update displays
+    updateBaseCharms();
+    updateCharmUsage();
+    updatePrice();
+}
 function setupEventListeners() {
     try {
         const productBtns = document.querySelectorAll('.product-btn');
