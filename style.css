@@ -1074,16 +1074,32 @@ body.modal-open {
     background: #f8f9fa;
     border-radius: 8px;
 }
-#delivery-fee, #order-delivery {
-    color: #666;
-    font-style: italic;
+.order-summary {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
 }
 
-#total-price, #order-total-price {
+.order-summary div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+#order-delivery {
+    color: #666;
+    font-size: 0.9em;
+}
+
+#order-total-price {
     font-weight: bold;
     color: #d6336c;
+    border-top: 1px solid #eee;
+    padding-top: 0.5rem;
     margin-top: 0.5rem;
 }
+
 .price-display {
     background: #f8f9fa;
     padding: 1rem;
