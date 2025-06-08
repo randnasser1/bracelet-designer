@@ -133,61 +133,53 @@ async function captureBraceletDesign() {
 
 // Function declarations
 function calculatePrice() {
-   const product = PRODUCTS[currentProduct];
+    const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
     
-    let totalPrice = product.basePrice + sizeData.price;
+    // Base price includes product base + size upgrade
+    let basePrice = product.basePrice + sizeData.price;
+    let totalPrice = basePrice;
     
-    if (currentProduct === 'bracelet') {
-        totalPrice += SIZE_CHARTS[currentProduct][currentSize].price;
-    }
-    
+    // Material upgrades
     if (materialType === 'gold') {
         totalPrice += 1;
     } else if (materialType === 'mix') {
         totalPrice += 2.5;
     }
 
-    if (isFullGlam) {
-        let glamPrice = PRODUCTS[currentProduct].fullGlam;
-        let specialCount = 0;
-        
-        const slots = document.querySelectorAll('.slot img:not([data-type="base"])');
-        slots.forEach(charm => {
-            const type = charm.dataset.type;
-            if (type === 'special') {
-                specialCount++;
-                if (specialCount > 18) {
-                    glamPrice += 2;
-                }
-            } else if (type === 'rare') {
-                glamPrice += 3;
-            } else if (type === 'custom') {
-                glamPrice += 3.5;
-            }
-        });
-        
-        return glamPrice;
-    }
-
-    const slots = document.querySelectorAll('.slot img:not([data-type="base"])');
+    // Count all placed charms
+    const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
     let specialCount = 0;
-    
-    slots.forEach(charm => {
+    let rareCount = 0;
+    let customCount = 0;
+
+    placedCharms.forEach(charm => {
         const type = charm.dataset.type;
-        if (type === 'special') {
-            specialCount++;
-            if (specialCount > PRODUCTS[currentProduct].includedSpecial) {
-                totalPrice += 2;
-            }
-        } else if (type === 'rare') {
-            totalPrice += 3;
-        } else if (type === 'custom') {
-            totalPrice += 3.5;
-        }
+        if (type === 'special') specialCount++;
+        else if (type === 'rare') rareCount++;
+        else if (type === 'custom') customCount++;
     });
 
-    return totalPrice;
+    // Full Glam pricing
+    if (isFullGlam) {
+        totalPrice = product.fullGlam;
+        // Full Glam includes baseSlots worth of free special charms
+        const paidSpecials = Math.max(0, specialCount - product.baseSlots);
+        totalPrice += paidSpecials * 2; // Extra special charms beyond free limit
+    } else {
+        // Regular pricing
+        const includedSpecials = product.includedSpecial;
+        const paidSpecials = Math.max(0, specialCount - includedSpecials);
+        totalPrice += paidSpecials * 2; // Additional special charms
+    }
+
+    // Add rare and custom charm costs
+    totalPrice += rareCount * 3;   // Rare charms cost 3 JDs each
+    totalPrice += customCount * 3.5; // Custom charms cost 3.5 JDs each
+
+    // Add delivery fee (will be shown separately in checkout)
+    const deliveryFee = 2.5;
+    return totalPrice + deliveryFee;
 }
 
 function updateJewelryPiece() {
@@ -272,6 +264,8 @@ function updatePrice() {
     // Get all placed charms (excluding base charms)
     const slots = document.querySelectorAll('.slot img:not([data-type="base"])');
     let specialCount = 0;
+    let rareCount = 0;
+    let customCount = 0;
     
     // Calculate charm costs
     slots.forEach(charm => {
@@ -282,8 +276,10 @@ function updatePrice() {
                 charmPrice += 2; // Additional special charms cost 2 JDs
             }
         } else if (type === 'rare') {
+            rareCount++;
             charmPrice += 3; // Rare charms cost 3 JDs
         } else if (type === 'custom') {
+            customCount++;
             charmPrice += 3.5; // Custom charms cost 3.5 JDs
         }
     });
@@ -294,6 +290,10 @@ function updatePrice() {
         const freeSpecials = product.baseSlots; // Full glam includes baseSlots worth of free special charms
         const paidSpecials = Math.max(0, specialCount - freeSpecials);
         charmPrice += paidSpecials * 2; // Extra special charms beyond free limit
+        
+        // Add rare and custom charm costs to Full Glam price
+        totalPrice += rareCount * 3;
+        totalPrice += customCount * 3.5;
     } else {
         totalPrice += charmPrice;
     }
@@ -305,7 +305,7 @@ function updatePrice() {
         totalPrice += 2.5;
     }
 
-     // Add delivery fee (will be shown separately in checkout)
+    // Add delivery fee
     const deliveryFee = 2.5;
     const subtotal = totalPrice;
     totalPrice += deliveryFee;
@@ -313,26 +313,48 @@ function updatePrice() {
     // Update price display
     const basePriceElement = document.getElementById('base-price');
     const charmPriceElement = document.getElementById('charm-price');
-    const deliveryElement = document.getElementById('delivery-fee'); // Add this element
     const totalPriceElement = document.getElementById('total-price');
 
-     if (isFullGlam) {
-        basePriceElement.textContent = `Full Glam Base Price: ${product.fullGlam} JDs`;
-        charmPriceElement.textContent = `Additional Charms: ${charmPrice} JDs (${Math.min(specialCount, product.baseSlots)}/${product.baseSlots} free specials used)`;
+    if (isFullGlam) {
+        basePriceElement.textContent = `Full Glam Base: ${product.fullGlam} JDs`;
+        let charmText = `Charms: ${Math.min(specialCount, product.baseSlots)}/${product.baseSlots} free specials`;
+        
+        if (paidSpecials > 0) {
+            charmText += `, ${paidSpecials} extra specials (+${paidSpecials * 2} JDs)`;
+        }
+        if (rareCount > 0) {
+            charmText += `, ${rareCount} rare (+${rareCount * 3} JDs)`;
+        }
+        if (customCount > 0) {
+            charmText += `, ${customCount} custom (+${customCount * 3.5} JDs)`;
+        }
+        
+        charmPriceElement.textContent = charmText;
     } else {
         const freeSpecials = product.includedSpecial;
         const paidSpecials = Math.max(0, specialCount - freeSpecials);
         
         basePriceElement.textContent = `Base Price: ${basePrice} JDs`;
-        charmPriceElement.textContent = `Charms: ${charmPrice} JDs (${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials used + ${paidSpecials} paid)`;
+        let charmText = `Charms: ${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials`;
+        
+        if (paidSpecials > 0) {
+            charmText += `, ${paidSpecials} paid specials (+${paidSpecials * 2} JDs)`;
+        }
+        if (rareCount > 0) {
+            charmText += `, ${rareCount} rare (+${rareCount * 3} JDs)`;
+        }
+        if (customCount > 0) {
+            charmText += `, ${customCount} custom (+${customCount * 3.5} JDs)`;
+        }
+        
+        charmPriceElement.textContent = charmText;
     }
 
-    // Show subtotal without delivery during design
-    totalPriceElement.textContent = `Subtotal: ${totalPrice.toFixed(2)} JDs`;
+    // Show final total including delivery
+    totalPriceElement.textContent = `Total: ${totalPrice.toFixed(2)} JDs (includes delivery)`;
     
     return totalPrice;
 }
-
 function initProduct(product) {
     if (!PRODUCTS[product]) return;
 
