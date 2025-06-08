@@ -117,7 +117,10 @@ async function captureBraceletDesign() {
 
 // Function declarations
 function calculatePrice() {
-    let totalPrice = PRODUCTS[currentProduct].basePrice;
+   const product = PRODUCTS[currentProduct];
+const sizeData = SIZE_CHARTS[currentProduct][currentSize];
+    
+    let totalPrice = product.basePrice + sizeData.price;
     
     if (currentProduct === 'bracelet') {
         totalPrice += BRACELET_SIZES[currentSize].price;
@@ -169,6 +172,17 @@ function calculatePrice() {
     });
 
     return totalPrice;
+}
+
+function updateJewelryPiece() {
+    const jewelryPiece = document.getElementById('jewelry-piece');
+    jewelryPiece.innerHTML = '';
+    
+    const slots = SIZE_CHARTS[currentProduct][currentSize].charms;
+    for (let i = 0; i < slots; i++) {
+        const slot = createBaseSlot();
+        jewelryPiece.appendChild(slot);
+    }
 }
 
 function updateCartDisplay() {
