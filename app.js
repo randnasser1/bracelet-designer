@@ -619,6 +619,7 @@ function blobToBase64(blob) {
 function setupOrderFunctionality() {
     console.log('Initializing order functionality...');
     
+    // Get all required elements
     orderModal = document.getElementById('order-modal');
     orderForm = document.getElementById('order-form');
     payCliqOption = document.getElementById('pay-cliq');
@@ -630,10 +631,12 @@ function setupOrderFunctionality() {
     const payCliqRadio = document.getElementById('pay-cliq');
     const cancelOrderBtn = document.getElementById('cancel-order-btn');
 
+    // Check for missing elements
     const missingElements = [];
     if (!orderModal) missingElements.push('order-modal');
     if (!orderForm) missingElements.push('order-form');
     if (!placeOrderBtn) missingElements.push('order-btn');
+    if (!cancelOrderBtn) missingElements.push('cancel-order-btn');
     
     if (missingElements.length > 0) {
         console.error('Missing required elements:', missingElements.join(', '));
@@ -643,8 +646,8 @@ function setupOrderFunctionality() {
 
     // Remove any existing event listeners to prevent duplicates
     orderForm.removeEventListener('submit', handleFormSubmit);
-    if (placeOrderBtn) placeOrderBtn.removeEventListener('click', handlePlaceOrderClick);
-    if (cancelOrderBtn) cancelOrderBtn.removeEventListener('click', handleCancelOrder);
+    placeOrderBtn.removeEventListener('click', handlePlaceOrderClick);
+    cancelOrderBtn.removeEventListener('click', handleCancelOrder);
     if (closeConfirmation) closeConfirmation.removeEventListener('click', handleCloseConfirmation);
     if (payCliqRadio) payCliqRadio.removeEventListener('change', handlePaymentChange);
 
@@ -673,8 +676,8 @@ function setupOrderFunctionality() {
     }
 
     function handleCancelOrder() {
-        document.body.classList.remove('modal-open');
         orderModal.classList.remove('active');
+        document.body.classList.remove('modal-open');
         if (orderForm) orderForm.reset();
     }
 
@@ -694,7 +697,7 @@ function setupOrderFunctionality() {
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     
         try {
-            // 1. First validate form fields
+            // 1. Validate form fields
             const formData = new FormData(form);
             const requiredFields = ['full-name', 'phone', 'governorate', 'address', 'payment'];
             const missingFields = requiredFields.filter(field => !formData.get(field));
@@ -707,14 +710,28 @@ function setupOrderFunctionality() {
                 throw new Error('Payment proof is required for Cliq payments');
             }
             
-            // 2. Validate charm sets before proceeding
-            const invalidSets = validateCharmSets();
+            // 2. Validate charm sets in cart
+            const invalidSets = [];
+            cart.forEach(item => {
+                const placedCharms = item.charms.map(charm => charm.src);
+                
+                Object.values(CHARM_SETS).forEach(set => {
+                    const foundCharms = set.charms.filter(charm => 
+                        placedCharms.some(placed => placed.includes(charm))
+                    );
+                    
+                    if (foundCharms.length > 0 && foundCharms.length < set.requiredCount) {
+                        invalidSets.push(set);
+                    }
+                });
+            });
+            
             if (invalidSets.length > 0) {
                 const errorMessages = invalidSets.map(set => set.message).join('\n\n');
-                throw new Error(errorMessages);
+                throw new Error(`Please complete these charm sets:\n\n${errorMessages}`);
             }
             
-            // 3. Proceed with order submission if validation passes
+            // 3. Proceed with order submission
             const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
             const deliveryFee = 2.5;
             const total = subtotal + deliveryFee;
@@ -774,12 +791,12 @@ function setupOrderFunctionality() {
         } catch (error) {
             console.error('Order submission failed:', error);
             
-            if (error.message.includes('Missing required fields')) {
+            if (error.message.includes('Please complete these charm sets')) {
+                alert(error.message);
+            } else if (error.message.includes('Missing required fields')) {
                 alert(error.message);
             } else if (error.message.includes('payment proof')) {
                 alert('Please upload payment proof for Cliq payments');
-            } else if (error.message.includes('cart is empty')) {
-                alert('Your cart is empty. Please add items before ordering.');
             } else {
                 alert('Order submission failed. Please check your connection and try again.');
             }
@@ -792,8 +809,8 @@ function setupOrderFunctionality() {
 
     // Add event listeners
     orderForm.addEventListener('submit', handleFormSubmit);
-    if (placeOrderBtn) placeOrderBtn.addEventListener('click', handlePlaceOrderClick);
-    if (cancelOrderBtn) cancelOrderBtn.addEventListener('click', handleCancelOrder);
+    placeOrderBtn.addEventListener('click', handlePlaceOrderClick);
+    cancelOrderBtn.addEventListener('click', handleCancelOrder);
     if (closeConfirmation) closeConfirmation.addEventListener('click', handleCloseConfirmation);
     if (payCliqRadio) payCliqRadio.addEventListener('change', handlePaymentChange);
 
@@ -910,17 +927,19 @@ function handleSlotClick(slot) {
     const charmSet = getCharmSet(charmSrc);
     
     if (charmSet) {
-      // Check if all required charms from the set are being added
-      const selectedCharms = Array.from(document.querySelectorAll('.slot img:not([data-type="base"])'))
+      // Check if we're adding the first charm of a set
+      const placedCharms = Array.from(document.querySelectorAll('.slot img:not([data-type="base"])'))
         .map(img => img.dataset.charm);
       
-      const hasOtherSetCharms = selectedCharms.some(src => 
-        charmSet.charms.some(charm => src.includes(charm) && !src.includes(charmSrc))
+      const hasOtherSetCharms = placedCharms.some(src => 
+        charmSet.charms.some(charm => src.includes(charm))
       );
       
+      // If this is the first charm of a set, just warn but allow adding
       if (!hasOtherSetCharms) {
-        alert(charmSet.message);
-        return;
+        if (!confirm(`${charmSet.message}\n\nDo you want to add this charm anyway?`)) {
+          return;
+        }
       }
     }
     
