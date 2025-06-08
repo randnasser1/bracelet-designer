@@ -288,9 +288,15 @@ function updatePrice() {
         totalPrice += 2.5;
     }
 
+     // Add delivery fee (will be shown separately in checkout)
+    const deliveryFee = 2.5;
+    const subtotal = totalPrice;
+    totalPrice += deliveryFee;
+
     // Update price display
     const basePriceElement = document.getElementById('base-price');
     const charmPriceElement = document.getElementById('charm-price');
+    const deliveryElement = document.getElementById('delivery-fee'); // Add this element
     const totalPriceElement = document.getElementById('total-price');
 
     if (isFullGlam) {
@@ -304,7 +310,9 @@ function updatePrice() {
         charmPriceElement.textContent = `Charms: ${charmPrice} JDs (${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials used + ${paidSpecials} paid)`;
     }
 
-    totalPriceElement.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
+    // Add delivery fee display
+    deliveryElement.textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    totalPriceElement.textContent = `Total: ${totalPrice.toFixed(2)} JDs (includes delivery)`;
     
     return totalPrice;
 }
@@ -666,7 +674,14 @@ function setupOrderFunctionality() {
             if (cart.length === 0) {
                 throw new Error('Your cart is empty');
             }
-    
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            const deliveryFee = 2.5;
+            const orderTotal = total + deliveryFee;
+            
+            document.getElementById('order-subtotal').textContent = `Subtotal: ${total.toFixed(2)} JDs`;
+            document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+            document.getElementById('order-total-price').textContent = `Total: ${orderTotal.toFixed(2)} JDs (includes delivery)`;
+                
             const orderData = {
                 clientOrderId: `client-${Date.now()}-${Math.random().toString(36).substr(2, 8)}`,
                 customer: {
