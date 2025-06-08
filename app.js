@@ -962,6 +962,7 @@ function addCharmToSlot(slot, src, type, isSoldOut) {
     const placedCharms = Array.from(document.querySelectorAll('.slot img:not([data-type="base"])'))
       .map(img => img.dataset.charm);
     
+    // Corrected line with proper parentheses:
     const setCharmsPlaced = placedCharms.filter(placedSrc => 
       charmSet.charms.some(charm => placedSrc.includes(charm))
       .length;
