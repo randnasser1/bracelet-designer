@@ -667,39 +667,35 @@ function setupOrderFunctionality() {
     
         const form = e.target;
         const submitButton = form.querySelector('button[type="submit"]');
-        const orderIdSpan = document.getElementById('order-id');
-        const orderModal = document.getElementById('order-modal');
-        const orderConfirmation = document.getElementById('order-confirmation');
-    
-        if (!form || !submitButton || !orderModal || !orderConfirmation) {
-            console.error('Missing required elements during form submission');
-            alert('Form submission error. Please refresh and try again.');
-            return;
-        }
     
         submitButton.disabled = true;
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        window.orderSubmissionInProgress = true;
     
         try {
+            // 1. First validate form fields
             const formData = new FormData(form);
             const requiredFields = ['full-name', 'phone', 'governorate', 'address', 'payment'];
             const missingFields = requiredFields.filter(field => !formData.get(field));
-    
+            
             if (missingFields.length > 0) {
                 throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
             }
-    
+            
             if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
                 throw new Error('Payment proof is required for Cliq payments');
             }
-    
-            if (cart.length === 0) {
-                throw new Error('Your cart is empty');
+            
+            // 2. Validate charm sets before proceeding
+            const invalidSets = validateCharmSets();
+            if (invalidSets.length > 0) {
+                const errorMessages = invalidSets.map(set => set.message).join('\n\n');
+                throw new Error(errorMessages);
             }
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            
+            // 3. Proceed with order submission if validation passes
+            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
             const deliveryFee = 2.5;
-            const orderTotal = total + deliveryFee;
+            const total = subtotal + deliveryFee;
             
             document.getElementById('order-subtotal').textContent = `Subtotal: ${total.toFixed(2)} JDs`;
             document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
@@ -872,7 +868,31 @@ function initJewelryPiece() {
         jewelryPiece.appendChild(slot);
     }
 }
-
+function validateCharmSets() {
+    const invalidSets = [];
+    const placedCharms = [];
+    
+    // Collect all placed charms from all cart items
+    cart.forEach(item => {
+        item.charms.forEach(charm => {
+            placedCharms.push(charm.src);
+        });
+    });
+    
+    // Check each charm set requirement
+    Object.values(CHARM_SETS).forEach(set => {
+        const foundCharms = set.charms.filter(charm => 
+            placedCharms.some(placed => placed.includes(charm))
+        );
+        
+        // If some but not all charms from set are present
+        if (foundCharms.length > 0 && foundCharms.length < set.requiredCount) {
+            invalidSets.push(set);
+        }
+    });
+    
+    return invalidSets;
+}
 function createSlots(slotCount) {
     for (let i = 0; i < slotCount; i++) {
         const slot = document.createElement('div');
