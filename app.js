@@ -617,30 +617,32 @@ function blobToBase64(blob) {
 }
 
 function setupOrderFunctionality() {
-    console.log('Initializing order functionality...');
-    
-    // Get all required elements
+    // First get ALL required elements
     orderModal = document.getElementById('order-modal');
     orderForm = document.getElementById('order-form');
+    orderIdSpan = document.getElementById('order-id'); // Add this line
     payCliqOption = document.getElementById('pay-cliq');
     paymentProofContainer = document.getElementById('payment-proof-container');
     orderConfirmation = document.getElementById('order-confirmation');
     closeConfirmation = document.getElementById('close-confirmation');
-    orderIdSpan = document.getElementById('order-id');
-    const placeOrderBtn = document.getElementById('order-btn');
-    const payCliqRadio = document.getElementById('pay-cliq');
-    const cancelOrderBtn = document.getElementById('cancel-order-btn');
-
-    // Check for missing elements
-    const missingElements = [];
-    if (!orderModal) missingElements.push('order-modal');
-    if (!orderForm) missingElements.push('order-form');
-    if (!placeOrderBtn) missingElements.push('order-btn');
-    if (!cancelOrderBtn) missingElements.push('cancel-order-btn');
+    
+    // Check for missing critical elements
+    const requiredElements = [
+        orderModal, orderForm, orderIdSpan, 
+        document.getElementById('order-subtotal'),
+        document.getElementById('order-delivery'),
+        document.getElementById('order-total-price')
+    ];
+    
+    const missingElements = requiredElements
+        .map((el, i) => !el ? ['order-modal','order-form','order-id',
+                              'order-subtotal','order-delivery',
+                              'order-total-price'][i] : null)
+        .filter(Boolean);
     
     if (missingElements.length > 0) {
         console.error('Missing required elements:', missingElements.join(', '));
-        alert('Critical components failed to load. Please refresh the page.');
+        alert('Some order components failed to load. Please refresh the page.');
         return;
     }
 
@@ -658,23 +660,33 @@ function setupOrderFunctionality() {
     }
 
     function handlePlaceOrderClick() {
-        if (cart.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-        
-        const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-        const deliveryFee = 2.5;
-        const total = subtotal + deliveryFee;
-        
-        document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
-        document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
-        document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
-        
-        document.body.classList.add('modal-open');
-        orderModal.classList.add('active');
+    if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
     }
-
+    
+    // First check if elements exist
+    const subtotalElement = document.getElementById('order-subtotal');
+    const deliveryElement = document.getElementById('order-delivery');
+    const totalElement = document.getElementById('order-total-price');
+    
+    if (!subtotalElement || !deliveryElement || !totalElement) {
+        console.error('Missing required price display elements');
+        return;
+    }
+    
+    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+    const deliveryFee = 2.5;
+    const total = subtotal + deliveryFee;
+    
+    // Now we know elements exist
+    subtotalElement.textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
+    deliveryElement.textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    totalElement.textContent = `Total: ${total.toFixed(2)} JDs`;
+    
+    document.body.classList.add('modal-open');
+    orderModal.classList.add('active');
+}
     function handleCancelOrder() {
         orderModal.classList.remove('active');
         document.body.classList.remove('modal-open');
@@ -783,7 +795,12 @@ function setupOrderFunctionality() {
             updateCartDisplay();
             form.reset();
     
-            if (orderIdSpan) orderIdSpan.textContent = orderRef.id;
+            const orderIdElement = document.getElementById('order-id');
+            if (orderIdElement) {
+                orderIdElement.textContent = orderRef.id;
+            } else {
+                console.error('Order ID element not found');
+            }
             orderModal.classList.remove('active');
             orderConfirmation.classList.add('active');
             document.body.classList.remove('modal-open');
