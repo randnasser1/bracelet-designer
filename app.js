@@ -1593,6 +1593,7 @@ function updateJewelrySize(size) {
 }
 document.addEventListener('DOMContentLoaded', () => {
     try {
+        // Initialize Firebase if not already initialized
         if (!window.firebaseInitialized) {
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
@@ -1603,6 +1604,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.firebaseInitialized = true;
         }
 
+        // Get DOM elements
         jewelryPiece = document.getElementById('jewelry-piece');
         specialCharmsGrid = document.getElementById('special-charms');
         rareCharmsGrid = document.getElementById('rare-charms');
@@ -1612,13 +1614,15 @@ document.addEventListener('DOMContentLoaded', () => {
         specialCategoryTabs = document.querySelectorAll('#special-categories .category-tab');
         rareCategoryTabs = document.querySelectorAll('#rare-categories .category-tab');
         
+        // Cart elements
         cartButton = document.getElementById('cart-button');
         cartPreview = document.getElementById('cart-preview');
         cartCloseBtn = document.querySelector('.cart-close-btn');
         addToCartBtn = document.getElementById('add-to-cart-bottom');
         cartItems = document.getElementById('cart-items');
         placeOrderBtn = document.getElementById('order-btn');
-                
+        
+        // Order elements
         orderModal = document.getElementById('order-modal');
         orderForm = document.getElementById('order-form');
         payCliqOption = document.getElementById('pay-cliq');
@@ -1627,18 +1631,60 @@ document.addEventListener('DOMContentLoaded', () => {
         closeConfirmation = document.getElementById('close-confirmation');
         orderIdSpan = document.getElementById('order-id');
 
+        // Set default product to bracelet
+        currentProduct = 'bracelet';
+        currentSize = '15.2-16.2';
+        maxSlots = SIZE_CHARTS[currentProduct][currentSize].charms;
+        
+        // Initialize bracelet by default
+        const braceletBtn = document.querySelector('.product-btn[data-type="bracelet"]');
+        if (braceletBtn) {
+            braceletBtn.classList.add('active');
+        }
+        
+        // Initialize jewelry piece with bracelet
         initJewelryPiece();
+        
+        // Initialize size selector with bracelet sizes
+        const sizeSelect = document.getElementById('size');
+        if (sizeSelect) {
+            sizeSelect.innerHTML = '';
+            Object.entries(SIZE_CHARTS.bracelet).forEach(([size, data]) => {
+                const option = document.createElement('option');
+                option.value = size;
+                option.textContent = data.display;
+                sizeSelect.appendChild(option);
+            });
+            sizeSelect.value = currentSize;
+        }
+        
+        // Initialize material selector
+        const silverOption = document.querySelector('.material-option[data-material="silver"]');
+        if (silverOption) {
+            silverOption.classList.add('selected');
+        }
+        
+        // Set up event listeners
         setupEventListeners();
         
+        // Set up custom charm handlers
         if (customCharmUpload && customCharmPreview && addCustomCharmBtn) {
             setupCustomCharmHandlers();
         }
 
+        // Initialize order functionality if not already done
         if (!window.orderFormInitialized) {
             setupOrderFunctionality();
             window.orderFormInitialized = true;
         }
-       
+        
+        // Update price display
+        updatePrice();
+        
+        // Initialize charm displays
+        updateSpecialCharmsDisplay();
+        updateRareCharmsDisplay();
+        
     } catch (error) {
         console.error('Initialization error:', error);
         alert('Failed to initialize application. Please refresh the page.');
