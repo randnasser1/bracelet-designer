@@ -70,7 +70,7 @@ window.orderFormInitialized = false;
 let currentProduct = 'bracelet';
 let currentSize = '15.2-16.2';
 let isFullGlam = false;
-let maxSlots = BRACELET_SIZES[currentSize].charms;
+let maxSlots = SIZE_CHARTS[currentProduct][currentSize].charms;
 let materialType = 'silver';
 let specialCount = 0;
 let rareCount = 0;
@@ -118,12 +118,12 @@ async function captureBraceletDesign() {
 // Function declarations
 function calculatePrice() {
    const product = PRODUCTS[currentProduct];
-const sizeData = SIZE_CHARTS[currentProduct][currentSize];
+    const sizeData = SIZE_CHARTS[currentProduct][currentSize];
     
     let totalPrice = product.basePrice + sizeData.price;
     
     if (currentProduct === 'bracelet') {
-        totalPrice += BRACELET_SIZES[currentSize].price;
+        totalPrice += SIZE_CHARTS[currentProduct][currentSize].price;
     }
     
     if (materialType === 'gold') {
