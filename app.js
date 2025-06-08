@@ -221,52 +221,69 @@ function updateCartDisplay() {
 }
 
 function updatePrice() {
-    const basePrice = document.getElementById('base-price');
-    const charmPrice = document.getElementById('charm-price');
-    const totalPrice = document.getElementById('total-price');
+    const product = PRODUCTS[currentProduct];
+    const sizeData = SIZE_CHARTS[currentProduct][currentSize];
     
-    if (!basePrice || !charmPrice || !totalPrice) return;
-
+    // Calculate base price (product base + size upgrade)
+    let basePrice = product.basePrice + sizeData.price;
+    let totalPrice = basePrice;
+    let charmPrice = 0;
+    
+    // Get all placed charms (excluding base charms)
     const slots = document.querySelectorAll('.slot img:not([data-type="base"])');
     let specialCount = 0;
-    let additionalCharmPrice = 0;
     
+    // Calculate charm costs
     slots.forEach(charm => {
         const type = charm.dataset.type;
         if (type === 'special') {
             specialCount++;
-            if (!isFullGlam && specialCount > PRODUCTS[currentProduct].includedSpecial) {
-                additionalCharmPrice += 2;
+            if (!isFullGlam && specialCount > product.includedSpecial) {
+                charmPrice += 2; // Additional special charms cost 2 JDs
             }
         } else if (type === 'rare') {
-            additionalCharmPrice += 3;
+            charmPrice += 3; // Rare charms cost 3 JDs
         } else if (type === 'custom') {
-            additionalCharmPrice += 3.5;
+            charmPrice += 3.5; // Custom charms cost 3.5 JDs
         }
     });
 
-    const productBasePrice = PRODUCTS[currentProduct].basePrice;
-    const sizePrice = currentProduct === 'bracelet' ? BRACELET_SIZES[currentSize].price : 0;
-    let materialPriceAdd = 0;
-    if (materialType === 'gold') materialPriceAdd = 1;
-    else if (materialType === 'mix') materialPriceAdd = 2.5;
+    // Full Glam pricing
+    if (isFullGlam) {
+        totalPrice = product.fullGlam;
+        const freeSpecials = product.baseSlots; // Full glam includes baseSlots worth of free special charms
+        const paidSpecials = Math.max(0, specialCount - freeSpecials);
+        charmPrice += paidSpecials * 2; // Extra special charms beyond free limit
+    } else {
+        totalPrice += charmPrice;
+    }
+
+    // Material upgrades
+    if (materialType === 'gold') {
+        totalPrice += 1;
+    } else if (materialType === 'mix') {
+        totalPrice += 2.5;
+    }
+
+    // Update price display
+    const basePriceElement = document.getElementById('base-price');
+    const charmPriceElement = document.getElementById('charm-price');
+    const totalPriceElement = document.getElementById('total-price');
 
     if (isFullGlam) {
-        const freeSpecials = 18;
-        const paidSpecials = Math.max(0, specialCount - freeSpecials);
-        const specialCharmPrice = paidSpecials * 2;
-        
-        basePrice.textContent = `Full Glam Base Price: ${PRODUCTS[currentProduct].fullGlam} JDs`;
-        charmPrice.textContent = `Additional Charms: ${additionalCharmPrice + specialCharmPrice} JDs (${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials used)`;
-        totalPrice.textContent = `Total: ${calculatePrice()} JDs`;
+        basePriceElement.textContent = `Full Glam Base Price: ${product.fullGlam} JDs`;
+        charmPriceElement.textContent = `Additional Charms: ${charmPrice} JDs (${Math.min(specialCount, product.baseSlots)}/${product.baseSlots} free specials used)`;
     } else {
-        const freeSpecials = PRODUCTS[currentProduct].includedSpecial;
+        const freeSpecials = product.includedSpecial;
         const paidSpecials = Math.max(0, specialCount - freeSpecials);
         
-        basePrice.textContent = `Base Price: ${productBasePrice + sizePrice + materialPriceAdd} JDs`;
-        charmPrice.textContent = `Charms: ${additionalCharmPrice} JDs (${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials used + ${paidSpecials} paid)`;
-        totalPrice.textContent = `Total: ${calculatePrice()} JDs`;
+        basePriceElement.textContent = `Base Price: ${basePrice} JDs`;
+        charmPriceElement.textContent = `Charms: ${charmPrice} JDs (${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials used + ${paidSpecials} paid)`;
     }
+
+    totalPriceElement.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
+    
+    return totalPrice;
 }
 function initProduct(product) {
     if (!PRODUCTS[product]) return;
@@ -775,7 +792,8 @@ function setupOrderFunctionality() {
 
 // Update size-based slot counts to match the HTML select options
 // Initialize maxSlots based on current size
-maxSlots = BRACELET_SIZES[currentSize].charms;
+ maxSlots = SIZE_CHARTS[currentProduct][currentSize].charms;
+
 
 function initJewelryPiece() {
     const jewelryPiece = document.getElementById('jewelry-piece');
@@ -787,7 +805,7 @@ function initJewelryPiece() {
     jewelryPiece.innerHTML = '';
     
     // Create slots based on initial size
-    const initialSlots = BRACELET_SIZES[currentSize].charms;
+    const initialSlots = SIZE_CHARTS[currentProduct][currentSize].charms;
     for (let i = 0; i < initialSlots; i++) {
         const slot = createBaseSlot();
         jewelryPiece.appendChild(slot);
@@ -1381,14 +1399,20 @@ function setupCustomCharmHandlers() {
         selectedCharm.classList.add('selected');
     });
 }
-function updateBraceletSize(size) {
-    if (!BRACELET_SIZES[size]) return;
+function updateJewelrySize(size) {
+    // Get the size chart for current product
+    const sizeChart = SIZE_CHARTS[currentProduct];
+    
+    // Verify the size exists for current product
+    if (!sizeChart || !sizeChart[size]) return;
     
     const oldSize = currentSize;
     currentSize = size;
-    maxSlots = BRACELET_SIZES[size].charms;
     
-    // Get current charm configuration
+    // Update max slots based on current product and size
+    maxSlots = sizeChart[size].charms;
+    
+    // Get current charm configuration before changing size
     const currentConfig = [];
     const slots = Array.from(jewelryPiece.children);
     slots.forEach(slot => {
@@ -1405,34 +1429,33 @@ function updateBraceletSize(size) {
         }
     });
 
-    // Clear and rebuild the bracelet with new size
+    // Clear and rebuild with new size
     jewelryPiece.innerHTML = '';
     
-    // Create all needed slots for the new size
+    // Create new slots
     for (let i = 0; i < maxSlots; i++) {
         const slot = createBaseSlot();
         jewelryPiece.appendChild(slot);
     }
 
-    // Reapply charms from the configuration up to the new size limit
+    // Reapply charms up to new size limit
     let slotIndex = 0;
     let charmsAdded = 0;
     
     currentConfig.forEach((config, i) => {
-        if (charmsAdded >= maxSlots) return; // Don't exceed new max slots
+        if (charmsAdded >= maxSlots) return;
         
         if (config) {
             const currentSlot = jewelryPiece.children[slotIndex];
-            if (!currentSlot) return; // Skip if we've run out of slots
+            if (!currentSlot) return;
             
             if (config.isLong && slotIndex < maxSlots - 1) {
+                // Handle long charm placement
                 const nextSlot = jewelryPiece.children[slotIndex + 1];
-                if (nextSlot && charmsAdded < maxSlots - 1) { // Check if we have space for long charm
-                    // Create long charm container
+                if (nextSlot && charmsAdded < maxSlots - 1) {
                     const longContainer = document.createElement('div');
                     longContainer.className = 'slot long-slot';
                     
-                    // Add the long charm image
                     const longCharm = document.createElement('img');
                     longCharm.src = config.src;
                     longCharm.className = 'long-charm';
@@ -1444,20 +1467,18 @@ function updateBraceletSize(size) {
                     }
                     
                     longContainer.appendChild(longCharm);
-                    
-                    // Replace the two slots with the long container
                     currentSlot.replaceWith(longContainer);
                     nextSlot.remove();
                     
-                    // Add click handler
                     longContainer.addEventListener('click', function() {
                         handleSlotClick(this);
                     });
                     
                     slotIndex += 2;
-                    charmsAdded += 2; // Long charm counts as 2
+                    charmsAdded += 2;
                 }
             } else if (!config.isLong) {
+                // Regular charm placement
                 addCharmToSlot(currentSlot, config.src, config.type, config.isSoldOut);
                 slotIndex++;
                 charmsAdded++;
@@ -1467,14 +1488,14 @@ function updateBraceletSize(size) {
         }
     });
 
-    // If we're increasing the size, add new empty slots
+    // If increasing size, add empty slots if needed
     while (jewelryPiece.children.length < maxSlots) {
         const slot = createBaseSlot();
         jewelryPiece.appendChild(slot);
     }
     
     updateCharmUsage();
-    calculatePrice();
+    updatePrice();
 }
 document.addEventListener('DOMContentLoaded', () => {
     try {
