@@ -551,7 +551,16 @@ body.modal-open {
   background: #c2255c;
 }
 
+/* For ring display - smaller slots */
+.product-ring #jewelry-piece .slot {
+    width: 40px;
+    height: 40px;
+}
 
+.product-ring #jewelry-piece .slot img {
+    width: 36px;
+    height: 36px;
+}
 
 .confirm-order-btn {
     background-color: #28a745;
