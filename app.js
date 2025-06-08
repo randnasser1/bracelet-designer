@@ -1216,7 +1216,69 @@ function setupCategoryTabs() {
         updateRareCharmsDisplay();
     }
 }
+function setupCustomCharmHandlers() {
+    // Get DOM elements
+    const customCharmUpload = document.getElementById('custom-charm-upload');
+    const customCharmPreview = document.getElementById('custom-charm-preview');
+    const addCustomCharmBtn = document.getElementById('add-custom-charm');
 
+    if (!customCharmUpload || !customCharmPreview || !addCustomCharmBtn) {
+        console.error('Custom charm elements not found');
+        return;
+    }
+
+    // Handle file selection
+    customCharmUpload.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Check if file is an image
+        if (!file.type.match('image.*')) {
+            alert('Please select an image file');
+            return;
+        }
+
+        // Create preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            customCharmPreview.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            customCharmPreview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Handle add custom charm button
+    addCustomCharmBtn.addEventListener('click', function() {
+        const img = customCharmPreview.querySelector('img');
+        if (!img) {
+            alert('Please upload an image first');
+            return;
+        }
+
+        // Create a custom charm object
+        const customCharm = {
+            src: img.src,
+            type: 'custom',
+            element: img.cloneNode(true)
+        };
+
+        // Set this as the selected charm
+        selectedCharm = customCharm.element;
+        selectedCharm.dataset.type = 'custom';
+        selectedCharm.dataset.charm = img.src;
+        selectedCharm.classList.add('custom-charm');
+
+        // Clear the upload
+        customCharmPreview.innerHTML = '<span>Preview</span>';
+        customCharmUpload.value = '';
+
+        // Highlight the charm as selected
+        document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
+        selectedCharm.classList.add('selected');
+    });
+}
 function updateBraceletSize(size) {
     if (!BRACELET_SIZES[size]) return;
     
