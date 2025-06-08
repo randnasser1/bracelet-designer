@@ -380,13 +380,11 @@ function setupEventListeners() {
             });
         });
 
-        if (sizeSelect) {
-            sizeSelect.addEventListener('change', () => {
-                currentSize = sizeSelect.value;
-                updateBraceletSize(currentSize);
-                updatePrice();
-            });
-        }
+        // Updated correct code
+        sizeSelect.addEventListener('change', () => {
+            updateJewelrySize(sizeSelect.value); // Now using the correct function name
+            updatePrice(); // Make sure to update the price display too
+        });
 
         if (fullGlamBtn) {
             fullGlamBtn.addEventListener('click', () => {
