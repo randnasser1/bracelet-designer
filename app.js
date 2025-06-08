@@ -215,12 +215,14 @@ function updateCartDisplay() {
     
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
-        cartTotalElement.textContent = 'Total: 0 JDs';
+        cartTotalElement.innerHTML = 'Total: 0 JDs';
         cartCountElement.textContent = '0';
         return;
     }
     
-    const total = cart.reduce((sum, item) => sum + item.price, 0);
+    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+    const deliveryFee = 2.5;
+    const total = subtotal + deliveryFee;
     
     cartItemsContainer.innerHTML = cart.map(item => `
         <div class="cart-item">
@@ -239,10 +241,25 @@ function updateCartDisplay() {
         </div>
     `).join('');
     
-    cartTotalElement.textContent = `Total: ${total.toFixed(2)} JDs`;
+    cartTotalElement.innerHTML = `
+        <div class="price-breakdown">
+            <div class="price-row">
+                <span>Subtotal:</span>
+                <span>${subtotal.toFixed(2)} JDs</span>
+            </div>
+            <div class="price-row delivery-fee">
+                <span>Delivery Fee:</span>
+                <span>${deliveryFee.toFixed(2)} JDs</span>
+            </div>
+            <div class="price-row total-price">
+                <span>Total:</span>
+                <span>${total.toFixed(2)} JDs</span>
+            </div>
+        </div>
+    `;
+    
     cartCountElement.textContent = cart.length;
 }
-
 function updatePrice() {
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
@@ -299,7 +316,7 @@ function updatePrice() {
     const deliveryElement = document.getElementById('delivery-fee'); // Add this element
     const totalPriceElement = document.getElementById('total-price');
 
-    if (isFullGlam) {
+     if (isFullGlam) {
         basePriceElement.textContent = `Full Glam Base Price: ${product.fullGlam} JDs`;
         charmPriceElement.textContent = `Additional Charms: ${charmPrice} JDs (${Math.min(specialCount, product.baseSlots)}/${product.baseSlots} free specials used)`;
     } else {
@@ -310,12 +327,12 @@ function updatePrice() {
         charmPriceElement.textContent = `Charms: ${charmPrice} JDs (${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials used + ${paidSpecials} paid)`;
     }
 
-    // Add delivery fee display
-    deliveryElement.textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
-    totalPriceElement.textContent = `Total: ${totalPrice.toFixed(2)} JDs (includes delivery)`;
+    // Show subtotal without delivery during design
+    totalPriceElement.textContent = `Subtotal: ${totalPrice.toFixed(2)} JDs`;
     
     return totalPrice;
 }
+
 function initProduct(product) {
     if (!PRODUCTS[product]) return;
 
@@ -616,17 +633,23 @@ function setupOrderFunctionality() {
     }
 
     function handlePlaceOrderClick() {
-        if (cart.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-        
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
-        
-        document.body.classList.add('modal-open');
-        orderModal.classList.add('active');
+    if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
     }
+    
+    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+    const deliveryFee = 2.5;
+    const total = subtotal + deliveryFee;
+    
+    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
+    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
+    
+    document.body.classList.add('modal-open');
+    orderModal.classList.add('active');
+}
+
 
     function handleCancelOrder() {
         document.body.classList.remove('modal-open');
@@ -704,7 +727,9 @@ function setupOrderFunctionality() {
                     materialType: item.materialType,
                     timestamp: new Date().toISOString()
                 }))),
-                total: cart.reduce((sum, item) => sum + item.price, 0),
+                subtotal: cart.reduce((sum, item) => sum + item.price, 0),
+                deliveryFee: 2.5,
+                total: cart.reduce((sum, item) => sum + item.price, 0) + 2.5,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 status: 'pending'
             };
