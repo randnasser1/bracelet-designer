@@ -24,20 +24,41 @@ let closeConfirmation;
 
 // Constants
 const MAX_SLOT_SPACES = 16;
-const BRACELET_SIZES = {
-    '15.2-16.2': { charms: 18, price: 0, display: '15.2cm - 16.2cm (18 charms)' },
-    '16.2-17.1': { charms: 19, price: 0.5, display: '16.2cm - 17.1cm (+0.5 JDs, 19 charms)' },
-    '17.1-18.1': { charms: 20, price: 1, display: '17.1cm - 18.1cm (+1 JD, 20 charms)' },
-    '18.1-19.2': { charms: 21, price: 1.5, display: '18.1cm - 19.2cm (+1.5 JDs, 21 charms)' },
-    '19.2-20': { charms: 22, price: 2, display: '19.2cm - 20cm (+2 JDs, 22 charms)' },
-    '20-21': { charms: 23, price: 2.5, display: '20cm - 21cm (+2.5 JDs, 23 charms)' },
-    '21-22': { charms: 24, price: 3, display: '21cm - 22cm (+3 JDs, 24 charms)' }
+const SIZE_CHARTS = {
+    bracelet: {
+        '15.2-16.2': { charms: 18, price: 0, display: '15.2cm - 16.2cm (18 charms)' },
+        '16.2-17.1': { charms: 19, price: 0.5, display: '16.2cm - 17.1cm (+0.5 JDs, 19 charms)' },
+        '17.1-18.1': { charms: 20, price: 1, display: '17.1cm - 18.1cm (+1 JD, 20 charms)' },
+        '18.1-19.2': { charms: 21, price: 1.5, display: '18.1cm - 19.2cm (+1.5 JDs, 21 charms)' },
+        '19.2-20': { charms: 22, price: 2, display: '19.2cm - 20cm (+2 JDs, 22 charms)' },
+        '20-21': { charms: 23, price: 2.5, display: '20cm - 21cm (+2.5 JDs, 23 charms)' },
+        '21-22': { charms: 24, price: 3, display: '21cm - 22cm (+3 JDs, 24 charms)' }
+    },
+    anklet: {
+        '21-22': { charms: 23, price: 0, display: '21cm - 22cm (23 charms)' },
+        '22-23': { charms: 24, price: 0.5, display: '22cm - 23cm (+0.5 JDs, 24 charms)' },
+        '23-24': { charms: 25, price: 1, display: '23cm - 24cm (+1 JD, 25 charms)' },
+        '24-25': { charms: 26, price: 1.5, display: '24cm - 25cm (+1.5 JDs, 26 charms)' }
+    },
+    necklace: {
+        '32-33': { charms: 34, price: 0, display: '32cm - 33cm (34 charms)' },
+        '33-34': { charms: 35, price: 0.5, display: '33cm - 34cm (+0.5 JDs, 35 charms)' },
+        '34-35': { charms: 36, price: 1, display: '34cm - 35cm (+1 JD, 36 charms)' },
+        '35-36': { charms: 37, price: 1.5, display: '35cm - 36cm (+1.5 JDs, 37 charms)' }
+    },
+    ring: {
+        '7': { charms: 7, price: 0, display: '~7.0cm (7 charms)' },
+        '8': { charms: 8, price: 0.5, display: '~8.0cm (+0.5 JDs, 8 charms)' },
+        '9': { charms: 9, price: 1, display: '~9.0cm (+1 JD, 9 charms)' },
+        '10': { charms: 10, price: 1.5, display: '~10.0cm (+1.5 JDs, 10 charms)' },
+        '11': { charms: 11, price: 2, display: '~11.0cm (+2 JDs, 11 charms)' }
+    }
 };
-
 const PRODUCTS = {
-    bracelet: { basePrice: 10, slots: 18, includedSpecial: 2, fullGlam: 29 },
-    anklet: { basePrice: 15, slots: 23, includedSpecial: 2, fullGlam: 42 },
-    necklace: { basePrice: 22, slots: 34, includedSpecial: 2, fullGlam: 64 }
+    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 2, fullGlam: 29 },
+    anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 2, fullGlam: 42 },
+    necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 2, fullGlam: 64 },
+    ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 }
 };
 
 // Global state
