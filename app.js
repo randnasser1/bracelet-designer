@@ -60,7 +60,23 @@ const PRODUCTS = {
     necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 2, fullGlam: 64 },
     ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 }
 };
-
+const CHARM_SETS = {
+  bestFriends: {
+    charms: ['best.png', 'ends.png', 'fri.png'],
+    message: 'Best Friends charms must be bought together in 3 different items',
+    requiredCount: 3
+  },
+  mrAndMrs: {
+    charms: ['mrmrs1.png', 'mrmrs2.png'],
+    message: 'Mr and Mrs. charms must be bought together in 2 different items',
+    requiredCount: 2
+  },
+  soulmates: {
+    charms: ['love.png', 'love2.png'],
+    message: 'Soulmates charms must be bought together in 2 different items',
+    requiredCount: 2
+  }
+};
 // Global state
 let isOrderProcessing = false;
 const cart = [];
@@ -184,6 +200,13 @@ function updateJewelryPiece() {
         jewelryPiece.appendChild(slot);
     }
 }
+
+function getCharmSet(charmSrc) {
+  return Object.values(CHARM_SETS).find(set => 
+    set.charms.some(charm => charmSrc.includes(charm))
+  );
+}
+
 
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
@@ -892,58 +915,70 @@ function placeSelectedCharm(slot) {
     selectedCharm = null;
 }
 function handleSlotClick(slot) {
-    // If we have a selected charm and we're clicking on an empty slot or different charm
-    if (selectedCharm) {
-        const existingCharm = slot.querySelector('img:not([data-type="base"])');
-        
-        // If slot is empty or has a different charm, place the selected charm
-        if (!existingCharm || existingCharm.dataset.charm !== selectedCharm.dataset.charm) {
-            placeSelectedCharm(slot);
-            return;
-        }
-        
-        // If clicking on the same charm, remove it
-        if (existingCharm.dataset.charm === selectedCharm.dataset.charm) {
-            removeCharmFromSlot(slot);
-            selectedCharm = null; // Clear selection after removal
-            return;
-        }
+  if (selectedCharm) {
+    const charmSrc = selectedCharm.dataset.charm;
+    const charmSet = getCharmSet(charmSrc);
+    
+    if (charmSet) {
+      // Check if all required charms from the set are being added
+      const selectedCharms = Array.from(document.querySelectorAll('.slot img:not([data-type="base"])'))
+        .map(img => img.dataset.charm);
+      
+      const hasOtherSetCharms = selectedCharms.some(src => 
+        charmSet.charms.some(charm => src.includes(charm) && !src.includes(charmSrc))
+      );
+      
+      if (!hasOtherSetCharms) {
+        alert(charmSet.message);
+        return;
+      }
     }
-    // If no charm selected and slot has a charm, remove it
-    else if (slot.querySelector('img:not([data-type="base"])')) {
-        removeCharmFromSlot(slot);
-    }
+    
+    placeSelectedCharm(slot);
+  } else if (slot.querySelector('img:not([data-type="base"])')) {
+    removeCharmFromSlot(slot);
+  }
 }
 
-
-
 function addCharmToSlot(slot, src, type, isSoldOut) {
-    const charm = document.createElement('img');
+  const charmSet = getCharmSet(src);
+  
+  if (charmSet) {
+    const placedCharms = Array.from(document.querySelectorAll('.slot img:not([data-type="base"])'))
+      .map(img => img.dataset.charm);
     
-    // Handle data URLs differently from regular charm paths
-    if (src && src.startsWith('data:')) {
-        charm.src = src; // Use the data URL directly
-    } else if (src) {
-        charm.src = src.replace('bracelet-designer-main/', '');
-    } else if (selectedCharm) {
-        charm.src = selectedCharm.src;
+    const setCharmsPlaced = placedCharms.filter(placedSrc => 
+      charmSet.charms.some(charm => placedSrc.includes(charm))
+      .length;
+    
+    // Check if adding this charm would complete the set
+    if (setCharmsPlaced + 1 === charmSet.requiredCount) {
+      if (!confirm(`You're adding ${charmSet.requiredCount} ${charmSet.message.split(' ')[0]} charms. Continue?`)) {
+        return false;
+      }
     }
-    
-    charm.dataset.type = type || (selectedCharm ? selectedCharm.dataset.type : 'custom');
-    charm.dataset.charm = src || (selectedCharm ? selectedCharm.dataset.charm : `custom-${Date.now()}`);
-    
-    if (isSoldOut || (selectedCharm && selectedCharm.classList.contains('sold-out'))) {
-        charm.classList.add('sold-out');
-    }
-    
-    slot.innerHTML = '';
-    slot.appendChild(charm);
-    
-    if (!src) { // Only update counts if this is a new charm being added
-        usedCharms.add(charm.dataset.charm);
-        if (charm.dataset.type === 'special') specialCount++;
-        if (charm.dataset.type === 'rare') rareCount++;
-    }
+  }
+  
+  // Original charm placement logic
+  const charm = document.createElement('img');
+  charm.src = src.startsWith('data:') ? src : src.replace('bracelet-designer-main/', '');
+  charm.dataset.type = type;
+  charm.dataset.charm = src;
+  
+  if (isSoldOut) {
+    charm.classList.add('sold-out');
+  }
+  
+  slot.innerHTML = '';
+  slot.appendChild(charm);
+  
+  if (!src) {
+    usedCharms.add(charm.dataset.charm);
+    if (charm.dataset.type === 'special') specialCount++;
+    if (charm.dataset.type === 'rare') rareCount++;
+  }
+  
+  return true;
 }
 
 function removeCharmFromSlot(slot) {
