@@ -254,20 +254,30 @@ function updatePrice() {
         totalPrice.textContent = `Total: ${calculatePrice()} JDs`;
     }
 }
-function initProduct(product) {More actions
+function initProduct(product) {
     if (!PRODUCTS[product]) return;
 
     currentProduct = product;
-
+    
     // Update size options based on product type
     const sizeSelect = document.getElementById('size');
     if (sizeSelect) {
-        sizeSelect.innerHTML = Object.entries(BRACELET_SIZES).map(([size, data]) => `
-            <option value="${size}">${data.display}</option>
-        `).join('');
+        // Clear existing options
+        sizeSelect.innerHTML = '';
+        
+        // Get the size chart for current product
+        const sizeChart = SIZE_CHARTS[product];
+        
+        // Add new options
+        Object.entries(sizeChart).forEach(([size, data]) => {
+            const option = document.createElement('option');
+            option.value = size;
+            option.textContent = data.display;
+            sizeSelect.appendChild(option);
+        });
 
         // Reset to first size
-        currentSize = Object.keys(BRACELET_SIZES)[0];
+        currentSize = Object.keys(sizeChart)[0];
         sizeSelect.value = currentSize;
     }
 
@@ -287,9 +297,9 @@ function initProduct(product) {More actions
         fullGlamBtn.classList.remove('active');
     }
 
-    // Clear all slots and create new ones
+    // Clear all slots and create new ones based on selected size
     jewelryPiece.innerHTML = '';
-    maxSlots = PRODUCTS[product].slots;
+    maxSlots = SIZE_CHARTS[product][currentSize].charms;
 
     for (let i = 0; i < maxSlots; i++) {
         const slot = createBaseSlot();
@@ -307,6 +317,10 @@ function initProduct(product) {More actions
     updateBaseCharms();
     updateCharmUsage();
     updatePrice();
+
+    // Add product-specific class to body for CSS targeting
+    document.body.classList.remove('product-bracelet', 'product-anklet', 'product-necklace', 'product-ring');
+    document.body.classList.add(`product-${product}`);
 }
 function setupEventListeners() {
     try {
