@@ -534,55 +534,65 @@ function setupCartFunctionality() {
         document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
     });
 
-    document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
-        const addToCartBtn = document.getElementById('add-to-cart-bottom');
-        const jewelryPiece = document.getElementById('jewelry-piece');
-        
-        try {
-            // First validate charm sets
-            const invalidSets = validateCharmSets();
-            if (invalidSets.length > 0) {
-                const errorMessages = invalidSets.map(set => set.message).join('\n\n');
-                alert(errorMessages);
+   document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
+    const addToCartBtn = document.getElementById('add-to-cart-bottom');
+    const jewelryPiece = document.getElementById('jewelry-piece');
+    
+    try {
+        // First validate charm sets
+        const invalidSets = validateCharmSets();
+        if (invalidSets.length > 0) {
+            const errorMessages = invalidSets.map(set => 
+                `${set.message}\n\nCurrently have: ${set.currentCount}/${set.requiredCount}`
+            ).join('\n\n');
+            
+            const proceed = confirm(
+                `${errorMessages}\n\nDo you want to add this item anyway? ` +
+                `You can add the remaining charms in another item.`
+            );
+            
+            if (!proceed) {
                 return;
             }
-            
-            addToCartBtn.disabled = true;
-            addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            
-            const designBlob = await captureBraceletDesign();
-            const designUrl = URL.createObjectURL(designBlob);
-            
-            const cartItem = {
-                id: Date.now().toString(),
-                product: currentProduct,
-                size: currentSize,
-                isFullGlam: isFullGlam,
-                materialType: materialType,
-                price: calculatePrice(false), // Price without delivery
-                charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
-                    src: img.src,
-                    type: img.dataset.type
-                })),
-                imageUrl: designUrl,
-                imageBlob: designBlob,
-                timestamp: new Date().toISOString()
-            };
-            
-            cart.push(cartItem);
-            updateCartDisplay();
-            
-            alert('Design added to cart!');
-            cartElements.cartPreview.classList.add('active');
-            
-        } catch (error) {
-            console.error('Error adding to cart:', error);
-            alert('Could not add design to cart. Please try again.');
-        } finally {
-            addToCartBtn.disabled = false;
-            addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
         }
-    });
+        
+        // Rest of your cart addition logic...
+        addToCartBtn.disabled = true;
+        addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        const designBlob = await captureBraceletDesign();
+        const designUrl = URL.createObjectURL(designBlob);
+        
+        const cartItem = {
+            id: Date.now().toString(),
+            product: currentProduct,
+            size: currentSize,
+            isFullGlam: isFullGlam,
+            materialType: materialType,
+            price: calculatePrice(false), // Price without delivery
+            charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
+                src: img.src,
+                type: img.dataset.type
+            })),
+            imageUrl: designUrl,
+            imageBlob: designBlob,
+            timestamp: new Date().toISOString()
+        };
+        
+        cart.push(cartItem);
+        updateCartDisplay();
+        
+        alert('Design added to cart!');
+        cartElements.cartPreview.classList.add('active');
+        
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        alert('Could not add design to cart. Please try again.');
+    } finally {
+        addToCartBtn.disabled = false;
+        addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+    }
+});
 }
 
 function validateCharmSets() {
@@ -625,8 +635,9 @@ function setupOrderFunctionality() {
     paymentProofContainer = document.getElementById('payment-proof-container');
     orderConfirmation = document.getElementById('order-confirmation');
     closeConfirmation = document.getElementById('close-confirmation');
-    cancelOrderBtn = document.getElementById('cancel-order'); // Add this line to define cancelOrderBtn
-    payCliqRadio = document.getElementById('pay-cliq'); // Add this line to define payCliqRadio
+    cancelOrderBtn = document.getElementById('cancel-order');
+    payCliqRadio = document.getElementById('pay-cliq');
+    placeOrderBtn = document.getElementById('order-btn');
     
     // Check for missing critical elements
     const requiredElements = [
@@ -634,8 +645,8 @@ function setupOrderFunctionality() {
         document.getElementById('order-subtotal'),
         document.getElementById('order-delivery'),
         document.getElementById('order-total-price'),
-        cancelOrderBtn, // Add to required elements check
-        placeOrderBtn // Make sure this is defined
+        cancelOrderBtn,
+        placeOrderBtn
     ];
     
     const missingElements = requiredElements
@@ -652,15 +663,20 @@ function setupOrderFunctionality() {
     }
 
     // Remove any existing event listeners to prevent duplicates
-    if (orderForm) orderForm.removeEventListener('submit', handleFormSubmit);
-    if (placeOrderBtn) placeOrderBtn.removeEventListener('click', handlePlaceOrderClick);
-    if (cancelOrderBtn) cancelOrderBtn.removeEventListener('click', handleCancelOrder);
+    orderForm.removeEventListener('submit', handleFormSubmit);
+    placeOrderBtn.removeEventListener('click', handlePlaceOrderClick);
+    cancelOrderBtn.removeEventListener('click', handleCancelOrder);
     if (closeConfirmation) closeConfirmation.removeEventListener('click', handleCloseConfirmation);
     if (payCliqRadio) payCliqRadio.removeEventListener('change', handlePaymentChange);
 
     function handlePaymentChange(e) {
         if (paymentProofContainer) {
             paymentProofContainer.style.display = e.target.checked ? 'block' : 'none';
+            if (e.target.checked) {
+                document.getElementById('payment-proof').required = true;
+            } else {
+                document.getElementById('payment-proof').required = false;
+            }
         }
     }
 
@@ -670,24 +686,14 @@ function setupOrderFunctionality() {
             return;
         }
         
-        // First check if elements exist
-        const subtotalElement = document.getElementById('order-subtotal');
-        const deliveryElement = document.getElementById('order-delivery');
-        const totalElement = document.getElementById('order-total-price');
-        
-        if (!subtotalElement || !deliveryElement || !totalElement) {
-            console.error('Missing required price display elements');
-            return;
-        }
-        
+        // Calculate and display order summary
         const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
         const deliveryFee = 2.5;
         const total = subtotal + deliveryFee;
         
-        // Now we know elements exist
-        subtotalElement.textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
-        deliveryElement.textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
-        totalElement.textContent = `Total: ${total.toFixed(2)} JDs`;
+        document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
+        document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+        document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
         
         document.body.classList.add('modal-open');
         orderModal.classList.add('active');
@@ -697,24 +703,147 @@ function setupOrderFunctionality() {
         orderModal.classList.remove('active');
         document.body.classList.remove('modal-open');
         if (orderForm) orderForm.reset();
+        if (paymentProofContainer) paymentProofContainer.style.display = 'none';
     }
 
     function handleCloseConfirmation() {
-        if (orderConfirmation) orderConfirmation.classList.remove('active');
+        orderConfirmation.classList.remove('active');
         document.body.classList.remove('modal-open');
+        // Reset the designer after successful order
+        initProduct('bracelet');
     }
 
-    // Rest of the function remains the same...
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        console.log('Form submission started');
+    
+        const form = e.target;
+        const submitButton = form.querySelector('button[type="submit"]');
+    
+        // Prevent multiple submissions
+        if (window.orderSubmissionInProgress) return;
+        window.orderSubmissionInProgress = true;
+        
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    
+        try {
+            // 1. Validate form fields
+            const formData = new FormData(form);
+            const requiredFields = ['full-name', 'phone', 'governorate', 'address', 'payment'];
+            const missingFields = requiredFields.filter(field => !formData.get(field));
+            
+            if (missingFields.length > 0) {
+                throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
+            }
+            
+            if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
+                throw new Error('Payment proof is required for Cliq payments');
+            }
+            
+            // 2. Validate charm sets across all cart items
+            const allCharms = cart.flatMap(item => item.charms.map(charm => charm.src));
+            const invalidSets = [];
+            
+            Object.values(CHARM_SETS).forEach(set => {
+                const foundCharms = set.charms.filter(charm => 
+                    allCharms.some(placed => placed.includes(charm))
+                ).length;
+                
+                if (foundCharms > 0 && foundCharms < set.requiredCount) {
+                    invalidSets.push({
+                        ...set,
+                        currentCount: foundCharms
+                    });
+                }
+            });
+            
+            if (invalidSets.length > 0) {
+                const errorMessages = invalidSets.map(set => 
+                    `${set.message}\n\nYou have: ${set.currentCount}/${set.requiredCount}`
+                ).join('\n\n');
+                throw new Error(`Please complete these charm sets:\n\n${errorMessages}`);
+            }
+            
+            // 3. Proceed with order submission
+            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+            const deliveryFee = 2.5;
+            const total = subtotal + deliveryFee;
+            
+            const orderData = {
+                clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
+                customer: {
+                    name: formData.get('full-name'),
+                    phone: formData.get('phone'),
+                    phone2: formData.get('phone2') || null,
+                    governorate: formData.get('governorate'),
+                    address: formData.get('address'),
+                    notes: formData.get('notes') || null
+                },
+                paymentMethod: formData.get('payment'),
+                items: await Promise.all(cart.map(async (item) => ({
+                    product: item.product,
+                    size: item.size,
+                    price: item.price,
+                    imageUrl: item.imageUrl,
+                    imageBase64: await blobToBase64(item.imageBlob),
+                    charms: item.charms,
+                    isFullGlam: item.isFullGlam,
+                    materialType: item.materialType,
+                    timestamp: new Date().toISOString()
+                }))),
+                subtotal: subtotal,
+                deliveryFee: deliveryFee,
+                total: total,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'pending'
+            };
+    
+            // Upload payment proof if Cliq payment
+            if (formData.get('payment') === 'Cliq') {
+                const paymentProofFile = document.getElementById('payment-proof').files[0];
+                if (paymentProofFile) {
+                    const fileName = `payment-proofs/${Date.now()}_${paymentProofFile.name}`;
+                    const storageRef = storage.ref(fileName);
+                    await storageRef.put(paymentProofFile);
+                    orderData.paymentProofUrl = await storageRef.getDownloadURL();
+                }
+            }
+    
+            // Submit to Firestore
+            const orderRef = await db.collection('orders').add(orderData);
+            console.log('Order submitted with ID:', orderRef.id);
+    
+            // Clear cart and reset form
+            cart.length = 0;
+            updateCartDisplay();
+            form.reset();
+            paymentProofContainer.style.display = 'none';
+    
+            // Show confirmation
+            orderIdSpan.textContent = orderRef.id;
+            orderModal.classList.remove('active');
+            orderConfirmation.classList.add('active');
+            
+        } catch (error) {
+            console.error('Order submission failed:', error);
+            alert(error.message || 'Order submission failed. Please check your connection and try again.');
+        } finally {
+            window.orderSubmissionInProgress = false;
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Order';
+        }
+    }
+
     // Add event listeners
-    if (orderForm) orderForm.addEventListener('submit', handleFormSubmit);
-    if (placeOrderBtn) placeOrderBtn.addEventListener('click', handlePlaceOrderClick);
-    if (cancelOrderBtn) cancelOrderBtn.addEventListener('click', handleCancelOrder);
-    if (closeConfirmation) closeConfirmation.addEventListener('click', handleCloseConfirmation);
-    if (payCliqRadio) payCliqRadio.addEventListener('change', handlePaymentChange);
+    orderForm.addEventListener('submit', handleFormSubmit);
+    placeOrderBtn.addEventListener('click', handlePlaceOrderClick);
+    cancelOrderBtn.addEventListener('click', handleCancelOrder);
+    closeConfirmation.addEventListener('click', handleCloseConfirmation);
+    payCliqRadio.addEventListener('change', handlePaymentChange);
 
-    if (paymentProofContainer) {
-        paymentProofContainer.style.display = 'none';
-    }
+    // Initialize payment proof container state
+    paymentProofContainer.style.display = 'none';
 
     console.log('Order functionality initialized successfully');
     window.orderFunctionalityInitialized = true;
