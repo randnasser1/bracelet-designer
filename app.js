@@ -913,9 +913,46 @@ function placeSelectedCharm(slot) {
 
     // Handle long charm placement if needed
     const isLongCharm = selectedCharm.classList.contains('long-charm');
-    if (isLongCharm) {
-        // Your existing long charm placement logic...
-    }  else if (isDanglyCharm) {
+        const isDanglyCharm = selectedCharm.classList.contains('dangly-charm');
+
+   if (isLongCharm) {
+    // Get the current slot index
+    const slotIndex = Array.from(jewelryPiece.children).indexOf(slot);
+    
+    // Check if we have space for a long charm
+    if (slotIndex + 1 >= jewelryPiece.children.length) {
+        alert("Not enough space for a long charm at this position!");
+        return;
+    }
+    
+    // Create a container for the long charm
+    const longContainer = document.createElement('div');
+    longContainer.className = 'slot long-slot';
+    
+    // Create the long charm image
+    const longCharm = document.createElement('img');
+    longCharm.src = selectedCharm.src.startsWith('data:') 
+        ? selectedCharm.src 
+        : selectedCharm.dataset.charm;
+    longCharm.className = 'long-charm';
+    longCharm.dataset.type = charmType;
+    longCharm.dataset.charm = charmSrc;
+    
+    if (selectedCharm.classList.contains('sold-out')) {
+        longCharm.classList.add('sold-out');
+    }
+    
+    longContainer.appendChild(longCharm);
+    
+    // Replace the current slot and remove the next one
+    const nextSlot = jewelryPiece.children[slotIndex + 1];
+    slot.replaceWith(longContainer);
+    nextSlot.remove();
+    
+    longContainer.addEventListener('click', function() {
+        handleSlotClick(this);
+    });
+} else if (isDanglyCharm) {
         // Get the current slot index
         const slotIndex = Array.from(jewelryPiece.children).indexOf(slot);
         
