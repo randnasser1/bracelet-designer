@@ -953,42 +953,25 @@ function placeSelectedCharm(slot) {
         handleSlotClick(this);
     });
 } else if (isDanglyCharm) {
-        // Get the current slot index
-        const slotIndex = Array.from(jewelryPiece.children).indexOf(slot);
+        // For dangly charm, just make the slot taller
+        slot.classList.add('has-dangly');
         
-        // Check if we have space for a vertical charm
-        if (slotIndex + maxSlots >= jewelryPiece.children.length) {
-            alert("Not enough space for a vertical dangly charm at this position!");
-            return;
-        }
-        
-        // Create a container for the vertical dangly charm
-        const danglyContainer = document.createElement('div');
-        danglyContainer.className = 'slot dangly-slot';
-        
-        // Create the dangly charm image
-        const danglyCharm = document.createElement('img');
-        danglyCharm.src = selectedCharm.src.startsWith('data:') 
+        const danglyImg = document.createElement('img');
+        danglyImg.src = selectedCharm.src.startsWith('data:') 
             ? selectedCharm.src 
             : selectedCharm.dataset.charm;
-        danglyCharm.className = 'dangly-charm';
-        danglyCharm.dataset.type = charmType;
-        danglyCharm.dataset.charm = charmSrc;
+        danglyImg.className = 'dangly-charm';
+        danglyImg.dataset.type = charmType;
+        danglyImg.dataset.charm = charmSrc;
         
         if (selectedCharm.classList.contains('sold-out')) {
-            danglyCharm.classList.add('sold-out');
+            danglyImg.classList.add('sold-out');
         }
         
-        danglyContainer.appendChild(danglyCharm);
-        
-        // Replace the current slot and remove the one below it
-        const nextSlot = jewelryPiece.children[slotIndex + maxSlots];
-        slot.replaceWith(danglyContainer);
-        nextSlot.remove();
-        
-        danglyContainer.addEventListener('click', function() {
-            handleSlotClick(this);
-        });
+        // Clear slot and add dangly charm
+        slot.innerHTML = '';
+        slot.appendChild(danglyImg);
+    }
     } else {
         // Regular charm placement
         const src = selectedCharm.src.startsWith('data:') 
@@ -1107,14 +1090,8 @@ function removeCharmFromSlot(slot) {
         baseSlot1.after(baseSlot2);
     } 
     // If it's a vertical dangly slot
-    else if (slot.classList.contains('dangly-slot')) {
-        const baseSlot1 = createBaseSlot();
-        const baseSlot2 = createBaseSlot();
-        
-        slot.replaceWith(baseSlot1);
-        // Insert the second slot below (accounting for grid layout)
-        const slotIndex = Array.from(jewelryPiece.children).indexOf(baseSlot1);
-        jewelryPiece.insertBefore(baseSlot2, jewelryPiece.children[slotIndex + maxSlots]);
+    else if (slot.classList.contains('has-dangly')) {
+        slot.classList.remove('has-dangly');
     }
     else {
         // Regular slot
@@ -1384,7 +1361,7 @@ function updateRareCharmsDisplay() {
 
 function createCharm(src, alt, type) {
     const img = document.createElement('img');
-    img.src = src.replace('bracelet-designer-main/', '');
+    img.src = src;
     img.alt = alt;
     img.className = 'charm';
     img.dataset.type = type;
@@ -1394,7 +1371,7 @@ function createCharm(src, alt, type) {
     const quantityBadge = document.createElement('div');
     quantityBadge.className = 'quantity-badge';
     
-    // Find the quantity from our data
+    // Find quantity from data
     let quantity = 1;
     if (type === 'special') {
         const charmData = specialCharms.find(c => c.src === src);
@@ -1408,13 +1385,12 @@ function createCharm(src, alt, type) {
     quantityBadge.textContent = quantity;
     img.appendChild(quantityBadge);
     
-    // Check if it's a long charm
+    // Check charm types
     if (src.includes('long')) {
         img.classList.add('long-charm');
         img.style.width = '96px';
         img.style.height = '48px';
-    }
-    // Check if it's a dangly charm
+    } 
     else if (src.includes('dangly')) {
         img.classList.add('dangly-charm');
         img.style.width = '48px';
