@@ -61,6 +61,7 @@ body {
 #jewelry-piece {
     display: grid;
     grid-template-columns: repeat(auto-fill, 95px);
+    grid-auto-rows: 95px;
     gap: 4px;
     justify-content: center;
     padding: 2rem;
