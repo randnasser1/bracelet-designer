@@ -915,6 +915,43 @@ function placeSelectedCharm(slot) {
     const isLongCharm = selectedCharm.classList.contains('long-charm');
     if (isLongCharm) {
         // Your existing long charm placement logic...
+    }  else if (isDanglyCharm) {
+        // Get the current slot index
+        const slotIndex = Array.from(jewelryPiece.children).indexOf(slot);
+        
+        // Check if we have space for a vertical charm
+        if (slotIndex + maxSlots >= jewelryPiece.children.length) {
+            alert("Not enough space for a vertical dangly charm at this position!");
+            return;
+        }
+        
+        // Create a container for the vertical dangly charm
+        const danglyContainer = document.createElement('div');
+        danglyContainer.className = 'slot dangly-slot';
+        
+        // Create the dangly charm image
+        const danglyCharm = document.createElement('img');
+        danglyCharm.src = selectedCharm.src.startsWith('data:') 
+            ? selectedCharm.src 
+            : selectedCharm.dataset.charm;
+        danglyCharm.className = 'dangly-charm';
+        danglyCharm.dataset.type = charmType;
+        danglyCharm.dataset.charm = charmSrc;
+        
+        if (selectedCharm.classList.contains('sold-out')) {
+            danglyCharm.classList.add('sold-out');
+        }
+        
+        danglyContainer.appendChild(danglyCharm);
+        
+        // Replace the current slot and remove the one below it
+        const nextSlot = jewelryPiece.children[slotIndex + maxSlots];
+        slot.replaceWith(danglyContainer);
+        nextSlot.remove();
+        
+        danglyContainer.addEventListener('click', function() {
+            handleSlotClick(this);
+        });
     } else {
         // Regular charm placement
         const src = selectedCharm.src.startsWith('data:') 
@@ -1031,7 +1068,18 @@ function removeCharmFromSlot(slot) {
         
         slot.replaceWith(baseSlot1);
         baseSlot1.after(baseSlot2);
-    } else {
+    } 
+    // If it's a vertical dangly slot
+    else if (slot.classList.contains('dangly-slot')) {
+        const baseSlot1 = createBaseSlot();
+        const baseSlot2 = createBaseSlot();
+        
+        slot.replaceWith(baseSlot1);
+        // Insert the second slot below (accounting for grid layout)
+        const slotIndex = Array.from(jewelryPiece.children).indexOf(baseSlot1);
+        jewelryPiece.insertBefore(baseSlot2, jewelryPiece.children[slotIndex + maxSlots]);
+    }
+    else {
         // Regular slot
         charm.remove();
         
@@ -1328,6 +1376,12 @@ function createCharm(src, alt, type) {
         img.classList.add('long-charm');
         img.style.width = '96px';
         img.style.height = '48px';
+    }
+    // Check if it's a dangly charm
+    else if (src.includes('dangly')) {
+        img.classList.add('dangly-charm');
+        img.style.width = '48px';
+        img.style.height = '96px';
     }
     
     return img;
