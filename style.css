@@ -245,6 +245,12 @@ body {
     position: relative;
 }
 
+.slot.has-dangly {
+    height: 96px; /* Taller slot for dangly charm */
+    padding-bottom: 46px; /* Extra space at bottom */
+    overflow: visible; /* Allow charm to extend beyond */
+}
+
 .slot.dangly-slot .dangly-charm {
     width: 95px !important;
     height: 190px !important;
