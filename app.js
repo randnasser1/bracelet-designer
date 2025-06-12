@@ -1076,36 +1076,34 @@ function addCharmToSlot(slot, src, type, isSoldOut) {
   
   return true;
 }
-
 function removeCharmFromSlot(slot) {
     const charm = slot.querySelector('img:not([data-type="base"])');
     if (!charm) return;
     
     const charmSrc = charm.dataset.charm;
     const charmType = charm.dataset.type;
+    const isDangly = charm.classList.contains('dangly-charm');
     
-    // If it's a long slot
-    if (slot.classList.contains('long-slot')) {
-        const baseSlot1 = createBaseSlot();
-        const baseSlot2 = createBaseSlot();
-        
-        slot.replaceWith(baseSlot1);
-        baseSlot1.after(baseSlot2);
-    } 
-    // If it's a vertical dangly slot
-    else if (slot.classList.contains('has-dangly')) {
+    // Remove dangly class if present
+    if (isDangly) {
         slot.classList.remove('has-dangly');
     }
-    else {
-        // Regular slot
-        charm.remove();
-        
-        // Add base charm back
-        const baseImg = document.createElement('img');
-        baseImg.src = materialType === 'silver' ? 'basecharms/silver.png' : 'basecharms/gold.png';
-        baseImg.dataset.type = 'base';
-        slot.appendChild(baseImg);
+    
+    // Clear the slot completely (remove any existing charm)
+    slot.innerHTML = '';
+    
+    // Add base charm back
+    const baseImg = document.createElement('img');
+    if (materialType === 'silver') {
+        baseImg.src = 'basecharms/silver.png';
+    } else if (materialType === 'gold') {
+        baseImg.src = 'basecharms/gold.png';
+    } else if (materialType === 'mix') {
+        const index = Array.from(jewelryPiece.children).indexOf(slot);
+        baseImg.src = index % 2 === 0 ? 'basecharms/gold.png' : 'basecharms/silver.png';
     }
+    baseImg.dataset.type = 'base';
+    slot.appendChild(baseImg);
     
     // For non-custom charms, restore quantity
     if (charmType !== 'custom') {
