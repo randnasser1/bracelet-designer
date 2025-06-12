@@ -972,7 +972,7 @@ function placeSelectedCharm(slot) {
         slot.innerHTML = '';
         slot.appendChild(danglyImg);
     }
-    } else {
+     else {
         // Regular charm placement
         const src = selectedCharm.src.startsWith('data:') 
             ? selectedCharm.src 
