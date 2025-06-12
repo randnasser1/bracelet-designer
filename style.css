@@ -231,6 +231,27 @@ body {
     right: 20px;
     z-index: 1001;
 }
+/* Vertical Dangly Charms */
+.dangly-charm {
+    grid-row: span 2;
+    width: 48px !important;
+    height: 96px !important;
+}
+
+.slot.dangly-slot {
+    height: 194px; /* 95px * 2 + 4px gap */
+    grid-row: span 2;
+    position: relative;
+}
+
+.slot.dangly-slot .dangly-charm {
+    width: 95px !important;
+    height: 190px !important;
+    object-fit: contain;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
 
 .cart-button {
     background: #d6336c;
