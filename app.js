@@ -688,7 +688,6 @@ function setupOrderFunctionality() {
             return;
         }
         
-        // Calculate and display order summary
         const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
         const deliveryFee = 2.5;
         const total = subtotal + deliveryFee;
@@ -696,7 +695,7 @@ function setupOrderFunctionality() {
         document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
         document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
         document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
-        document.getElementById('order-total-display').textContent = total.toFixed(2);
+        document.getElementById('order-total-amount').textContent = total.toFixed(2);
 
         document.body.classList.add('modal-open');
         orderModal.classList.add('active');
@@ -773,6 +772,11 @@ function setupOrderFunctionality() {
             const deliveryFee = 2.5;
             const total = subtotal + deliveryFee;
             
+            document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
+            document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+            document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
+            document.getElementById('order-total-amount').textContent = total.toFixed(2);
+                        
             const orderData = {
                 clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
                 customer: {
