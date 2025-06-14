@@ -1160,7 +1160,7 @@ function createBaseSlot() {
 
 function initCharms() {
     updateSpecialCharmsDisplay();
-    ();
+    updateRareCharmsDisplay();
     
     // Add click handlers for charms
     document.querySelectorAll('.charm').forEach(charm => {
