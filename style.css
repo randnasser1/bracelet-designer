@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 /* ==================== */
-/* BASE STYLES (Unchanged) */
+/* BASE STYLES */
 /* ==================== */
 body {
     font-family: 'Poppins', sans-serif;
@@ -13,7 +13,7 @@ body {
 }
 
 /* ==================== */
-/* CONTROLS (Unchanged) */
+/* CONTROLS */
 /* ==================== */
 .controls {
     display: flex;
@@ -61,7 +61,7 @@ body {
 }
 
 /* ==================== */
-/* JEWELRY PIECE (Modified for long/dangly) */
+/* JEWELRY PIECE */
 /* ==================== */
 #jewelry-piece {
     display: grid;
@@ -124,7 +124,7 @@ body {
 }
 
 /* ==================== */
-/* CHARM POOLS (Modified for dangly positioning) */
+/* CHARM POOLS - FIXED GRID */
 /* ==================== */
 .charm-pools {
     display: flex;
@@ -174,28 +174,7 @@ body {
     color: #fff;
 }
 
-/* ==================== */
-/* CHARMS GRID (Modified for sold-out/dangly) */
-/* ==================== */
-.charms-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-    gap: 10px;
-    padding: 10px;
-}
-
-/* Dangly positioning at bottom */
-.dangly-charm-container {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 10px 0;
-}
-.dangly-charm-container img {
-    height: 80px !important;
-    width: auto !important;
-}
-
-/* New styles for charms grid */
+/* CHARMS GRID - FIXED VERSION */
 .charms-grid-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
@@ -205,6 +184,48 @@ body {
     overflow-y: auto;
 }
 
+.charm-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.charm {
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    border-radius: 4px;
+    object-fit: contain;
+}
+
+.charm:hover {
+    transform: scale(1.1);
+}
+
+.charm.selected {
+    box-shadow: 0 0 0 2px #d6336c;
+}
+
+/* Sold-out state (just blur) */
+.charm[data-quantity="0"] {
+    filter: blur(1.5px);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Special charm types */
+.long-charm {
+    width: 100px;
+    height: 50px;
+}
+
+.dangly-charm {
+    width: 48px;
+    height: 80px;
+}
 
 /* Gold toggle */
 .gold-toggle-container {
@@ -216,70 +237,6 @@ body {
     text-align: center;
 }
 
-.charm[data-quantity="0"] {
-    filter: blur(1px);
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-.dangly-grid {
-    border-top: 1px dashed #f5a0c2;
-    padding-top: 15px;
-    margin-top: 10px;
-}
-.charm {
-    pointer-events: auto;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.charm-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    pointer-events: auto;
-}
-.charm:hover {
-    transform: scale(1.1);
-}
-
-.charm.selected {
-    box-shadow: 0 0 0 2px #d6336c;
-}
-
-/* Modified sold-out style (removed blur) */
-/* Sold-out state - JUST BLUR */
-.charm.sold-out {
-    filter: blur(1px);
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-
-/* Special charm types */
-.long-charm {
-    width: 100px;
-    height: 50px;
-    grid-column: span 2;
-}
-
-.dangly-charm {
-    width: 48px;
-    height: 96px;
-}
-
-/* ==================== */
-/* GOLD TOGGLE (Unchanged) */
-/* ==================== */
-.gold-toggle-wrapper {
-    display: flex;
-    justify-content: center;
-    margin: 1rem 0;
-    padding-top: 1rem;
-    border-top: 1px solid #f5a0c2;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
 .gold-toggle-btn {
     background: #ff85b3;
     color: white;
@@ -296,9 +253,8 @@ body {
     background: #d6336c;
 }
 
-
 /* ==================== */
-/* CART STYLES (Unchanged) */
+/* CART STYLES */
 /* ==================== */
 .cart-button-container {
     position: fixed;
@@ -444,7 +400,7 @@ body {
 }
 
 /* ==================== */
-/* MODAL STYLES (Unchanged) */
+/* MODAL STYLES */
 /* ==================== */
 .modal {
     display: none;
@@ -598,7 +554,7 @@ body.modal-open {
 }
 
 /* ==================== */
-/* RESPONSIVE (Unchanged) */
+/* RESPONSIVE */
 /* ==================== */
 @media (max-width: 768px) {
     .modal {
@@ -672,7 +628,7 @@ body.modal-open {
 }
 
 /* ==================== */
-/* PRODUCT-SPECIFIC (Unchanged) */
+/* PRODUCT-SPECIFIC */
 /* ==================== */
 .product-ring #jewelry-piece .slot {
     width: 40px;
