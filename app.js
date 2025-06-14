@@ -271,47 +271,22 @@ function createCharmElement(charm, type) {
     const container = document.createElement('div');
     container.className = 'charm-container';
     
-    // Determine charm type and size
-    let charmType = 'normal';
-    if (charm.src.includes('long') || charm.category === 'long') {
-        charmType = 'long';
-    } else if (charm.category === 'dangly') {
-        charmType = 'dangly';
-    }
-
-    // Set container size
-    container.style.width = `${CHARM_SIZES[charmType].width}px`;
-    container.style.height = `${CHARM_SIZES[charmType].height}px`;
-    container.classList.add(`${charmType}-charm-container`);
-
-    // Create image element
     const img = document.createElement('img');
     img.src = charm.src;
-    img.alt = `${type} Charm ${charm.src}`;
-    img.className = `charm ${charmType}-charm`;
+    img.className = `charm ${type}-charm`;
     img.dataset.type = type;
     img.dataset.charm = charm.src;
-    img.dataset.category = charm.category;
-    img.style.width = `${CHARM_SIZES[charmType].width}px`;
-    img.style.height = `${CHARM_SIZES[charmType].height}px`;
-
-    // Handle sold-out state
+    
+    // Just blur if sold out (remove sold-out overlay)
     if (charm.quantity <= 0) {
-        container.classList.add('sold-out');
-        
-        const overlay = document.createElement('div');
-        overlay.className = 'sold-out-overlay';
-        
-        const soldOutText = document.createElement('div');
-        soldOutText.className = 'sold-out-text';
-        soldOutText.textContent = 'SOLD OUT';
-        
-        overlay.appendChild(soldOutText);
-        container.appendChild(overlay);
+        img.style.filter = 'blur(1px)';
+        img.style.opacity = '0.7';
+        img.style.cursor = 'not-allowed';
     }
-
+    
     container.appendChild(img);
     return container;
+}
 }
 
 
@@ -1238,14 +1213,13 @@ const CHARM_SIZES = {
 function updateSpecialCharmsDisplay() {
     specialCharmsGrid.innerHTML = '';
     
-    // Create a container for the gold toggle
+    // Gold toggle at top
     const toggleContainer = document.createElement('div');
     toggleContainer.className = 'gold-toggle-container';
     
-    // Add gold toggle at the top
     const hasGoldVariants = specialCharms.some(charm => 
-        charm.src.includes('-gold.png') && 
-        (currentSpecialCategory === 'all' || charm.category === currentSpecialCategory)
+        (currentSpecialCategory === 'all' || charm.category === currentSpecialCategory) &&
+        charm.src.includes('-gold.png')
     );
     
     if (hasGoldVariants) {
@@ -1257,47 +1231,33 @@ function updateSpecialCharmsDisplay() {
             updateSpecialCharmsDisplay();
         });
         toggleContainer.appendChild(toggleBtn);
+        specialCharmsGrid.appendChild(toggleContainer);
     }
+
+    // Create proper grid container
+    const grid = document.createElement('div');
+    grid.className = 'charms-grid';
     
-    specialCharmsGrid.appendChild(toggleContainer);
-
-    // Filter charms based on current category and gold/silver mode
-    const filteredCharms = specialCharms.filter(charm => {
-        // Filter by category
-        if (currentSpecialCategory !== 'all' && charm.category !== currentSpecialCategory) {
-            return false;
+    // Add charms
+    specialCharms.forEach(charm => {
+        if (currentSpecialCategory === 'all' || charm.category === currentSpecialCategory) {
+            if (!hasGoldVariants || 
+                (showGoldVariants && charm.src.includes('-gold.png')) || 
+                (!showGoldVariants && !charm.src.includes('-gold.png'))) {
+                grid.appendChild(createCharmElement(charm, 'special'));
+            }
         }
-
-        // Filter gold/silver variants if they exist
-        const isGoldVariant = charm.src.includes('-gold.png');
-        if (hasGoldVariants) {
-            return showGoldVariants ? isGoldVariant : !isGoldVariant;
-        }
-
-        return true;
     });
-
-    // Create a grid container for the charms
-    const gridContainer = document.createElement('div');
-    gridContainer.className = 'charms-grid-container';
     
-    // Add charms to the grid
-    filteredCharms.forEach(charm => {
-        const charmElement = createCharmElement(charm, 'special');
-        gridContainer.appendChild(charmElement);
-    });
-
-    specialCharmsGrid.appendChild(gridContainer);
+    specialCharmsGrid.appendChild(grid);
 }
-
 function updateRareCharmsDisplay() {
     rareCharmsGrid.innerHTML = '';
     
-    // Create a container for the gold toggle
+    // Gold toggle
     const toggleContainer = document.createElement('div');
     toggleContainer.className = 'gold-toggle-container';
     
-    // Check if this category has gold variants
     const hasGoldVariants = rareCharms.some(charm => 
         charm.src.includes('-gold.png') && 
         (currentRareCategory === 'all' || charm.category === currentRareCategory)
@@ -1312,65 +1272,33 @@ function updateRareCharmsDisplay() {
             updateRareCharmsDisplay();
         });
         toggleContainer.appendChild(toggleBtn);
+        rareCharmsGrid.appendChild(toggleContainer);
     }
+
+    // Main grid
+    const grid = document.createElement('div');
+    grid.className = 'charms-grid';
     
-    rareCharmsGrid.appendChild(toggleContainer);
-
-    // Separate charms into regular and dangly
-    let regularCharms = [];
-    let danglyCharms = [];
-
     rareCharms.forEach(charm => {
-        // Filter by category
-        if (currentRareCategory !== 'all' && charm.category !== currentRareCategory) {
-            return;
-        }
-
-        // Filter gold/silver variants if they exist
-        const isGoldVariant = charm.src.includes('-gold.png');
-        if (hasGoldVariants) {
-            if (showGoldVariants !== isGoldVariant) {
-                return;
+        if (currentRareCategory === 'all' || charm.category === currentRareCategory) {
+            if (!hasGoldVariants || 
+                (showGoldVariants && charm.src.includes('-gold.png')) || 
+                (!showGoldVariants && !charm.src.includes('-gold.png'))) {
+                
+                // Make sure dangly charms are visible
+                if (charm.category === 'dangly') {
+                    const danglyContainer = document.createElement('div');
+                    danglyContainer.className = 'dangly-charm-container';
+                    danglyContainer.appendChild(createCharmElement(charm, 'rare'));
+                    grid.appendChild(danglyContainer);
+                } else {
+                    grid.appendChild(createCharmElement(charm, 'rare'));
+                }
             }
         }
-
-        // Separate dangly charms
-        if (charm.category === 'dangly') {
-            danglyCharms.push(charm);
-        } else {
-            regularCharms.push(charm);
-        }
     });
-
-    // Create grid container for regular charms
-    const gridContainer = document.createElement('div');
-    gridContainer.className = 'charms-grid-container';
     
-    // Add regular charms
-    regularCharms.forEach(charm => {
-        gridContainer.appendChild(createCharmElement(charm, 'rare'));
-    });
-
-    rareCharmsGrid.appendChild(gridContainer);
-
-    // For "All" category, add dangly charms in a separate section
-    if (currentRareCategory === 'all' && danglyCharms.length > 0) {
-        const danglyHeader = document.createElement('h4');
-        danglyHeader.textContent = 'Dangly Charms';
-        danglyHeader.style.marginTop = '20px';
-        danglyHeader.style.textAlign = 'center';
-        danglyHeader.style.color = '#d6336c';
-        rareCharmsGrid.appendChild(danglyHeader);
-
-        const danglyGrid = document.createElement('div');
-        danglyGrid.className = 'charms-grid-container dangly-grid';
-        
-        danglyCharms.forEach(charm => {
-            danglyGrid.appendChild(createCharmElement(charm, 'rare'));
-        });
-        
-        rareCharmsGrid.appendChild(danglyGrid);
-    }
+    rareCharmsGrid.appendChild(grid);
 }
 function updateBaseCharms() {
     const slots = document.querySelectorAll('.slot');
