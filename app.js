@@ -1217,53 +1217,32 @@ function updateSpecialCharmsDisplay() {
 
     // Create and append charms
     filteredCharms.forEach(charm => {
-        const charmElement = createCharm(charm.src, `Special Charm ${charm.src}`, 'special');
-        charmElement.classList.add('special');
+        const charmElement = document.createElement('img');
+        charmElement.src = charm.src;
+        charmElement.alt = `Special Charm ${charm.src}`;
+        charmElement.className = 'charm';
+        charmElement.dataset.type = 'special';
         charmElement.dataset.charm = charm.src;
         charmElement.dataset.category = charm.category;
-        charmElement.dataset.quantity = charm.quantity || 1; 
         
         // Check if it's a long charm
-        const isLongCharm = charm.src.includes('long');
-        if (isLongCharm) {
+        if (charm.src.includes('long')) {
             charmElement.classList.add('long-charm');
         }
         
-        // Update styling based on quantity
+        // Update styling if sold out
         if (charm.quantity <= 0) {
             charmElement.classList.add('sold-out');
-            charmElement.style.filter = 'blur(2px)';
+            charmElement.style.filter = 'blur(1px)';
             charmElement.style.opacity = '0.7';
             charmElement.style.cursor = 'not-allowed';
-            
-            // Add sold out label
-            const soldOutLabel = document.createElement('div');
-            soldOutLabel.className = 'sold-out-label';
-            soldOutLabel.textContent = 'SOLD OUT';
-            charmElement.appendChild(soldOutLabel);
-        }
-
-        if (usedCharms.has(charm.src)) {
-            charmElement.classList.add('used');
         }
 
         charmElement.addEventListener('click', () => {
-            const quantity = parseInt(charmElement.dataset.quantity) || 1;
-            
             // Don't allow selection if out of stock
-            if (quantity <= 0) {
-                return;
-            }
+            if (charm.quantity <= 0) return;
             
-            // Don't allow selection if already used (unless quantity > 1)
-            if (quantity === 1 && usedCharms.has(charm.src)) {
-                return;
-            }
-            
-            // Deselect all other charms
             document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
-            
-            // Select this charm
             charmElement.classList.add('selected');
             selectedCharm = charmElement;
         });
@@ -1298,9 +1277,9 @@ function updateSpecialCharmsDisplay() {
             toggleBtn.style.background = showGoldVariants ? '#d6336c' : '#fff';
             toggleBtn.style.color = showGoldVariants ? '#fff' : '#d6336c';
             toggleBtn.classList.toggle('active');
-            selectedCharm = null; // Clear selection when toggling
+            selectedCharm = null;
             updateSpecialCharmsDisplay();
-            updateRareCharmsDisplay(); // Update both displays when toggling
+            updateRareCharmsDisplay();
         };
         toggleContainer.appendChild(toggleBtn);
         specialCharmsGrid.appendChild(toggleContainer);
@@ -1390,47 +1369,30 @@ function updateRareCharmsDisplay() {
 
     // Create and append charms
     filteredCharms.forEach(charm => {
-        const charmElement = createCharm(charm.src, `Rare Charm ${charm.src}`, 'rare');
-        charmElement.classList.add('rare');
+        const charmElement = document.createElement('img');
+        charmElement.src = charm.src;
+        charmElement.alt = `Rare Charm ${charm.src}`;
+        charmElement.className = 'charm';
+        charmElement.dataset.type = 'rare';
         charmElement.dataset.charm = charm.src;
         charmElement.dataset.category = charm.category;
-        charmElement.dataset.quantity = charm.quantity || 1;
         
         // Check if it's a dangly charm
         if (charm.category === 'dangly') {
             charmElement.classList.add('dangly-charm');
         }
         
-        // Update styling based on quantity
+        // Update styling if sold out
         if (charm.quantity <= 0) {
             charmElement.classList.add('sold-out');
-            charmElement.style.filter = 'blur(2px)';
+            charmElement.style.filter = 'blur(1px)';
             charmElement.style.opacity = '0.7';
             charmElement.style.cursor = 'not-allowed';
-            
-            // Add sold out label
-            const soldOutLabel = document.createElement('div');
-            soldOutLabel.className = 'sold-out-label';
-            soldOutLabel.textContent = 'SOLD OUT';
-            charmElement.appendChild(soldOutLabel);
-        }
-
-        if (usedCharms.has(charm.src)) {
-            charmElement.classList.add('used');
         }
 
         charmElement.addEventListener('click', () => {
-            const quantity = parseInt(charmElement.dataset.quantity) || 1;
-            
             // Don't allow selection if out of stock
-            if (quantity <= 0) {
-                return;
-            }
-            
-            // Don't allow selection if already used (unless quantity > 1)
-            if (quantity === 1 && usedCharms.has(charm.src)) {
-                return;
-            }
+            if (charm.quantity <= 0) return;
             
             document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
             charmElement.classList.add('selected');
@@ -1469,52 +1431,12 @@ function updateRareCharmsDisplay() {
             toggleBtn.classList.toggle('active');
             selectedCharm = null; // Clear selection when toggling
             updateSpecialCharmsDisplay();
-            updateRareCharmsDisplay(); // Update both displays when toggling
+            updateRareCharmsDisplay();
         };
         toggleContainer.appendChild(toggleBtn);
         rareCharmsGrid.appendChild(toggleContainer);
     }
-}
-
-function createCharm(src, alt, type) {
-    const container = document.createElement('div');
-    container.className = 'charm-container';
-    
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = alt;
-    img.className = 'charm';
-    img.dataset.type = type;
-    img.dataset.charm = src;
-    
-    // Check if it's a dangly charm
-    if (src.includes('dangly') || src.includes('dangly')) {
-        container.classList.add('dangly-container');
-        img.classList.add('dangly-charm');
-    }
-    
-    container.appendChild(img);
-    
-    // Add quantity badge
-    const quantityBadge = document.createElement('div');
-    quantityBadge.className = 'quantity-badge';
-    
-    // Find quantity from data
-    let quantity = 1;
-    if (type === 'special') {
-        const charmData = specialCharms.find(c => c.src === src);
-        quantity = charmData ? (charmData.quantity || 1) : 1;
-    } else if (type === 'rare') {
-        const charmData = rareCharms.find(c => c.src === src);
-        quantity = charmData ? (charmData.quantity || 1) : 1;
-    }
-    
-    img.dataset.quantity = quantity;
-    quantityBadge.textContent = quantity;
-    container.appendChild(quantityBadge);
-    
-    return container;
-}
+} 
 function updateCharmUsage() {
     document.querySelectorAll('.charms-grid .charm').forEach(charm => {
         charm.classList.remove('used');
