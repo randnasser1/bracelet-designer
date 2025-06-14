@@ -273,11 +273,26 @@ function createCharmElement(charm, type) {
     
     const img = document.createElement('img');
     img.src = charm.src;
+    img.alt = `${type} charm`;
     img.className = `charm ${type}-charm`;
     img.dataset.type = type;
     img.dataset.charm = charm.src;
+    img.dataset.quantity = charm.quantity || 1;
     
-    // Just blur if sold out (remove sold-out overlay)
+    // Add click handler directly to the image
+    img.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        // Skip if sold out
+        if (parseInt(this.dataset.quantity) <= 0) return;
+        
+        // Toggle selection
+        document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+        selectedCharm = this;
+    });
+    
+    // Visual sold-out state (just blur)
     if (charm.quantity <= 0) {
         img.style.filter = 'blur(1px)';
         img.style.opacity = '0.7';
@@ -286,7 +301,6 @@ function createCharmElement(charm, type) {
     
     container.appendChild(img);
     return container;
-}
 }
 
 
