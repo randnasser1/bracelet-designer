@@ -1235,16 +1235,33 @@ const CHARM_SIZES = {
     long: { width: 100, height: 50 },
     dangly: { width: 50, height: 80 }
 };
-
 function updateSpecialCharmsDisplay() {
     specialCharmsGrid.innerHTML = '';
     
-    // 1. Filter charms based on current category and gold/silver mode
+    // Create a container for the gold toggle
+    const toggleContainer = document.createElement('div');
+    toggleContainer.className = 'gold-toggle-container';
+    
+    // Add gold toggle at the top
     const hasGoldVariants = specialCharms.some(charm => 
-        (currentSpecialCategory === 'all' || charm.category === currentSpecialCategory) &&
-        charm.src.includes('-gold.png')
+        charm.src.includes('-gold.png') && 
+        (currentSpecialCategory === 'all' || charm.category === currentSpecialCategory)
     );
+    
+    if (hasGoldVariants) {
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = `gold-toggle-btn ${showGoldVariants ? 'active' : ''}`;
+        toggleBtn.textContent = showGoldVariants ? 'Show Silver' : 'Show Gold';
+        toggleBtn.addEventListener('click', () => {
+            showGoldVariants = !showGoldVariants;
+            updateSpecialCharmsDisplay();
+        });
+        toggleContainer.appendChild(toggleBtn);
+    }
+    
+    specialCharmsGrid.appendChild(toggleContainer);
 
+    // Filter charms based on current category and gold/silver mode
     const filteredCharms = specialCharms.filter(charm => {
         // Filter by category
         if (currentSpecialCategory !== 'all' && charm.category !== currentSpecialCategory) {
@@ -1252,45 +1269,65 @@ function updateSpecialCharmsDisplay() {
         }
 
         // Filter gold/silver variants if they exist
+        const isGoldVariant = charm.src.includes('-gold.png');
         if (hasGoldVariants) {
-            const isGoldVariant = charm.src.includes('-gold.png');
             return showGoldVariants ? isGoldVariant : !isGoldVariant;
         }
 
         return true;
     });
 
-    // 2. Create and append charm elements
+    // Create a grid container for the charms
+    const gridContainer = document.createElement('div');
+    gridContainer.className = 'charms-grid-container';
+    
+    // Add charms to the grid
     filteredCharms.forEach(charm => {
         const charmElement = createCharmElement(charm, 'special');
-        specialCharmsGrid.appendChild(charmElement);
+        gridContainer.appendChild(charmElement);
     });
 
-    // 3. Add gold/silver toggle if needed
-    if (hasGoldVariants) {
-        addGoldToggle(specialCharmsGrid);
-    }
+    specialCharmsGrid.appendChild(gridContainer);
 }
 
 function updateRareCharmsDisplay() {
     rareCharmsGrid.innerHTML = '';
     
-    // 1. Separate charms into regular and dangly
+    // Create a container for the gold toggle
+    const toggleContainer = document.createElement('div');
+    toggleContainer.className = 'gold-toggle-container';
+    
+    // Check if this category has gold variants
+    const hasGoldVariants = rareCharms.some(charm => 
+        charm.src.includes('-gold.png') && 
+        (currentRareCategory === 'all' || charm.category === currentRareCategory)
+    );
+    
+    if (hasGoldVariants) {
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = `gold-toggle-btn ${showGoldVariants ? 'active' : ''}`;
+        toggleBtn.textContent = showGoldVariants ? 'Show Silver' : 'Show Gold';
+        toggleBtn.addEventListener('click', () => {
+            showGoldVariants = !showGoldVariants;
+            updateRareCharmsDisplay();
+        });
+        toggleContainer.appendChild(toggleBtn);
+    }
+    
+    rareCharmsGrid.appendChild(toggleContainer);
+
+    // Separate charms into regular and dangly
     let regularCharms = [];
     let danglyCharms = [];
-    let hasGoldVariants = false;
 
     rareCharms.forEach(charm => {
-        // Check if this category has gold variants
-        const isGoldVariant = charm.src.includes('-gold.png');
-        if (isGoldVariant) hasGoldVariants = true;
-
         // Filter by category
         if (currentRareCategory !== 'all' && charm.category !== currentRareCategory) {
             return;
         }
 
         // Filter gold/silver variants if they exist
+        const isGoldVariant = charm.src.includes('-gold.png');
         if (hasGoldVariants) {
             if (showGoldVariants !== isGoldVariant) {
                 return;
@@ -1305,21 +1342,34 @@ function updateRareCharmsDisplay() {
         }
     });
 
-    // 2. Create and append charm elements
+    // Create grid container for regular charms
+    const gridContainer = document.createElement('div');
+    gridContainer.className = 'charms-grid-container';
+    
+    // Add regular charms
     regularCharms.forEach(charm => {
-        rareCharmsGrid.appendChild(createCharmElement(charm, 'rare'));
+        gridContainer.appendChild(createCharmElement(charm, 'rare'));
     });
 
-    // For "All" category, add dangly charms at the end
-    if (currentRareCategory === 'all') {
-        danglyCharms.forEach(charm => {
-            rareCharmsGrid.appendChild(createCharmElement(charm, 'rare'));
-        });
-    }
+    rareCharmsGrid.appendChild(gridContainer);
 
-    // 3. Add gold/silver toggle if needed
-    if (hasGoldVariants) {
-        addGoldToggle(rareCharmsGrid);
+    // For "All" category, add dangly charms in a separate section
+    if (currentRareCategory === 'all' && danglyCharms.length > 0) {
+        const danglyHeader = document.createElement('h4');
+        danglyHeader.textContent = 'Dangly Charms';
+        danglyHeader.style.marginTop = '20px';
+        danglyHeader.style.textAlign = 'center';
+        danglyHeader.style.color = '#d6336c';
+        rareCharmsGrid.appendChild(danglyHeader);
+
+        const danglyGrid = document.createElement('div');
+        danglyGrid.className = 'charms-grid-container dangly-grid';
+        
+        danglyCharms.forEach(charm => {
+            danglyGrid.appendChild(createCharmElement(charm, 'rare'));
+        });
+        
+        rareCharmsGrid.appendChild(danglyGrid);
     }
 }
 function updateBaseCharms() {
