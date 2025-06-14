@@ -267,6 +267,53 @@ function updateCartDisplay() {
         });
     });
 }
+function createCharmElement(charm, type) {
+    const container = document.createElement('div');
+    container.className = 'charm-container';
+    
+    // Determine charm type and size
+    let charmType = 'normal';
+    if (charm.src.includes('long') || charm.category === 'long') {
+        charmType = 'long';
+    } else if (charm.category === 'dangly') {
+        charmType = 'dangly';
+    }
+
+    // Set container size
+    container.style.width = `${CHARM_SIZES[charmType].width}px`;
+    container.style.height = `${CHARM_SIZES[charmType].height}px`;
+    container.classList.add(`${charmType}-charm-container`);
+
+    // Create image element
+    const img = document.createElement('img');
+    img.src = charm.src;
+    img.alt = `${type} Charm ${charm.src}`;
+    img.className = `charm ${charmType}-charm`;
+    img.dataset.type = type;
+    img.dataset.charm = charm.src;
+    img.dataset.category = charm.category;
+    img.style.width = `${CHARM_SIZES[charmType].width}px`;
+    img.style.height = `${CHARM_SIZES[charmType].height}px`;
+
+    // Handle sold-out state
+    if (charm.quantity <= 0) {
+        container.classList.add('sold-out');
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'sold-out-overlay';
+        
+        const soldOutText = document.createElement('div');
+        soldOutText.className = 'sold-out-text';
+        soldOutText.textContent = 'SOLD OUT';
+        
+        overlay.appendChild(soldOutText);
+        container.appendChild(overlay);
+    }
+
+    container.appendChild(img);
+    return container;
+}
+
 
 function updatePrice() {
     const totalPrice = calculatePrice(false); // Don't include delivery in main display
@@ -1183,273 +1230,98 @@ function initCharms() {
         });
     });
 }
+const CHARM_SIZES = {
+    normal: { width: 50, height: 50 },
+    long: { width: 100, height: 50 },
+    dangly: { width: 50, height: 80 }
+};
 
 function updateSpecialCharmsDisplay() {
     specialCharmsGrid.innerHTML = '';
     
-    // Check if the current category has any gold variants
-    const hasGoldVariants = specialCharms.some(charm => {
-        if (currentSpecialCategory === 'all') {
-            return charm.src.includes('-gold.png');
-        }
-        return charm.src.includes('-gold.png') && charm.category === currentSpecialCategory;
-    });
+    // 1. Filter charms based on current category and gold/silver mode
+    const hasGoldVariants = specialCharms.some(charm => 
+        (currentSpecialCategory === 'all' || charm.category === currentSpecialCategory) &&
+        charm.src.includes('-gold.png')
+    );
 
     const filteredCharms = specialCharms.filter(charm => {
-        // First filter by category
+        // Filter by category
         if (currentSpecialCategory !== 'all' && charm.category !== currentSpecialCategory) {
             return false;
         }
 
-        const isGoldVariant = charm.src.includes('-gold.png');
-
-        // Only apply gold/silver filtering if this category has gold variants
+        // Filter gold/silver variants if they exist
         if (hasGoldVariants) {
-            if (showGoldVariants) {
-                return isGoldVariant;
-            }
-            return !isGoldVariant;
+            const isGoldVariant = charm.src.includes('-gold.png');
+            return showGoldVariants ? isGoldVariant : !isGoldVariant;
         }
 
-        // If category has no gold variants, show all charms regardless of gold/silver state
         return true;
     });
 
-    // Create and append charms
+    // 2. Create and append charm elements
     filteredCharms.forEach(charm => {
-        const charmElement = document.createElement('img');
-        charmElement.src = charm.src;
-        charmElement.alt = `Special Charm ${charm.src}`;
-        charmElement.className = 'charm';
-        charmElement.dataset.type = 'special';
-        charmElement.dataset.charm = charm.src;
-        charmElement.dataset.category = charm.category;
-        
-        // Check if it's a long charm
-        if (charm.src.includes('long')) {
-            charmElement.classList.add('long-charm');
-        }
-        
-        // Update styling if sold out
-        if (charm.quantity <= 0) {
-            charmElement.classList.add('sold-out');
-            charmElement.style.filter = 'blur(1px)';
-            charmElement.style.opacity = '0.7';
-            charmElement.style.cursor = 'not-allowed';
-        }
-
-        charmElement.addEventListener('click', () => {
-            // Don't allow selection if out of stock
-            if (charm.quantity <= 0) return;
-            
-            document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
-            charmElement.classList.add('selected');
-            selectedCharm = charmElement;
-        });
-
+        const charmElement = createCharmElement(charm, 'special');
         specialCharmsGrid.appendChild(charmElement);
     });
 
-    // Add gold toggle button if category has gold variants
+    // 3. Add gold/silver toggle if needed
     if (hasGoldVariants) {
-        const toggleContainer = document.createElement('div');
-        toggleContainer.className = 'gold-toggle-container';
-        toggleContainer.style.width = '100%';
-        toggleContainer.style.display = 'flex';
-        toggleContainer.style.justifyContent = 'center';
-        toggleContainer.style.marginTop = '1rem';
-        toggleContainer.style.paddingTop = '1rem';
-        toggleContainer.style.borderTop = '1px solid #f5a0c2';
-
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = 'btn' + (showGoldVariants ? ' active' : '');
-        toggleBtn.style.minWidth = '100px';
-        toggleBtn.style.background = showGoldVariants ? '#d6336c' : '#fff';
-        toggleBtn.style.color = showGoldVariants ? '#fff' : '#d6336c';
-        toggleBtn.style.border = '2px solid #d6336c';
-        toggleBtn.style.borderRadius = '20px';
-        toggleBtn.style.padding = '0.5rem 1.5rem';
-        toggleBtn.textContent = showGoldVariants ? 'Silver' : 'Gold';
-        
-        toggleBtn.onclick = () => {
-            showGoldVariants = !showGoldVariants;
-            toggleBtn.textContent = showGoldVariants ? 'Silver' : 'Gold';
-            toggleBtn.style.background = showGoldVariants ? '#d6336c' : '#fff';
-            toggleBtn.style.color = showGoldVariants ? '#fff' : '#d6336c';
-            toggleBtn.classList.toggle('active');
-            selectedCharm = null;
-            updateSpecialCharmsDisplay();
-            updateRareCharmsDisplay();
-        };
-        toggleContainer.appendChild(toggleBtn);
-        specialCharmsGrid.appendChild(toggleContainer);
+        addGoldToggle(specialCharmsGrid);
     }
 }
+
 function updateRareCharmsDisplay() {
     rareCharmsGrid.innerHTML = '';
     
-    // Check if the current category has any gold variants
-    const hasGoldVariants = rareCharms.some(charm => {
-        if (currentRareCategory === 'all') {
-            return charm.src.includes('-gold.png');
-        }
-        return charm.src.includes('-gold.png') && charm.category === currentRareCategory;
-    });
-
-    // Separate dangly charms for sorting
-    let filteredCharms = [];
+    // 1. Separate charms into regular and dangly
+    let regularCharms = [];
     let danglyCharms = [];
+    let hasGoldVariants = false;
 
     rareCharms.forEach(charm => {
-        // First filter by category
+        // Check if this category has gold variants
+        const isGoldVariant = charm.src.includes('-gold.png');
+        if (isGoldVariant) hasGoldVariants = true;
+
+        // Filter by category
         if (currentRareCategory !== 'all' && charm.category !== currentRareCategory) {
             return;
         }
 
-        const isGoldVariant = charm.src.includes('-gold.png');
-        const isGoldCategory = charm.category === 'gold';
-        const isDangly = charm.category === 'dangly';
-
-        // For 'all' category, show gold variants and gold category items when gold is selected
-        if (currentRareCategory === 'all') {
-            if (showGoldVariants) {
-                if (isGoldVariant || isGoldCategory) {
-                    if (isDangly) {
-                        danglyCharms.push(charm);
-                    } else {
-                        filteredCharms.push(charm);
-                    }
-                }
-            } else {
-                if (!isGoldVariant && !isGoldCategory) {
-                    if (isDangly) {
-                        danglyCharms.push(charm);
-                    } else {
-                        filteredCharms.push(charm);
-                    }
-                }
-            }
-            return;
-        }
-
-        // For other categories with gold variants
+        // Filter gold/silver variants if they exist
         if (hasGoldVariants) {
-            if (showGoldVariants) {
-                if (isGoldVariant) {
-                    if (isDangly) {
-                        danglyCharms.push(charm);
-                    } else {
-                        filteredCharms.push(charm);
-                    }
-                }
-            } else {
-                if (!isGoldVariant) {
-                    if (isDangly) {
-                        danglyCharms.push(charm);
-                    } else {
-                        filteredCharms.push(charm);
-                    }
-                }
+            if (showGoldVariants !== isGoldVariant) {
+                return;
             }
-            return;
         }
 
-        // If category has no gold variants, show all charms
-        if (isDangly) {
+        // Separate dangly charms
+        if (charm.category === 'dangly') {
             danglyCharms.push(charm);
         } else {
-            filteredCharms.push(charm);
+            regularCharms.push(charm);
         }
+    });
+
+    // 2. Create and append charm elements
+    regularCharms.forEach(charm => {
+        rareCharmsGrid.appendChild(createCharmElement(charm, 'rare'));
     });
 
     // For "All" category, add dangly charms at the end
     if (currentRareCategory === 'all') {
-        filteredCharms = [...filteredCharms, ...danglyCharms];
-    }
-
-    // Create and append charms
-    filteredCharms.forEach(charm => {
-        const charmElement = document.createElement('img');
-        charmElement.src = charm.src;
-        charmElement.alt = `Rare Charm ${charm.src}`;
-        charmElement.className = 'charm';
-        charmElement.dataset.type = 'rare';
-        charmElement.dataset.charm = charm.src;
-        charmElement.dataset.category = charm.category;
-        
-        // Check if it's a dangly charm
-        if (charm.category === 'dangly') {
-            charmElement.classList.add('dangly-charm');
-        }
-        
-        // Update styling if sold out
-        if (charm.quantity <= 0) {
-            charmElement.classList.add('sold-out');
-            charmElement.style.filter = 'blur(1px)';
-            charmElement.style.opacity = '0.7';
-            charmElement.style.cursor = 'not-allowed';
-        }
-
-        charmElement.addEventListener('click', () => {
-            // Don't allow selection if out of stock
-            if (charm.quantity <= 0) return;
-            
-            document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
-            charmElement.classList.add('selected');
-            selectedCharm = charmElement;
+        danglyCharms.forEach(charm => {
+            rareCharmsGrid.appendChild(createCharmElement(charm, 'rare'));
         });
-
-        rareCharmsGrid.appendChild(charmElement);
-    });
-
-    // Add gold toggle button if category has gold variants
-    if (hasGoldVariants) {
-        const toggleContainer = document.createElement('div');
-        toggleContainer.className = 'gold-toggle-container';
-        toggleContainer.style.width = '100%';
-        toggleContainer.style.display = 'flex';
-        toggleContainer.style.justifyContent = 'center';
-        toggleContainer.style.marginTop = '1rem';
-        toggleContainer.style.paddingTop = '1rem';
-        toggleContainer.style.borderTop = '1px solid #f5a0c2';
-
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = 'btn' + (showGoldVariants ? ' active' : '');
-        toggleBtn.style.minWidth = '100px';
-        toggleBtn.style.background = showGoldVariants ? '#d6336c' : '#fff';
-        toggleBtn.style.color = showGoldVariants ? '#fff' : '#d6336c';
-        toggleBtn.style.border = '2px solid #d6336c';
-        toggleBtn.style.borderRadius = '20px';
-        toggleBtn.style.padding = '0.5rem 1.5rem';
-        toggleBtn.textContent = showGoldVariants ? 'Silver' : 'Gold';
-        
-        toggleBtn.onclick = () => {
-            showGoldVariants = !showGoldVariants;
-            toggleBtn.textContent = showGoldVariants ? 'Silver' : 'Gold';
-            toggleBtn.style.background = showGoldVariants ? '#d6336c' : '#fff';
-            toggleBtn.style.color = showGoldVariants ? '#fff' : '#d6336c';
-            toggleBtn.classList.toggle('active');
-            selectedCharm = null; // Clear selection when toggling
-            updateSpecialCharmsDisplay();
-            updateRareCharmsDisplay();
-        };
-        toggleContainer.appendChild(toggleBtn);
-        rareCharmsGrid.appendChild(toggleContainer);
     }
-} 
-function updateCharmUsage() {
-    document.querySelectorAll('.charms-grid .charm').forEach(charm => {
-        charm.classList.remove('used');
-    });
 
-    usedCharms.forEach(charmSrc => {
-        const charmEl = document.querySelector(`.charms-grid .charm[src$="${charmSrc}"]`);
-        if (charmEl) {
-            charmEl.classList.add('used');
-        }
-    });
+    // 3. Add gold/silver toggle if needed
+    if (hasGoldVariants) {
+        addGoldToggle(rareCharmsGrid);
+    }
 }
-
 function updateBaseCharms() {
     const slots = document.querySelectorAll('.slot');
     slots.forEach((slot, index) => {
