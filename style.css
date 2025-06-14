@@ -196,7 +196,32 @@ body {
     padding-top: 10px;
     border-top: 1px dashed #f5a0c2;
 }
+/* New styles for charms grid */
+.charms-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 10px;
+    padding: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
 
+.gold-toggle-container {
+    position: sticky;
+    top: 0;
+    background: #fff0f5;
+    padding: 10px;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+}
+
+
+.dangly-grid {
+    border-top: 1px dashed #f5a0c2;
+    padding-top: 15px;
+    margin-top: 10px;
+}
 .charm {
     width: 48px;
     height: 48px;
@@ -247,21 +272,22 @@ body {
     gap: 1rem;
     flex-wrap: wrap;
 }
-
 .gold-toggle-btn {
-    background: white;
-    color: #d6336c;
-    border: 2px solid #d6336c;
+    background: #ff85b3;
+    color: white;
+    border: none;
     border-radius: 20px;
-    padding: 0.5rem 1.5rem;
-    font-weight: 600;
+    padding: 8px 16px;
     cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s;
 }
 
 .gold-toggle-btn.active {
     background: #d6336c;
-    color: white;
 }
+
 
 /* ==================== */
 /* CART STYLES (Unchanged) */
