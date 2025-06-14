@@ -1339,6 +1339,23 @@ function updateBaseCharms() {
     });
 }
 
+function addGoldToggle(container) {
+    const toggleContainer = document.createElement('div');
+    toggleContainer.className = 'gold-toggle-container';
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = `gold-toggle-btn ${showGoldVariants ? 'active' : ''}`;
+    toggleBtn.textContent = showGoldVariants ? 'Show Silver' : 'Show Gold';
+    
+    toggleBtn.addEventListener('click', () => {
+        showGoldVariants = !showGoldVariants;
+        updateSpecialCharmsDisplay();
+        updateRareCharmsDisplay();
+    });
+
+    toggleContainer.appendChild(toggleBtn);
+    container.appendChild(toggleContainer);
+}
 function setupCategoryTabs() {
     // Special charms categories - select first category by default
     let firstSpecialCategory = null;
