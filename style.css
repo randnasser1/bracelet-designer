@@ -179,23 +179,22 @@ body {
 /* ==================== */
 .charms-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
-    gap: 0.5rem;
-    padding: 1rem;
-    background: #fff0f5;
-    border-radius: 16px;
-    margin: 1rem auto;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 10px;
+    padding: 10px;
 }
 
 /* Dangly positioning at bottom */
 .dangly-charm-container {
-    order: 1;
     grid-column: 1 / -1;
     text-align: center;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px dashed #f5a0c2;
+    padding: 10px 0;
 }
+.dangly-charm-container img {
+    height: 80px !important;
+    width: auto !important;
+}
+
 /* New styles for charms grid */
 .charms-grid-container {
     display: grid;
@@ -206,17 +205,22 @@ body {
     overflow-y: auto;
 }
 
+
+/* Gold toggle */
 .gold-toggle-container {
     position: sticky;
     top: 0;
     background: #fff0f5;
     padding: 10px;
     z-index: 10;
-    display: flex;
-    justify-content: center;
+    text-align: center;
 }
 
-
+.charm[data-quantity="0"] {
+    filter: blur(1px);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
 .dangly-grid {
     border-top: 1px dashed #f5a0c2;
     padding-top: 15px;
