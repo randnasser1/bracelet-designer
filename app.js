@@ -123,29 +123,23 @@ window.orderFunctionalityInitialized = false;
 
 // Modify your captureBraceletDesign function to use this:
 async function captureBraceletDesign() {
-  const jewelryPiece = document.getElementById('jewelry-piece');
-  
-  try {
-    const canvas = await html2canvas(jewelryPiece, {
-      useCORS: true, // Enable CORS
-      allowTaint: true, // Allow tainted canvas
-      logging: true,
-      scale: 2,
-      backgroundColor: null
-    });
+    const jewelryPiece = document.getElementById('jewelry-piece');
+    const options = {
+        useCORS: true,
+        allowTaint: true,
+        scale: 1, // Reduce from 2 to 1 for smaller image
+        logging: false,
+        backgroundColor: null,
+        removeContainer: true // Clean up temporary elements
+    };
 
-    const blob = await new Promise((resolve) => {
-      canvas.toBlob((blob) => {
-        resolve(blob);
-      }, 'image/png', 0.95);
-    });
-    
-    // Save permanently and return permanent URL
-    return await saveDesignPermanently(blob);
-  } catch (error) {
-    console.error('Error capturing design:', error);
-    throw error;
-  }
+    try {
+        const canvas = await html2canvas(jewelryPiece, options);
+        return canvas.toDataURL('image/png'); // Use data URL instead of blob
+    } catch (error) {
+        console.error('Capture error:', error);
+        throw error;
+    }
 }
 function calculatePrice(includeDelivery = false) {
     const product = PRODUCTS[currentProduct];
