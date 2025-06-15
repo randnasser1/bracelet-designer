@@ -722,66 +722,17 @@
   <div class="main-content">
     <h1>Jewelry Designer</h1>
     
-    <div class="product-selector">
-      <button class="product-btn active" data-type="bracelet">Bracelet</button>
-      <button class="product-btn" data-type="anklet">Anklet</button>
-      <button class="product-btn" data-type="necklace">Necklace</button>
-      <button class="product-btn" data-type="ring">Ring</button>
-    </div>
-    
-    <div class="controls">
-      <div class="control-group">
-        <label for="size">Size:</label>
-        <select id="size" class="btn">
-          <option value="15.2-16.2">15.2cm - 16.2cm (18 charms)</option>
-          <option value="16.2-17.1">16.2cm - 17.1cm (+0.5 JDs, 19 charms)</option>
-          <option value="17.1-18.1">17.1cm - 18.1cm (+1 JD, 20 charms)</option>
-          <option value="18.1-19.2">18.1cm - 19.2cm (+1.5 JDs, 21 charms)</option>
-          <option value="19.2-20">19.2cm - 20cm (+2 JDs, 22 charms)</option>
-          <option value="20-21">20cm - 21cm (+2.5 JDs, 23 charms)</option>
-          <option value="21-22">21cm - 22cm (+3 JDs, 24 charms)</option>
-        </select>
-      </div>
-      <div class="control-group">
-        <label>Material:</label>
-        <button class="material-option selected" data-material="silver">Silver</button>
-        <button class="material-option gold" data-material="gold">Gold</button>
-        <button class="material-option mix" data-material="mix">Mix</button>
-      </div>
-      <button id="full-glam-btn" class="btn">Full Glam</button>
-    </div>
-    
-    <div class="bracelet-container">
-      <div id="jewelry-piece"></div>
-    </div>
-
-    <div class="price-display">
-      <div id="base-price">Base Price: 10 JDs</div>
-      <div id="charm-price">Charms: 0 JDs (0/2 free specials used)</div>
-      <div id="total-price">Total: 10 JDs</div>
-    </div>
-
-    <div class="action-buttons">
-      <button class="btn download-btn" id="download-btn">
-        <i class="fas fa-download"></i> Download Design
-      </button>
-      <button class="btn add-to-cart-btn" id="add-to-cart-bottom">
-        <i class="fas fa-cart-plus"></i> Add to Cart
-      </button>
-    </div>
-
-    <div class="pricing-contact-buttons">
-      <button class="btn pricing-toggle-btn" id="pricing-toggle">
-        <i class="fas fa-tag"></i> Pricing Info
-      </button>
-      <a href="https://wa.me/962788838118" class="btn whatsapp-btn" target="_blank">
-        <i class="fab fa-whatsapp"></i> WhatsApp
-      </a>
-      <a href="https://instagram.com/italiacharm.jo" class="btn instagram-btn" target="_blank">
-        <i class="fab fa-instagram"></i> Instagram
-      </a>
-    </div>
-
+<div class="top-action-buttons">
+    <button class="btn pricing-toggle-btn" id="pricing-toggle">
+      <i class="fas fa-tag"></i> Pricing Info
+    </button>
+    <a href="https://wa.me/962788838118" class="btn whatsapp-btn" target="_blank" style="margin-right: 12px;">
+      <i class="fab fa-whatsapp"></i> WhatsApp
+    </a>
+    <a href="https://instagram.com/italiacharm.jo" class="btn instagram-btn" target="_blank">
+      <i class="fab fa-instagram"></i> Instagram
+    </a>
+  </div>
 <div class="pricing-info">
   <h3>Pricing Information</h3>
   <h3 style="text-align: left;">Pricing Information</h3>
@@ -822,6 +773,53 @@
     <p>Instagram: <a href="https://www.instagram.com/italiacharms.jo/">@italiacharm.jo</a></p>
   </div>
 </div>
+ <div class="product-selector" style="margin-top: 1.5rem;">
+    <button class="product-btn active" data-type="bracelet">Bracelet</button>
+    <button class="product-btn" data-type="anklet">Anklet</button>
+    <button class="product-btn" data-type="necklace">Necklace</button>
+    <button class="product-btn" data-type="ring">Ring</button>
+  </div>
+    
+    <div class="controls">
+      <div class="control-group">
+        <label for="size">Size:</label>
+        <select id="size" class="btn">
+          <option value="15.2-16.2">15.2cm - 16.2cm (18 charms)</option>
+          <option value="16.2-17.1">16.2cm - 17.1cm (+0.5 JDs, 19 charms)</option>
+          <option value="17.1-18.1">17.1cm - 18.1cm (+1 JD, 20 charms)</option>
+          <option value="18.1-19.2">18.1cm - 19.2cm (+1.5 JDs, 21 charms)</option>
+          <option value="19.2-20">19.2cm - 20cm (+2 JDs, 22 charms)</option>
+          <option value="20-21">20cm - 21cm (+2.5 JDs, 23 charms)</option>
+          <option value="21-22">21cm - 22cm (+3 JDs, 24 charms)</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Material:</label>
+        <button class="material-option selected" data-material="silver">Silver</button>
+        <button class="material-option gold" data-material="gold">Gold</button>
+        <button class="material-option mix" data-material="mix">Mix</button>
+      </div>
+      <button id="full-glam-btn" class="btn">Full Glam</button>
+    </div>
+    
+    <div class="bracelet-container">
+      <div id="jewelry-piece"></div>
+    </div>
+
+    <div class="price-display">
+      <div id="base-price">Base Price: 10 JDs</div>
+      <div id="charm-price">Charms: 0 JDs (0/2 free specials used)</div>
+      <div id="total-price">Total: 10 JDs</div>
+    </div>
+    <div class="action-buttons">
+      <button class="btn download-btn" id="download-btn">
+        <i class="fas fa-download"></i> Download Design
+      </button>
+      <button class="btn add-to-cart-btn" id="add-to-cart-bottom">
+        <i class="fas fa-cart-plus"></i> Add to Cart
+      </button>
+    </div>
+
     <div class="charm-pools">
         <!-- Special Charms -->
         <div class="charm-pool">
