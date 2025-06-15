@@ -143,7 +143,7 @@ const specialCharms = [
   { src: 'special/cute specials/128-gold.png', category: 'cutespecials', quantity: 8 },
   { src: 'special/cute specials/special.png', category: 'cutespecials', quantity: 17 },
   { src: 'special/cute specials/special2.png', category: 'cutespecials', quantity: 46 },
-    { src: 'special/cute specials/1.png', category: 'cutespecials', quantity: 46 },
+    { src: 'special/cute specials/1-gold.png', category: 'cutespecials', quantity: 46 },
 
   { src: 'special/cute specials/special3.png', category: 'cutespecials', quantity: 8 },
   { src: 'special/cute specials/special4.png', category: 'cutespecials', quantity: 12 },
@@ -159,8 +159,8 @@ const specialCharms = [
   { src: 'special/cute specials/special14.png', category: 'cutespecials', quantity: 1 },
   { src: 'special/cute specials/special15.png', category: 'cutespecials', quantity: 4 },
   { src: 'special/cute specials/special16.png', category: 'cutespecials', quantity: 1 },
-    { src: 'special/cute specials/3.png', category: 'cutespecials', quantity: 1 },
-  { src: 'special/cute specials/2.png', category: 'cutespecials', quantity: 4 },
+    { src: 'special/cute specials/3-gold.png', category: 'cutespecials', quantity: 1 },
+  { src: 'special/cute specials/2-gold.png', category: 'cutespecials', quantity: 4 },
 
   { src: 'special/cute specials/special17.png', category: 'cutespecials', quantity: 8 },
   { src: 'special/cute specials/special18.png', category: 'cutespecials', quantity: 0 },
@@ -405,3 +405,4 @@ const rareCharms = [
       { src: 'rares/sporty/31.png', category: 'sporty', quantity: 1 },
 
 ];
+
