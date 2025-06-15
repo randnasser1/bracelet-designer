@@ -1083,27 +1083,43 @@ function removeCharmFromSlot(slot) {
     const charmSrc = charm.dataset.charm;
     const charmType = charm.dataset.type;
     const isDangly = charm.classList.contains('dangly-charm');
+    const isLong = slot.classList.contains('long-slot');
     
-    // Remove dangly class if present
-    if (isDangly) {
-        slot.classList.remove('has-dangly');
+    // Get the slot index before removal
+    const slotIndex = Array.from(jewelryPiece.children).indexOf(slot);
+    
+    // Remove the slot completely
+    slot.remove();
+    
+    if (isLong) {
+        // For long charms, we need to add back two regular slots
+        const newSlot1 = createBaseSlot();
+        const newSlot2 = createBaseSlot();
+        
+        // Insert them at the correct position
+        if (slotIndex >= 0) {
+            jewelryPiece.insertBefore(newSlot1, jewelryPiece.children[slotIndex]);
+            jewelryPiece.insertBefore(newSlot2, jewelryPiece.children[slotIndex + 1]);
+        } else {
+            // If for some reason we couldn't get the index, append to end
+            jewelryPiece.appendChild(newSlot1);
+            jewelryPiece.appendChild(newSlot2);
+        }
+    } else {
+        // For regular charms, just add one slot back
+        const newSlot = createBaseSlot();
+        
+        if (slotIndex >= 0) {
+            jewelryPiece.insertBefore(newSlot, jewelryPiece.children[slotIndex]);
+        } else {
+            jewelryPiece.appendChild(newSlot);
+        }
+        
+        // Remove dangly class if present
+        if (isDangly) {
+            newSlot.classList.remove('has-dangly');
+        }
     }
-    
-    // Clear the slot completely (remove any existing charm)
-    slot.innerHTML = '';
-    
-    // Add base charm back
-    const baseImg = document.createElement('img');
-    if (materialType === 'silver') {
-        baseImg.src = 'basecharms/silver.png';
-    } else if (materialType === 'gold') {
-        baseImg.src = 'basecharms/gold.png';
-    } else if (materialType === 'mix') {
-        const index = Array.from(jewelryPiece.children).indexOf(slot);
-        baseImg.src = index % 2 === 0 ? 'basecharms/gold.png' : 'basecharms/silver.png';
-    }
-    baseImg.dataset.type = 'base';
-    slot.appendChild(baseImg);
     
     // For non-custom charms, restore quantity
     if (charmType !== 'custom') {
@@ -1342,22 +1358,77 @@ function updateRareCharmsDisplay() {
         charmElement.classList.add('rare');
         charmElement.dataset.charm = charm.src;
         charmElement.dataset.category = charm.category;
+        charmElement.dataset.quantity = charm.quantity || 1; // Add quantity tracking
         
-        if (charm.soldOut) {
-            charmElement.classList.add('sold-out');
+        // Update styling based on quantity
+        if (charm.quantity <= 0) {
+            charmElement.classList.add('out-of-stock');
+            charmElement.style.opacity = '0.5';
+            charmElement.style.cursor = 'not-allowed';
         }
+
         if (usedCharms.has(charm.src)) {
             charmElement.classList.add('used');
         }
 
         charmElement.addEventListener('click', () => {
+            const quantity = parseInt(charmElement.dataset.quantity) || 1;
+            
+            // Don't allow selection if out of stock
+            if (quantity <= 0) {
+                return;
+            }
+            
+            // Don't allow selection if already used (unless quantity > 1)
+            if (quantity === 1 && usedCharms.has(charm.src)) {
+                return;
+            }
+            
+            // Deselect all other charms
             document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
+            
+            // Select this charm
             charmElement.classList.add('selected');
             selectedCharm = charmElement;
         });
 
         rareCharmsGrid.appendChild(charmElement);
     });
+
+    // Add gold toggle button if category has gold variants
+    if (hasGoldVariants) {
+        const toggleContainer = document.createElement('div');
+        toggleContainer.className = 'gold-toggle-container';
+        toggleContainer.style.width = '100%';
+        toggleContainer.style.display = 'flex';
+        toggleContainer.style.justifyContent = 'center';
+        toggleContainer.style.marginTop = '1rem';
+        toggleContainer.style.paddingTop = '1rem';
+        toggleContainer.style.borderTop = '1px solid #f5a0c2';
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = 'btn' + (showGoldVariants ? ' active' : '');
+        toggleBtn.style.minWidth = '100px';
+        toggleBtn.style.background = showGoldVariants ? '#d6336c' : '#fff';
+        toggleBtn.style.color = showGoldVariants ? '#fff' : '#d6336c';
+        toggleBtn.style.border = '2px solid #d6336c';
+        toggleBtn.style.borderRadius = '20px';
+        toggleBtn.style.padding = '0.5rem 1.5rem';
+        toggleBtn.textContent = showGoldVariants ? 'Silver' : 'Gold';
+        
+        toggleBtn.onclick = () => {
+            showGoldVariants = !showGoldVariants;
+            toggleBtn.textContent = showGoldVariants ? 'Silver' : 'Gold';
+            toggleBtn.style.background = showGoldVariants ? '#d6336c' : '#fff';
+            toggleBtn.style.color = showGoldVariants ? '#fff' : '#d6336c';
+            toggleBtn.classList.toggle('active');
+            selectedCharm = null; // Clear selection when toggling
+            updateSpecialCharmsDisplay();
+            updateRareCharmsDisplay(); // Update both displays when toggling
+        };
+        toggleContainer.appendChild(toggleBtn);
+        rareCharmsGrid.appendChild(toggleContainer);
+    }
 }
 
 function createCharm(src, alt, type) {
