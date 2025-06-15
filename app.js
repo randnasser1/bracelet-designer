@@ -875,25 +875,36 @@ function setupOrderFunctionality() {
         };
 
         // Upload payment proof if Cliq payment
-       if (formData.get('payment') === 'Cliq') {
-            const paymentProofFile = document.getElementById('payment-proof').files[0];
-            if (paymentProofFile) {
-                // Create unique filename without user ID
-                const fileName = `payment-proofs/${Date.now()}_${paymentProofFile.name}`;
-                const storageRef = storage.ref(fileName);
-                
-                // Upload with basic metadata
-                const metadata = {
-                    contentType: paymentProofFile.type,
-                    customMetadata: {
-                        orderId: orderData.clientOrderId // Link to order
-                    }
-                };
-                
-                await storageRef.put(paymentProofFile, metadata);
-                orderData.paymentProofUrl = await storageRef.getDownloadURL();
-            }
+      if (formData.get('payment') === 'Cliq') {
+    const paymentProofFile = document.getElementById('payment-proof').files[0];
+    if (!paymentProofFile) {
+        throw new Error('Please upload payment proof for Cliq payment');
+    }
+
+    // Simple client-side validation
+    if (paymentProofFile.size > 5 * 1024 * 1024) { // 5MB max
+        throw new Error('Payment proof must be smaller than 5MB');
+    }
+
+    const fileExt = paymentProofFile.name.split('.').pop().toLowerCase();
+    if (!['png', 'jpg', 'jpeg', 'pdf'].includes(fileExt)) {
+        throw new Error('Only PNG, JPG, or PDF files allowed');
+    }
+
+    // Upload with order reference
+    const fileName = `payment-proofs/${orderData.clientOrderId}_${Date.now()}.${fileExt}`;
+    const storageRef = storage.ref(fileName);
+    
+    await storageRef.put(paymentProofFile, {
+        contentType: paymentProofFile.type,
+        customMetadata: {
+            orderId: orderData.clientOrderId,
+            phone: formData.get('phone') || 'none'
         }
+    });
+    
+    orderData.paymentProofUrl = await storageRef.getDownloadURL();
+}
         
         // Submit to Firestore
         const orderRef = await db.collection('orders').add(orderData);
