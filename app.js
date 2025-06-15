@@ -422,7 +422,20 @@ function setupEventListeners() {
         const sizeSelect = document.getElementById('size');
         const fullGlamBtn = document.getElementById('full-glam-btn');
         const downloadBtn = document.getElementById('download-btn');
-
+        const pricingToggle = document.getElementById('pricing-toggle');
+        if (pricingToggle) {
+            pricingToggle.addEventListener('click', () => {
+                const pricingInfo = document.querySelector('.pricing-info');
+                pricingInfo.classList.toggle('visible');
+                
+                // Update button text based on state
+                const btnText = pricingToggle.querySelector('.btn-text');
+                if (pricingInfo.classList.contains('visible')) {
+                    btnText.textContent = 'Hide Pricing';
+                } else {
+                    btnText.textContent = 'Pricing';
+                }
+            });
         productBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const product = btn.dataset.type;
@@ -431,7 +444,7 @@ function setupEventListeners() {
                 initProduct(product);
             });
         });
-
+    
         materialOptions.forEach(option => {
             option.addEventListener('click', () => {
                 materialOptions.forEach(opt => opt.classList.remove('selected'));
