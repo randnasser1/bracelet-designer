@@ -875,25 +875,18 @@ function setupOrderFunctionality() {
         };
 
         // Upload payment proof if Cliq payment
-        if (formData.get('payment') === 'Cliq') {
+       if (formData.get('payment') === 'Cliq') {
             const paymentProofFile = document.getElementById('payment-proof').files[0];
             if (paymentProofFile) {
-                // Get current user
-                const user = firebase.auth().currentUser;
-                if (!user) {
-                    throw new Error('You must be logged in to submit payment proof');
-                }
-                
-                // Create unique filename with user ID
-                const fileName = `payment-proofs/${user.uid}_${Date.now()}_${paymentProofFile.name}`;
+                // Create unique filename without user ID
+                const fileName = `payment-proofs/${Date.now()}_${paymentProofFile.name}`;
                 const storageRef = storage.ref(fileName);
                 
-                // Upload with metadata
+                // Upload with basic metadata
                 const metadata = {
                     contentType: paymentProofFile.type,
                     customMetadata: {
-                        userId: user.uid,
-                        orderId: orderData.clientOrderId
+                        orderId: orderData.clientOrderId // Link to order
                     }
                 };
                 
