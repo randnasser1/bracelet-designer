@@ -557,7 +557,7 @@ function setupCartFunctionality() {
 
     });
 
-   document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
+  document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
     const addToCartBtn = document.getElementById('add-to-cart-bottom');
     const jewelryPiece = document.getElementById('jewelry-piece');
     
@@ -579,12 +579,11 @@ function setupCartFunctionality() {
             }
         }
         
-        // Rest of your cart addition logic...
         addToCartBtn.disabled = true;
         addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
         
-        const designBlob = await captureBraceletDesign();
-        const designUrl = URL.createObjectURL(designBlob);
+        // Get the data URL directly from captureBraceletDesign
+        const designUrl = await captureBraceletDesign();
         
         const cartItem = {
             id: Date.now().toString(),
@@ -597,8 +596,7 @@ function setupCartFunctionality() {
                 src: img.src,
                 type: img.dataset.type
             })),
-            imageUrl: designUrl,
-            imageBlob: designBlob,
+            imageUrl: designUrl, // Use the data URL directly
             timestamp: new Date().toISOString()
         };
         
@@ -615,9 +613,7 @@ function setupCartFunctionality() {
         addToCartBtn.disabled = false;
         addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
     }
-});
-}
-
+});}f
 function validateCharmSets() {
     const invalidSets = [];
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => img.src);
