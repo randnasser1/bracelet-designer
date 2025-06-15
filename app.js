@@ -924,16 +924,29 @@ function placeSelectedCharm(slot) {
     const charmType = selectedCharm.dataset.type;
     let quantity = parseInt(selectedCharm.dataset.quantity) || 1;
     
+    // First check if charm is out of stock
+    if (selectedCharm.classList.contains('out-of-stock') || 
+        selectedCharm.classList.contains('sold-out')) {
+        alert('This charm is out of stock!');
+        selectedCharm.classList.remove('selected');
+        selectedCharm = null;
+        return;
+    }
+
     // For non-custom charms, check availability
     if (charmType !== 'custom') {
         if (quantity <= 0) {
             alert('This charm is out of stock!');
+            selectedCharm.classList.remove('selected');
+            selectedCharm = null;
             return;
         }
         
         // Check if this charm is already used (unless quantity > 1)
         if (usedCharms.has(charmSrc) && quantity <= 1) {
             alert('You can only add this charm once!');
+            selectedCharm.classList.remove('selected');
+            selectedCharm = null;
             return;
         }
     }
