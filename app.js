@@ -75,7 +75,12 @@ const CHARM_SETS = {
     charms: ['love.png', 'love2.png'],
     message: 'Soulmates charms must be bought together in 2 different items',
     requiredCount: 2
-  }
+  },
+    loveSet: {
+    charms: ['rares/love/6.png', 'rares/love/7.png'],
+    message: 'Love charms must be bought together as a set of 2',
+    requiredCount: 2
+  },
 };
 
 // Global state
@@ -1330,10 +1335,19 @@ function updateRareCharmsDisplay() {
             return;
         }
 
-        const isGoldVariant = charm.src.includes('-gold.png');
+      const isGoldVariant = charm.src.includes('-gold.png');
         const isGoldCategory = charm.category === 'gold';
         const isDangly = charm.src.includes('dangly') || charm.category === 'dangly';
         const isOutOfStock = charm.quantity <= 0;
+        const isLoveSet = charm.src.includes('rares/love/6.png') || charm.src.includes('rares/love/7.png');
+
+        // Special handling for love set charms
+        if (isLoveSet) {
+            if (isOutOfStock) outOfStockCharms.push(charm);
+            else loveSetCharms.push(charm);
+            return;
+        }
+
 
         // For ALL category, separate dangly charms
         if (currentRareCategory === 'all' && isDangly) {
@@ -1393,7 +1407,10 @@ function updateRareCharmsDisplay() {
             createAndAppendCharm(charm);
         });
     }
-
+  // Display love set charms (treated as dangly size)
+    if (loveSetCharms.length > 0) {
+        loveSetCharms.forEach(charm => createCharmElement(charm, false, true));
+    }
     // Display out-of-stock charms at the end
     outOfStockCharms.forEach(charm => {
         createAndAppendCharm(charm, true);
@@ -1404,13 +1421,20 @@ function updateRareCharmsDisplay() {
         addGoldToggle();
     }
 
-    function createAndAppendCharm(charm, isOutOfStock = false) {
+    function createCharmElement(charm, isOutOfStock = false, isLoveSet = false) {
         const charmElement = createCharm(charm.src, `Rare Charm ${charm.src}`, 'rare');
         charmElement.classList.add('rare');
         charmElement.dataset.charm = charm.src;
         charmElement.dataset.category = charm.category;
         charmElement.dataset.quantity = charm.quantity || 1;
         
+        // Special handling for love set charms (make them dangly size)
+        if (isLoveSet) {
+            charmElement.classList.add('dangly-charm');
+            charmElement.style.width = '48px';
+            charmElement.style.height = '96px';
+        }
+
         if (isOutOfStock || charm.quantity <= 0) {
             charmElement.classList.add('out-of-stock');
             charmElement.style.opacity = '0.5';
@@ -1426,6 +1450,23 @@ function updateRareCharmsDisplay() {
             if (quantity <= 0) return;
             if (quantity === 1 && usedCharms.has(charm.src)) return;
             
+            // Check if this is part of the love set
+            const charmSet = getCharmSet(charm.src);
+            if (charmSet && charmSet.charms.includes(charm.src)) {
+                const placedCharms = Array.from(document.querySelectorAll('.slot img:not([data-type="base"])'))
+                    .map(img => img.dataset.charm);
+                
+                const hasOtherSetCharms = placedCharms.some(src => 
+                    charmSet.charms.some(charm => src.includes(charm))
+                );
+                
+                if (!hasOtherSetCharms) {
+                    if (!confirm(`${charmSet.message}\n\nDo you want to add this charm anyway?`)) {
+                        return;
+                    }
+                }
+            }
+            
             document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
             charmElement.classList.add('selected');
             selectedCharm = charmElement;
@@ -1433,27 +1474,13 @@ function updateRareCharmsDisplay() {
 
         rareCharmsGrid.appendChild(charmElement);
     }
+}
 
-    function addGoldToggle() {
-        const toggleContainer = document.createElement('div');
-        toggleContainer.style.cssText = 'width:100%; display:flex; justify-content:center; margin:1rem 0; padding-top:1rem; border-top:1px dashed #f5a0c2;';
-
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = 'btn';
-        toggleBtn.textContent = showGoldVariants ? 'Show Silver' : 'Show Gold';
-        toggleBtn.style.cssText = 'min-width:120px; background:' + (showGoldVariants ? '#d6336c' : '#fff') + 
-                                 '; color:' + (showGoldVariants ? '#fff' : '#d6336c') + 
-                                 '; border:2px solid #d6336c; border-radius:20px; padding:0.5rem 1.5rem; font-weight:bold;';
-
-        toggleBtn.onclick = () => {
-            showGoldVariants = !showGoldVariants;
-            updateRareCharmsDisplay();
-            updateSpecialCharmsDisplay();
-        };
-
-        toggleContainer.appendChild(toggleBtn);
-        rareCharmsGrid.appendChild(toggleContainer);
-    }
+// Add this helper function if you don't have it already
+function getCharmSet(charmSrc) {
+    return Object.values(CHARM_SETS).find(set => 
+        set.charms.some(charm => charmSrc.includes(charm))
+    );
 }
 
 function createCharm(src, alt, type) {
