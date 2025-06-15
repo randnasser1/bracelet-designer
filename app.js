@@ -121,30 +121,32 @@ let currentDesign = {
 };
 window.orderFunctionalityInitialized = false;
 
-/* NEW: Bracelet Capture Functions */
+// Modify your captureBraceletDesign function to use this:
 async function captureBraceletDesign() {
-    const jewelryPiece = document.getElementById('jewelry-piece');
+  const jewelryPiece = document.getElementById('jewelry-piece');
+  
+  try {
+    const canvas = await html2canvas(jewelryPiece, {
+      useCORS: true, // Enable CORS
+      allowTaint: true, // Allow tainted canvas
+      logging: true,
+      scale: 2,
+      backgroundColor: null
+    });
+
+    const blob = await new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        resolve(blob);
+      }, 'image/png', 0.95);
+    });
     
-    try {
-        const canvas = await html2canvas(jewelryPiece, {
-            useCORS: true,
-            allowTaint: false,
-            logging: true,
-            scale: 2,
-            backgroundColor: null
-        });
-
-        return new Promise((resolve) => {
-            canvas.toBlob((blob) => {
-                resolve(blob);
-            }, 'image/png', 0.95);
-        });
-    } catch (error) {
-        console.error('Error capturing design:', error);
-        throw error;
-    }
+    // Save permanently and return permanent URL
+    return await saveDesignPermanently(blob);
+  } catch (error) {
+    console.error('Error capturing design:', error);
+    throw error;
+  }
 }
-
 function calculatePrice(includeDelivery = false) {
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
@@ -1509,6 +1511,40 @@ function updateRareCharmsDisplay() {
         rareCharmsGrid.appendChild(charmElement);
     }
 }
+async function saveDesignPermanently(blob) {
+  try {
+    const timestamp = Date.now();
+    const filename = `designs/design-${timestamp}.png`;
+    const storageRef = firebase.storage().ref();
+    const uploadTask = storageRef.child(filename).put(blob, {
+      contentType: 'image/png'
+    });
+    
+    return new Promise((resolve, reject) => {
+      uploadTask.on('state_changed',
+        null, // Progress handler (optional)
+        (error) => {
+          console.error('Upload error:', error);
+          reject(error);
+        },
+        async () => {
+          try {
+            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+            resolve(downloadURL);
+          } catch (error) {
+            console.error('Error getting download URL:', error);
+            reject(error);
+          }
+        }
+      );
+    });
+  } catch (error) {
+    console.error('Error saving design:', error);
+    throw error;
+  }
+}
+
+
 function createCharm(src, alt, type, isDangly = false) {
     const img = document.createElement('img');
     img.src = src;
