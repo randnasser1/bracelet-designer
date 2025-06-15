@@ -1341,25 +1341,30 @@ function updateRareCharmsDisplay() {
         const isOutOfStock = charm.quantity <= 0;
         const isLoveSet = charm.src.includes('rares/love/6.png') || charm.src.includes('rares/love/7.png');
 
-        // Special handling for love set charms
+        // Handle love set separately
         if (isLoveSet) {
             if (isOutOfStock) outOfStockCharms.push(charm);
             else loveSetCharms.push(charm);
             return;
         }
 
-        // Filter logic...
+        // Handle dangly charms
+        if (isDangly) {
+            if (isOutOfStock) outOfStockCharms.push(charm);
+            else danglyCharms.push(charm);
+            return;
+        }
+
+        // Filter remaining charms
         if (currentRareCategory === 'all') {
             if (showGoldVariants) {
                 if (isGoldVariant || isGoldCategory) {
                     if (isOutOfStock) outOfStockCharms.push(charm);
-                    else if (isDangly) danglyCharms.push(charm);
                     else availableCharms.push(charm);
                 }
             } else {
                 if (!isGoldVariant && !isGoldCategory) {
                     if (isOutOfStock) outOfStockCharms.push(charm);
-                    else if (isDangly) danglyCharms.push(charm);
                     else availableCharms.push(charm);
                 }
             }
@@ -1370,13 +1375,11 @@ function updateRareCharmsDisplay() {
             if (showGoldVariants) {
                 if (isGoldVariant) {
                     if (isOutOfStock) outOfStockCharms.push(charm);
-                    else if (isDangly) danglyCharms.push(charm);
                     else availableCharms.push(charm);
                 }
             } else {
                 if (!isGoldVariant) {
                     if (isOutOfStock) outOfStockCharms.push(charm);
-                    else if (isDangly) danglyCharms.push(charm);
                     else availableCharms.push(charm);
                 }
             }
@@ -1384,14 +1387,20 @@ function updateRareCharmsDisplay() {
         }
 
         if (isOutOfStock) outOfStockCharms.push(charm);
-        else if (isDangly) danglyCharms.push(charm);
         else availableCharms.push(charm);
     });
 
-    // Display order...
+    // Display order:
+    // 1. Available regular charms
     availableCharms.forEach(charm => createCharmElement(charm));
+    
+    // 2. Love set charms (as dangly size)
     loveSetCharms.forEach(charm => createCharmElement(charm, false, true));
-    if (currentRareCategory === 'all') danglyCharms.forEach(charm => createCharmElement(charm));
+    
+    // 3. Available dangly charms
+    danglyCharms.forEach(charm => createCharmElement(charm, false, true));
+    
+    // 4. Out of stock charms
     outOfStockCharms.forEach(charm => createCharmElement(charm, true));
 
     // Gold toggle...
@@ -1416,14 +1425,14 @@ function updateRareCharmsDisplay() {
         rareCharmsGrid.appendChild(toggleContainer);
     }
 
-    function createCharmElement(charm, isOutOfStock = false, isLoveSet = false) {
+    function createCharmElement(charm, isOutOfStock = false, isDangly = false) {
         const charmElement = createCharm(charm.src, `Rare Charm ${charm.src}`, 'rare');
         charmElement.classList.add('rare');
         charmElement.dataset.charm = charm.src;
         charmElement.dataset.category = charm.category;
         charmElement.dataset.quantity = charm.quantity || 1;
         
-        if (isLoveSet) {
+        if (isDangly) {
             charmElement.classList.add('dangly-charm');
             charmElement.style.width = '48px';
             charmElement.style.height = '96px';
@@ -1469,7 +1478,6 @@ function updateRareCharmsDisplay() {
         rareCharmsGrid.appendChild(charmElement);
     }
 }
-
 function createCharm(src, alt, type) {
     const img = document.createElement('img');
     img.src = src;
