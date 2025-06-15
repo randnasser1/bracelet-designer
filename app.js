@@ -626,38 +626,36 @@ function setupCartFunctionality() {
 
     });
 
-  document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
+document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
     const addToCartBtn = document.getElementById('add-to-cart-bottom');
     const jewelryPiece = document.getElementById('jewelry-piece');
     
-   document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
-  try {
-    // 1. Capture bracelet design as image
-    const jewelryPiece = document.getElementById('jewelry-piece');
-    const canvas = await html2canvas(jewelryPiece);
-    const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    
-    // 2. Upload the image
-    const designUrl = await uploadImageToFirebase(imageBlob, 'designs/');
-    
-    // 3. Add to cart with the image URL
-    const cartItem = {
-      id: Date.now().toString(),
-      product: currentProduct,
-      designImage: designUrl,
-    size: currentSize,
-    isFullGlam: isFullGlam,
-    materialType: materialType,
-    price: calculatePrice(false),
-    charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
-        src: img.src,
-        type: img.dataset.type
-    })),
-    imageUrl: designUrl, // This is the data URL from canvas.toDataURL()
-    timestamp: new Date().toISOString()
-};
+    try {
+        // 1. Capture bracelet design as image
+        const canvas = await html2canvas(jewelryPiece);
+        const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         
-         cart.push(cartItem);
+        // 2. Upload the image
+        const designUrl = await uploadImageToFirebase(imageBlob, 'designs/');
+        
+        // 3. Add to cart with the image URL
+        const cartItem = {
+            id: Date.now().toString(),
+            product: currentProduct,
+            designImage: designUrl,
+            size: currentSize,
+            isFullGlam: isFullGlam,
+            materialType: materialType,
+            price: calculatePrice(false),
+            charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
+                src: img.src,
+                type: img.dataset.type
+            })),
+            imageUrl: designUrl,
+            timestamp: new Date().toISOString()
+        };
+            
+        cart.push(cartItem);
         updateCartDisplay();
         
         alert('Design added to cart!');
@@ -670,7 +668,7 @@ function setupCartFunctionality() {
         addToCartBtn.disabled = false;
         addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
     }
-});}
+});
 function validateCharmSets() {
     const invalidSets = [];
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => img.src);
