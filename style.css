@@ -119,7 +119,58 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 1rem;
 }
+/* Long Horizontal Charms */
+.long-charm {
+    width: 96px !important;
+    height: 48px !important;
+    object-fit: contain;
+}
 
+.slot.long-slot {
+    width: 96px;
+    height: 48px;
+    grid-column: span 2;
+}
+
+/* Dangly Vertical Charms */
+.dangly-charm {
+    width: 48px !important;
+    height: 96px !important;
+    object-fit: contain;
+}
+
+.slot.has-dangly {
+    height: 96px;
+    position: relative;
+    overflow: visible;
+}
+
+.slot.has-dangly img.dangly-charm {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Charm Pool Display Adjustments */
+.charms-grid .long-charm {
+    width: 96px !important;
+    height: 48px !important;
+    grid-column: span 2;
+}
+
+.charms-grid .dangly-charm {
+    width: 48px !important;
+    height: 96px !important;
+    margin-bottom: -48px; /* Compensate for extra height in grid */
+    position: relative;
+    z-index: 1;
+}
+
+/* Special sorting for dangly charms in "All" category */
+#rare-charms.all .dangly-charm {
+    order: 999; /* Forces dangly charms to appear last */
+}
 .charm-pool h3 {
     color: #d6336c;
     margin-bottom: 1rem;
