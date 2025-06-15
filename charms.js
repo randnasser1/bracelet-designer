@@ -122,7 +122,6 @@ const specialCharms = [
   { src: 'special/cute and simple/c5.png', category: 'simple', quantity: 1 },
   { src: 'special/cute and simple/c6.png', category: 'simple', quantity: 1 },
   { src: 'special/cute and simple/turtle.png', category: 'simple', quantity: 1 },
-
   { src: 'special/cute and simple/c7.png', category: 'simple', quantity: 4 },
   { src: 'special/cute and simple/c8.png', category: 'simple', quantity: 1 },
   // cutespecials charms
@@ -143,8 +142,7 @@ const specialCharms = [
   { src: 'special/cute specials/128-gold.png', category: 'cutespecials', quantity: 8 },
   { src: 'special/cute specials/special.png', category: 'cutespecials', quantity: 17 },
   { src: 'special/cute specials/special2.png', category: 'cutespecials', quantity: 46 },
-    { src: 'special/cute specials/1-gold.png', category: 'cutespecials', quantity: 46 },
-
+  { src: 'special/cute specials/1-gold.png', category: 'cutespecials', quantity: 46 },
   { src: 'special/cute specials/special3.png', category: 'cutespecials', quantity: 8 },
   { src: 'special/cute specials/special4.png', category: 'cutespecials', quantity: 12 },
   { src: 'special/cute specials/special5.png', category: 'cutespecials', quantity: 18 },
@@ -159,16 +157,15 @@ const specialCharms = [
   { src: 'special/cute specials/special14.png', category: 'cutespecials', quantity: 1 },
   { src: 'special/cute specials/special15.png', category: 'cutespecials', quantity: 4 },
   { src: 'special/cute specials/special16.png', category: 'cutespecials', quantity: 1 },
-    { src: 'special/cute specials/3-gold.png', category: 'cutespecials', quantity: 1 },
+  { src: 'special/cute specials/3-gold.png', category: 'cutespecials', quantity: 1 },
   { src: 'special/cute specials/2-gold.png', category: 'cutespecials', quantity: 4 },
-
   { src: 'special/cute specials/special17.png', category: 'cutespecials', quantity: 8 },
   { src: 'special/cute specials/special18.png', category: 'cutespecials', quantity: 0 },
   { src: 'special/cute specials/special19.png', category: 'cutespecials', quantity: 0 },
   { src: 'special/cute specials/special20.png', category: 'cutespecials', quantity: 0 },
   { src: 'special/cute specials/special21.png', category: 'cutespecials', quantity: 1 },
-  // cute charms
   { src: 'special/cute specials/special girly.png', category: 'cutespecials', quantity: 5 },
+  // cute charms
   { src: 'special/cute/cute.png', category: 'cute', quantity: 0 },
   { src: 'special/cute/cute2.png', category: 'cute', quantity: 0 },
   { src: 'special/cute/cute3.png', category: 'cute', quantity: 0 },
@@ -241,25 +238,22 @@ const specialCharms = [
   { src: 'special/teddy/teddy2.png', category: 'teddy', quantity: 5 },
   { src: 'special/teddy/teddy3.png', category: 'teddy', quantity: 6 },
   { src: 'special/teddy/teddy4.png', category: 'teddy', quantity: 9 },
-    { src: 'special/teddy/128-gold.png', category: 'teddy', quantity: 9 },
-
+  { src: 'special/teddy/128-gold.png', category: 'teddy', quantity: 9 },
   { src: 'special/teddy/teddy5.png', category: 'teddy', quantity: 9 },
   { src: 'special/teddy/teddy6.png', category: 'teddy', quantity: 12 },
 ];
 
 const rareCharms = [
   // dangly charms
-    { src: 'rares/dangly/dangly.png', category: 'dangly', quantity: 8 },
+  { src: 'rares/dangly/dangly.png', category: 'dangly', quantity: 8 },
   { src: 'rares/dangly/9-gold.png', category: 'dangly', quantity: 1 },
   { src: 'rares/dangly/10.png', category: 'dangly', quantity: 1 },
-
   { src: 'rares/dangly/11.png', category: 'dangly', quantity: 1 },
-    { src: 'rares/dangly/12-gold.png', category: 'dangly', quantity: 1 },
+  { src: 'rares/dangly/12-gold.png', category: 'dangly', quantity: 1 },
   { src: 'rares/dangly/13.png', category: 'dangly', quantity: 1 },
   { src: 'rares/dangly/14-gold.png', category: 'dangly', quantity: 1 },
   { src: 'rares/dangly/15-gold.png', category: 'dangly', quantity: 4 },
   { src: 'rares/dangly/16.png', category: 'dangly', quantity: 4 },
-
   // disney charms
   { src: 'rares/disney/bluemonster.png', category: 'disney', quantity: 2 },
   { src: 'rares/disney/74-gold.png', category: 'disney', quantity: 4 },
@@ -281,8 +275,7 @@ const rareCharms = [
   { src: 'rares/disney/stitch.png', category: 'disney', quantity: 3 },
   // gold charms
   { src: 'rares/gold/gold.png', category: 'gold', quantity: 0 },
-    { src: 'rares/gold/gold17.png', category: 'gold', quantity: 1},
-
+  { src: 'rares/gold/gold17.png', category: 'gold', quantity: 1 },
   { src: 'rares/gold/gold2.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold3.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold4.png', category: 'gold', quantity: 0 },
@@ -300,21 +293,18 @@ const rareCharms = [
   // graduation charms
   { src: 'rares/graduation/grad.png', category: 'graduation', quantity: 1 },
   // hgs charms
-
   { src: 'rares/hgs/hgs.png', category: 'hgs', quantity: 0 },
   { src: 'rares/hgs/hgs2.png', category: 'hgs', quantity: 0 },
-  { src: 'rares/hgs/hgs3.png', category: 'hgs', quantity: 0 },
+  { src: 'rares/hgs/hgs3.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/hgs4.png', category: 'hgs', quantity: 0 },
-    { src: 'rares/hgs/25.png', category: 'hgs', quantity: 1 },
+  { src: 'rares/hgs/25.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/20.png', category: 'hgs', quantity: 1 },
-      { src: 'rares/hgs/27.png', category: 'hgs', quantity: 1 },
-
+  { src: 'rares/hgs/27.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/21.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/22.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/23.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/24.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/26.png', category: 'hgs', quantity: 1 },
-
   { src: 'rares/hgs/hgs5.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/hgs6.png', category: 'hgs', quantity: 0 },
   { src: 'rares/hgs/hgs7.png', category: 'hgs', quantity: 1 },
@@ -324,10 +314,10 @@ const rareCharms = [
   { src: 'rares/hgs/hgs10.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/hgs11.png', category: 'hgs', quantity: 0 },
   { src: 'rares/hgs/hgs12.png', category: 'hgs', quantity: 0 },
-  { src: 'rares/hgs/hgs13.png', category: 'hgs', quantity: 0 },
+  { src: 'rares/hgs/hgs13.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/hgs14.png', category: 'hgs', quantity: 0 },
   { src: 'rares/hgs/hgs15.png', category: 'hgs', quantity: 0 },
-  { src: 'rares/hgs/hgs16.png', category: 'hgs', quantity: 0 },
+  { src: 'rares/hgs/hgs16.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/hgs17.png', category: 'hgs', quantity: 0 },
   // long charms
   { src: 'rares/long/long.png', category: 'long', quantity: 0 },
@@ -337,10 +327,9 @@ const rareCharms = [
   { src: 'rares/love/ends.png', category: 'love', quantity: 1 },
   { src: 'rares/love/fri.png', category: 'love', quantity: 1 },
   { src: 'rares/love/6.png', category: 'love', quantity: 1 },
-    { src: 'rares/love/7.png', category: 'love', quantity: 1 },
-    { src: 'rares/love/19.png', category: 'love', quantity: 1 },
-
-  { src: 'rares/love/love.png', category: 'love', quantity: 1},
+  { src: 'rares/love/7.png', category: 'love', quantity: 1 },
+  { src: 'rares/love/19.png', category: 'love', quantity: 1 },
+  { src: 'rares/love/love.png', category: 'love', quantity: 1 },
   { src: 'rares/love/love2.png', category: 'love', quantity: 1 },
   { src: 'rares/love/love3.png', category: 'love', quantity: 1 },
   { src: 'rares/love/love4.png', category: 'love', quantity: 0 },
@@ -382,27 +371,23 @@ const rareCharms = [
   { src: 'rares/sanrio/83-gold.png', category: 'sanrio', quantity: 9 },
   // sporty charms
   { src: 'rares/sporty/sporty.png', category: 'sporty', quantity: 3 },
-    { src: 'rares/sporty/18-gold.png', category: 'sporty', quantity: 3 },
-
+  { src: 'rares/sporty/18-gold.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty2.png', category: 'sporty', quantity: 3 },
-  { src: 'rares/sporty/sporty3.png', category: 'sporty', quantity: 0 },
+  { src: 'rares/sporty/sporty3.png', category: 'sporty', quantity: 4 },
   { src: 'rares/sporty/sporty4.png', category: 'sporty', quantity: 3 },
   { src: 'rares/sporty/sporty5.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty6.png', category: 'sporty', quantity: 0 },
   { src: 'rares/sporty/sporty7.png', category: 'sporty', quantity: 3 },
   { src: 'rares/sporty/sporty8.png', category: 'sporty', quantity: 0 },
-    { src: 'rares/sporty/30.png', category: 'sporty', quantity: 1 },
-
-  { src: 'rares/sporty/sporty9.png', category: 'sporty', quantity: 0 },
+  { src: 'rares/sporty/30.png', category: 'sporty', quantity: 1 },
+  { src: 'rares/sporty/sporty9.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty10.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty11.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty12.png', category: 'sporty', quantity: 0 },
   { src: 'rares/sporty/sporty13.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty14.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty15.png', category: 'sporty', quantity: 1 },
-    { src: 'rares/sporty/29.png', category: 'sporty', quantity: 1 },
-
-      { src: 'rares/sporty/31.png', category: 'sporty', quantity: 1 },
-
+  { src: 'rares/sporty/29.png', category: 'sporty', quantity: 1 },
+  { src: 'rares/sporty/31.png', category: 'sporty', quantity: 1 },
 ];
 
