@@ -60,28 +60,35 @@ const PRODUCTS = {
     necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 2, fullGlam: 64 },
     ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 }
 };
+// Add this to your CHARM_SETS configuration
 const CHARM_SETS = {
   bestFriends: {
     charms: ['best.png', 'ends.png', 'fri.png'],
-    message: 'Best Friends charms must be bought together in 3 different items',
+    message: 'Best Friends charms must be in 3 different items',
     requiredCount: 3
   },
   mrAndMrs: {
     charms: ['mrmrs1.png', 'mrmrs2.png'],
-    message: 'Mr and Mrs. charms must be bought together in 2 different items',
+    message: 'Mr and Mrs charms must be in 2 different items',
     requiredCount: 2
   },
   soulmates: {
     charms: ['love.png', 'love2.png'],
-    message: 'Soulmates charms must be bought together in 2 different items',
+    message: 'Soulmates charms must be in 2 different items',
     requiredCount: 2
   },
-    loveSet: {
+  loveSet: {
     charms: ['rares/love/6.png', 'rares/love/7.png'],
-    message: 'Love charms must be bought together as a set of 2',
+    message: 'Love charms must be in 2 different items',
     requiredCount: 2
-  },
+  }
 };
+
+function getCharmSet(charmSrc) {
+    return Object.values(CHARM_SETS).find(set => 
+        set.charms.some(charm => charmSrc.includes(charm))
+    );
+}
 
 // Global state
 let isOrderProcessing = false;
@@ -1315,25 +1322,18 @@ function updateSpecialCharmsDisplay() {
 function updateRareCharmsDisplay() {
     rareCharmsGrid.innerHTML = '';
     
-    // Check if the current category has any gold variants
     const hasGoldVariants = rareCharms.some(charm => {
-        if (currentRareCategory === 'all') {
-            return charm.src.includes('-gold.png');
-        }
+        if (currentRareCategory === 'all') return charm.src.includes('-gold.png');
         return charm.src.includes('-gold.png') && charm.category === currentRareCategory;
     });
 
-    // Separate charms into groups
     let availableCharms = [];
     let outOfStockCharms = [];
     let danglyCharms = [];
     let loveSetCharms = [];
 
     rareCharms.forEach(charm => {
-        // Skip charms not in current category
-        if (currentRareCategory !== 'all' && charm.category !== currentRareCategory) {
-            return;
-        }
+        if (currentRareCategory !== 'all' && charm.category !== currentRareCategory) return;
 
         const isGoldVariant = charm.src.includes('-gold.png');
         const isGoldCategory = charm.category === 'gold';
@@ -1343,15 +1343,12 @@ function updateRareCharmsDisplay() {
 
         // Special handling for love set charms
         if (isLoveSet) {
-            if (isOutOfStock) {
-                outOfStockCharms.push(charm);
-            } else {
-                loveSetCharms.push(charm);
-            }
+            if (isOutOfStock) outOfStockCharms.push(charm);
+            else loveSetCharms.push(charm);
             return;
         }
 
-        // Filter for ALL category
+        // Filter logic...
         if (currentRareCategory === 'all') {
             if (showGoldVariants) {
                 if (isGoldVariant || isGoldCategory) {
@@ -1369,7 +1366,6 @@ function updateRareCharmsDisplay() {
             return;
         }
 
-        // Filter for specific categories with gold variants
         if (hasGoldVariants) {
             if (showGoldVariants) {
                 if (isGoldVariant) {
@@ -1387,31 +1383,18 @@ function updateRareCharmsDisplay() {
             return;
         }
 
-        // Default case for categories without gold variants
-        if (isOutOfStock) {
-            outOfStockCharms.push(charm);
-        } else if (isDangly) {
-            danglyCharms.push(charm);
-        } else {
-            availableCharms.push(charm);
-        }
+        if (isOutOfStock) outOfStockCharms.push(charm);
+        else if (isDangly) danglyCharms.push(charm);
+        else availableCharms.push(charm);
     });
 
-    // Display available charms first
+    // Display order...
     availableCharms.forEach(charm => createCharmElement(charm));
-
-    // Display love set charms (as dangly size)
     loveSetCharms.forEach(charm => createCharmElement(charm, false, true));
-
-    // Display dangly charms (only in ALL category)
-    if (currentRareCategory === 'all') {
-        danglyCharms.forEach(charm => createCharmElement(charm));
-    }
-
-    // Display out-of-stock charms at the end
+    if (currentRareCategory === 'all') danglyCharms.forEach(charm => createCharmElement(charm));
     outOfStockCharms.forEach(charm => createCharmElement(charm, true));
 
-    // Add gold toggle button if needed
+    // Gold toggle...
     if (hasGoldVariants) {
         const toggleContainer = document.createElement('div');
         toggleContainer.style.cssText = 'width:100%; display:flex; justify-content:center; margin:1rem 0; padding-top:1rem; border-top:1px dashed #f5a0c2;';
@@ -1419,9 +1402,9 @@ function updateRareCharmsDisplay() {
         const toggleBtn = document.createElement('button');
         toggleBtn.className = 'btn';
         toggleBtn.textContent = showGoldVariants ? 'Show Silver' : 'Show Gold';
-        toggleBtn.style.cssText = 'min-width:120px; background:' + (showGoldVariants ? '#d6336c' : '#fff') + 
-                                 '; color:' + (showGoldVariants ? '#fff' : '#d6336c') + 
-                                 '; border:2px solid #d6336c; border-radius:20px; padding:0.5rem 1.5rem; font-weight:bold;';
+        toggleBtn.style.cssText = `min-width:120px; background:${showGoldVariants ? '#d6336c' : '#fff'}; 
+                                 color:${showGoldVariants ? '#fff' : '#d6336c'}; 
+                                 border:2px solid #d6336c; border-radius:20px; padding:0.5rem 1.5rem; font-weight:bold;`;
 
         toggleBtn.onclick = () => {
             showGoldVariants = !showGoldVariants;
@@ -1440,7 +1423,6 @@ function updateRareCharmsDisplay() {
         charmElement.dataset.category = charm.category;
         charmElement.dataset.quantity = charm.quantity || 1;
         
-        // Special handling for love set charms (make them dangly size)
         if (isLoveSet) {
             charmElement.classList.add('dangly-charm');
             charmElement.style.width = '48px';
@@ -1462,20 +1444,20 @@ function updateRareCharmsDisplay() {
             if (quantity <= 0) return;
             if (quantity === 1 && usedCharms.has(charm.src)) return;
             
-            // Check if this is part of the love set
+            // Check if this is part of a charm set
             const charmSet = getCharmSet(charm.src);
             if (charmSet) {
-                const placedCharms = Array.from(document.querySelectorAll('.slot img:not([data-type="base"])'))
+                const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'))
                     .map(img => img.dataset.charm);
                 
-                const hasOtherSetCharms = placedCharms.some(src => 
+                // Count how many from this set are already in current item
+                const currentItemCount = placedCharms.filter(src => 
                     charmSet.charms.some(charmName => src.includes(charmName))
-                );
+                ).length;
                 
-                if (!hasOtherSetCharms) {
-                    if (!confirm(`${charmSet.message}\n\nDo you want to add this charm anyway?`)) {
-                        return;
-                    }
+                if (currentItemCount > 0) {
+                    alert(`This charm is part of a set that must be spread across different items.\n\n${charmSet.message}`);
+                    return;
                 }
             }
             
