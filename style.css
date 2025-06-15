@@ -740,4 +740,52 @@ body.modal-open {
     text-decoration: underline;
   }
 
+  /* Mobile-responsive buttons */
+.top-action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 10px 15px;
+  border-radius: 25px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.btn i {
+  margin-right: 6px;
+}
+
+/* Dangly charm sizing for love set */
+#love-charms .charm {
+  width: 48px;
+  height: 96px;
+  object-fit: contain;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
   
+  .btn-text {
+    display: none; /* Hide text on smallest screens */
+  }
+  
+  .btn i {
+    margin-right: 0;
+    font-size: 16px;
+  }
+  
+  .top-action-buttons {
+    gap: 6px;
+  }
+}
