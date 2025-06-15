@@ -623,52 +623,52 @@ function setupCartFunctionality() {
         document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
         document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
         document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
-
     });
 
-document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
-    const addToCartBtn = document.getElementById('add-to-cart-bottom');
-    const jewelryPiece = document.getElementById('jewelry-piece');
-    
-    try {
-        // 1. Capture bracelet design as image
-        const canvas = await html2canvas(jewelryPiece);
-        const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
+        const addToCartBtn = document.getElementById('add-to-cart-bottom');
+        const jewelryPiece = document.getElementById('jewelry-piece');
         
-        // 2. Upload the image
-        const designUrl = await uploadImageToFirebase(imageBlob, 'designs/');
-        
-        // 3. Add to cart with the image URL
-        const cartItem = {
-            id: Date.now().toString(),
-            product: currentProduct,
-            designImage: designUrl,
-            size: currentSize,
-            isFullGlam: isFullGlam,
-            materialType: materialType,
-            price: calculatePrice(false),
-            charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
-                src: img.src,
-                type: img.dataset.type
-            })),
-            imageUrl: designUrl,
-            timestamp: new Date().toISOString()
-        };
+        try {
+            // 1. Capture bracelet design as image
+            const canvas = await html2canvas(jewelryPiece);
+            const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
             
-        cart.push(cartItem);
-        updateCartDisplay();
-        
-        alert('Design added to cart!');
-        cartElements.cartPreview.classList.add('active');
-        
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        alert('Could not add design to cart. Please try again.');
-    } finally {
-        addToCartBtn.disabled = false;
-        addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
-    }
-});
+            // 2. Upload the image
+            const designUrl = await uploadImageToFirebase(imageBlob, 'designs/');
+            
+            // 3. Add to cart with the image URL
+            const cartItem = {
+                id: Date.now().toString(),
+                product: currentProduct,
+                designImage: designUrl,
+                size: currentSize,
+                isFullGlam: isFullGlam,
+                materialType: materialType,
+                price: calculatePrice(false),
+                charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
+                    src: img.src,
+                    type: img.dataset.type
+                })),
+                imageUrl: designUrl,
+                timestamp: new Date().toISOString()
+            };
+                
+            cart.push(cartItem);
+            updateCartDisplay();
+            
+            alert('Design added to cart!');
+            cartElements.cartPreview.classList.add('active');
+            
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            alert('Could not add design to cart. Please try again.');
+        } finally {
+            addToCartBtn.disabled = false;
+            addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+        }
+    });
+}
 function validateCharmSets() {
     const invalidSets = [];
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => img.src);
