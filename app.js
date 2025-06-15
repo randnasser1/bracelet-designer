@@ -586,19 +586,19 @@ function setupCartFunctionality() {
         const designUrl = await captureBraceletDesign();
         
         const cartItem = {
-            id: Date.now().toString(),
-            product: currentProduct,
-            size: currentSize,
-            isFullGlam: isFullGlam,
-            materialType: materialType,
-            price: calculatePrice(false), // Price without delivery
-            charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
-                src: img.src,
-                type: img.dataset.type
-            })),
-            imageUrl: designUrl, // Use the data URL directly
-            timestamp: new Date().toISOString()
-        };
+    id: Date.now().toString(),
+    product: currentProduct,
+    size: currentSize,
+    isFullGlam: isFullGlam,
+    materialType: materialType,
+    price: calculatePrice(false),
+    charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
+        src: img.src,
+        type: img.dataset.type
+    })),
+    imageUrl: designUrl, // This is the data URL from canvas.toDataURL()
+    timestamp: new Date().toISOString()
+};
         
         cart.push(cartItem);
         updateCartDisplay();
@@ -733,20 +733,20 @@ function setupOrderFunctionality() {
     }
 
     async function handleFormSubmit(e) {
-        e.preventDefault();
-        console.log('Form submission started');
+         e.preventDefault();
+    console.log('Form submission started');
+
+    const form = e.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    // Prevent multiple submissions
+    if (window.orderSubmissionInProgress) return;
+    window.orderSubmissionInProgress = true;
     
-        const form = e.target;
-        const submitButton = form.querySelector('button[type="submit"]');
-    
-        // Prevent multiple submissions
-        if (window.orderSubmissionInProgress) return;
-        window.orderSubmissionInProgress = true;
-        
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-    
-        try {
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+    try {
             // 1. Validate form fields
             const formData = new FormData(form);
             const requiredFields = ['full-name', 'phone', 'governorate', 'address', 'payment'];
@@ -790,44 +790,44 @@ function setupOrderFunctionality() {
             const total = subtotal + deliveryFee;
             
             const orderData = {
-                clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
-                customer: {
-                    name: formData.get('full-name'),
-                    phone: formData.get('phone'),
-                    phone2: formData.get('phone2') || null,
-                    governorate: formData.get('governorate'),
-                    address: formData.get('address'),
-                    notes: formData.get('notes') || null
-                },
-                paymentMethod: formData.get('payment'),
-                items: await Promise.all(cart.map(async (item) => ({
-                    product: item.product,
-                    size: item.size,
-                    price: item.price,
-                    imageUrl: item.imageUrl,
-                    imageBase64: await blobToBase64(item.imageBlob),
-                    charms: item.charms,
-                    isFullGlam: item.isFullGlam,
-                    materialType: item.materialType,
-                    timestamp: new Date().toISOString()
-                }))),
-                subtotal: subtotal,
-                deliveryFee: deliveryFee,
-                total: total,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'pending'
-            };
+            clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
+            customer: {
+                name: formData.get('full-name'),
+                phone: formData.get('phone'),
+                phone2: formData.get('phone2') || null,
+                governorate: formData.get('governorate'),
+                address: formData.get('address'),
+                notes: formData.get('notes') || null
+            },
+            paymentMethod: formData.get('payment'),
+            items: cart.map(item => ({
+                product: item.product,
+                size: item.size,
+                price: item.price,
+                imageUrl: item.imageUrl, // Use the data URL directly
+                charms: item.charms,
+                isFullGlam: item.isFullGlam,
+                materialType: item.materialType,
+                timestamp: new Date().toISOString()
+            })),
+            subtotal: subtotal,
+            deliveryFee: deliveryFee,
+            total: total,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            status: 'pending'
+        };
+
     
             // Upload payment proof if Cliq payment
-            if (formData.get('payment') === 'Cliq') {
-                const paymentProofFile = document.getElementById('payment-proof').files[0];
-                if (paymentProofFile) {
-                    const fileName = `payment-proofs/${Date.now()}_${paymentProofFile.name}`;
-                    const storageRef = storage.ref(fileName);
-                    await storageRef.put(paymentProofFile);
-                    orderData.paymentProofUrl = await storageRef.getDownloadURL();
-                }
-            }
+     if (formData.get('payment') === 'Cliq') {
+    const paymentProofFile = document.getElementById('payment-proof').files[0];
+    if (paymentProofFile) {
+        const fileName = `payment-proofs/${Date.now()}_${paymentProofFile.name}`;
+        const storageRef = storage.ref(fileName);
+        await storageRef.put(paymentProofFile);
+        orderData.paymentProofUrl = await storageRef.getDownloadURL();
+    }
+}
     
             // Submit to Firestore
             const orderRef = await db.collection('orders').add(orderData);
@@ -844,16 +844,15 @@ function setupOrderFunctionality() {
             orderModal.classList.remove('active');
             orderConfirmation.classList.add('active');
             
-        } catch (error) {
-            console.error('Order submission failed:', error);
-            alert(error.message || 'Order submission failed. Please check your connection and try again.');
-        } finally {
-            window.orderSubmissionInProgress = false;
-            submitButton.disabled = false;
-            submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Order';
-        }
+       } catch (error) {
+        console.error('Order submission failed:', error);
+        alert(error.message || 'Order submission failed. Please check your connection and try again.');
+    } finally {
+        window.orderSubmissionInProgress = false;
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Order';
     }
-
+}
     // Add event listeners
     orderForm.addEventListener('submit', handleFormSubmit);
     placeOrderBtn.addEventListener('click', handlePlaceOrderClick);
