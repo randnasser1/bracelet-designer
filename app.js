@@ -1349,15 +1349,17 @@ function updateSpecialCharmsDisplay() {
 
         specialCharmsGrid.appendChild(charmElement);
     }
-}function updateRareCharmsDisplay() {
+}
+function updateRareCharmsDisplay() {
     rareCharmsGrid.innerHTML = '';
  
-    // Check if the current category has any gold variants
+    // Check if the current category has any gold variants (excluding the 'gold' category)
     const hasGoldVariants = rareCharms.some(charm => {
         if (currentRareCategory === 'all') {
-            return charm.src.includes('-gold.png') || charm.category === 'gold';
+            return charm.src.includes('-gold.png') && charm.category !== 'gold';
         }
-        return (charm.src.includes('-gold.png') || charm.category === 'gold') && 
+        return charm.src.includes('-gold.png') && 
+               charm.category !== 'gold' && 
                charm.category === currentRareCategory;
     });
 
@@ -1376,6 +1378,16 @@ function updateSpecialCharmsDisplay() {
         const isGoldVariant = charm.src.includes('-gold.png') || charm.category === 'gold';
         const isDangly = charm.src.includes('dangly') || charm.category === 'dangly';
         const isOutOfStock = charm.quantity <= 0;
+
+        // Special handling for gold category - always show regardless of toggle
+        if (charm.category === 'gold') {
+            if (isOutOfStock) {
+                outOfStockCharms.push(charm);
+            } else {
+                availableCharms.push(charm);
+            }
+            return;
+        }
 
         // Handle dangly charms separately
         if (isDangly) {
@@ -1439,7 +1451,7 @@ function updateSpecialCharmsDisplay() {
         createAndAppendCharm(charm, true, charm.isGold);
     });
 
-    // Add gold toggle button if needed
+    // Only add gold toggle if there are gold variants (excluding the gold category)
     if (hasGoldVariants) {
         const toggleContainer = document.createElement('div');
         toggleContainer.style.cssText = 'width:100%; display:flex; justify-content:center; margin:1rem 0; padding-top:1rem; border-top:1px dashed #f5a0c2;';
@@ -1473,7 +1485,6 @@ function updateSpecialCharmsDisplay() {
             charmElement.style.height = '96px';
         }
 
-        // Moved the out-of-stock handling here where charmElement is defined
         if (isOutOfStock || charm.quantity <= 0) {
             charmElement.classList.add('out-of-stock');
             charmElement.classList.add('sold-out');
