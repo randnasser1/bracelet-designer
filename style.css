@@ -1350,3 +1350,113 @@ body.modal-open {
     font-size: 1.2em;
     font-weight: bold;
 }
+/* ============================================= */
+/* Long Horizontal Charms (96px × 48px) */
+/* ============================================= */
+
+/* Charm pool display - shows as wide rectangle */
+.charms-grid .long-charm {
+    width: 96px !important;
+    height: 48px !important;
+    object-fit: contain;
+    grid-column: span 2; /* Spans 2 columns in grid */
+}
+
+/* Placed charm - merges two slots */
+.slot.long-slot {
+    width: 96px;
+    height: 48px;
+    grid-column: span 2; /* Takes up space of 2 slots */
+    position: relative;
+}
+
+.slot.long-slot img.long-charm {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* ============================================= */
+/* Vertical Dangly Charms (48px × 96px) */
+/* ============================================= */
+
+/* Charm pool display - shows as tall rectangle */
+.charms-grid .dangly-charm {
+    width: 48px !important;
+    height: 96px !important;
+    object-fit: contain;
+    position: relative;
+    z-index: 1;
+    margin-bottom: -48px; /* Compensates for extra height */
+}
+
+/* Placed charm - single slot becomes taller */
+.slot.has-dangly {
+    height: 96px;
+    position: relative;
+    overflow: visible;
+}
+
+.slot.has-dangly img.dangly-charm {
+    width: 48px;
+    height: 96px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    object-fit: contain;
+}
+
+/* ============================================= */
+/* Special Sorting for Dangly Charms in "All" Category */
+/* ============================================= */
+
+/* Forces dangly charms to appear last in "All" category */
+#rare-charms.all .dangly-charm {
+    order: 999;
+}
+
+/* ============================================= */
+/* Visual Feedback for Selection */
+/* ============================================= */
+
+.charm.selected {
+    box-shadow: 0 0 0 3px #d6336c;
+    position: relative;
+    z-index: 2;
+}
+
+/* ============================================= */
+/* Responsive Adjustments */
+/* ============================================= */
+
+@media (max-width: 480px) {
+    /* Adjust for smaller screens if needed */
+    .charms-grid .long-charm {
+        width: 80px !important;
+        height: 40px !important;
+    }
+    
+    .slot.long-slot {
+        width: 80px;
+        height: 40px;
+    }
+    
+    .charms-grid .dangly-charm {
+        width: 40px !important;
+        height: 80px !important;
+        margin-bottom: -40px;
+    }
+    
+    .slot.has-dangly {
+        height: 80px;
+    }
+    
+    .slot.has-dangly img.dangly-charm {
+        width: 40px;
+        height: 80px;
+    }
+}
