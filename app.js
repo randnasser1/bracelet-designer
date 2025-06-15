@@ -1436,7 +1436,6 @@ function updateRareCharmsDisplay() {
         charmElement.classList.add('rare');
         charmElement.dataset.charm = charm.src;
         charmElement.dataset.category = charm.category;
-        charmElement.dataset.quantity = charm.quantity || 1;
         
         if (isDangly) {
             charmElement.classList.add('dangly-charm');
@@ -1455,7 +1454,7 @@ function updateRareCharmsDisplay() {
         }
 
         charmElement.addEventListener('click', () => {
-            const quantity = parseInt(charmElement.dataset.quantity) || 1;
+            const quantity = charm.quantity || 1;
             if (quantity <= 0) return;
             if (quantity === 1 && usedCharms.has(charm.src)) return;
             
@@ -1469,11 +1468,6 @@ function updateRareCharmsDisplay() {
 }
 
 function createCharm(src, alt, type, isDangly = false) {
-    const container = document.createElement('div');
-    container.className = 'charm-container';
-    container.style.position = 'relative';
-    container.style.display = 'inline-block';
-    
     const img = document.createElement('img');
     img.src = src;
     img.alt = alt;
@@ -1486,7 +1480,6 @@ function createCharm(src, alt, type, isDangly = false) {
         img.classList.add('dangly-charm');
         img.style.width = '48px';
         img.style.height = '96px';
-        container.style.height = '96px';
     } else if (src.includes('long')) {
         img.classList.add('long-charm');
         img.style.width = '96px';
@@ -1496,43 +1489,8 @@ function createCharm(src, alt, type, isDangly = false) {
         img.style.height = '45px';
     }
     
-    // Add quantity badge if not a dangly charm
-    if (!isDangly && !src.includes('dangly')) {
-        const quantityBadge = document.createElement('div');
-        quantityBadge.className = 'quantity-badge';
-        quantityBadge.style.position = 'absolute';
-        quantityBadge.style.top = '-5px';
-        quantityBadge.style.right = '-5px';
-        quantityBadge.style.background = '#d6336c';
-        quantityBadge.style.color = 'white';
-        quantityBadge.style.borderRadius = '50%';
-        quantityBadge.style.width = '18px';
-        quantityBadge.style.height = '18px';
-        quantityBadge.style.display = 'flex';
-        quantityBadge.style.alignItems = 'center';
-        quantityBadge.style.justifyContent = 'center';
-        quantityBadge.style.fontSize = '10px';
-        quantityBadge.style.fontWeight = 'bold';
-        
-        // Find quantity from data
-        let quantity = 1;
-        if (type === 'special') {
-            const charmData = specialCharms.find(c => c.src === src);
-            quantity = charmData ? (charmData.quantity || 1) : 1;
-        } else if (type === 'rare') {
-            const charmData = rareCharms.find(c => c.src === src);
-            quantity = charmData ? (charmData.quantity || 1) : 1;
-        }
-        
-        img.dataset.quantity = quantity;
-        quantityBadge.textContent = quantity;
-        container.appendChild(quantityBadge);
-    }
-    
-    container.appendChild(img);
-    return container;
+    return img;
 }
-
 function updateCharmUsage() {
     document.querySelectorAll('.charms-grid .charm').forEach(charm => {
         charm.classList.remove('used');
