@@ -121,30 +121,32 @@ let currentDesign = {
 };
 window.orderFunctionalityInitialized = false;
 
-/* NEW: Bracelet Capture Functions */
+// Modify your captureBraceletDesign function to use this:
 async function captureBraceletDesign() {
-    const jewelryPiece = document.getElementById('jewelry-piece');
+  const jewelryPiece = document.getElementById('jewelry-piece');
+  
+  try {
+    const canvas = await html2canvas(jewelryPiece, {
+      useCORS: true,
+      allowTaint: false,
+      logging: true,
+      scale: 2,
+      backgroundColor: null
+    });
+
+    const blob = await new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        resolve(blob);
+      }, 'image/png', 0.95);
+    });
     
-    try {
-        const canvas = await html2canvas(jewelryPiece, {
-            useCORS: true,
-            allowTaint: false,
-            logging: true,
-            scale: 2,
-            backgroundColor: null
-        });
-
-        return new Promise((resolve) => {
-            canvas.toBlob((blob) => {
-                resolve(blob);
-            }, 'image/png', 0.95);
-        });
-    } catch (error) {
-        console.error('Error capturing design:', error);
-        throw error;
-    }
+    // Save permanently and return permanent URL
+    return await saveDesignPermanently(blob);
+  } catch (error) {
+    console.error('Error capturing design:', error);
+    throw error;
+  }
 }
-
 function calculatePrice(includeDelivery = false) {
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
@@ -560,65 +562,62 @@ function setupCartFunctionality() {
         document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
 
     });
-
-   document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
-    const addToCartBtn = document.getElementById('add-to-cart-bottom');
-    const jewelryPiece = document.getElementById('jewelry-piece');
-    
-    try {
-        // First validate charm sets
-        const invalidSets = validateCharmSets();
-        if (invalidSets.length > 0) {
-            const errorMessages = invalidSets.map(set => 
-                `${set.message}\n\nCurrently have: ${set.currentCount}/${set.requiredCount}`
-            ).join('\n\n');
-            
-            const proceed = confirm(
-                `${errorMessages}\n\nDo you want to add this item anyway? ` +
-                `You can add the remaining charms in another item.`
-            );
-            
-            if (!proceed) {
-                return;
-            }
-        }
-        
-        // Rest of your cart addition logic...
-        addToCartBtn.disabled = true;
-        addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        
-        const designBlob = await captureBraceletDesign();
-        const designUrl = URL.createObjectURL(designBlob);
-        
-        const cartItem = {
-            id: Date.now().toString(),
-            product: currentProduct,
-            size: currentSize,
-            isFullGlam: isFullGlam,
-            materialType: materialType,
-            price: calculatePrice(false), // Price without delivery
-            charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
-                src: img.src,
-                type: img.dataset.type
-            })),
-            imageUrl: designUrl,
-            imageBlob: designBlob,
-            timestamp: new Date().toISOString()
-        };
-        
-        cart.push(cartItem);
-        updateCartDisplay();
-        
-        alert('Design added to cart!');
-        cartElements.cartPreview.classList.add('active');
-        
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        alert('Could not add design to cart. Please try again.');
-    } finally {
-        addToCartBtn.disabled = false;
-        addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
+  const addToCartBtn = document.getElementById('add-to-cart-bottom');
+  const jewelryPiece = document.getElementById('jewelry-piece');
+  
+  try {
+    // First validate charm sets
+    const invalidSets = validateCharmSets();
+    if (invalidSets.length > 0) {
+      const errorMessages = invalidSets.map(set => 
+        `${set.message}\n\nCurrently have: ${set.currentCount}/${set.requiredCount}`
+      ).join('\n\n');
+      
+      const proceed = confirm(
+        `${errorMessages}\n\nDo you want to add this item anyway? ` +
+        `You can add the remaining charms in another item.`
+      );
+      
+      if (!proceed) {
+        return;
+      }
     }
+    
+    addToCartBtn.disabled = true;
+    addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    
+    // This now returns a permanent URL
+    const designUrl = await captureBraceletDesign();
+    
+    const cartItem = {
+      id: Date.now().toString(),
+      product: currentProduct,
+      size: currentSize,
+      isFullGlam: isFullGlam,
+      materialType: materialType,
+      price: calculatePrice(false),
+      charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
+        src: img.src,
+        type: img.dataset.type
+      })),
+      imageUrl: designUrl, // Now a permanent URL
+      timestamp: new Date().toISOString()
+    };
+    
+    cart.push(cartItem);
+    updateCartDisplay();
+    
+    alert('Design added to cart!');
+    cartElements.cartPreview.classList.add('active');
+    
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    alert('Could not add design to cart. Please try again.');
+  } finally {
+    addToCartBtn.disabled = false;
+    addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+  }
 });
 }
 
@@ -642,16 +641,15 @@ function validateCharmSets() {
 }
 
 function blobToBase64(blob) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64String = reader.result.split(',')[1];
-            resolve(base64String);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-    });
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
 }
+
+// Then store the base64 string in your database
 
 function setupOrderFunctionality() {
     // First get ALL required elements
@@ -1509,6 +1507,32 @@ function updateRareCharmsDisplay() {
         rareCharmsGrid.appendChild(charmElement);
     }
 }
+
+
+async function saveDesignPermanently(blob) {
+  try {
+    // Generate unique filename
+    const timestamp = Date.now();
+    const filename = `design-${timestamp}.png`;
+    
+    // Create storage reference
+    const storageRef = firebase.storage().ref();
+    const designRef = storageRef.child(`designs/${filename}`);
+    
+    // Upload the blob
+    await designRef.put(blob);
+    
+    // Get permanent download URL
+    const downloadURL = await designRef.getDownloadURL();
+    
+    return downloadURL; // This is a permanent URL
+  } catch (error) {
+    console.error('Error saving design:', error);
+    throw error;
+  }
+}
+
+
 function createCharm(src, alt, type, isDangly = false) {
     const img = document.createElement('img');
     img.src = src;
