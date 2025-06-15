@@ -1371,8 +1371,10 @@ function updateRareCharmsDisplay() {
     rareCharms.forEach(charm => {
         // First filter by category
         if (currentRareCategory !== 'all' && charm.category !== currentRareCategory) {
+          if (charm.category !== 'gold') {  // <-- Allow gold charms to bypass
             return;
-        }
+          }
+}
 
         const isGoldVariant = charm.src.includes('-gold.png') || charm.category === 'gold';
         const isDangly = charm.src.includes('dangly') || charm.category === 'dangly';
