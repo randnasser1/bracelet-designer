@@ -788,7 +788,7 @@ function setupOrderFunctionality() {
     }
 
     async function handleFormSubmit(e) {
-         e.preventDefault();
+    e.preventDefault();
     console.log('Form submission started');
 
     const form = e.target;
@@ -802,49 +802,49 @@ function setupOrderFunctionality() {
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
     try {
-            // 1. Validate form fields
-            const formData = new FormData(form);
-            const requiredFields = ['full-name', 'phone', 'governorate', 'address', 'payment'];
-            const missingFields = requiredFields.filter(field => !formData.get(field));
+        // 1. Validate form fields
+        const formData = new FormData(form);
+        const requiredFields = ['full-name', 'phone', 'governorate', 'address', 'payment'];
+        const missingFields = requiredFields.filter(field => !formData.get(field));
+        
+        if (missingFields.length > 0) {
+            throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
+        }
+        
+        if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
+            throw new Error('Payment proof is required for Cliq payments');
+        }
+        
+        // 2. Validate charm sets across all cart items
+        const allCharms = cart.flatMap(item => item.charms.map(charm => charm.src));
+        const invalidSets = [];
+        
+        Object.values(CHARM_SETS).forEach(set => {
+            const foundCharms = set.charms.filter(charm => 
+                allCharms.some(placed => placed.includes(charm))
+            ).length;
             
-            if (missingFields.length > 0) {
-                throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
+            if (foundCharms > 0 && foundCharms < set.requiredCount) {
+                invalidSets.push({
+                    ...set,
+                    currentCount: foundCharms
+                });
             }
-            
-            if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
-                throw new Error('Payment proof is required for Cliq payments');
-            }
-            
-            // 2. Validate charm sets across all cart items
-            const allCharms = cart.flatMap(item => item.charms.map(charm => charm.src));
-            const invalidSets = [];
-            
-            Object.values(CHARM_SETS).forEach(set => {
-                const foundCharms = set.charms.filter(charm => 
-                    allCharms.some(placed => placed.includes(charm))
-                ).length;
-                
-                if (foundCharms > 0 && foundCharms < set.requiredCount) {
-                    invalidSets.push({
-                        ...set,
-                        currentCount: foundCharms
-                    });
-                }
-            });
-            
-            if (invalidSets.length > 0) {
-                const errorMessages = invalidSets.map(set => 
-                    `${set.message}\n\nYou have: ${set.currentCount}/${set.requiredCount}`
-                ).join('\n\n');
-                throw new Error(`Please complete these charm sets:\n\n${errorMessages}`);
-            }
-            
-            // 3. Proceed with order submission
-            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-            const deliveryFee = 2.5;
-            const total = subtotal + deliveryFee;
-            
-            const orderData = {
+        });
+        
+        if (invalidSets.length > 0) {
+            const errorMessages = invalidSets.map(set => 
+                `${set.message}\n\nYou have: ${set.currentCount}/${set.requiredCount}`
+            ).join('\n\n');
+            throw new Error(`Please complete these charm sets:\n\n${errorMessages}`);
+        }
+        
+        // 3. Proceed with order submission
+        const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+        const deliveryFee = 2.5;
+        const total = subtotal + deliveryFee;
+        
+        const orderData = {
             clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
             customer: {
                 name: formData.get('full-name'),
@@ -854,13 +854,14 @@ function setupOrderFunctionality() {
                 address: formData.get('address'),
                 notes: formData.get('notes') || null
             },
-        designImage: item.designImage,
+            // Changed from item.designImage to cart[0].designImage or similar
+            designImage: cart.length > 0 ? cart[0].designImage : null,
             paymentMethod: formData.get('payment'),
             items: cart.map(item => ({
                 product: item.product,
                 size: item.size,
                 price: item.price,
-                imageUrl: item.imageUrl, // Use the data URL directly
+                imageUrl: item.imageUrl,
                 charms: item.charms,
                 isFullGlam: item.isFullGlam,
                 materialType: item.materialType,
@@ -873,34 +874,33 @@ function setupOrderFunctionality() {
             status: 'pending'
         };
 
-    
-            // Upload payment proof if Cliq payment
-     if (formData.get('payment') === 'Cliq') {
-    const paymentProofFile = document.getElementById('payment-proof').files[0];
-    if (paymentProofFile) {
-        const fileName = `payment-proofs/${Date.now()}_${paymentProofFile.name}`;
-        const storageRef = storage.ref(fileName);
-        await storageRef.put(paymentProofFile);
-        orderData.paymentProofUrl = await storageRef.getDownloadURL();
-    }
-}
-    
-            // Submit to Firestore
-            const orderRef = await db.collection('orders').add(orderData);
-            console.log('Order submitted with ID:', orderRef.id);
-    
-            // Clear cart and reset form
-            cart.length = 0;
-            updateCartDisplay();
-            form.reset();
-            paymentProofContainer.style.display = 'none';
-    
-            // Show confirmation
-            orderIdSpan.textContent = orderRef.id;
-            orderModal.classList.remove('active');
-            orderConfirmation.classList.add('active');
-            
-       } catch (error) {
+        // Upload payment proof if Cliq payment
+        if (formData.get('payment') === 'Cliq') {
+            const paymentProofFile = document.getElementById('payment-proof').files[0];
+            if (paymentProofFile) {
+                const fileName = `payment-proofs/${Date.now()}_${paymentProofFile.name}`;
+                const storageRef = storage.ref(fileName);
+                await storageRef.put(paymentProofFile);
+                orderData.paymentProofUrl = await storageRef.getDownloadURL();
+            }
+        }
+        
+        // Submit to Firestore
+        const orderRef = await db.collection('orders').add(orderData);
+        console.log('Order submitted with ID:', orderRef.id);
+
+        // Clear cart and reset form
+        cart.length = 0;
+        updateCartDisplay();
+        form.reset();
+        paymentProofContainer.style.display = 'none';
+
+        // Show confirmation
+        orderIdSpan.textContent = orderRef.id;
+        orderModal.classList.remove('active');
+        orderConfirmation.classList.add('active');
+        
+    } catch (error) {
         console.error('Order submission failed:', error);
         alert(error.message || 'Order submission failed. Please check your connection and try again.');
     } finally {
