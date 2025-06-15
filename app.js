@@ -428,7 +428,14 @@ function setupEventListeners() {
                 updatePrice();
             });
         });
-
+        // Toggle between gold/silver views
+        document.getElementById('material-toggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            showGoldVariants = !showGoldVariants;
+            this.textContent = showGoldVariants ? 'Show Silver' : 'Show Gold';
+            updateSpecialCharmsDisplay();
+            updateRareCharmsDisplay();
+        });
         sizeSelect.addEventListener('change', () => {
             updateJewelrySize(sizeSelect.value);
             updatePrice();
