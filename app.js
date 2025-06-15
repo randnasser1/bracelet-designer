@@ -532,7 +532,6 @@ function setupCartFunctionality() {
         document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
         document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
         document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
-        document.getElementById('order-total-display').textContent = total.toFixed(2);
 
     });
 
@@ -696,7 +695,6 @@ function setupOrderFunctionality() {
         document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
         document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
         document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
-        document.getElementById('order-total-display').textContent = total.toFixed(2);
 
         document.body.classList.add('modal-open');
         orderModal.classList.add('active');
