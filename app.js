@@ -1237,7 +1237,12 @@ function initCharms() {
 
 function updateSpecialCharmsDisplay() {
     specialCharmsGrid.innerHTML = '';
-    
+    if (isOutOfStock || charm.quantity <= 0) {
+    charmElement.classList.add('out-of-stock');
+    charmElement.classList.add('sold-out');
+    charmElement.style.opacity = '0.5';
+    charmElement.style.cursor = 'not-allowed';
+}
     // Check if the current category has any gold variants
     const hasGoldVariants = specialCharms.some(charm => {
         if (currentSpecialCategory === 'all') {
@@ -1350,7 +1355,12 @@ function updateSpecialCharmsDisplay() {
 }
 function updateRareCharmsDisplay() {
     rareCharmsGrid.innerHTML = '';
-    
+    if (isOutOfStock || charm.quantity <= 0) {
+    charmElement.classList.add('out-of-stock');
+    charmElement.classList.add('sold-out');
+    charmElement.style.opacity = '0.5';
+    charmElement.style.cursor = 'not-allowed';
+}
     // Check if the current category has any gold variants
     const hasGoldVariants = rareCharms.some(charm => {
         if (currentRareCategory === 'all') {
