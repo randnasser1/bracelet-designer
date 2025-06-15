@@ -1205,33 +1205,78 @@ function updateSpecialCharmsDisplay() {
         return charm.src.includes('-gold.png') && charm.category === currentSpecialCategory;
     });
 
-    const filteredCharms = specialCharms.filter(charm => {
+    // Separate charms into available and out-of-stock
+    let availableCharms = [];
+    let outOfStockCharms = [];
+
+    specialCharms.forEach(charm => {
         // First filter by category
         if (currentSpecialCategory !== 'all' && charm.category !== currentSpecialCategory) {
-            return false;
+            return;
         }
 
         const isGoldVariant = charm.src.includes('-gold.png');
+        const isOutOfStock = charm.quantity <= 0;
 
         // Only apply gold/silver filtering if this category has gold variants
         if (hasGoldVariants) {
             if (showGoldVariants) {
-                return isGoldVariant;
+                if (isGoldVariant) {
+                    if (isOutOfStock) outOfStockCharms.push(charm);
+                    else availableCharms.push(charm);
+                }
+            } else {
+                if (!isGoldVariant) {
+                    if (isOutOfStock) outOfStockCharms.push(charm);
+                    else availableCharms.push(charm);
+                }
             }
-            return !isGoldVariant;
+            return;
         }
 
-        // If category has no gold variants, show all charms regardless of gold/silver state
-        return true;
+        // If category has no gold variants, show all charms
+        if (isOutOfStock) outOfStockCharms.push(charm);
+        else availableCharms.push(charm);
     });
 
-    // Create and append charms
-    filteredCharms.forEach(charm => {
+    // Display available charms first
+    availableCharms.forEach(charm => {
+        createAndAppendCharm(charm);
+    });
+
+    // Display out-of-stock charms at the end
+    outOfStockCharms.forEach(charm => {
+        createAndAppendCharm(charm, true);
+    });
+
+    // Add gold toggle button if needed
+    if (hasGoldVariants) {
+        const toggleContainer = document.createElement('div');
+        toggleContainer.style.cssText = 'width:100%; display:flex; justify-content:center; margin:1rem 0; padding-top:1rem; border-top:1px dashed #f5a0c2;';
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = 'btn';
+        toggleBtn.textContent = showGoldVariants ? 'Show Silver' : 'Show Gold';
+        toggleBtn.style.cssText = 'min-width:120px; background:' + (showGoldVariants ? '#d6336c' : '#fff') + 
+                                 '; color:' + (showGoldVariants ? '#fff' : '#d6336c') + 
+                                 '; border:2px solid #d6336c; border-radius:20px; padding:0.5rem 1.5rem; font-weight:bold;';
+
+        toggleBtn.onclick = () => {
+            showGoldVariants = !showGoldVariants;
+            updateSpecialCharmsDisplay();
+            updateRareCharmsDisplay();
+        };
+
+        toggleContainer.appendChild(toggleBtn);
+        specialCharmsGrid.appendChild(toggleContainer);
+    }
+
+    function createAndAppendCharm(charm, isOutOfStock = false) {
         const charmElement = createCharm(charm.src, `Special Charm ${charm.src}`, 'special');
         charmElement.classList.add('special');
         charmElement.dataset.charm = charm.src;
         charmElement.dataset.category = charm.category;
-        charmElement.dataset.quantity = charm.quantity || 1; 
+        charmElement.dataset.quantity = charm.quantity || 1;
         
         // Check if it's a long charm
         const isLongCharm = charm.src.includes('long');
@@ -1239,8 +1284,7 @@ function updateSpecialCharmsDisplay() {
             charmElement.classList.add('long-charm');
         }
         
-        // Update styling based on quantity
-        if (charm.quantity <= 0) {
+        if (isOutOfStock || charm.quantity <= 0) {
             charmElement.classList.add('out-of-stock');
             charmElement.style.opacity = '0.5';
             charmElement.style.cursor = 'not-allowed';
@@ -1252,61 +1296,15 @@ function updateSpecialCharmsDisplay() {
 
         charmElement.addEventListener('click', () => {
             const quantity = parseInt(charmElement.dataset.quantity) || 1;
+            if (quantity <= 0) return;
+            if (quantity === 1 && usedCharms.has(charm.src)) return;
             
-            // Don't allow selection if out of stock
-            if (quantity <= 0) {
-                return;
-            }
-            
-            // Don't allow selection if already used (unless quantity > 1)
-            if (quantity === 1 && usedCharms.has(charm.src)) {
-                return;
-            }
-            
-            // Deselect all other charms
             document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
-            
-            // Select this charm
             charmElement.classList.add('selected');
             selectedCharm = charmElement;
         });
 
         specialCharmsGrid.appendChild(charmElement);
-    });
-
-    // Add gold toggle button if category has gold variants
-    if (hasGoldVariants) {
-        const toggleContainer = document.createElement('div');
-        toggleContainer.className = 'gold-toggle-container';
-        toggleContainer.style.width = '100%';
-        toggleContainer.style.display = 'flex';
-        toggleContainer.style.justifyContent = 'center';
-        toggleContainer.style.marginTop = '1rem';
-        toggleContainer.style.paddingTop = '1rem';
-        toggleContainer.style.borderTop = '1px solid #f5a0c2';
-
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = 'btn' + (showGoldVariants ? ' active' : '');
-        toggleBtn.style.minWidth = '100px';
-        toggleBtn.style.background = showGoldVariants ? '#d6336c' : '#fff';
-        toggleBtn.style.color = showGoldVariants ? '#fff' : '#d6336c';
-        toggleBtn.style.border = '2px solid #d6336c';
-        toggleBtn.style.borderRadius = '20px';
-        toggleBtn.style.padding = '0.5rem 1.5rem';
-        toggleBtn.textContent = showGoldVariants ? 'Silver' : 'Gold';
-        
-        toggleBtn.onclick = () => {
-            showGoldVariants = !showGoldVariants;
-            toggleBtn.textContent = showGoldVariants ? 'Silver' : 'Gold';
-            toggleBtn.style.background = showGoldVariants ? '#d6336c' : '#fff';
-            toggleBtn.style.color = showGoldVariants ? '#fff' : '#d6336c';
-            toggleBtn.classList.toggle('active');
-            selectedCharm = null; // Clear selection when toggling
-            updateSpecialCharmsDisplay();
-            updateRareCharmsDisplay(); // Update both displays when toggling
-        };
-        toggleContainer.appendChild(toggleBtn);
-        specialCharmsGrid.appendChild(toggleContainer);
     }
 }
 
@@ -1321,8 +1319,9 @@ function updateRareCharmsDisplay() {
         return charm.src.includes('-gold.png') && charm.category === currentRareCategory;
     });
 
-    // Separate regular and dangly charms for ALL category
-    let filteredCharms = [];
+    // Separate charms into available and out-of-stock
+    let availableCharms = [];
+    let outOfStockCharms = [];
     let danglyCharms = [];
 
     rareCharms.forEach(charm => {
@@ -1334,10 +1333,15 @@ function updateRareCharmsDisplay() {
         const isGoldVariant = charm.src.includes('-gold.png');
         const isGoldCategory = charm.category === 'gold';
         const isDangly = charm.src.includes('dangly') || charm.category === 'dangly';
+        const isOutOfStock = charm.quantity <= 0;
 
         // For ALL category, separate dangly charms
         if (currentRareCategory === 'all' && isDangly) {
-            danglyCharms.push(charm);
+            if (isOutOfStock) {
+                outOfStockCharms.push(charm);
+            } else {
+                danglyCharms.push(charm);
+            }
             return;
         }
 
@@ -1345,11 +1349,13 @@ function updateRareCharmsDisplay() {
         if (currentRareCategory === 'all') {
             if (showGoldVariants) {
                 if (isGoldVariant || isGoldCategory) {
-                    filteredCharms.push(charm);
+                    if (isOutOfStock) outOfStockCharms.push(charm);
+                    else availableCharms.push(charm);
                 }
             } else {
                 if (!isGoldVariant && !isGoldCategory) {
-                    filteredCharms.push(charm);
+                    if (isOutOfStock) outOfStockCharms.push(charm);
+                    else availableCharms.push(charm);
                 }
             }
             return;
@@ -1359,29 +1365,53 @@ function updateRareCharmsDisplay() {
         if (hasGoldVariants) {
             if (showGoldVariants) {
                 if (isGoldVariant) {
-                    filteredCharms.push(charm);
+                    if (isOutOfStock) outOfStockCharms.push(charm);
+                    else availableCharms.push(charm);
                 }
             } else {
                 if (!isGoldVariant) {
-                    filteredCharms.push(charm);
+                    if (isOutOfStock) outOfStockCharms.push(charm);
+                    else availableCharms.push(charm);
                 }
             }
             return;
         }
 
         // If category has no gold variants, show all charms
-        filteredCharms.push(charm);
+        if (isOutOfStock) outOfStockCharms.push(charm);
+        else availableCharms.push(charm);
     });
 
-    // Display regular charms first
-    filteredCharms.forEach(charm => {
+    // Display available charms first
+    availableCharms.forEach(charm => {
+        createAndAppendCharm(charm);
+    });
+
+    // Display dangly charms (only in ALL category)
+    if (currentRareCategory === 'all' && danglyCharms.length > 0) {
+        danglyCharms.forEach(charm => {
+            createAndAppendCharm(charm);
+        });
+    }
+
+    // Display out-of-stock charms at the end
+    outOfStockCharms.forEach(charm => {
+        createAndAppendCharm(charm, true);
+    });
+
+    // Add gold toggle button if needed
+    if (hasGoldVariants) {
+        addGoldToggle();
+    }
+
+    function createAndAppendCharm(charm, isOutOfStock = false) {
         const charmElement = createCharm(charm.src, `Rare Charm ${charm.src}`, 'rare');
         charmElement.classList.add('rare');
         charmElement.dataset.charm = charm.src;
         charmElement.dataset.category = charm.category;
         charmElement.dataset.quantity = charm.quantity || 1;
         
-        if (charm.quantity <= 0) {
+        if (isOutOfStock || charm.quantity <= 0) {
             charmElement.classList.add('out-of-stock');
             charmElement.style.opacity = '0.5';
             charmElement.style.cursor = 'not-allowed';
@@ -1402,55 +1432,9 @@ function updateRareCharmsDisplay() {
         });
 
         rareCharmsGrid.appendChild(charmElement);
-    });
-
-    // Add dangly charms at the end for ALL category
-    if (currentRareCategory === 'all' && danglyCharms.length > 0) {
-        // Add separator
-        const separator = document.createElement('div');
-        separator.style.cssText = 'width:100%; height:2px; background:linear-gradient(90deg,transparent,#f5a0c2,transparent); margin:1.5rem 0;';
-        rareCharmsGrid.appendChild(separator);
-
-        // Add label
-        const danglyLabel = document.createElement('div');
-        danglyLabel.textContent = '✨ Dangly Charms ✨';
-        danglyLabel.style.cssText = 'text-align:center; font-weight:bold; color:#d6336c; margin:0.5rem 0 1rem; font-size:1.1em;';
-        rareCharmsGrid.appendChild(danglyLabel);
-
-        // Add dangly charms
-        danglyCharms.forEach(charm => {
-            const charmElement = createCharm(charm.src, `Rare Charm ${charm.src}`, 'rare');
-            charmElement.classList.add('rare');
-            charmElement.dataset.charm = charm.src;
-            charmElement.dataset.category = charm.category;
-            charmElement.dataset.quantity = charm.quantity || 1;
-            
-            if (charm.quantity <= 0) {
-                charmElement.classList.add('out-of-stock');
-                charmElement.style.opacity = '0.5';
-                charmElement.style.cursor = 'not-allowed';
-            }
-
-            if (usedCharms.has(charm.src)) {
-                charmElement.classList.add('used');
-            }
-
-            charmElement.addEventListener('click', () => {
-                const quantity = parseInt(charmElement.dataset.quantity) || 1;
-                if (quantity <= 0) return;
-                if (quantity === 1 && usedCharms.has(charm.src)) return;
-                
-                document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
-                charmElement.classList.add('selected');
-                selectedCharm = charmElement;
-            });
-
-            rareCharmsGrid.appendChild(charmElement);
-        });
     }
 
-    // Add gold toggle button if category has gold variants
-    if (hasGoldVariants) {
+    function addGoldToggle() {
         const toggleContainer = document.createElement('div');
         toggleContainer.style.cssText = 'width:100%; display:flex; justify-content:center; margin:1rem 0; padding-top:1rem; border-top:1px dashed #f5a0c2;';
 
