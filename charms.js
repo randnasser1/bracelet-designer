@@ -127,7 +127,7 @@ const specialCharms = [
   // cutespecials charms
   { src: 'special/cute specials/so cute.png', category: 'cutespecials', quantity: 11 },
   { src: 'special/cute specials/102-gold.png', category: 'cutespecials', quantity: 31 },
-  { src: 'special/cute specials/116-gold.png', category: 'cutespecials', quantity: 8 },
+  { src: 'special/cute specials/116-gold.png', category: 'cutespecials', quantity: 7 },
   { src: 'special/cute specials/117-gold.png', category: 'cutespecials', quantity: 10 },
   { src: 'special/cute specials/118-gold.png', category: 'cutespecials', quantity: 17 },
   { src: 'special/cute specials/119-gold.png', category: 'cutespecials', quantity: 8 },
@@ -151,7 +151,7 @@ const specialCharms = [
   { src: 'special/cute specials/special8.png', category: 'cutespecials', quantity: 13 },
   { src: 'special/cute specials/special9.png', category: 'cutespecials', quantity: 10 },
   { src: 'special/cute specials/special10.png', category: 'cutespecials', quantity: 10 },
-  { src: 'special/cute specials/special11.png', category: 'cutespecials', quantity: 8 },
+  { src: 'special/cute specials/special11.png', category: 'cutespecials', quantity: 7 },
   { src: 'special/cute specials/special12.png', category: 'cutespecials', quantity: 30 },
   { src: 'special/cute specials/special13.png', category: 'cutespecials', quantity: 0 },
   { src: 'special/cute specials/special14.png', category: 'cutespecials', quantity: 1 },
@@ -390,4 +390,3 @@ const rareCharms = [
   { src: 'rares/sporty/29.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/31.png', category: 'sporty', quantity: 1 },
 ];
-
