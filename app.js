@@ -1352,28 +1352,22 @@ function updateSpecialCharmsDisplay() {
 }
 function updateRareCharmsDisplay() {
     rareCharmsGrid.innerHTML = '';
- 
-    // Check if the current category has any gold variants
-    const hasGoldVariants = rareCharms.some(charm => {
-        if (currentRareCategory === 'all') {
-            return charm.src.includes('-gold.png') || charm.category === 'gold';
-        }
-        return (charm.src.includes('-gold.png') || charm.category === 'gold') && 
-               charm.category === currentRareCategory;
-    });
 
-    // Separate charms into different groups
     let availableCharms = [];
     let outOfStockCharms = [];
-    let danglyCharms = [];
-    let goldDanglyCharms = [];
 
     rareCharms.forEach(charm => {
-        // First filter by category
-        if (currentRareCategory !== 'all' && charm.category !== currentRareCategory) {
-          if (charm.category !== 'gold') {  // <-- Allow gold charms to bypass
+        const isOutOfStock = charm.quantity <= 0;
+        const isGoldCharm = charm.category === 'gold' || charm.src.includes('-gold.png');
+
+        // EXCLUSIVE FILTER - Only show gold charms when gold category selected
+        if (currentRareCategory === 'gold') {
+            if (!isGoldCharm) return; // Skip non-gold charms
+        } 
+        // Normal category filtering for other cases
+        else if (currentRareCategory !== 'all' && charm.category !== currentRareCategory) {
             return;
-          }
+        }
 }
 
         const isGoldVariant = charm.src.includes('-gold.png') || charm.category === 'gold';
