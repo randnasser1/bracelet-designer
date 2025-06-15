@@ -80,7 +80,8 @@ const CHARM_SETS = {
   loveSet: {
     charms: ['rares/love/6.png', 'rares/love/7.png'],
     message: 'Love charms must be in 2 different items',
-    requiredCount: 2
+    requiredCount: 2,
+      isDangly: true
   }
 };
 
@@ -965,8 +966,8 @@ function placeSelectedCharm(slot) {
     longContainer.addEventListener('click', function() {
         handleSlotClick(this);
     });
-} else if (isDanglyCharm) {
-        // For dangly charm, just make the slot taller
+ } else if (isDanglyCharm) {
+        // For dangly charm (including love set), make the slot taller
         slot.classList.add('has-dangly');
         
         const danglyImg = document.createElement('img');
@@ -1090,9 +1091,11 @@ function removeCharmFromSlot(slot) {
     const charm = slot.querySelector('img:not([data-type="base"])');
     if (!charm) return;
     
+    const isDangly = charm.classList.contains('dangly-charm') || 
+                    (getCharmSet(charm.dataset.charm)?.isDangly);
+    
     const charmSrc = charm.dataset.charm;
     const charmType = charm.dataset.type;
-    const isDangly = charm.classList.contains('dangly-charm');
     const isLong = slot.classList.contains('long-slot');
     
     // Get the slot index before removal
@@ -1466,7 +1469,6 @@ function updateRareCharmsDisplay() {
         rareCharmsGrid.appendChild(charmElement);
     }
 }
-
 function createCharm(src, alt, type, isDangly = false) {
     const img = document.createElement('img');
     img.src = src;
@@ -1475,8 +1477,11 @@ function createCharm(src, alt, type, isDangly = false) {
     img.dataset.type = type;
     img.dataset.charm = src;
     
-    // Set dimensions based on type
-    if (isDangly || src.includes('dangly')) {
+    // Check if this is part of the love set or explicitly marked as dangly
+    const charmSet = getCharmSet(src);
+    const shouldBeDangly = isDangly || (charmSet && charmSet.isDangly);
+    
+    if (shouldBeDangly || src.includes('dangly')) {
         img.classList.add('dangly-charm');
         img.style.width = '48px';
         img.style.height = '96px';
