@@ -194,7 +194,76 @@ function calculatePrice(includeDelivery = false) {
     
     return totalPrice;
 }
+async function uploadBraceletImage(imageFile) {
+  try {
+    // 1. Create storage reference
+    const storageRef = firebase.storage().ref();
+    const fileRef = storageRef.child(`designs/${Date.now()}_${imageFile.name}`);
+    
+    // 2. Upload with metadata
+    const uploadTask = fileRef.put(imageFile, {
+      contentType: imageFile.type,
+      customMetadata: {
+        uploadedBy: "user123",
+      }
+    });
 
+    // 3. Track progress
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload progress:', progress);
+      },
+      (error) => {
+        console.error('Upload failed:', error);
+      },
+      async () => {
+        // 4. Get download URL after upload
+        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+        console.log('File available at:', downloadURL);
+        return downloadURL;
+      }
+    );
+  } catch (error) {
+    console.error('Upload error:', error);
+    throw error;
+  }
+}
+// Helper function to upload images to Firebase Storage
+async function uploadImageToFirebase(imageFile, folder = 'designs/') {
+  try {
+    // 1. Create a unique filename
+    const timestamp = Date.now();
+    const fileName = `${folder}${timestamp}_${imageFile.name}`;
+    
+    // 2. Create storage reference
+    const storageRef = firebase.storage().ref();
+    const fileRef = storageRef.child(fileName);
+    
+    // 3. Start upload
+    const uploadTask = fileRef.put(imageFile);
+    
+    // 4. Return a promise that resolves with download URL
+    return new Promise((resolve, reject) => {
+      uploadTask.on('state_changed',
+        null, // Progress handler (optional)
+        (error) => reject(error),
+        async () => {
+          try {
+            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+            resolve(downloadURL);
+          } catch (error) {
+            reject(error);
+          }
+        }
+      );
+    });
+    
+  } catch (error) {
+    console.error('Upload error:', error);
+    throw error;
+  }
+}
 function updateJewelryPiece() {
     const jewelryPiece = document.getElementById('jewelry-piece');
     jewelryPiece.innerHTML = '';
@@ -561,33 +630,21 @@ function setupCartFunctionality() {
     const addToCartBtn = document.getElementById('add-to-cart-bottom');
     const jewelryPiece = document.getElementById('jewelry-piece');
     
-    try {
-        // First validate charm sets
-        const invalidSets = validateCharmSets();
-        if (invalidSets.length > 0) {
-            const errorMessages = invalidSets.map(set => 
-                `${set.message}\n\nCurrently have: ${set.currentCount}/${set.requiredCount}`
-            ).join('\n\n');
-            
-            const proceed = confirm(
-                `${errorMessages}\n\nDo you want to add this item anyway? ` +
-                `You can add the remaining charms in another item.`
-            );
-            
-            if (!proceed) {
-                return;
-            }
-        }
-        
-        addToCartBtn.disabled = true;
-        addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        
-        // Get the data URL directly from captureBraceletDesign
-        const designUrl = await captureBraceletDesign();
-        
-        const cartItem = {
-    id: Date.now().toString(),
-    product: currentProduct,
+   document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
+  try {
+    // 1. Capture bracelet design as image
+    const jewelryPiece = document.getElementById('jewelry-piece');
+    const canvas = await html2canvas(jewelryPiece);
+    const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    
+    // 2. Upload the image
+    const designUrl = await uploadImageToFirebase(imageBlob, 'designs/');
+    
+    // 3. Add to cart with the image URL
+    const cartItem = {
+      id: Date.now().toString(),
+      product: currentProduct,
+      designImage: designUrl,
     size: currentSize,
     isFullGlam: isFullGlam,
     materialType: materialType,
@@ -600,7 +657,7 @@ function setupCartFunctionality() {
     timestamp: new Date().toISOString()
 };
         
-        cart.push(cartItem);
+         cart.push(cartItem);
         updateCartDisplay();
         
         alert('Design added to cart!');
@@ -799,6 +856,7 @@ function setupOrderFunctionality() {
                 address: formData.get('address'),
                 notes: formData.get('notes') || null
             },
+        designImage: item.designImage,
             paymentMethod: formData.get('payment'),
             items: cart.map(item => ({
                 product: item.product,
