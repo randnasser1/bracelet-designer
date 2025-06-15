@@ -613,7 +613,7 @@ function setupCartFunctionality() {
         addToCartBtn.disabled = false;
         addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
     }
-});}f
+});}
 function validateCharmSets() {
     const invalidSets = [];
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => img.src);
