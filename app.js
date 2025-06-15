@@ -444,7 +444,7 @@ function setupEventListeners() {
                 initProduct(product);
             });
         });
-    
+        }
         materialOptions.forEach(option => {
             option.addEventListener('click', () => {
                 materialOptions.forEach(opt => opt.classList.remove('selected'));
@@ -1237,12 +1237,7 @@ function initCharms() {
 
 function updateSpecialCharmsDisplay() {
     specialCharmsGrid.innerHTML = '';
-    if (isOutOfStock || charm.quantity <= 0) {
-    charmElement.classList.add('out-of-stock');
-    charmElement.classList.add('sold-out');
-    charmElement.style.opacity = '0.5';
-    charmElement.style.cursor = 'not-allowed';
-}
+
     // Check if the current category has any gold variants
     const hasGoldVariants = specialCharms.some(charm => {
         if (currentSpecialCategory === 'all') {
@@ -1330,8 +1325,10 @@ function updateSpecialCharmsDisplay() {
             charmElement.classList.add('long-charm');
         }
         
+        // Moved the out-of-stock handling here where charmElement is defined
         if (isOutOfStock || charm.quantity <= 0) {
             charmElement.classList.add('out-of-stock');
+            charmElement.classList.add('sold-out');
             charmElement.style.opacity = '0.5';
             charmElement.style.cursor = 'not-allowed';
         }
@@ -1355,12 +1352,7 @@ function updateSpecialCharmsDisplay() {
 }
 function updateRareCharmsDisplay() {
     rareCharmsGrid.innerHTML = '';
-    if (isOutOfStock || charm.quantity <= 0) {
-    charmElement.classList.add('out-of-stock');
-    charmElement.classList.add('sold-out');
-    charmElement.style.opacity = '0.5';
-    charmElement.style.cursor = 'not-allowed';
-}
+ 
     // Check if the current category has any gold variants
     const hasGoldVariants = rareCharms.some(charm => {
         if (currentRareCategory === 'all') {
@@ -1482,8 +1474,10 @@ function updateRareCharmsDisplay() {
             charmElement.style.height = '96px';
         }
 
+        // Moved the out-of-stock handling here where charmElement is defined
         if (isOutOfStock || charm.quantity <= 0) {
             charmElement.classList.add('out-of-stock');
+            charmElement.classList.add('sold-out');
             charmElement.style.opacity = '0.5';
             charmElement.style.cursor = 'not-allowed';
         }
