@@ -978,3 +978,11 @@ html[dir="rtl"] .charm-pool h3 {
     font-weight: bold;
     color: #d6336c;
 }
+.location-subheader {
+  font-size: 0.85rem;
+  color: #a61e4d; /* Darker pink to match your theme */
+  text-align: center;
+  margin: -0.5rem 0 0.5rem 0;
+  opacity: 0.9;
+  font-weight: 500;
+}
