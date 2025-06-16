@@ -1041,25 +1041,33 @@
   <script src="charms.js"></script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     const welcomePopup = document.getElementById('welcome-popup');
     const welcomeClose = document.getElementById('welcome-close');
+    const startDesigningBtn = document.getElementById('start-designing-btn');
     
     // Check if 24 hours have passed since last view
     const lastSeen = localStorage.getItem('popupLastSeen');
     const now = new Date().getTime();
     
     if (!lastSeen || now - lastSeen > 24 * 60 * 60 * 1000) {
-      setTimeout(() => {
-        welcomePopup.style.display = 'flex';
-        localStorage.setItem('popupLastSeen', now);
-      }, 1000);
+        setTimeout(() => {
+            welcomePopup.style.display = 'flex';
+            localStorage.setItem('popupLastSeen', now);
+        }, 1000);
     }
     
     welcomeClose.addEventListener('click', () => {
-      welcomePopup.style.display = 'none';
+        welcomePopup.style.display = 'none';
     });
-  });
+
+    // Add this event listener for the "Let's Design!" button
+    if (startDesigningBtn) {
+        startDesigningBtn.addEventListener('click', () => {
+            welcomePopup.style.display = 'none';
+        });
+    }
+});
 </script>
 </body>
 </html>
