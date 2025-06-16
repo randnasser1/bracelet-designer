@@ -479,52 +479,17 @@ function initProduct(product) {
     document.body.classList.remove('product-bracelet', 'product-anklet', 'product-necklace', 'product-ring');
     document.body.classList.add(`product-${product}`);
 }
+
 function setupEventListeners() {
-    try {
+     try {
         const productBtns = document.querySelectorAll('.product-btn');
         const materialOptions = document.querySelectorAll('.material-option');
         const sizeSelect = document.getElementById('size');
         const fullGlamBtn = document.getElementById('full-glam-btn');
         const downloadBtn = document.getElementById('download-btn');
         const pricingToggle = document.getElementById('pricing-toggle');
-        const translateBtn = document.getElementById('translate-btn');
-
-        // Translate button functionality
-        if (translateBtn) {
-            translateBtn.addEventListener('click', function() {
-                // Check if Google Translate is loaded
-                if (typeof google !== 'undefined' && google.translate) {
-                    const currentLang = localStorage.getItem('googtrans') || '/en';
-                    const newLang = currentLang.includes('ar') ? '/en' : '/ar';
-                    
-                    // Change the language
-                    localStorage.setItem('googtrans', newLang);
-                    
-                    // Reload the iframe
-                    const iframe = document.querySelector('.goog-te-menu-frame');
-                    if (iframe) {
-                        iframe.contentWindow.location.reload();
-                    }
-                    
-                    // Update button text
-                    const btnText = translateBtn.querySelector('.btn-text');
-                    if (btnText) {
-                        btnText.textContent = newLang.includes('ar') ? 'English' : 'العربية';
-                    }
-                } else {
-                    // Fallback if Google Translate isn't loaded
-                    console.log('Translation service loading...');
-                    setTimeout(() => {
-                        if (typeof google !== 'undefined' && google.translate) {
-                            document.querySelector('.goog-te-combo').value = 'ar';
-                            document.querySelector('.goog-te-combo').dispatchEvent(new Event('change'));
-                        }
-                    }, 1000);
-                }
-            });
-        }
-
-        // Pricing toggle functionality
+        
+        // Move the pricing toggle listener outside the if block
         if (pricingToggle) {
             pricingToggle.addEventListener('click', () => {
                 const pricingInfo = document.querySelector('.pricing-info');
@@ -542,7 +507,7 @@ function setupEventListeners() {
             });
         }
 
-        // Product buttons functionality
+        // The rest of your event listeners...
         productBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const product = btn.dataset.type;
@@ -551,8 +516,23 @@ function setupEventListeners() {
                 initProduct(product);
             });
         });
+        
 
-        // Material options functionality
+        // Add this to your setupEventListeners() function
+        const translateBtn = document.getElementById('translate-btn');
+        if (translateBtn) {
+          translateBtn.addEventListener('click', function() {
+            // This will trigger the Google Translate element
+            const translateElement = document.querySelector('.goog-te-combo');
+            if (translateElement) {
+              translateElement.value = translateElement.value === 'en' ? 'ar' : 'en';
+              translateElement.dispatchEvent(new Event('change'));
+            } else {
+              // Fallback in case Google Translate isn't loaded
+              alert('Translation service is still loading. Please try again in a moment.');
+            }
+          });
+        }
         materialOptions.forEach(option => {
             option.addEventListener('click', () => {
                 materialOptions.forEach(opt => opt.classList.remove('selected'));
@@ -563,15 +543,11 @@ function setupEventListeners() {
             });
         });
 
-        // Size select functionality
-        if (sizeSelect) {
-            sizeSelect.addEventListener('change', () => {
-                updateJewelrySize(sizeSelect.value);
-                updatePrice();
-            });
-        }
+        sizeSelect.addEventListener('change', () => {
+            updateJewelrySize(sizeSelect.value);
+            updatePrice();
+        });
 
-        // Full glam button functionality
         if (fullGlamBtn) {
             fullGlamBtn.addEventListener('click', () => {
                 isFullGlam = !isFullGlam;
@@ -580,7 +556,6 @@ function setupEventListeners() {
             });
         }
 
-        // Download button functionality
         if (downloadBtn) {
             downloadBtn.addEventListener('click', async () => {
                 try {
@@ -674,44 +649,49 @@ function setupCartFunctionality() {
     });
 
     document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
-       const addToCartBtn = document.getElementById('add-to-cart-bottom');
-    const jewelryPiece = document.getElementById('jewelry-piece');
-    
-    try {
-        // Capture design as data URL (not uploading yet)
-        const canvas = await html2canvas(jewelryPiece);
-        const imageData = canvas.toDataURL('image/png');
+        const addToCartBtn = document.getElementById('add-to-cart-bottom');
+        const jewelryPiece = document.getElementById('jewelry-piece');
         
-        // Create cart item with data URL (not Firebase URL)
-        const cartItem = {
-            id: Date.now().toString(),
-            product: currentProduct,
-            designData: imageData, // Store as data URL
-            size: currentSize,
-            isFullGlam: isFullGlam,
-            materialType: materialType,
-            price: calculatePrice(false),
-            charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
-                src: img.src,
-                type: img.dataset.type
-            })),
-            timestamp: new Date().toISOString()
-        };
+        try {
+            // 1. Capture bracelet design as image
+            const canvas = await html2canvas(jewelryPiece);
+            const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
             
-        cart.push(cartItem);
-        updateCartDisplay();
-        
-        alert('Design added to cart!');
-        cartPreview.classList.add('active');
-        
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        alert('Could not add design to cart. Please try again.');
-    } finally {
-        addToCartBtn.disabled = false;
-        addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
-    }
-});
+            // 2. Upload the image
+            const designUrl = await uploadImageToFirebase(imageBlob, 'designs/');
+            
+            // 3. Add to cart with the image URL
+            const cartItem = {
+                id: Date.now().toString(),
+                product: currentProduct,
+                designImage: designUrl,
+                size: currentSize,
+                isFullGlam: isFullGlam,
+                materialType: materialType,
+                price: calculatePrice(false),
+                charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
+                    src: img.src,
+                    type: img.dataset.type
+                })),
+                imageUrl: designUrl,
+                timestamp: new Date().toISOString()
+            };
+                
+            cart.push(cartItem);
+            updateCartDisplay();
+            
+            alert('Design added to cart!');
+            cartElements.cartPreview.classList.add('active');
+            
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            alert('Could not add design to cart. Please try again.');
+        } finally {
+            addToCartBtn.disabled = false;
+            addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+        }
+    });
+}
 function validateCharmSets() {
     const invalidSets = [];
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => img.src);
@@ -830,18 +810,22 @@ function setupOrderFunctionality() {
         initProduct('bracelet');
     }
 
-async function handleFormSubmit(e) {
+    async function handleFormSubmit(e) {
     e.preventDefault();
+    console.log('Form submission started');
+
+    const form = e.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    // Prevent multiple submissions
     if (window.orderSubmissionInProgress) return;
     window.orderSubmissionInProgress = true;
     
-    const form = e.target;
-    const submitButton = form.querySelector('button[type="submit"]');
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
     try {
-        // Validate form fields
+        // 1. Validate form fields
         const formData = new FormData(form);
         const requiredFields = ['full-name', 'phone', 'governorate', 'address', 'payment'];
         const missingFields = requiredFields.filter(field => !formData.get(field));
@@ -854,7 +838,7 @@ async function handleFormSubmit(e) {
             throw new Error('Payment proof is required for Cliq payments');
         }
         
-        // Validate charm sets across all cart items
+        // 2. Validate charm sets across all cart items
         const allCharms = cart.flatMap(item => item.charms.map(charm => charm.src));
         const invalidSets = [];
         
@@ -878,7 +862,7 @@ async function handleFormSubmit(e) {
             throw new Error(`Please complete these charm sets:\n\n${errorMessages}`);
         }
         
-        // Proceed with order submission
+        // 3. Proceed with order submission
         const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
         const deliveryFee = 2.5;
         const total = subtotal + deliveryFee;
@@ -893,6 +877,7 @@ async function handleFormSubmit(e) {
                 address: formData.get('address'),
                 notes: formData.get('notes') || null
             },
+            // Changed from item.designImage to cart[0].designImage or similar
             designImage: cart.length > 0 ? cart[0].designImage : null,
             paymentMethod: formData.get('payment'),
             items: cart.map(item => ({
@@ -913,46 +898,36 @@ async function handleFormSubmit(e) {
         };
 
         // Upload payment proof if Cliq payment
-        if (formData.get('payment') === 'Cliq') {
-            const paymentProofFile = document.getElementById('payment-proof').files[0];
-            if (!paymentProofFile) {
-                throw new Error('Please upload payment proof for Cliq payment');
-            }
+      if (formData.get('payment') === 'Cliq') {
+    const paymentProofFile = document.getElementById('payment-proof').files[0];
+    if (!paymentProofFile) {
+        throw new Error('Please upload payment proof for Cliq payment');
+    }
 
-            // Simple client-side validation
-            if (paymentProofFile.size > 5 * 1024 * 1024) { // 5MB max
-                throw new Error('Payment proof must be smaller than 5MB');
-            }
+    // Simple client-side validation
+    if (paymentProofFile.size > 5 * 1024 * 1024) { // 5MB max
+        throw new Error('Payment proof must be smaller than 5MB');
+    }
 
-            const fileExt = paymentProofFile.name.split('.').pop().toLowerCase();
-            if (!['png', 'jpg', 'jpeg', 'pdf'].includes(fileExt)) {
-                throw new Error('Only PNG, JPG, or PDF files allowed');
-            }
+    const fileExt = paymentProofFile.name.split('.').pop().toLowerCase();
+    if (!['png', 'jpg', 'jpeg', 'pdf'].includes(fileExt)) {
+        throw new Error('Only PNG, JPG, or PDF files allowed');
+    }
 
-            // Upload with order reference
-            const fileName = `payment-proofs/${orderData.clientOrderId}_${Date.now()}.${fileExt}`;
-            const storageRef = storage.ref(fileName);
-            
-            await storageRef.put(paymentProofFile, {
-                contentType: paymentProofFile.type,
-                customMetadata: {
-                    orderId: orderData.clientOrderId,
-                    phone: formData.get('phone') || 'none'
-                }
-            });
-            
-            orderData.paymentProofUrl = await storageRef.getDownloadURL();
+    // Upload with order reference
+    const fileName = `payment-proofs/${orderData.clientOrderId}_${Date.now()}.${fileExt}`;
+    const storageRef = storage.ref(fileName);
+    
+    await storageRef.put(paymentProofFile, {
+        contentType: paymentProofFile.type,
+        customMetadata: {
+            orderId: orderData.clientOrderId,
+            phone: formData.get('phone') || 'none'
         }
-        
-        // Upload design images to Firebase only now (when order is confirmed)
-        for (const item of cart) {
-            if (item.designData) {
-                // Convert data URL to blob
-                const blob = await (await fetch(item.designData)).blob();
-                const designUrl = await uploadImageToFirebase(blob, 'designs/');
-                item.imageUrl = designUrl;
-            }
-        }
+    });
+    
+    orderData.paymentProofUrl = await storageRef.getDownloadURL();
+}
         
         // Submit to Firestore
         const orderRef = await db.collection('orders').add(orderData);
@@ -978,7 +953,20 @@ async function handleFormSubmit(e) {
         submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Order';
     }
 }
+    // Add event listeners
+    orderForm.addEventListener('submit', handleFormSubmit);
+    placeOrderBtn.addEventListener('click', handlePlaceOrderClick);
+    cancelOrderBtn.addEventListener('click', handleCancelOrder);
+    closeConfirmation.addEventListener('click', handleCloseConfirmation);
+    payCliqRadio.addEventListener('change', handlePaymentChange);
+
+    // Initialize payment proof container state
+    paymentProofContainer.style.display = 'none';
+
+    console.log('Order functionality initialized successfully');
+    window.orderFunctionalityInitialized = true;
 }
+
 function initJewelryPiece() {
     const jewelryPiece = document.getElementById('jewelry-piece');
     if (!jewelryPiece) {
@@ -1911,8 +1899,6 @@ function updateJewelrySize(size) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-      setupTranslation();
-
     try {
         // Initialize Firebase if not already initialized
         if (!window.firebaseInitialized) {
@@ -2010,4 +1996,3 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Failed to initialize application. Please refresh the page.');
     }
 });
-}
