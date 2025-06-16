@@ -283,65 +283,48 @@ function getCharmSet(charmSrc) {
 
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
-    const cartTotalElement = document.querySelector('.cart-total');
-    const cartCountElement = document.querySelector('.cart-count');
+    const cartCount = document.querySelector('.cart-count');
+    const cartTotal = document.querySelector('.cart-total');
+    
+    cartCount.textContent = cart.length;
     
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
-        cartTotalElement.innerHTML = 'Total: 0 JDs';
-        cartCountElement.textContent = '0';
+        cartTotal.textContent = 'Total: 0 JDs';
         return;
     }
     
-    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-    const deliveryFee = 2.5;
-    const total = subtotal + deliveryFee;
+    let itemsHTML = '';
+    let total = 0;
     
-    cartItemsContainer.innerHTML = cart.map(item => `
-        <div class="cart-item">
-            <div class="cart-item-preview">
-                <img src="${item.imageUrl}" alt="Design Preview" class="cart-item-image">
-                <div class="cart-item-details">
-                    <strong>${item.product.charAt(0).toUpperCase() + item.product.slice(1)}</strong>
-                    <div>Size: ${item.size}</div>
-                    <div>${item.isFullGlam ? 'Full Glam' : `${item.charms.length} charms`}</div>
-                    <div>${item.price.toFixed(2)} JDs</div>
+    cart.forEach((item, index) => {
+        total += item.price;
+        itemsHTML += `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <div class="cart-item-symbol">${item.symbol}</div>
+                    <div class="cart-item-details">
+                        <div>${item.product} (${item.size})</div>
+                        <div>${item.materialType}</div>
+                        <div>${item.price} JDs</div>
+                    </div>
                 </div>
+                <button class="remove-item" data-index="${index}">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
-            <button class="remove-item" data-id="${item.id}">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
-    `).join('');
+        `;
+    });
     
-    cartTotalElement.innerHTML = `
-        <div class="price-breakdown">
-            <div class="price-row">
-                <span>Subtotal:</span>
-                <span>${subtotal.toFixed(2)} JDs</span>
-            </div>
-            <div class="price-row delivery-fee">
-                <span>Delivery Fee:</span>
-                <span>${deliveryFee.toFixed(2)} JDs</span>
-            </div>
-            <div class="price-row total-price">
-                <span>Total:</span>
-                <span>${total.toFixed(2)} JDs</span>
-            </div>
-        </div>
-    `;
-    
-    cartCountElement.textContent = cart.length;
+    cartItemsContainer.innerHTML = itemsHTML;
+    cartTotal.textContent = `Total: ${total} JDs`;
     
     // Add event listeners to remove buttons
     document.querySelectorAll('.remove-item').forEach(button => {
         button.addEventListener('click', (e) => {
-            const itemId = e.currentTarget.dataset.id;
-            const index = cart.findIndex(item => item.id === itemId);
-            if (index !== -1) {
-                cart.splice(index, 1);
-                updateCartDisplay();
-            }
+            const index = e.currentTarget.dataset.index;
+            cart.splice(index, 1);
+            updateCartDisplay();
         });
     });
 }
@@ -649,22 +632,17 @@ function setupCartFunctionality() {
     });
 
     document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
-    const addToCartBtn = document.getElementById('add-to-cart-bottom');
-    const jewelryPiece = document.getElementById('jewelry-piece');
+   const addToCartBtn = document.getElementById('add-to-cart-bottom');
     
     try {
         addToCartBtn.disabled = true;
         addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
-        // Capture design as data URL (no Firebase upload yet)
-        const canvas = await html2canvas(jewelryPiece);
-        const imageData = canvas.toDataURL('image/png'); // Base64 string
-
-        // Create cart item with data URL
+        // Create cart item with cute symbol instead of image
         const cartItem = {
-            id: Date.now().toString(), // Unique ID for later Firebase upload
+            id: Date.now().toString(),
             product: currentProduct,
-            designData: imageData, // Stored as base64, not Firebase URL
+            symbol: '🍓', // This can be any cute symbol you like
             size: currentSize,
             isFullGlam: isFullGlam,
             materialType: materialType,
