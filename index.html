@@ -18,19 +18,22 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 <script>
   function googleTranslateElementInit() {
-    // Add slight delay to ensure script is loaded
-    setTimeout(() => {
-      new google.translate.TranslateElement({
-        pageLanguage: 'en',
-        includedLanguages: 'en,ar',
-        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-      }, 'google_translate_element');
-      
-      // Hide Google branding
-      const style = document.createElement('style');
-      style.innerHTML = '.goog-te-banner-frame { display: none !important; }';
-      document.head.appendChild(style);
-    }, 500);
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'en,ar',
+      layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
+      autoDisplay: false // This prevents the automatic top bar
+    }, 'google_translate_element');
+    
+    // More styling to hide Google elements
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .goog-te-banner-frame { display: none !important; }
+      .goog-te-gadget-icon { display: none !important; }
+      .goog-te-menu-value span { display: none !important; }
+      .goog-te-menu-value:after { content: "🌐 Translate"; }
+    `;
+    document.head.appendChild(style);
   }
 </script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
@@ -765,11 +768,11 @@
  <button id="pricing-toggle" class="btn">
   <i class="fas fa-tag"></i>
   <span class="btn-text">Pricing</span>
-</button>
- <button id="translate-btn" class="btn translate-btn">
+<button id="translate-btn" class="btn translate-btn">
   <i class="fas fa-language"></i>
   <span class="btn-text">العربية</span>
 </button>
+<div id="google_translate_element" style="display:none"></div>
   <a href="https://wa.me/962788838118" class="btn whatsapp-btn" target="_blank">
     <i class="fab fa-whatsapp"></i>
     <span class="btn-text">WhatsApp</span>
