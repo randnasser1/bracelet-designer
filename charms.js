@@ -276,10 +276,10 @@ const rareCharms = [
   // gold charms
   { src: 'rares/gold/gold.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold17.png', category: 'gold', quantity: 1 },
-  { src: 'rares/gold/gold2.png', category: 'gold', quantity: 0 },
-  { src: 'rares/gold/gold3.png', category: 'gold', quantity: 0 },
+  { src: 'rares/gold/gold2.png', category: 'gold', quantity: 2 },
+  { src: 'rares/gold/gold3.png', category: 'gold', quantity: 1 },
   { src: 'rares/gold/gold4.png', category: 'gold', quantity: 0 },
-  { src: 'rares/gold/gold5.png', category: 'gold', quantity: 0 },
+  { src: 'rares/gold/gold5.png', category: 'gold', quantity: 1 },
   { src: 'rares/gold/gold6.png', category: 'gold', quantity: 1 },
   { src: 'rares/gold/gold7.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold8.png', category: 'gold', quantity: 2 },
