@@ -886,7 +886,6 @@ html[dir="rtl"] .charm-pool h3 {
     background: white;
     overflow: hidden;
 }
-
 .custom-charm-preview img {
     max-width: 100%;
     max-height: 100%;
@@ -900,4 +899,64 @@ html[dir="rtl"] .charm-pool h3 {
 
 #add-custom-charm:hover {
     background: #c2255c;
+}
+.top-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  padding: 0 0.5rem;
+}.top-action-buttons .btn {
+  flex: 1 0 auto; /* Allows buttons to grow but not shrink too much */
+  min-width: 100px; /* Minimum width for each button */
+  max-width: 150px; /* Maximum width for each button */
+  padding: 0.5rem 0.3rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Specifically for the translate button */
+.top-action-buttons .translate-btn {
+  min-width: 80px; /* Smaller width for just the icon/arabic text */
+}
+@media (max-width: 480px) {
+  .top-action-buttons {
+    gap: 0.3rem;
+  }
+  
+  .top-action-buttons .btn {
+    min-width: 70px;
+    max-width: 100px;
+    font-size: 0.7rem;
+    padding: 0.4rem 0.2rem;
+  }
+  
+  .top-action-buttons .btn i {
+    margin-right: 0.2rem;
+  }
+  
+  .top-action-buttons .btn-text {
+    display: inline-block;
+    max-width: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+}@media (max-width: 320px) {
+  .top-action-buttons .btn-text {
+    display: none;
+  }
+  
+  .top-action-buttons .btn {
+    min-width: 40px;
+    max-width: 40px;
+    border-radius: 50%;
+  }
+  
+  .top-action-buttons .btn i {
+    margin-right: 0;
+  }
 }
