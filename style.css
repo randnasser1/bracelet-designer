@@ -3,16 +3,33 @@
 
 /* Italia Charms Header Styles */
 .header-container {
-  text-align: center;
-  margin: 1rem 0 2rem;
-  position: relative;
+  margin-bottom: -10px; /* Pulls everything up slightly */
 }
 
+
+.location-subheader {
+  font-size: 0.85rem;
+  color: #a61e4d;
+  margin: 0 0 0.2rem 0 !important; /* Top Right Bottom Left */
+  line-height: 1.2;
+}
+
+/* For the decorative line */
+.header-container p:nth-of-type(1) {
+  margin: 0.1rem 0 0.5rem 0 !important;
+  line-height: 1;
+}
+
+.subtitle {
+  margin-top: 0.3rem !important;
+}
 .main-title {
   font-family: 'Parisienne', cursive;
   font-size: 4rem;
   color: #d6336c;
   margin: 0;
+  margin-bottom: 0.2rem !important; /* Reduced from default 1rem */
+
   text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
   background: linear-gradient(to right, #ff85b3, #d6336c, #ff85b3);
   -webkit-background-clip: text;
@@ -977,12 +994,4 @@ html[dir="rtl"] .charm-pool h3 {
 .cart-item-details div:first-child {
     font-weight: bold;
     color: #d6336c;
-}
-.location-subheader {
-  font-size: 0.85rem;
-  color: #a61e4d; /* Darker pink to match your theme */
-  text-align: center;
-  margin: -0.5rem 0 0.5rem 0;
-  opacity: 0.9;
-  font-weight: 500;
 }
