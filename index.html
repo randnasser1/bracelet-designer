@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +14,21 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+<script>
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'en,ar',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+    
+    // Hide Google branding
+    const style = document.createElement('style');
+    style.innerHTML = '.goog-te-banner-frame { display: none !important; }';
+    document.head.appendChild(style);
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
   <script src="app.js" defer></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
@@ -694,6 +709,26 @@
   </style>
 </head>
 <body>
+  <!-- Welcome Popup -->
+<div class="welcome-popup" id="welcome-popup">
+  <div class="welcome-content">
+    <button class="welcome-close" id="welcome-close">&times;</button>
+    <h2>Welcome to Italia Charms!</h2>
+    <p>As a special gift, you get 2 free special charms with your order!!🧸🍓</p>
+    <p>Start designing your perfect jewelry piece now!</p>
+        <p>౨ৎ ˖ ࣪⊹ •🍓•⊹₊ ⋆୨ৎ</p>
+
+    <button class="btn" id="start-designing-btn">Let's Design!</button>
+  </div>
+</div>
+
+<!-- Header Section -->
+<div class="header-container">
+  <h1 class="main-title">Italia Charms</h1>
+  <p>౨ৎ ˖ ࣪⊹ •🍓•⊹₊ ⋆୨ৎ</p>
+  <p class="subtitle">Create Your Perfect Jewelry</p>
+</div>
+  <div id="google_translate_element"></div>
   <!-- Cart Button -->
   <button id="cart-button" class="cart-button">
     <i class="fas fa-shopping-cart"></i>
@@ -721,11 +756,12 @@
 
   <div class="main-content">
     <h1>Jewelry Designer</h1>
-    
-<!-- Top action buttons with responsive spacing -->
-  <div class="top-action-buttons">
+<div class="top-action-buttons">
     <button class="btn pricing-toggle-btn" id="pricing-toggle">
       <i class="fas fa-tag"></i> <span class="btn-text">Pricing</span>
+    </button>
+    <button class="btn translate-btn" id="translate-btn">
+      <i class="fas fa-language"></i> <span class="btn-text">العربية</span>
     </button>
     <a href="https://wa.me/962788838118" class="btn whatsapp-btn" target="_blank">
       <i class="fab fa-whatsapp"></i> <span class="btn-text">WhatsApp</span>
@@ -733,7 +769,7 @@
     <a href="https://instagram.com/italiacharms.jo" class="btn instagram-btn" target="_blank">
       <i class="fab fa-instagram"></i> <span class="btn-text">Instagram</span>
     </a>
-  </div>
+</div>
 <div class="pricing-info">
   <h3>Pricing Information</h3>
   <h3 style="text-align: left;">Pricing Information</h3>
@@ -991,5 +1027,48 @@
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script src="firebase-config.js"></script>
   <script src="charms.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const welcomePopup = document.getElementById('welcome-popup');
+  const welcomeClose = document.getElementById('welcome-close');
+  const startDesigningBtn = document.getElementById('start-designing-btn');
+
+  // Show popup logic (choose one option):
+
+  // Option 1: Show every time
+  setTimeout(() => {
+    welcomePopup.style.display = 'flex';
+  }, 1000);
+
+  // Option 2: Show once per session (original behavior)
+  // if(!sessionStorage.getItem('popupShown')) {
+  //   setTimeout(() => {
+  //     welcomePopup.style.display = 'flex';
+  //     sessionStorage.setItem('popupShown', 'true');
+  //   }, 1000);
+  // }
+
+  // Close handlers
+  welcomeClose.addEventListener('click', closePopup);
+  startDesigningBtn.addEventListener('click', closePopup);
+
+  function closePopup() {
+    welcomePopup.style.display = 'none';
+    
+    // Optional: Scroll to designer section
+    document.querySelector('.product-selector').scrollIntoView({
+      behavior: 'smooth'
+    });
+  }
+
+  // Optional: Close when clicking outside content
+  welcomePopup.addEventListener('click', function(e) {
+    if (e.target === welcomePopup) {
+      closePopup();
+    }
+  });
+});
+</script>
 </body>
 </html>
