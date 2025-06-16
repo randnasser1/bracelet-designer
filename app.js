@@ -481,26 +481,33 @@ function initProduct(product) {
 }
 
 function setupEventListeners() {
-    try {
+     try {
         const productBtns = document.querySelectorAll('.product-btn');
         const materialOptions = document.querySelectorAll('.material-option');
         const sizeSelect = document.getElementById('size');
         const fullGlamBtn = document.getElementById('full-glam-btn');
         const downloadBtn = document.getElementById('download-btn');
         const pricingToggle = document.getElementById('pricing-toggle');
+        
+        // Move the pricing toggle listener outside the if block
         if (pricingToggle) {
             pricingToggle.addEventListener('click', () => {
                 const pricingInfo = document.querySelector('.pricing-info');
-                pricingInfo.classList.toggle('visible');
-                
-                // Update button text based on state
-                const btnText = pricingToggle.querySelector('.btn-text');
-                if (pricingInfo.classList.contains('visible')) {
-                    btnText.textContent = 'Hide Pricing';
-                } else {
-                    btnText.textContent = 'Pricing';
+                if (pricingInfo) {
+                    pricingInfo.classList.toggle('visible');
+                    
+                    // Update button text based on state
+                    const btnText = pricingToggle.querySelector('.btn-text');
+                    if (btnText) {
+                        btnText.textContent = pricingInfo.classList.contains('visible') 
+                            ? 'Hide Pricing' 
+                            : 'Pricing';
+                    }
                 }
             });
+        }
+
+        // The rest of your event listeners...
         productBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const product = btn.dataset.type;
@@ -509,6 +516,22 @@ function setupEventListeners() {
                 initProduct(product);
             });
         });
+        
+
+        // Add this to your setupEventListeners() function
+        const translateBtn = document.getElementById('translate-btn');
+        if (translateBtn) {
+          translateBtn.addEventListener('click', function() {
+            // This will trigger the Google Translate element
+            const translateElement = document.querySelector('.goog-te-combo');
+            if (translateElement) {
+              translateElement.value = translateElement.value === 'en' ? 'ar' : 'en';
+              translateElement.dispatchEvent(new Event('change'));
+            } else {
+              // Fallback in case Google Translate isn't loaded
+              alert('Translation service is still loading. Please try again in a moment.');
+            }
+          });
         }
         materialOptions.forEach(option => {
             option.addEventListener('click', () => {
