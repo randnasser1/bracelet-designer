@@ -501,21 +501,16 @@ function setupEventListeners() {
         });
         
 
-        // Add this to your setupEventListeners() function
-        const translateBtn = document.getElementById('translate-btn');
-        if (translateBtn) {
-          translateBtn.addEventListener('click', function() {
-            // This will trigger the Google Translate element
-            const translateElement = document.querySelector('.goog-te-combo');
-            if (translateElement) {
-              translateElement.value = translateElement.value === 'en' ? 'ar' : 'en';
-              translateElement.dispatchEvent(new Event('change'));
-            } else {
-              // Fallback in case Google Translate isn't loaded
-              alert('Translation service is still loading. Please try again in a moment.');
-            }
-          });
-        }
+       document.getElementById('translate-btn').addEventListener('click', function() {
+  // Find the Google Translate dropdown and click it
+  const googleDropdown = document.querySelector('.goog-te-menu-value');
+  if (googleDropdown) {
+    googleDropdown.click();
+  } else {
+    // Fallback in case Google Translate hasn't fully loaded
+    alert('Translation is loading... Please try again in a moment.');
+  }
+});
         materialOptions.forEach(option => {
             option.addEventListener('click', () => {
                 materialOptions.forEach(opt => opt.classList.remove('selected'));
