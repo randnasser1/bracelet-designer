@@ -479,52 +479,52 @@ function initProduct(product) {
     document.body.classList.remove('product-bracelet', 'product-anklet', 'product-necklace', 'product-ring');
     document.body.classList.add(`product-${product}`);
 }
-
 function setupEventListeners() {
-     try {
-         
+    try {
         const productBtns = document.querySelectorAll('.product-btn');
         const materialOptions = document.querySelectorAll('.material-option');
         const sizeSelect = document.getElementById('size');
         const fullGlamBtn = document.getElementById('full-glam-btn');
         const downloadBtn = document.getElementById('download-btn');
         const pricingToggle = document.getElementById('pricing-toggle');
-         const translateBtn = document.getElementById('translate-btn');
-  if (!translateBtn) return;
+        const translateBtn = document.getElementById('translate-btn');
 
-  translateBtn.addEventListener('click', function() {
-    // Check if Google Translate is loaded
-    if (typeof google !== 'undefined' && google.translate) {
-      const currentLang = localStorage.getItem('googtrans') || '/en';
-      const newLang = currentLang.includes('ar') ? '/en' : '/ar';
-      
-      // Change the language
-      localStorage.setItem('googtrans', newLang);
-      
-      // Reload the iframe
-      const iframe = document.querySelector('.goog-te-menu-frame');
-      if (iframe) {
-        iframe.contentWindow.location.reload();
-      }
-      
-      // Update button text
-      const btnText = translateBtn.querySelector('.btn-text');
-      if (btnText) {
-        btnText.textContent = newLang.includes('ar') ? 'English' : 'العربية';
-      }
-    } else {
-      // Fallback if Google Translate isn't loaded
-      console.log('Translation service loading...');
-      setTimeout(() => {
-        if (typeof google !== 'undefined' && google.translate) {
-          document.querySelector('.goog-te-combo').value = 'ar';
-          document.querySelector('.goog-te-combo').dispatchEvent(new Event('change'));
+        // Translate button functionality
+        if (translateBtn) {
+            translateBtn.addEventListener('click', function() {
+                // Check if Google Translate is loaded
+                if (typeof google !== 'undefined' && google.translate) {
+                    const currentLang = localStorage.getItem('googtrans') || '/en';
+                    const newLang = currentLang.includes('ar') ? '/en' : '/ar';
+                    
+                    // Change the language
+                    localStorage.setItem('googtrans', newLang);
+                    
+                    // Reload the iframe
+                    const iframe = document.querySelector('.goog-te-menu-frame');
+                    if (iframe) {
+                        iframe.contentWindow.location.reload();
+                    }
+                    
+                    // Update button text
+                    const btnText = translateBtn.querySelector('.btn-text');
+                    if (btnText) {
+                        btnText.textContent = newLang.includes('ar') ? 'English' : 'العربية';
+                    }
+                } else {
+                    // Fallback if Google Translate isn't loaded
+                    console.log('Translation service loading...');
+                    setTimeout(() => {
+                        if (typeof google !== 'undefined' && google.translate) {
+                            document.querySelector('.goog-te-combo').value = 'ar';
+                            document.querySelector('.goog-te-combo').dispatchEvent(new Event('change'));
+                        }
+                    }, 1000);
+                }
+            });
         }
-      }, 1000);
-    }
-  });
-}
-        // Move the pricing toggle listener outside the if block
+
+        // Pricing toggle functionality
         if (pricingToggle) {
             pricingToggle.addEventListener('click', () => {
                 const pricingInfo = document.querySelector('.pricing-info');
@@ -542,7 +542,7 @@ function setupEventListeners() {
             });
         }
 
-        // The rest of your event listeners...
+        // Product buttons functionality
         productBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const product = btn.dataset.type;
@@ -551,23 +551,8 @@ function setupEventListeners() {
                 initProduct(product);
             });
         });
-        
 
-        // Add this to your setupEventListeners() function
-        const translateBtn = document.getElementById('translate-btn');
-        if (translateBtn) {
-          translateBtn.addEventListener('click', function() {
-            // This will trigger the Google Translate element
-            const translateElement = document.querySelector('.goog-te-combo');
-            if (translateElement) {
-              translateElement.value = translateElement.value === 'en' ? 'ar' : 'en';
-              translateElement.dispatchEvent(new Event('change'));
-            } else {
-              // Fallback in case Google Translate isn't loaded
-              alert('Translation service is still loading. Please try again in a moment.');
-            }
-          });
-        }
+        // Material options functionality
         materialOptions.forEach(option => {
             option.addEventListener('click', () => {
                 materialOptions.forEach(opt => opt.classList.remove('selected'));
@@ -578,11 +563,15 @@ function setupEventListeners() {
             });
         });
 
-        sizeSelect.addEventListener('change', () => {
-            updateJewelrySize(sizeSelect.value);
-            updatePrice();
-        });
+        // Size select functionality
+        if (sizeSelect) {
+            sizeSelect.addEventListener('change', () => {
+                updateJewelrySize(sizeSelect.value);
+                updatePrice();
+            });
+        }
 
+        // Full glam button functionality
         if (fullGlamBtn) {
             fullGlamBtn.addEventListener('click', () => {
                 isFullGlam = !isFullGlam;
@@ -591,6 +580,7 @@ function setupEventListeners() {
             });
         }
 
+        // Download button functionality
         if (downloadBtn) {
             downloadBtn.addEventListener('click', async () => {
                 try {
