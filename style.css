@@ -951,4 +951,30 @@ html[dir="rtl"] .charm-pool h3 {
       border-radius: 50%;
     }
   }
+}.cart-item-symbol {
+    font-size: 2rem;
+    margin-right: 1rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff0f5;
+    border-radius: 50%;
+    border: 2px solid #f5a0c2;
+}
+
+.cart-item-info {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.cart-item-details {
+    font-size: 0.9rem;
+}
+
+.cart-item-details div:first-child {
+    font-weight: bold;
+    color: #d6336c;
 }
