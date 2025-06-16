@@ -840,7 +840,8 @@ function setupOrderFunctionality() {
         initProduct('bracelet');
     }
 
-      e.preventDefault();
+async function handleFormSubmit(e) {
+    e.preventDefault();
     if (window.orderSubmissionInProgress) return;
     window.orderSubmissionInProgress = true;
     
@@ -859,30 +860,39 @@ function setupOrderFunctionality() {
             throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
         }
         
-        // Upload payment proof if Cliq payment
-        let paymentProofUrl = null;
-        if (formData.get('payment') === 'Cliq') {
-            const paymentProofFile = document.getElementById('payment-proof').files[0];
-            if (!paymentProofFile) {
-                throw new Error('Payment proof is required for Cliq payments');
-            }
-            paymentProofUrl = await uploadImageToFirebase(paymentProofFile, 'payment-proofs/');
+        if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
+            throw new Error('Payment proof is required for Cliq payments');
         }
-
-        // Upload all design images only now
-        const orderItems = [];
-        for (const item of cart) {
-            // Convert data URL to blob
-            const blob = await (await fetch(item.designData)).blob();
-            const designUrl = await uploadImageToFirebase(blob, 'designs/');
+        
+        // Validate charm sets across all cart items
+        const allCharms = cart.flatMap(item => item.charms.map(charm => charm.src));
+        const invalidSets = [];
+        
+        Object.values(CHARM_SETS).forEach(set => {
+            const foundCharms = set.charms.filter(charm => 
+                allCharms.some(placed => placed.includes(charm))
+            ).length;
             
-            orderItems.push({
-                ...item,
-                designImage: designUrl // Now store Firebase URL
-            });
+            if (foundCharms > 0 && foundCharms < set.requiredCount) {
+                invalidSets.push({
+                    ...set,
+                    currentCount: foundCharms
+                });
+            }
+        });
+        
+        if (invalidSets.length > 0) {
+            const errorMessages = invalidSets.map(set => 
+                `${set.message}\n\nYou have: ${set.currentCount}/${set.requiredCount}`
+            ).join('\n\n');
+            throw new Error(`Please complete these charm sets:\n\n${errorMessages}`);
         }
-
-        // Submit order data
+        
+        // Proceed with order submission
+        const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+        const deliveryFee = 2.5;
+        const total = subtotal + deliveryFee;
+        
         const orderData = {
             clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
             customer: {
@@ -893,22 +903,77 @@ function setupOrderFunctionality() {
                 address: formData.get('address'),
                 notes: formData.get('notes') || null
             },
-            items: orderItems,
+            designImage: cart.length > 0 ? cart[0].designImage : null,
             paymentMethod: formData.get('payment'),
-            paymentProofUrl: paymentProofUrl,
-            subtotal: cart.reduce((sum, item) => sum + item.price, 0),
-            deliveryFee: 2.5,
-            total: cart.reduce((sum, item) => sum + item.price, 0) + 2.5,
+            items: cart.map(item => ({
+                product: item.product,
+                size: item.size,
+                price: item.price,
+                imageUrl: item.imageUrl,
+                charms: item.charms,
+                isFullGlam: item.isFullGlam,
+                materialType: item.materialType,
+                timestamp: new Date().toISOString()
+            })),
+            subtotal: subtotal,
+            deliveryFee: deliveryFee,
+            total: total,
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             status: 'pending'
         };
 
-        const orderRef = await db.collection('orders').add(orderData);
+        // Upload payment proof if Cliq payment
+        if (formData.get('payment') === 'Cliq') {
+            const paymentProofFile = document.getElementById('payment-proof').files[0];
+            if (!paymentProofFile) {
+                throw new Error('Please upload payment proof for Cliq payment');
+            }
+
+            // Simple client-side validation
+            if (paymentProofFile.size > 5 * 1024 * 1024) { // 5MB max
+                throw new Error('Payment proof must be smaller than 5MB');
+            }
+
+            const fileExt = paymentProofFile.name.split('.').pop().toLowerCase();
+            if (!['png', 'jpg', 'jpeg', 'pdf'].includes(fileExt)) {
+                throw new Error('Only PNG, JPG, or PDF files allowed');
+            }
+
+            // Upload with order reference
+            const fileName = `payment-proofs/${orderData.clientOrderId}_${Date.now()}.${fileExt}`;
+            const storageRef = storage.ref(fileName);
+            
+            await storageRef.put(paymentProofFile, {
+                contentType: paymentProofFile.type,
+                customMetadata: {
+                    orderId: orderData.clientOrderId,
+                    phone: formData.get('phone') || 'none'
+                }
+            });
+            
+            orderData.paymentProofUrl = await storageRef.getDownloadURL();
+        }
         
-        // Clear cart only after successful submission
+        // Upload design images to Firebase only now (when order is confirmed)
+        for (const item of cart) {
+            if (item.designData) {
+                // Convert data URL to blob
+                const blob = await (await fetch(item.designData)).blob();
+                const designUrl = await uploadImageToFirebase(blob, 'designs/');
+                item.imageUrl = designUrl;
+            }
+        }
+        
+        // Submit to Firestore
+        const orderRef = await db.collection('orders').add(orderData);
+        console.log('Order submitted with ID:', orderRef.id);
+
+        // Clear cart and reset form
         cart.length = 0;
         updateCartDisplay();
-        
+        form.reset();
+        paymentProofContainer.style.display = 'none';
+
         // Show confirmation
         orderIdSpan.textContent = orderRef.id;
         orderModal.classList.remove('active');
@@ -922,19 +987,6 @@ function setupOrderFunctionality() {
         submitButton.disabled = false;
         submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Order';
     }
-}
-    // Add event listeners
-    orderForm.addEventListener('submit', handleFormSubmit);
-    placeOrderBtn.addEventListener('click', handlePlaceOrderClick);
-    cancelOrderBtn.addEventListener('click', handleCancelOrder);
-    closeConfirmation.addEventListener('click', handleCloseConfirmation);
-    payCliqRadio.addEventListener('change', handlePaymentChange);
-
-    // Initialize payment proof container state
-    paymentProofContainer.style.display = 'none';
-
-    console.log('Order functionality initialized successfully');
-    window.orderFunctionalityInitialized = true;
 }
 
 function initJewelryPiece() {
