@@ -1029,45 +1029,24 @@
   <script src="charms.js"></script>
 
 <script>
+// POPUP FIX - ADD THIS RIGHT BEFORE </body>
 document.addEventListener('DOMContentLoaded', function() {
-  const welcomePopup = document.getElementById('welcome-popup');
-  const welcomeClose = document.getElementById('welcome-close');
-  const startDesigningBtn = document.getElementById('start-designing-btn');
-
-  // Show popup logic (choose one option):
-
-  // Option 1: Show every time
+  const popup = document.getElementById('welcome-popup');
+  
+  // Show popup
   setTimeout(() => {
-    welcomePopup.style.display = 'flex';
+    popup.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
   }, 1000);
 
-  // Option 2: Show once per session (original behavior)
-  // if(!sessionStorage.getItem('popupShown')) {
-  //   setTimeout(() => {
-  //     welcomePopup.style.display = 'flex';
-  //     sessionStorage.setItem('popupShown', 'true');
-  //   }, 1000);
-  // }
-
   // Close handlers
-  welcomeClose.addEventListener('click', closePopup);
-  startDesigningBtn.addEventListener('click', closePopup);
-
+  document.getElementById('welcome-close').addEventListener('click', closePopup);
+  document.getElementById('start-designing-btn').addEventListener('click', closePopup);
+  
   function closePopup() {
-    welcomePopup.style.display = 'none';
-    
-    // Optional: Scroll to designer section
-    document.querySelector('.product-selector').scrollIntoView({
-      behavior: 'smooth'
-    });
+    popup.style.display = 'none';
+    document.body.style.overflow = '';
   }
-
-  // Optional: Close when clicking outside content
-  welcomePopup.addEventListener('click', function(e) {
-    if (e.target === welcomePopup) {
-      closePopup();
-    }
-  });
 });
 </script>
 </body>
