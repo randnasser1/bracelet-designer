@@ -978,7 +978,7 @@ async function handleFormSubmit(e) {
         submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Order';
     }
 }
-
+}
 function initJewelryPiece() {
     const jewelryPiece = document.getElementById('jewelry-piece');
     if (!jewelryPiece) {
@@ -2010,3 +2010,4 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Failed to initialize application. Please refresh the page.');
     }
 });
+}
