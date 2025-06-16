@@ -78,7 +78,6 @@ const specialCharms = [
   { src: 'special/bows/red.png', category: 'bows', quantity: 16 },
   { src: 'special/bows/wwhite.png', category: 'bows', quantity: 9 },
   // simple charms
-  { src: 'special/cute and simple/1.png', category: 'simple', quantity: 1 },
   { src: 'special/cute and simple/2.png', category: 'simple', quantity: 0 },
   { src: 'special/cute and simple/3.png', category: 'simple', quantity: 0 },
   { src: 'special/cute and simple/4.png', category: 'simple', quantity: 0 },
