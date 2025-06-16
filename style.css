@@ -754,16 +754,6 @@ body.modal-open {
   margin: 1rem 0;
   flex-wrap: wrap;
 }
-  .pricing-info {
-    display: none;
-    background: #fff0f5;
-    border: 1px solid #f5a0c2;
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin: 1.5rem auto;
-    max-width: 800px;
-    box-shadow: 0 2px 8px rgba(214, 51, 108, 0.1);
-  }
 
   .pricing-grid {
     display: grid;
@@ -900,63 +890,65 @@ html[dir="rtl"] .charm-pool h3 {
 #add-custom-charm:hover {
     background: #c2255c;
 }
+/* Top Action Buttons - Mobile Friendly */
 .top-action-buttons {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
-  margin: 1rem 0;
-  padding: 0 0.5rem;
-}.top-action-buttons .btn {
-  flex: 1 0 auto; /* Allows buttons to grow but not shrink too much */
-  min-width: 100px; /* Minimum width for each button */
-  max-width: 150px; /* Maximum width for each button */
+  margin: 1rem auto;
+  max-width: 100%;
+  padding: 0 10px;
+}
+
+.top-action-buttons .btn {
+  flex: 1 1 auto;
+  min-width: 80px;
+  max-width: 120px;
   padding: 0.5rem 0.3rem;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
 }
 
-/* Specifically for the translate button */
-.top-action-buttons .translate-btn {
-  min-width: 80px; /* Smaller width for just the icon/arabic text */
+/* Pricing Info Toggle Fix */
+.pricing-info {
+  display: none;
+  margin: 1rem auto;
+  max-width: 95%;
 }
+
+.pricing-info.visible {
+  display: block;
+}
+
+/* Mobile Specific Styles */
 @media (max-width: 480px) {
   .top-action-buttons {
     gap: 0.3rem;
+    padding: 0 5px;
   }
   
   .top-action-buttons .btn {
     min-width: 70px;
-    max-width: 100px;
     font-size: 0.7rem;
     padding: 0.4rem 0.2rem;
   }
   
-  .top-action-buttons .btn i {
-    margin-right: 0.2rem;
-  }
-  
-  .top-action-buttons .btn-text {
-    display: inline-block;
-    max-width: 50px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-  }
-}@media (max-width: 320px) {
-  .top-action-buttons .btn-text {
-    display: none;
-  }
-  
-  .top-action-buttons .btn {
-    min-width: 40px;
-    max-width: 40px;
-    border-radius: 50%;
-  }
-  
-  .top-action-buttons .btn i {
-    margin-right: 0;
+  /* Icon-only version for smallest screens */
+  @media (max-width: 350px) {
+    .top-action-buttons .btn-text {
+      display: none;
+    }
+    .top-action-buttons .btn {
+      min-width: 40px;
+      max-width: 40px;
+      border-radius: 50%;
+    }
   }
 }
