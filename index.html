@@ -18,25 +18,6 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
   <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
-<script>
-document.getElementById('translate-btn').addEventListener('click', function() {
-  // Wait for Google Translate to fully load
-  if (typeof google !== 'undefined' && google.translate) {
-    const dropdown = document.querySelector('.goog-te-menu-value');
-    if (dropdown) dropdown.click();
-  } else {
-    // Fallback: Show the hidden Google Translate element
-    const translateElement = document.getElementById('google_translate_element');
-    if (translateElement) {
-      translateElement.style.display = 'block';
-      setTimeout(() => {
-        const dropdown = document.querySelector('.goog-te-menu-value');
-        if (dropdown) dropdown.click();
-      }, 500);
-    }
-  }
-});
-</script>
   <script src="app.js" defer></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
@@ -1072,6 +1053,26 @@ document.addEventListener('DOMContentLoaded', function() {
             welcomePopup.style.display = 'none';
         });
     }
+});
+</script>
+  
+<script>
+document.getElementById('translate-btn').addEventListener('click', function() {
+  // Wait for Google Translate to fully load
+  if (typeof google !== 'undefined' && google.translate) {
+    const dropdown = document.querySelector('.goog-te-menu-value');
+    if (dropdown) dropdown.click();
+  } else {
+    // Fallback: Show the hidden Google Translate element
+    const translateElement = document.getElementById('google_translate_element');
+    if (translateElement) {
+      translateElement.style.display = 'block';
+      setTimeout(() => {
+        const dropdown = document.querySelector('.goog-te-menu-value');
+        if (dropdown) dropdown.click();
+      }, 500);
+    }
+  }
 });
 </script>
 </body>
