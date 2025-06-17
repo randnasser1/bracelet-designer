@@ -626,12 +626,15 @@ function setupCartFunctionality() {
         document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
     });
 
-    document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
-   const addToCartBtn = document.getElementById('add-to-cart-bottom');
+   document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
+    const addToCartBtn = document.getElementById('add-to-cart-bottom');
     
     try {
         addToCartBtn.disabled = true;
         addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+        // Capture the design image
+        const designImage = await captureBraceletDesign();
 
         // Create cart item with cute symbol instead of image
         const cartItem = {
@@ -642,6 +645,7 @@ function setupCartFunctionality() {
             isFullGlam: isFullGlam,
             materialType: materialType,
             price: calculatePrice(false),
+            designImage: designImage, // Add the captured image
             charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
                 src: img.src,
                 type: img.dataset.type
@@ -834,11 +838,32 @@ function setupOrderFunctionality() {
             throw new Error(`Please complete these charm sets:\n\n${errorMessages}`);
         }
         
-        // 3. Proceed with order submission
+        // 3. Upload design images for each item
+        const cartWithImages = await Promise.all(cart.map(async (item) => {
+            if (item.designImage) {
+                try {
+                    // Convert data URL to blob
+                    const blob = await (await fetch(item.designImage)).blob();
+                    // Upload to Firebase Storage
+                    const downloadURL = await uploadImageToFirebase(blob, 'designs/');
+                    return {
+                        ...item,
+                        imageUrl: downloadURL
+                    };
+                } catch (error) {
+                    console.error('Error uploading design image:', error);
+                    return item; // Return item without image if upload fails
+                }
+            }
+            return item;
+        }));
+
+        // 4. Calculate order totals
         const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
         const deliveryFee = 2.5;
         const total = subtotal + deliveryFee;
         
+        // 5. Create order data
         const orderData = {
             clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
             customer: {
@@ -849,17 +874,15 @@ function setupOrderFunctionality() {
                 address: formData.get('address'),
                 notes: formData.get('notes') || null
             },
-            // Changed from item.designImage to cart[0].designImage or similar
-            designImage: cart.length > 0 ? cart[0].designImage : null,
             paymentMethod: formData.get('payment'),
-            items: cart.map(item => ({
+            items: cartWithImages.map(item => ({
                 product: item.product,
                 size: item.size,
                 price: item.price,
-                imageUrl: item.imageUrl,
-                charms: item.charms,
+                imageUrl: item.imageUrl || null, // Use the uploaded URL
                 isFullGlam: item.isFullGlam,
                 materialType: item.materialType,
+                charms: item.charms,
                 timestamp: new Date().toISOString()
             })),
             subtotal: subtotal,
@@ -869,49 +892,49 @@ function setupOrderFunctionality() {
             status: 'pending'
         };
 
-        // Upload payment proof if Cliq payment
-      if (formData.get('payment') === 'Cliq') {
-    const paymentProofFile = document.getElementById('payment-proof').files[0];
-    if (!paymentProofFile) {
-        throw new Error('Please upload payment proof for Cliq payment');
-    }
+        // 6. Upload payment proof if Cliq payment
+        if (formData.get('payment') === 'Cliq') {
+            const paymentProofFile = document.getElementById('payment-proof').files[0];
+            if (!paymentProofFile) {
+                throw new Error('Please upload payment proof for Cliq payment');
+            }
 
-    // Simple client-side validation
-    if (paymentProofFile.size > 5 * 1024 * 1024) { // 5MB max
-        throw new Error('Payment proof must be smaller than 5MB');
-    }
+            // Simple client-side validation
+            if (paymentProofFile.size > 5 * 1024 * 1024) { // 5MB max
+                throw new Error('Payment proof must be smaller than 5MB');
+            }
 
-    const fileExt = paymentProofFile.name.split('.').pop().toLowerCase();
-    if (!['png', 'jpg', 'jpeg', 'pdf'].includes(fileExt)) {
-        throw new Error('Only PNG, JPG, or PDF files allowed');
-    }
+            const fileExt = paymentProofFile.name.split('.').pop().toLowerCase();
+            if (!['png', 'jpg', 'jpeg', 'pdf'].includes(fileExt)) {
+                throw new Error('Only PNG, JPG, or PDF files allowed');
+            }
 
-    // Upload with order reference
-    const fileName = `payment-proofs/${orderData.clientOrderId}_${Date.now()}.${fileExt}`;
-    const storageRef = storage.ref(fileName);
-    
-    await storageRef.put(paymentProofFile, {
-        contentType: paymentProofFile.type,
-        customMetadata: {
-            orderId: orderData.clientOrderId,
-            phone: formData.get('phone') || 'none'
+            // Upload with order reference
+            const fileName = `payment-proofs/${orderData.clientOrderId}_${Date.now()}.${fileExt}`;
+            const storageRef = storage.ref(fileName);
+            
+            await storageRef.put(paymentProofFile, {
+                contentType: paymentProofFile.type,
+                customMetadata: {
+                    orderId: orderData.clientOrderId,
+                    phone: formData.get('phone') || 'none'
+                }
+            });
+            
+            orderData.paymentProofUrl = await storageRef.getDownloadURL();
         }
-    });
-    
-    orderData.paymentProofUrl = await storageRef.getDownloadURL();
-}
         
-        // Submit to Firestore
+        // 7. Submit to Firestore
         const orderRef = await db.collection('orders').add(orderData);
         console.log('Order submitted with ID:', orderRef.id);
 
-        // Clear cart and reset form
+        // 8. Clear cart and reset form
         cart.length = 0;
         updateCartDisplay();
         form.reset();
         paymentProofContainer.style.display = 'none';
 
-        // Show confirmation
+        // 9. Show confirmation
         orderIdSpan.textContent = orderRef.id;
         orderModal.classList.remove('active');
         orderConfirmation.classList.add('active');
