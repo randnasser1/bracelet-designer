@@ -204,6 +204,9 @@ const specialCharms = [
 { src: 'special/new-collection/3-gold.png', category: 'new-collection', quantity: 1 },
 { src: 'special/new-collection/5-gold.png', category: 'new-collection', quantity: 1 },
 { src: 'special/new-collection/12-gold.png', category: 'new-collection', quantity: 1 },
+  { src: 'special/new-collection/15-gold.png', category: 'new-collection', quantity: 1 },
+  { src: 'special/new-collection/14-gold.png', category: 'new-collection', quantity: 1 },
+
   // cute charms
   { src: 'special/cute/cute.png', category: 'cute', quantity: 0 },
   { src: 'special/cute/cute2.png', category: 'cute', quantity: 0 },
@@ -428,7 +431,6 @@ const rareCharms = [
 { src: 'rares/new-collection/13-gold.png', category: 'new-collection', quantity: 1 },
 { src: 'rares/new-collection/13x-gold.png', category: 'new-collection', quantity: 1 },
 { src: 'rares/new-collection/14.png', category: 'new-collection', quantity: 1 },
-{ src: 'rares/new-collection/15-gold.png', category: 'new-collection', quantity: 1 },
 { src: 'rares/new-collection/16.png', category: 'new-collection', quantity: 1 },
 { src: 'rares/new-collection/17.png', category: 'new-collection', quantity: 1 },
 { src: 'rares/new-collection/18.png', category: 'new-collection', quantity: 1 },
