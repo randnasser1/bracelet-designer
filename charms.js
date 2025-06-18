@@ -163,7 +163,6 @@ const specialCharms = [
   { src: 'special/cute specials/special21.png', category: 'cutespecials', quantity: 1 },
   { src: 'special/cute specials/special girly.png', category: 'cutespecials', quantity: 5 },
   { src: 'special/new-collection/1.png', category: 'new-collection', quantity: 1 },
-{ src: 'special/new-collection/10.png', category: 'new-collection', quantity: 1 },
 { src: 'special/new-collection/11.png', category: 'new-collection', quantity: 1 },
 { src: 'special/new-collection/21.png', category: 'new-collection', quantity: 1 },
 { src: 'special/new-collection/22.png', category: 'new-collection', quantity: 1 },
@@ -204,7 +203,6 @@ const specialCharms = [
 { src: 'special/new-collection/6.png', category: 'new-collection', quantity: 1 },
 { src: 'special/new-collection/7.png', category: 'new-collection', quantity: 1 },
 { src: 'special/new-collection/8.png', category: 'new-collection', quantity: 1 },
-{ src: 'special/new-collection/9.png', category: 'new-collection', quantity: 1 },
   // cute charms
   { src: 'special/cute/cute.png', category: 'cute', quantity: 0 },
   { src: 'special/cute/cute2.png', category: 'cute', quantity: 0 },
