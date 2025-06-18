@@ -598,4 +598,9 @@ const rareCharms = [
 { src: 'rares/dangly/98-gold.png', category: 'dangly', quantity: 1 },
 { src: 'rares/dangly/99.png', category: 'dangly', quantity: 1 },
 { src: 'rares/dangly/dangly.png', category: 'dangly', quantity: 1 },
+  { src: 'rares/dangly/16-gold.png', category: 'dangly', quantity: 1 },
+{ src: 'rares/dangly/17.png', category: 'dangly', quantity: 1 },
+{ src: 'rares/dangly/18.png', category: 'dangly', quantity: 1 },
+{ src: 'rares/dangly/19-gold.png', category: 'dangly', quantity: 1 },
+
 ]
