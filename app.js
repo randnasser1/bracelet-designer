@@ -1256,7 +1256,7 @@ function placeSelectedCharm(slot) {
         // Create container for long charm
         const longContainer = document.createElement('div');
         longContainer.className = 'slot long-slot';
-        longContainer.style.width = '200px';
+        longContainer.style.width = '180px';
         longContainer.style.height = '100px';
         longContainer.style.gridColumn = 'span 2';
         
@@ -1266,7 +1266,7 @@ function placeSelectedCharm(slot) {
             ? selectedCharm.src 
             : selectedCharm.dataset.charm;
         longCharm.className = 'long-charm';
-        longCharm.style.width = '200px';
+        longCharm.style.width = '180px';
         longCharm.style.height = '100px';
         longCharm.dataset.type = charmType;
         longCharm.dataset.charm = charmSrc;
