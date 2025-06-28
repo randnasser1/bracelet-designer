@@ -535,195 +535,80 @@
       object-fit: contain;
     }
 
-  @media (max-width: 480px) {
+ /* Mobile-specific fixes */
+@media (max-width: 480px) {
+    /* Adjust slot sizing for mobile */
     .slot {
-        flex: 0 0 14vw;
-        width: 14vw;
-        height: 14vw;
-        padding: 0;
+        flex: 0 0 18vw; /* Use viewport units for responsive sizing */
+        width: 18vw;
+        height: 18vw;
+        min-width: 0; /* Allow flex shrinking */
     }
-
+    
+    /* Ensure images fit properly in slots */
     .slot img {
         width: 100%;
         height: 100%;
         object-fit: contain;
     }
-
+    
+    /* Adjust jewelry piece container */
     #jewelry-piece {
-        gap: 0px;
-        padding: 0.5rem;
+        gap: 2px; /* Reduce gap on mobile */
+        padding: 5px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
-    .bracelet-container {
-        padding: 5px 0;
+    /* Special handling for long charms on mobile */
+    .slot.long-slot {
+        width: 36vw !important; /* Double width for long charms */
+        height: 18vw !important;
     }
-
-  .action-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-
-    .btn.active {
-      background: #d6336c;
-      box-shadow: 0 0 0 2px white, 0 0 0 4px #d6336c;
+    
+    .slot.long-slot img.long-charm {
+        width: 100% !important;
+        height: 100% !important;
     }
-
-    #gold-variant-btn {
-      background: linear-gradient(135deg, #ffd700, #daa520);
-      color: #333;
-      font-weight: bold;
+    
+    /* Special handling for dangly charms on mobile */
+    .slot.has-dangly {
+        height: 36vw !important; /* Double height for dangly */
     }
-
-    #gold-variant-btn.active {
-      background: linear-gradient(135deg, #daa520, #b8860b);
-      box-shadow: 0 0 0 2px white, 0 0 0 4px #daa520;
+    
+    .slot.has-dangly img.dangly-charm {
+        width: 100% !important;
+        height: 100% !important;
     }
-
-   .cart-button {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #d6336c;
-  color: white;
-  : none;
-  -radius: 50%;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(214, 51, 108, 0.3);
-  z-index: 1001; /* Higher than other elements */
-  margin: 0;
-  padding: 0;
-}
-      .header-container {
-  position: relative;
-  padding-top: 30px; /* Give space for the cart button */
-  margin-bottom: -10px;
-  z-index: 0; /* Lower than cart button */
-}
-      .main-title, .subtitle {
-  position: relative;
-  z-index: 0;
-}
-    .cart-count {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: #ff85b3;
-      color: white;
-      -radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
+    
+    /* Adjust charm pools for mobile */
+    .charms-grid {
+        grid-template-columns: repeat(auto-fill, minmax(20vw, 1fr));
+        gap: 8px;
     }
-.cart-preview {
-  display: none;
-  position: fixed;
-  top: 80px;
-  right: 20px;
-  background: white;
-  -radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  width: 300px;
-  max-height: calc(100vh - 100px); /* Dynamic height based on viewport */
-  overflow-y: auto; /* Enable vertical scrolling */
-  z-index: 1000;
-  padding-bottom: 10px; /* Space at bottom */
-}
-
-    .cart-preview.active {
-      display: block;
+    
+    /* Special charm sizing in pools */
+    .charms-grid .charm {
+        width: 20vw;
+        height: 20vw;
     }
-
-    .cart-preview-header {
-      padding: 1rem;
-      -bottom: 1px solid #f5a0c2;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    
+    /* Long charm sizing in pools */
+    .charms-grid .long-charm {
+        width: 40vw;
+        height: 20vw;
     }
-
-    .cart-preview-header h3 {
-      margin: 0;
-      font-size: 1.1rem;
+    
+    /* Dangly charm sizing in pools */
+    .charms-grid .dangly-charm {
+        width: 20vw;
+        height: 40vw;
     }
-
-    .cart-close-btn {
-      background: none;
-      : none;
-      color: #d6336c;
-      cursor: pointer;
-      font-size: 1.2rem;
+    
+    /* Prevent charm text from being too small */
+    .charm-name, .charm-type {
+        font-size: 12px !important;
     }
-
-  .cart-items {
-  max-height: calc(100vh - 250px); /* Adjust based on your header/footer height */
-  overflow-y: auto;
-  padding: 0 15px;
-}
-
-
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.5rem;
-      -bottom: 1px solid #f5a0c2;
-      margin-bottom: 0.5rem;
-    }
-
-    .cart-item:last-child {
-      -bottom: none;
-      margin-bottom: 0;
-    }
-
-    .empty-cart {
-      text-align: center;
-      color: #999;
-      padding: 1rem;
-    }
-
-    .cart-footer {
-  position: sticky;
-  bottom: 0;
-  background: #fff0f5;
-  padding: 15px;
-  -top: 1px solid #f5a0c2;
-}
-
-    .cart-total {
-      font-weight: bold;
-      color: #d6336c;
-      margin-bottom: 1rem;
-      text-align: right;
-    }
-
-    .remove-item {
-      background: none;
-      : none;
-      color: #d6336c;
-      cursor: pointer;
-      font-size: 1.2rem;
-      padding: 0.2rem 0.5rem;
-    }
-
-    .remove-item:hover {
-      color: #ff85b3;
-    }
-    .add-charms-label {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #d6336c;
-  margin-bottom: 8px;
 }
 /* For desktop screens */
 @media (min-width: 768px) {
