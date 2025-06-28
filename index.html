@@ -108,25 +108,28 @@
       background: #d6336c;
     }
 
-    .bracelet-container {
-      width: 100%;
-      overflow-x: auto;
-      padding-bottom: 10px;
-      margin-bottom: 1rem;
-      -webkit-overflow-scrolling: touch;
-    }
-#jewelry-piece {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0;                        /* No gap between slots */
-  padding: 0;                    /* Remove padding if not needed */
-  border: 2px dashed #f5a0c2;
-  border-radius: 16px;         /* Keep rounded corners */
-  background: #fff0f5;           /* Keep the soft pink background */
-  width: fit-content;            /* Fit width to slots */
-  min-width: unset;              /* Cancel out any forced full width */
+   .bracelet-container {
+    position: sticky;
+    top: 20px; /* Adjust this value based on your header height */
+    z-index: 100;
+    background: #fff0f5;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f5a0c2;
 }
 
+#jewelry-piece {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    padding: 10px;
+    background: #fff0f5;
+    border-radius: 16px;
+    width: fit-content;
+    margin: 0 auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
     .bracelet-container::-webkit-scrollbar {
       height: 6px;
     }
@@ -914,6 +917,7 @@
   </div>
 
 <div class="add-charms-label">Add your charms below ↓</div>
+    <div class="design-area">
     <div class="bracelet-container">
       <div id="jewelry-piece"></div>
     </div>
