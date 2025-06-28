@@ -1256,8 +1256,8 @@ function placeSelectedCharm(slot) {
         // Create container for long charm
         const longContainer = document.createElement('div');
         longContainer.className = 'slot long-slot';
-        longContainer.style.width = '100px';
-        longContainer.style.height = '50px';
+        longContainer.style.width = '200px';
+        longContainer.style.height = '100px';
         longContainer.style.gridColumn = 'span 2';
         
         // Create the long charm image
@@ -1266,8 +1266,8 @@ function placeSelectedCharm(slot) {
             ? selectedCharm.src 
             : selectedCharm.dataset.charm;
         longCharm.className = 'long-charm';
-        longCharm.style.width = '100px';
-        longCharm.style.height = '50px';
+        longCharm.style.width = '200px';
+        longCharm.style.height = 100px';
         longCharm.dataset.type = charmType;
         longCharm.dataset.charm = charmSrc;
         
@@ -1289,15 +1289,15 @@ function placeSelectedCharm(slot) {
     else if (isDanglyCharm) {
         // For dangly charm, make the slot taller
         slot.classList.add('has-dangly');
-        slot.style.height = '96px';
+        slot.style.height = '192px';
         
         const danglyImg = document.createElement('img');
         danglyImg.src = selectedCharm.src.startsWith('data:') 
             ? selectedCharm.src 
             : selectedCharm.dataset.charm;
         danglyImg.className = 'dangly-charm';
-        danglyImg.style.width = '48px';
-        danglyImg.style.height = '96px';
+        danglyImg.style.width = '96px';
+        danglyImg.style.height = '192px';
         danglyImg.dataset.type = charmType;
         danglyImg.dataset.charm = charmSrc;
         
@@ -1317,8 +1317,8 @@ function placeSelectedCharm(slot) {
         
         const charmImg = document.createElement('img');
         charmImg.src = src;
-        charmImg.style.width = '48px';
-        charmImg.style.height = '48px';
+        charmImg.style.width = '96px';
+        charmImg.style.height = '96px';
         charmImg.dataset.type = charmType;
         charmImg.dataset.charm = src;
         
