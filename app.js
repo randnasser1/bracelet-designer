@@ -403,7 +403,6 @@ function updateCartDisplay() {
         });
     });
 }
-
 function updatePrice() {
     const priceData = calculatePrice(false);
     const basePriceElement = document.getElementById('base-price');
@@ -432,13 +431,13 @@ function updatePrice() {
         let charmText = `Charms: ${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials`;
         
         if (paidSpecials > 0) {
-            charmText += `, ${paidSpecials} extra specials (+${paidSpecials * 2} JDs)`;
+            charmText += `, ${paidSpecials} extra specials (+${(paidSpecials * 2).toFixed(2)} JDs)`;
         }
         if (rareCount > 0) {
-            charmText += `, ${rareCount} rare (+${rareCount * 3} JDs)`;
+            charmText += `, ${rareCount} rare (+${(rareCount * 3).toFixed(2)} JDs)`;
         }
         if (customCount > 0) {
-            charmText += `, ${customCount} custom (+${customCount * 3.5} JDs)`;
+            charmText += `, ${customCount} custom (+${(customCount * 3.5).toFixed(2)} JDs)`;
         }
         
         charmPriceElement.textContent = charmText;
@@ -446,34 +445,41 @@ function updatePrice() {
         const freeSpecials = product.includedSpecial;
         const paidSpecials = Math.max(0, specialCount - freeSpecials);
         
-        basePriceElement.textContent = `Base Price: ${product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price} JDs`;
+        basePriceElement.textContent = `Base Price: ${(product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price).toFixed(2)} JDs`;
         let charmText = `Charms: ${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials`;
         
         if (paidSpecials > 0) {
-            charmText += `, ${paidSpecials} paid specials (+${paidSpecials * 2} JDs)`;
+            charmText += `, ${paidSpecials} paid specials (+${(paidSpecials * 2).toFixed(2)} JDs)`;
         }
         if (rareCount > 0) {
-            charmText += `, ${rareCount} rare (+${rareCount * 3} JDs)`;
+            charmText += `, ${rareCount} rare (+${(rareCount * 3).toFixed(2)} JDs)`;
         }
         if (customCount > 0) {
-            charmText += `, ${customCount} custom (+${customCount * 3.5} JDs)`;
+            charmText += `, ${customCount} custom (+${(customCount * 3.5).toFixed(2)} JDs)`;
         }
         
         charmPriceElement.textContent = charmText;
     }
 
     // Update total price display
-    totalPriceElement.textContent = `Total: ${priceData.total.toFixed(2)} JDs`;
-    
-    // Highlight discount if applied
     if (priceData.discount > 0) {
         totalPriceElement.innerHTML = `
-            <span style="text-decoration: line-through; color: #999; margin-right: 8px;">
-                ${priceData.subtotal.toFixed(2)} JDs
-            </span>
-            ${priceData.total.toFixed(2)} JDs
-            <span style="color: #4CAF50; font-weight: bold; margin-left: 8px;">
-                (You saved ${priceData.discount.toFixed(2)} JDs!)
+            <div>
+                <span style="text-decoration: line-through; color: #999; margin-right: 8px;">
+                    ${priceData.subtotal.toFixed(2)} JDs
+                </span>
+                <span style="font-weight: bold; color: #d6336c;">
+                    ${priceData.total.toFixed(2)} JDs
+                </span>
+            </div>
+            <div style="color: #4CAF50; font-size: 0.9rem; margin-top: 4px;">
+                You saved ${priceData.discount.toFixed(2)} JDs! (10% discount)
+            </div>
+        `;
+    } else {
+        totalPriceElement.innerHTML = `
+            <span style="font-weight: bold; color: #d6336c;">
+                ${priceData.total.toFixed(2)} JDs
             </span>
         `;
     }
