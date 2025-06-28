@@ -1720,8 +1720,8 @@ function updateRareCharmsDisplay() {
         
         if (isDangly) {
             charmElement.classList.add('dangly-charm');
-            charmElement.style.width = '48px';
-            charmElement.style.height = '88px';
+            charmElement.style.width = '72px';
+            charmElement.style.height = '132px';
         }
 
         if (isOutOfStock || charm.quantity <= 0) {
@@ -1795,15 +1795,15 @@ function createCharm(src, alt, type, isDangly = false) {
     
     if (shouldBeDangly || src.includes('dangly')) {
         img.classList.add('dangly-charm');
-        img.style.width = '50px';  // Consistent pool size
-        img.style.height = '100px'; // Consistent pool size
+        img.style.width = '72px';  // Consistent pool size
+        img.style.height = '132px'; // Consistent pool size
     } else if (src.includes('long')) {
         img.classList.add('long-charm');
-        img.style.width = '100px';  // Consistent pool size
-        img.style.height = '50px';  // Consistent pool size
+        img.style.width = '150px';  // Consistent pool size
+        img.style.height = '75px';  // Consistent pool size
     } else {
-        img.style.width = '45px';
-        img.style.height = '45px';
+        img.style.width = '75px';
+        img.style.height = '75px';
     }
     
     return img;
