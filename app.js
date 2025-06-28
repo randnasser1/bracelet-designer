@@ -437,7 +437,9 @@ function updateCartDisplay() {
     } else {
         cartTotal.textContent = `Total: ${total.toFixed(2)} JDs`;
     }
-}function updatePrice() {
+}
+
+function updatePrice() {
     const priceData = calculatePrice(false);
     const basePriceElement = document.getElementById('base-price');
     const charmPriceElement = document.getElementById('charm-price');
@@ -463,62 +465,25 @@ function updateCartDisplay() {
     const subtotal = priceData.subtotal;
     const needsForDiscount = Math.max(0, 15 - subtotal).toFixed(2);
 
+    // Update base and charm prices
     if (isFullGlam) {
-        const freeSpecials = product.baseSlots;
-        const paidSpecials = Math.max(0, specialCount - freeSpecials);
-        
-        basePriceElement.innerHTML = `
-            <span>Full Glam Base:</span>
-            <span class="original-price">${product.fullGlam.toFixed(2)} JDs</span>
-        `;
-        let charmText = `Charms: ${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials`;
-        
-        if (paidSpecials > 0) {
-            charmText += `, ${paidSpecials} extra specials (+${(paidSpecials * 2).toFixed(2)} JDs)`;
-        }
-        if (rareCount > 0) {
-            charmText += `, ${rareCount} rare (+${(rareCount * 3).toFixed(2)} JDs)`;
-        }
-        if (customCount > 0) {
-            charmText += `, ${customCount} custom (+${(customCount * 3.5).toFixed(2)} JDs)`;
-        }
-        
-        charmPriceElement.textContent = charmText;
+        basePriceElement.innerHTML = `<span>Full Glam Base:</span> <span>${product.fullGlam.toFixed(2)} JDs</span>`;
     } else {
-        const freeSpecials = product.includedSpecial;
-        const paidSpecials = Math.max(0, specialCount - freeSpecials);
-        
-        basePriceElement.innerHTML = `
-            <span>Base Price:</span>
-            <span class="original-price">${basePrice.toFixed(2)} JDs</span>
-        `;
-        let charmText = `Charms: ${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials`;
-        
-        if (paidSpecials > 0) {
-            charmText += `, ${paidSpecials} paid specials (+${(paidSpecials * 2).toFixed(2)} JDs)`;
-        }
-        if (rareCount > 0) {
-            charmText += `, ${rareCount} rare (+${(rareCount * 3).toFixed(2)} JDs)`;
-        }
-        if (customCount > 0) {
-            charmText += `, ${customCount} custom (+${(customCount * 3.5).toFixed(2)} JDs)`;
-        }
-        
-        charmPriceElement.textContent = charmText;
+        basePriceElement.innerHTML = `<span>Base Price:</span> <span>${basePrice.toFixed(2)} JDs</span>`;
     }
+    
+    // Update charm breakdown
+    charmPriceElement.textContent = `Charms: ${calculateCharmCosts(specialCount, rareCount, customCount, product)}`;
 
-    // Discount messaging
+    // Update total price and discount messaging
     if (subtotal < 15) {
+        totalPriceElement.innerHTML = `<span class="final-price">Total: ${priceData.total.toFixed(2)} JDs</span>`;
         discountMessageElement.innerHTML = `
             <div class="discount-promo">
                 <i class="fas fa-tag"></i> Add ${needsForDiscount} JD more to get 10% OFF!
             </div>
         `;
-        totalPriceElement.innerHTML = `
-            <span class="final-price">${priceData.total.toFixed(2)} JDs</span>
-        `;
     } else {
-        discountMessageElement.innerHTML = '';
         if (priceData.discount > 0) {
             totalPriceElement.innerHTML = `
                 <div class="price-comparison">
@@ -526,19 +491,31 @@ function updateCartDisplay() {
                     <span>→</span>
                     <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
                 </div>
-                <div class="discount-badge">
-                    <span>10% OFF</span>
-                    <span class="savings">You saved ${priceData.discount.toFixed(2)} JDs!</span>
-                </div>
+                <div class="savings-notice">You saved ${priceData.discount.toFixed(2)} JDs!</div>
+            `;
+            discountMessageElement.innerHTML = `
+                <div class="discount-badge">10% OFF</div>
             `;
         } else {
-            totalPriceElement.innerHTML = `
-                <span class="final-price">${priceData.total.toFixed(2)} JDs</span>
-            `;
+            totalPriceElement.innerHTML = `<span class="final-price">Total: ${priceData.total.toFixed(2)} JDs</span>`;
+            discountMessageElement.innerHTML = '';
         }
     }
 
     return priceData.total;
+}
+
+function calculateCharmCosts(special, rare, custom, product) {
+    let text = '';
+    const freeSpecials = isFullGlam ? product.baseSlots : product.includedSpecial;
+    const paidSpecials = Math.max(0, special - freeSpecials);
+    
+    text += `${Math.min(special, freeSpecials)}/${freeSpecials} free specials`;
+    if (paidSpecials > 0) text += `, ${paidSpecials} paid (+${(paidSpecials * 2).toFixed(2)} JD)`;
+    if (rare > 0) text += `, ${rare} rare (+${(rare * 3).toFixed(2)} JD)`;
+    if (custom > 0) text += `, ${custom} custom (+${(custom * 3.5).toFixed(2)} JD)`;
+    
+    return text;
 }
 function initProduct(product) {
     if (!PRODUCTS[product]) return;
