@@ -2171,3 +2171,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial check
     updateStickyHeader();
 });
+document.addEventListener('DOMContentLoaded', function() {
+    const jewelryPiece = document.getElementById('jewelry-piece');
+    
+    function adjustJewelryWidth() {
+        const viewportWidth = window.innerWidth;
+        jewelryPiece.style.maxWidth = Math.min(viewportWidth - 40, 800) + 'px';
+    }
+    
+    // Initialize and set up resize listener
+    adjustJewelryWidth();
+    window.addEventListener('resize', adjustJewelryWidth);
+});
