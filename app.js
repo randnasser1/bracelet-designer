@@ -1296,7 +1296,7 @@ function placeSelectedCharm(slot) {
             ? selectedCharm.src 
             : selectedCharm.dataset.charm;
         danglyImg.className = 'dangly-charm';
-        danglyImg.style.width = '96px';
+        danglyImg.style.width = '88px';
         danglyImg.style.height = '192px';
         danglyImg.dataset.type = charmType;
         danglyImg.dataset.charm = charmSrc;
@@ -1317,8 +1317,8 @@ function placeSelectedCharm(slot) {
         
         const charmImg = document.createElement('img');
         charmImg.src = src;
-        charmImg.style.width = '96px';
-        charmImg.style.height = '96px';
+        charmImg.style.width = '88px';
+        charmImg.style.height = '88px';
         charmImg.dataset.type = charmType;
         charmImg.dataset.charm = src;
         
@@ -1721,7 +1721,7 @@ function updateRareCharmsDisplay() {
         if (isDangly) {
             charmElement.classList.add('dangly-charm');
             charmElement.style.width = '48px';
-            charmElement.style.height = '96px';
+            charmElement.style.height = '88px';
         }
 
         if (isOutOfStock || charm.quantity <= 0) {
