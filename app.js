@@ -21,6 +21,7 @@ let payCliqOption;
 let paymentProofContainer;
 let orderConfirmation;
 let closeConfirmation;
+let selectedCharmPreview = null;
 
 // Constants
 const MAX_SLOT_SPACES = 16;
@@ -192,8 +193,24 @@ function calculatePrice(includeDelivery = false) {
         return totalPrice + deliveryFee;
     }
     
-    return totalPrice;
-}
+    const currentDate = new Date();
+      const discountEndDate = new Date('2024-07-25');
+      
+      if (currentDate <= discountEndDate && totalPrice > 15) {
+        const discount = totalPrice * 0.1;
+        totalPrice -= discount;
+        
+        // You might want to show this discount in your UI
+        console.log(`Applied 10% discount: -${discount.toFixed(2)} JDs`);
+      }
+      
+      if (includeDelivery) {
+        const deliveryFee = 2.5;
+        return totalPrice + deliveryFee;
+      }
+      
+      return totalPrice;
+    }
 async function uploadBraceletImage(imageFile) {
   try {
     // 1. Create storage reference
@@ -280,6 +297,46 @@ function getCharmSet(charmSrc) {
     set.charms.some(charm => charmSrc.includes(charm))
   );
 }
+ function updateSelectedCharmPreview(charmElement) {
+      if (!charmElement) return;
+      
+      const preview = document.getElementById('selected-charm-preview');
+      const previewImage = document.getElementById('preview-charm-image');
+      const previewName = document.getElementById('preview-charm-name');
+      const previewType = document.getElementById('preview-charm-type');
+      
+      previewImage.src = charmElement.src;
+      
+      // Extract charm name from src (you can customize this)
+      const charmSrc = charmElement.src;
+      let charmName = 'Custom Charm';
+      
+      if (charmSrc.includes('special/')) {
+        charmName = charmSrc.split('special/')[1].split('.')[0].replace(/-/g, ' ').replace(/_/g, ' ');
+      } else if (charmSrc.includes('rare/')) {
+        charmName = charmSrc.split('rare/')[1].split('.')[0].replace(/-/g, ' ').replace(/_/g, ' ');
+      }
+      
+      previewName.textContent = charmName.charAt(0).toUpperCase() + charmName.slice(1);
+      
+      if (charmElement.dataset.type === 'special') {
+        previewType.textContent = 'Special Charm (+2 JDs)';
+      } else if (charmElement.dataset.type === 'rare') {
+        previewType.textContent = 'Rare Charm (+3 JDs)';
+      } else {
+        previewType.textContent = 'Custom Charm (+3.5 JDs)';
+      }
+      
+      preview.classList.add('active');
+      selectedCharmPreview = charmElement;
+    }
+    
+    // Function to hide the charm preview
+    function hideSelectedCharmPreview() {
+      const preview = document.getElementById('selected-charm-preview');
+      preview.classList.remove('active');
+      selectedCharmPreview = null;
+    }
 
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
@@ -1300,24 +1357,22 @@ function initCharms() {
     updateRareCharmsDisplay();
     
     // Add click handlers for charms
-    document.querySelectorAll('.charm').forEach(charm => {
-        charm.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent event bubbling
-            
-            // If already selected, deselect it
-            if (this.classList.contains('selected')) {
-                this.classList.remove('selected');
-                selectedCharm = null;
-                return;
-            }
-            
-            // Deselect all other charms
-            document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
-            
-            // Select this charm
-            this.classList.add('selected');
-            selectedCharm = this;
-        });
+document.querySelectorAll('.charm').forEach(charm => {
+      charm.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        if (this.classList.contains('selected')) {
+          this.classList.remove('selected');
+          hideSelectedCharmPreview();
+          selectedCharm = null;
+          return;
+        }
+        
+        document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+        selectedCharm = this;
+        updateSelectedCharmPreview(this);
+      });
     });
 }
 
