@@ -602,22 +602,25 @@
 
     /* Cart Styles */
     .cart-button {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #d6336c;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(214, 51, 108, 0.3);
-      z-index: 1000;
-    }
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #d6336c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(214, 51, 108, 0.3);
+  z-index: 1000;
+  /* Add these to prevent interference with other elements */
+  margin: 0;
+  padding: 0;
+}
 
     .cart-count {
       position: absolute;
@@ -636,18 +639,20 @@
     }
 
     .cart-preview {
-      display: none;
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      width: 300px;
-      max-height: 80vh;
-      overflow-y: auto;
-      z-index: 1000;
-    }
+  display: none;
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 300px;
+  max-width: 90vw; /* Add this for mobile */
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
 
     .cart-preview.active {
       display: block;
@@ -729,7 +734,13 @@
   color: #d6336c;
   margin-bottom: 8px;
 }
-
+/* For desktop screens */
+@media (min-width: 768px) {
+  .cart-preview {
+    right: 20px;
+    width: 350px; /* Slightly larger on desktop */
+  }
+}
   </style>
 </head>
 <body>
