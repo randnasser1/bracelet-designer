@@ -187,30 +187,48 @@ function calculatePrice(includeDelivery = false) {
     totalPrice += rareCount * 3;   // Rare charms cost 3 JDs each
     totalPrice += customCount * 3.5; // Custom charms cost 3.5 JDs each
 
+    // Check for discount eligibility
+    const currentDate = new Date();
+    const discountEndDate = new Date('2024-07-25');
+    let discountApplied = 0;
+    let originalPrice = totalPrice;
+    
+    if (currentDate <= discountEndDate && originalPrice > 15) {
+        discountApplied = originalPrice * 0.1;
+        totalPrice = originalPrice - discountApplied;
+        
+        // Show discount in UI
+        const discountInfo = document.getElementById('discount-info');
+        const discountAmount = document.getElementById('discount-amount');
+        if (discountInfo && discountAmount) {
+            discountInfo.style.display = 'block';
+            discountAmount.textContent = `10% Discount: -${discountApplied.toFixed(2)} JDs`;
+        }
+    } else {
+        // Hide discount info if not applicable
+        const discountInfo = document.getElementById('discount-info');
+        if (discountInfo) discountInfo.style.display = 'none';
+    }
+
     // Add delivery fee if requested
     if (includeDelivery) {
         const deliveryFee = 2.5;
-        return totalPrice + deliveryFee;
+        return {
+            subtotal: originalPrice,
+            discount: discountApplied,
+            total: totalPrice + deliveryFee,
+            delivery: deliveryFee
+        };
     }
     
-    const currentDate = new Date();
-      const discountEndDate = new Date('2024-07-25');
-      
-      if (currentDate <= discountEndDate && totalPrice > 15) {
-        const discount = totalPrice * 0.1;
-        totalPrice -= discount;
-        
-        // You might want to show this discount in your UI
-        console.log(`Applied 10% discount: -${discount.toFixed(2)} JDs`);
-      }
-      
-      if (includeDelivery) {
-        const deliveryFee = 2.5;
-        return totalPrice + deliveryFee;
-      }
-      
-      return totalPrice;
-    }
+    return {
+        subtotal: originalPrice,
+        discount: discountApplied,
+        total: totalPrice,
+        delivery: 0
+    };
+}
+
 async function uploadBraceletImage(imageFile) {
   try {
     // 1. Create storage reference
@@ -387,9 +405,7 @@ function updateCartDisplay() {
 }
 
 function updatePrice() {
-    const totalPrice = calculatePrice(false); // Don't include delivery in main display
-    
-    // Update price display without delivery
+    const priceData = calculatePrice(false);
     const basePriceElement = document.getElementById('base-price');
     const charmPriceElement = document.getElementById('charm-price');
     const totalPriceElement = document.getElementById('total-price');
@@ -446,9 +462,23 @@ function updatePrice() {
         charmPriceElement.textContent = charmText;
     }
 
-    totalPriceElement.textContent = `Total: ${totalPrice.toFixed(2)} JDs`;
+    // Update total price display
+    totalPriceElement.textContent = `Total: ${priceData.total.toFixed(2)} JDs`;
     
-    return totalPrice;
+    // Highlight discount if applied
+    if (priceData.discount > 0) {
+        totalPriceElement.innerHTML = `
+            <span style="text-decoration: line-through; color: #999; margin-right: 8px;">
+                ${priceData.subtotal.toFixed(2)} JDs
+            </span>
+            ${priceData.total.toFixed(2)} JDs
+            <span style="color: #4CAF50; font-weight: bold; margin-left: 8px;">
+                (You saved ${priceData.discount.toFixed(2)} JDs!)
+            </span>
+        `;
+    }
+    
+    return priceData.total;
 }
 
 function initProduct(product) {
