@@ -56,9 +56,9 @@ const SIZE_CHARTS = {
     }
 };
 const PRODUCTS = {
-    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 2, fullGlam: 29 },
-    anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 2, fullGlam: 42 },
-    necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 2, fullGlam: 64 },
+    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 1, fullGlam: 29 },
+    anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 1, fullGlam: 42 },
+    necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 1, fullGlam: 64 },
     ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 }
 };
 // Add this to your CHARM_SETS configuration
