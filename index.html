@@ -115,19 +115,17 @@
       margin-bottom: 1rem;
       -webkit-overflow-scrolling: touch;
     }
-
-    #jewelry-piece {
-      display: flex;
-      flex-wrap: nowrap;
-      gap:0px;
-      padding: 1rem;
-      border: 2px dashed #f5a0c2;
-      border-radius: 16px;
-      background: #fff0f5;
-      min-height: 80px;
-      width: max-content;
-      min-width: 100%;
-    }
+#jewelry-piece {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  padding: 0;                    /* Optional: Remove if not needed */
+  border: none;                  /* Optional: Remove border */
+  border-radius: 16px;           /* Keep if you want rounding */
+  background: transparent;       /* Remove background if needed */
+  width: fit-content;            /* Dynamically fits slot width */
+  min-width: unset;              /* Remove previous constraint */
+}
 
     .bracelet-container::-webkit-scrollbar {
       height: 6px;
