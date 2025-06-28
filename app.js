@@ -495,27 +495,21 @@ function updatePrice() {
         
         charmPriceElement.textContent = charmText;
     }
-
+basePriceElement.innerHTML = `
+        <span>Base Price:</span>
+        <span class="original-price">${basePrice.toFixed(2)} JDs</span>
+    `;
     // Update total price display
-    if (priceData.discount > 0) {
+     if (priceData.discount > 0) {
         totalPriceElement.innerHTML = `
-            <div>
-                <span style="text-decoration: line-through; color: #999; margin-right: 8px;">
-                    ${priceData.subtotal.toFixed(2)} JDs
-                </span>
-                <span style="font-weight: bold; color: #d6336c;">
-                    ${priceData.total.toFixed(2)} JDs
-                </span>
-            </div>
-            <div style="color: #4CAF50; font-size: 0.9rem; margin-top: 4px;">
-                You saved ${priceData.discount.toFixed(2)} JDs! (10% discount)
-            </div>
+            <span class="original-price">${priceData.subtotal.toFixed(2)} JDs</span>
+            <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
+            <span class="discount-badge">${Math.round((priceData.discount/priceData.subtotal)*100)}% OFF</span>
+            <div class="savings-notice">You save ${priceData.discount.toFixed(2)} JDs!</div>
         `;
     } else {
         totalPriceElement.innerHTML = `
-            <span style="font-weight: bold; color: #d6336c;">
-                ${priceData.total.toFixed(2)} JDs
-            </span>
+            <span class="final-price">${priceData.total.toFixed(2)} JDs</span>
         `;
     }
     
