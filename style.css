@@ -195,11 +195,15 @@ body {
 
 /* Long charm in jewelry piece */
 .slot.long-slot {
-    width: 200px;
-    height: 100px;
+    width: 200px !important;
+    height: 100px !important;
     grid-column: span 2;
 }
-
+.slot.long-slot img.long-charm {
+    width: 200px !important;
+    height: 100px !important;
+    object-fit: contain;
+}
 .slot.long-slot .long-charm {
     width: 200px;
     height: 100px;
@@ -211,8 +215,9 @@ body {
 }
 
 .slot.has-dangly img.dangly-charm {
-    width: 100px;
-    height: 200px;
+    width: 100px !important;
+    height: 200px !important;
+    object-fit: contain;
 }
 
 /* ==================== */
