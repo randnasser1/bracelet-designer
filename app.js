@@ -437,8 +437,7 @@ function updateCartDisplay() {
     } else {
         cartTotal.textContent = `Total: ${total.toFixed(2)} JDs`;
     }
-}
-function updatePrice() {
+}function updatePrice() {
     const priceData = calculatePrice(false);
     const basePriceElement = document.getElementById('base-price');
     const charmPriceElement = document.getElementById('charm-price');
@@ -458,11 +457,17 @@ function updatePrice() {
         else if (type === 'custom') customCount++;
     });
 
+    // Calculate base price (moved up before usage)
+    const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
+
     if (isFullGlam) {
         const freeSpecials = product.baseSlots;
         const paidSpecials = Math.max(0, specialCount - freeSpecials);
         
-        basePriceElement.textContent = `Full Glam Base: ${product.fullGlam} JDs`;
+        basePriceElement.innerHTML = `
+            <span>Full Glam Base:</span>
+            <span class="original-price">${product.fullGlam.toFixed(2)} JDs</span>
+        `;
         let charmText = `Charms: ${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials`;
         
         if (paidSpecials > 0) {
@@ -480,7 +485,10 @@ function updatePrice() {
         const freeSpecials = product.includedSpecial;
         const paidSpecials = Math.max(0, specialCount - freeSpecials);
         
-        basePriceElement.textContent = `Base Price: ${(product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price).toFixed(2)} JDs`;
+        basePriceElement.innerHTML = `
+            <span>Base Price:</span>
+            <span class="original-price">${basePrice.toFixed(2)} JDs</span>
+        `;
         let charmText = `Charms: ${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials`;
         
         if (paidSpecials > 0) {
@@ -495,12 +503,9 @@ function updatePrice() {
         
         charmPriceElement.textContent = charmText;
     }
-basePriceElement.innerHTML = `
-        <span>Base Price:</span>
-        <span class="original-price">${basePrice.toFixed(2)} JDs</span>
-    `;
+
     // Update total price display
-     if (priceData.discount > 0) {
+    if (priceData.discount > 0) {
         totalPriceElement.innerHTML = `
             <span class="original-price">${priceData.subtotal.toFixed(2)} JDs</span>
             <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
@@ -515,7 +520,6 @@ basePriceElement.innerHTML = `
     
     return priceData.total;
 }
-
 function initProduct(product) {
     if (!PRODUCTS[product]) return;
 
