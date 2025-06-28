@@ -2203,3 +2203,20 @@ function handleMobileViewport() {
 // Run on load and resize
 window.addEventListener('load', handleMobileViewport);
 window.addEventListener('resize', handleMobileViewport);
+
+// Add this to your existing JavaScript
+function updateCartButtonPosition() {
+    const cartButton = document.getElementById('cart-button');
+    const scrollY = window.scrollY;
+    
+    // Keep button visible but not overlapping with header
+    if (scrollY > 100) {
+        cartButton.style.top = '20px';
+    } else {
+        // When scrolled to top, position below promotion banner
+        cartButton.style.top = '90px';
+    }
+}
+
+window.addEventListener('scroll', updateCartButtonPosition);
+window.addEventListener('load', updateCartButtonPosition);
