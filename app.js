@@ -355,7 +355,6 @@ function getCharmSet(charmSrc) {
       preview.classList.remove('active');
       selectedCharmPreview = null;
     }
-
 function updateCartDisplay() {
     const cartItemsContainer = document.getElementById('cart-items');
     const cartCount = document.querySelector('.cart-count');
