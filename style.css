@@ -191,12 +191,12 @@ body {
     grid-column: span 2;
 }
 .slot.long-slot img.long-charm {
-    width: 180px !important;
+    width: 150px !important;
     height: 100px !important;
     object-fit: contain;
 }
 .slot.long-slot .long-charm {
-    width: 180px;
+    width: 150px;
     height: 100px;
 }
 
