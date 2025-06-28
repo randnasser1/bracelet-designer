@@ -165,11 +165,31 @@
       opacity: 0.5;
     }
 
-    .slot img {
-      width: 84px;
-      height: 84px;
-      object-fit: contain;
-    }
+   .slot img {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  transition: width 0.3s ease, height 0.3s ease;
+}
+    /* Long charms: twice as wide horizontally */
+.slot img.long-charm {
+  width: 168px;  /* 2 x 84 */
+  height: 84px;  /* keep height same */
+  object-fit: contain;
+  position: relative;
+  left: -42px;   /* shift left half the extra width to center */
+  z-index: 10;
+}
+
+/* Dangly charms: twice as tall vertically */
+.slot img.dangly-charm {
+  width: 84px;   /* keep width same */
+  height: 168px; /* 2 x 84 */
+  object-fit: contain;
+  position: relative;
+  top: -42px;    /* shift upward half the extra height to center */
+  z-index: 10;
+}
 
     .price-display {
       font-size: 1.1rem;
@@ -515,7 +535,8 @@
       max-height: 100%;
       object-fit: contain;
     }
-@media (max-width: 480px) {
+
+    @media (max-width: 480px) {
   .slot {
     flex: 0 0 14vw;   /* 14% of viewport width */
     width: 14vw;
@@ -538,6 +559,7 @@
   }
 }
 
+
     .btn.active {
       background: #d6336c;
       box-shadow: 0 0 0 2px white, 0 0 0 4px #d6336c;
@@ -556,9 +578,10 @@
 
     /* Long Slot Styles */
     .slot.long-slot {
-      flex: 0 0 216px;
-      width: 216px; /* 50px + 50px + 8px gap */
-    }
+  width: 168px !important;
+  height: 168px !important;
+  position: relative;
+}
 
     .slot.long-slot .long-charm {
       width: 100px !important;  /* Match pool size */
