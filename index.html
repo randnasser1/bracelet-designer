@@ -190,14 +190,7 @@
 
 
 
-    .price-display {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #d6336c;
-      margin: 0.5rem 0;
-      text-align: center;
-    }
-
+  
     .charm-pools {
       display: flex;
       flex-direction: column;
@@ -786,12 +779,18 @@
       <div id="jewelry-piece"></div>
     </div>
 <div class="price-display">
-  <div id="base-price">Base Price: <span class="original-price">10 JDs</span></div>
-  <div id="charm-price">Charms: 0 JDs (0/2 free specials used)</div>
-  <div id="total-price">
+  <div class="price-row" id="base-price">
+    <span>Base Price:</span>
     <span class="original-price">10 JDs</span>
-    <span class="discounted-price">10 JDs</span>
+  </div>
+  <div class="price-row" id="charm-price">
+    Charms: 0 JDs (0/2 free specials used)
+  </div>
+  <div class="price-row" id="total-price">
+    <span class="original-price">10 JDs</span>
+    <span class="discounted-price">9 JDs</span>
     <span class="discount-badge">10% OFF</span>
+    <div class="savings-notice">You save 1.00 JD!</div>
   </div>
 </div>
     <div class="action-buttons">
