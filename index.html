@@ -173,21 +173,20 @@
 }
     /* Long charms: twice as wide horizontally */
 .slot img.long-charm {
-  width: 168px;  /* 2 x 84 */
-  height: 84px;  /* keep height same */
+  width: 100px !important;  /* Match pool size */
+  height: 50px !important;
   object-fit: contain;
   position: relative;
-  left: -42px;   /* shift left half the extra width to center */
+  left: -25px;   /* Shift left half the extra width to center */
   z-index: 10;
 }
-
 /* Dangly charms: twice as tall vertically */
 .slot img.dangly-charm {
-  width: 84px;   /* keep width same */
-  height: 168px; /* 2 x 84 */
+  width: 50px !important;   /* Match pool size */
+  height: 100px !important; /* Match pool size */
   object-fit: contain;
   position: relative;
-  top: -42px;    /* shift upward half the extra height to center */
+  top: -25px;    /* Shift upward half the extra height to center */
   z-index: 10;
 }
 
