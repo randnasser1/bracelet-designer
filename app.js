@@ -2143,3 +2143,31 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Failed to initialize application. Please refresh the page.');
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const braceletContainer = document.querySelector('.bracelet-container');
+    const jewelryPiece = document.getElementById('jewelry-piece');
+    
+    // Calculate when to make it sticky
+    function updateStickyHeader() {
+        const rect = braceletContainer.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > rect.top) {
+            braceletContainer.classList.add('sticky-active');
+            // Adjust width when sticky
+            jewelryPiece.style.maxWidth = window.innerWidth - 40 + 'px';
+        } else {
+            braceletContainer.classList.remove('sticky-active');
+            // Reset width when not sticky
+            jewelryPiece.style.maxWidth = '';
+        }
+    }
+    
+    // Run on scroll and resize
+    window.addEventListener('scroll', updateStickyHeader);
+    window.addEventListener('resize', updateStickyHeader);
+    
+    // Initial check
+    updateStickyHeader();
+});
