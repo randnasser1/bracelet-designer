@@ -442,6 +442,7 @@ function updateCartDisplay() {
     const basePriceElement = document.getElementById('base-price');
     const charmPriceElement = document.getElementById('charm-price');
     const totalPriceElement = document.getElementById('total-price');
+    const discountMessageElement = document.getElementById('discount-message');
 
     const product = PRODUCTS[currentProduct];
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
@@ -457,8 +458,10 @@ function updateCartDisplay() {
         else if (type === 'custom') customCount++;
     });
 
-    // Calculate base price (moved up before usage)
+    // Calculate prices
     const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
+    const subtotal = priceData.subtotal;
+    const needsForDiscount = Math.max(0, 15 - subtotal).toFixed(2);
 
     if (isFullGlam) {
         const freeSpecials = product.baseSlots;
@@ -504,20 +507,37 @@ function updateCartDisplay() {
         charmPriceElement.textContent = charmText;
     }
 
-    // Update total price display
-    if (priceData.discount > 0) {
-        totalPriceElement.innerHTML = `
-            <span class="original-price">${priceData.subtotal.toFixed(2)} JDs</span>
-            <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
-            <span class="discount-badge">${Math.round((priceData.discount/priceData.subtotal)*100)}% OFF</span>
-            <div class="savings-notice">You save ${priceData.discount.toFixed(2)} JDs!</div>
+    // Discount messaging
+    if (subtotal < 15) {
+        discountMessageElement.innerHTML = `
+            <div class="discount-promo">
+                <i class="fas fa-tag"></i> Add ${needsForDiscount} JD more to get 10% OFF!
+            </div>
         `;
-    } else {
         totalPriceElement.innerHTML = `
             <span class="final-price">${priceData.total.toFixed(2)} JDs</span>
         `;
+    } else {
+        discountMessageElement.innerHTML = '';
+        if (priceData.discount > 0) {
+            totalPriceElement.innerHTML = `
+                <div class="price-comparison">
+                    <span class="original-price">${subtotal.toFixed(2)} JDs</span>
+                    <span>→</span>
+                    <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
+                </div>
+                <div class="discount-badge">
+                    <span>10% OFF</span>
+                    <span class="savings">You saved ${priceData.discount.toFixed(2)} JDs!</span>
+                </div>
+            `;
+        } else {
+            totalPriceElement.innerHTML = `
+                <span class="final-price">${priceData.total.toFixed(2)} JDs</span>
+            `;
+        }
     }
-    
+
     return priceData.total;
 }
 function initProduct(product) {
