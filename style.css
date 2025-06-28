@@ -182,14 +182,14 @@ body {
 
 /* Jewelry piece slots */
 .slot {
-    width: 48px;
-    height: 48px;
+    width: 100px;
+    height: 100px;
     position: relative;
 }
 
 .slot img {
-    width: 48px;
-    height: 48px;
+    width: 100px;
+    height: 100px;
     object-fit: contain;
 }
 
