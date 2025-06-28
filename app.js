@@ -381,7 +381,7 @@ function updateCartDisplay() {
                     <div class="cart-item-details">
                         <div>${item.product} (${item.size})</div>
                         <div>${item.materialType}</div>
-                        <div>${item.price} JDs</div>
+                        <div>${item.price.toFixed(2)} JDs</div>
                     </div>
                 </div>
                 <button class="remove-item" data-index="${index}">
@@ -392,7 +392,7 @@ function updateCartDisplay() {
     });
     
     cartItemsContainer.innerHTML = itemsHTML;
-    cartTotal.textContent = `Total: ${total} JDs`;
+    cartTotal.textContent = `Total: ${total.toFixed(2)} JDs`;
     
     // Add event listeners to remove buttons
     document.querySelectorAll('.remove-item').forEach(button => {
@@ -729,6 +729,9 @@ function setupCartFunctionality() {
         // Capture the design image
         const designImage = await captureBraceletDesign();
 
+        // Get the price data
+        const priceData = calculatePrice(false);
+        
         // Create cart item with cute symbol instead of image
         const cartItem = {
             id: Date.now().toString(),
@@ -737,7 +740,7 @@ function setupCartFunctionality() {
             size: currentSize,
             isFullGlam: isFullGlam,
             materialType: materialType,
-            price: calculatePrice(false),
+            price: priceData.total, // Use the total price from the priceData object
             designImage: designImage, // Add the captured image
             charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
                 src: img.src,
