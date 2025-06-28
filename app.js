@@ -1267,7 +1267,7 @@ function placeSelectedCharm(slot) {
             : selectedCharm.dataset.charm;
         longCharm.className = 'long-charm';
         longCharm.style.width = '200px';
-        longCharm.style.height = 100px';
+        longCharm.style.height = '100px';
         longCharm.dataset.type = charmType;
         longCharm.dataset.charm = charmSrc;
         
