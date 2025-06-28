@@ -108,16 +108,17 @@
       background: #d6336c;
     }
 
-   .bracelet-container {
+.bracelet-container {
     position: sticky;
-         max-width: 800px; /* Match controls width */
-
-    top: 20px; /* Adjust this value based on your header height */
+    top: 20px;
     z-index: 100;
     background: #fff0f5;
     padding: 10px 0;
     margin-bottom: 20px;
-    -bottom: 1px solid #f5a0c2;
+    border-bottom: 1px solid #f5a0c2;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 #jewelry-piece {
@@ -126,13 +127,28 @@
     gap: 4px;
     padding: 10px;
     background: #fff0f5;
-      max-width: 800px; /* Match your controls width */
-
-    -radius: 16px;
-    width: fit-content;
+    border-radius: 16px;
+    width: auto;
     margin: 0 auto;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    max-width: 100vw;
+    box-sizing: border-box;
+}
+
+    .design-area {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+.bracelet-container {
+    background: transparent;
+}
+
+#jewelry-piece {
+    background: #fff0f5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
     .bracelet-container::-webkit-scrollbar {
       height: 6px;
@@ -519,25 +535,29 @@
       object-fit: contain;
     }
 
-    @media (max-width: 480px) {
-  .slot {
-.slot {
-    flex: 0 0 14vw;
-    width: 14vw;
-    height: 14vw;
-    padding: 0;
-  }
+  @media (max-width: 480px) {
+    .slot {
+        flex: 0 0 14vw;
+        width: 14vw;
+        height: 14vw;
+        padding: 0;
+    }
 
-  .slot img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
+    .slot img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
 
-  #jewelry-piece {
-    gap: 0px; /* or 0 if you want it tighter */
-    padding: 0rem;
-  }
+    #jewelry-piece {
+        gap: 0px;
+        padding: 0.5rem;
+    }
+    
+    .bracelet-container {
+        padding: 5px 0;
+    }
+
   .action-buttons {
     flex-direction: column;
     align-items: center;
