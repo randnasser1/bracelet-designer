@@ -429,30 +429,29 @@ body {
     position: fixed;
     top: 80px;
     right: 20px;
-    width: 320px; /* Slightly wider */
-    max-height: 70vh; /* More vertical space */
+    width: 340px; /* Slightly wider */
+    max-height: 70vh;
     background: white;
     border-radius: 16px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.15);
     z-index: 1000;
     display: none;
-    padding-bottom: 15px;
+    overflow: hidden; /* Prevent content from overflowing rounded corners */
 }
+
 
 
 .cart-preview.active {
     display: flex;
 }
 
-
 .cart-preview-header {
-    padding: 15px 20px;
-    border-bottom: 1px solid #f5a0c2;
+    padding: 18px 20px;
     background: #fff0f5;
-    border-radius: 16px 16px 0 0;
-    position: sticky;
-    top: 0;
-    z-index: 1;
+    border-bottom: 1px solid #f5a0c2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 .cart-preview-header h3 {
     margin: 0;
@@ -469,16 +468,57 @@ body {
 }
 
 
+/* Cart Items List */
 .cart-items {
-    max-height: calc(70vh - 200px); /* Adjusted space */
+    max-height: calc(70vh - 220px); /* Adjusted space */
     overflow-y: auto;
     padding: 0 20px;
 }
 
+/* Individual Cart Item - Now Vertical Layout */
 .cart-item {
-    padding: 12px 0; /* More vertical padding */
-    border-bottom: 1px dashed #f5a0c2;
-    margin-bottom: 0;
+    padding: 15px 0;
+    border-bottom: 1px solid #f5e0e9;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    gap: 8px;
+}
+
+.cart-item-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.cart-item-symbol {
+    font-size: 1.8rem;
+    min-width: 40px;
+    text-align: center;
+    color: #d6336c;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+}
+
+.cart-item-details div:first-child {
+    font-weight: bold;
+    color: #d6336c;
+}
+
+.cart-item-details div {
+    margin: 3px 0;
+    font-size: 0.9rem;
+}
+
+.remove-item {
+    align-self: flex-end; /* Align remove button to right */
+    background: none;
+    border: none;
+    color: #d6336c;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 5px;
+    margin-top: 5px;
 }
 
 .cart-footer {
@@ -519,14 +559,7 @@ body {
     font-size: 0.9rem;
 }
 
-.remove-item {
-    background: none;
-    border: none;
-    color: #d6336c;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 5px;
-}
+
 
 .remove-item:hover {
     color: #ff0000;
@@ -724,7 +757,12 @@ body.modal-open {
     }
     
     .cart-items {
-        max-height: calc(75vh - 200px);
+        max-height: calc(75vh - 220px);
+        padding: 0 15px;
+    }
+    
+    .cart-item {
+        padding: 12px 0;
     }
     .cart-button {
         width: 45px;
