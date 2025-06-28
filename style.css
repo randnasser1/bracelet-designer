@@ -19,6 +19,11 @@
   margin: 0.1rem 0 0.5rem 0 !important;
   line-height: 1;
 }
+.base-charm img {
+  width: 100px !important;
+  height: 100px !important;
+  object-fit: contain; /* Optional: keep image inside container without cropping */
+}
 
 .subtitle {
   margin-top: 0.3rem !important;
