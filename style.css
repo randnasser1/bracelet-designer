@@ -276,8 +276,8 @@ body {
 }
 /* Charm pool sizes */
 .charms-grid .charm {
-    width: 48px;
-    height: 48px;
+    width: 75px;
+    height: 75px;
 }
 
 .charms-grid .long-charm {
@@ -302,8 +302,8 @@ body {
 }
 
 .charm {
-    width: 48px;
-    height: 48px;
+    width: 75px;
+    height: 75px;
     cursor: pointer;
     transition: transform 0.2s ease;
     border-radius: 4px;
