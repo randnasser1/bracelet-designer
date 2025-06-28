@@ -2183,3 +2183,23 @@ document.addEventListener('DOMContentLoaded', function() {
     adjustJewelryWidth();
     window.addEventListener('resize', adjustJewelryWidth);
 });
+function handleMobileViewport() {
+    const isMobile = window.innerWidth <= 480;
+    const jewelryPiece = document.getElementById('jewelry-piece');
+    
+    if (isMobile) {
+        // Enable horizontal scrolling on mobile
+        jewelryPiece.style.overflowX = 'auto';
+        jewelryPiece.style.flexWrap = 'nowrap';
+        jewelryPiece.style.padding = '5px';
+    } else {
+        // Reset to desktop styles
+        jewelryPiece.style.overflowX = '';
+        jewelryPiece.style.flexWrap = '';
+        jewelryPiece.style.padding = '';
+    }
+}
+
+// Run on load and resize
+window.addEventListener('load', handleMobileViewport);
+window.addEventListener('resize', handleMobileViewport);
