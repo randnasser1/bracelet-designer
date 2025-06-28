@@ -168,30 +168,7 @@
       opacity: 0.5;
     }
 
-   .slot img {
-  width: 84px;
-  height: 84px;
-  object-fit: contain;
-  transition: width 0.3s ease, height 0.3s ease;
-}
-    /* Long charms: twice as wide horizontally */
-.slot img.long-charm {
-  width: 100px !important;  /* Match pool size */
-  height: 50px !important;
-  object-fit: contain;
-  position: relative;
-  left: -25px;   /* Shift left half the extra width to center */
-  z-index: 10;
-}
-/* Dangly charms: twice as tall vertically */
-.slot img.dangly-charm {
-  width: 50px !important;   /* Match pool size */
-  height: 100px !important; /* Match pool size */
-  object-fit: contain;
-  position: relative;
-  top: -25px;    /* Shift upward half the extra height to center */
-  z-index: 10;
-}
+
 
     .price-display {
       font-size: 1.1rem;
@@ -578,28 +555,6 @@
     #gold-variant-btn.active {
       background: linear-gradient(135deg, #daa520, #b8860b);
       box-shadow: 0 0 0 2px white, 0 0 0 4px #daa520;
-    }
-
-    /* Long Slot Styles */
-    .slot.long-slot {
-  width: 168px !important;
-  height: 168px !important;
-  position: relative;
-}
-
-    .slot.long-slot .long-charm {
-      width: 100px !important;  /* Match pool size */
-      height: 50px !important;
-      object-fit: contain;
-      position: absolute;
-      left: 0;
-      top: 0;
-    }
-
-    /* Charm Pool Styles (unchanged) */
-    .charms-grid .long-charm {
-      width: 100px !important;
-      height: 50px !important;
     }
 
    .cart-button {
