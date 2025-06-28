@@ -1136,125 +1136,7 @@ function createSlots(slotCount) {
     }
 }
 
-function placeSelectedCharm(slot) {
-   const charmSrc = selectedCharm.dataset.charm;
-    const charmType = selectedCharm.dataset.type;
-    let quantity = parseInt(selectedCharm.dataset.quantity) || 1;
-    
-    // First check if charm is out of stock
-    if (selectedCharm.classList.contains('out-of-stock') || 
-        selectedCharm.classList.contains('sold-out')) {
-        alert('This charm is out of stock!');
-        selectedCharm.classList.remove('selected');
-        selectedCharm = null;
-        return;
-    }
 
-    // For non-custom charms, check availability
-    if (charmType !== 'custom') {
-        if (quantity <= 0) {
-            alert('This charm is out of stock!');
-            selectedCharm.classList.remove('selected');
-            selectedCharm = null;
-            return;
-        }
-        
-        // Check if this charm is already used (unless quantity > 1)
-        if (usedCharms.has(charmSrc) && quantity <= 1) {
-            alert('You can only add this charm once!');
-            selectedCharm.classList.remove('selected');
-            selectedCharm = null;
-            return;
-        }
-    }
-
-    // Handle long charm placement if needed
-    const isLongCharm = selectedCharm.classList.contains('long-charm');
-        const isDanglyCharm = selectedCharm.classList.contains('dangly-charm');
-
-    // Handle long charm placement if needed
-    const isLongCharm = selectedCharm.classList.contains('long-charm');
-    const isDanglyCharm = selectedCharm.classList.contains('dangly-charm');
-
-    if (isLongCharm) {
-        // Get the current slot index
-        const slotIndex = Array.from(jewelryPiece.children).indexOf(slot);
-        
-        // Check if we have space for a long charm
-        if (slotIndex + 1 >= jewelryPiece.children.length) {
-            alert("Not enough space for a long charm at this position!");
-            return;
-        }
-        
-        // Create the long charm image with matching pool size
-        const longCharm = document.createElement('img');
-        longCharm.src = selectedCharm.src.startsWith('data:') 
-            ? selectedCharm.src 
-            : selectedCharm.dataset.charm;
-        longCharm.className = 'long-charm';
-        longCharm.dataset.type = charmType;
-        longCharm.dataset.charm = charmSrc;
-        
-        if (selectedCharm.classList.contains('sold-out')) {
-            longCharm.classList.add('sold-out');
-        }
-        
-        // Clear slot and add long charm
-        slot.innerHTML = '';
-        slot.appendChild(longCharm);
-        
-        // Remove the next slot since long charm occupies two slots
-        const nextSlot = jewelryPiece.children[slotIndex + 1];
-        nextSlot.remove();
-        
-    } else if (isDanglyCharm) {
-        // For dangly charm, make the slot taller
-        const danglyImg = document.createElement('img');
-        danglyImg.src = selectedCharm.src.startsWith('data:') 
-            ? selectedCharm.src 
-            : selectedCharm.dataset.charm;
-        danglyImg.className = 'dangly-charm';
-        danglyImg.dataset.type = charmType;
-        danglyImg.dataset.charm = charmSrc;
-        
-        if (selectedCharm.classList.contains('sold-out')) {
-            danglyImg.classList.add('sold-out');
-        }
-        
-        // Clear slot and add dangly charm
-        slot.innerHTML = '';
-        slot.appendChild(danglyImg);
-    } else {
-        // Regular charm placement
-        const src = selectedCharm.src.startsWith('data:') 
-            ? selectedCharm.src 
-            : selectedCharm.dataset.charm;
-        
-        addCharmToSlot(slot, src, selectedCharm.dataset.type, selectedCharm.classList.contains('sold-out'));
-        // Update quantity only after successful placement
-        if (charmType !== 'custom') {
-            quantity--;
-            selectedCharm.dataset.quantity = quantity;
-            
-            document.querySelectorAll(`.charm[data-charm="${charmSrc}"]`).forEach(charmEl => {
-                charmEl.dataset.quantity = quantity;
-                if (quantity <= 0) {
-                    charmEl.classList.add('out-of-stock');
-                    charmEl.style.opacity = '0.5';
-                    charmEl.style.cursor = 'not-allowed';
-                    usedCharms.add(charmSrc);
-                }
-            });
-        } else {
-            usedCharms.add(charmSrc);
-        }
-    }
-
-    // Clear selection after placement
-    selectedCharm.classList.remove('selected');
-    selectedCharm = null;
-    updatePrice();
-}
 
 function handleSlotClick(slot) {
   if (selectedCharm) {
@@ -1323,6 +1205,154 @@ function addCharmToSlot(slot, src, type, isSoldOut) {
   }
   
   return true;
+}
+
+function placeSelectedCharm(slot) {
+    const charmSrc = selectedCharm.dataset.charm;
+    const charmType = selectedCharm.dataset.type;
+    let quantity = parseInt(selectedCharm.dataset.quantity) || 1;
+    
+    // First check if charm is out of stock
+    if (selectedCharm.classList.contains('out-of-stock') || 
+        selectedCharm.classList.contains('sold-out')) {
+        alert('This charm is out of stock!');
+        selectedCharm.classList.remove('selected');
+        selectedCharm = null;
+        return;
+    }
+
+    // For non-custom charms, check availability
+    if (charmType !== 'custom') {
+        if (quantity <= 0) {
+            alert('This charm is out of stock!');
+            selectedCharm.classList.remove('selected');
+            selectedCharm = null;
+            return;
+        }
+        
+        // Check if this charm is already used (unless quantity > 1)
+        if (usedCharms.has(charmSrc) && quantity <= 1) {
+            alert('You can only add this charm once!');
+            selectedCharm.classList.remove('selected');
+            selectedCharm = null;
+            return;
+        }
+    }
+
+    // Handle long and dangly charm placement
+    const isLongCharm = selectedCharm.classList.contains('long-charm');
+    const isDanglyCharm = selectedCharm.classList.contains('dangly-charm');
+
+    if (isLongCharm) {
+        // Get the current slot index
+        const slotIndex = Array.from(jewelryPiece.children).indexOf(slot);
+        
+        // Check if we have space for a long charm
+        if (slotIndex + 1 >= jewelryPiece.children.length) {
+            alert("Not enough space for a long charm at this position!");
+            return;
+        }
+        
+        // Create container for long charm
+        const longContainer = document.createElement('div');
+        longContainer.className = 'slot long-slot';
+        longContainer.style.width = '100px';
+        longContainer.style.height = '50px';
+        longContainer.style.gridColumn = 'span 2';
+        
+        // Create the long charm image
+        const longCharm = document.createElement('img');
+        longCharm.src = selectedCharm.src.startsWith('data:') 
+            ? selectedCharm.src 
+            : selectedCharm.dataset.charm;
+        longCharm.className = 'long-charm';
+        longCharm.style.width = '100px';
+        longCharm.style.height = '50px';
+        longCharm.dataset.type = charmType;
+        longCharm.dataset.charm = charmSrc;
+        
+        if (selectedCharm.classList.contains('sold-out')) {
+            longCharm.classList.add('sold-out');
+        }
+        
+        longContainer.appendChild(longCharm);
+        
+        // Replace the current slot and remove the next one
+        const nextSlot = jewelryPiece.children[slotIndex + 1];
+        slot.replaceWith(longContainer);
+        nextSlot.remove();
+        
+        longContainer.addEventListener('click', function() {
+            handleSlotClick(this);
+        });
+    } 
+    else if (isDanglyCharm) {
+        // For dangly charm, make the slot taller
+        slot.classList.add('has-dangly');
+        slot.style.height = '96px';
+        
+        const danglyImg = document.createElement('img');
+        danglyImg.src = selectedCharm.src.startsWith('data:') 
+            ? selectedCharm.src 
+            : selectedCharm.dataset.charm;
+        danglyImg.className = 'dangly-charm';
+        danglyImg.style.width = '48px';
+        danglyImg.style.height = '96px';
+        danglyImg.dataset.type = charmType;
+        danglyImg.dataset.charm = charmSrc;
+        
+        if (selectedCharm.classList.contains('sold-out')) {
+            danglyImg.classList.add('sold-out');
+        }
+        
+        // Clear slot and add dangly charm
+        slot.innerHTML = '';
+        slot.appendChild(danglyImg);
+    }
+    else {
+        // Regular charm placement
+        const src = selectedCharm.src.startsWith('data:') 
+            ? selectedCharm.src 
+            : selectedCharm.dataset.charm;
+        
+        const charmImg = document.createElement('img');
+        charmImg.src = src;
+        charmImg.style.width = '48px';
+        charmImg.style.height = '48px';
+        charmImg.dataset.type = charmType;
+        charmImg.dataset.charm = src;
+        
+        if (selectedCharm.classList.contains('sold-out')) {
+            charmImg.classList.add('sold-out');
+        }
+        
+        slot.innerHTML = '';
+        slot.appendChild(charmImg);
+        
+        // Update quantity only after successful placement
+        if (charmType !== 'custom') {
+            quantity--;
+            selectedCharm.dataset.quantity = quantity;
+            
+            document.querySelectorAll(`.charm[data-charm="${charmSrc}"]`).forEach(charmEl => {
+                charmEl.dataset.quantity = quantity;
+                if (quantity <= 0) {
+                    charmEl.classList.add('out-of-stock');
+                    charmEl.style.opacity = '0.5';
+                    charmEl.style.cursor = 'not-allowed';
+                    usedCharms.add(charmSrc);
+                }
+            });
+        } else {
+            usedCharms.add(charmSrc);
+        }
+    }
+
+    // Clear selection after placement
+    selectedCharm.classList.remove('selected');
+    selectedCharm = null;
+    hideSelectedCharmPreview();
+    updatePrice();
 }
 function removeCharmFromSlot(slot) {
     const charm = slot.querySelector('img:not([data-type="base"])');
