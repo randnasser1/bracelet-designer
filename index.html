@@ -118,13 +118,13 @@
 #jewelry-piece {
   display: flex;
   flex-wrap: nowrap;
-  gap: 0;
-  padding: 0;                    /* Optional: Remove if not needed */
-  border: none;                  /* Optional: Remove border */
-  border-radius: 16px;           /* Keep if you want rounding */
-  background: transparent;       /* Remove background if needed */
-  width: fit-content;            /* Dynamically fits slot width */
-  min-width: unset;              /* Remove previous constraint */
+  gap: 0;                        /* No gap between slots */
+  padding: 0;                    /* Remove padding if not needed */
+  border: none;                  /* Remove the dashed border */
+  border-radius: 16px;           /* Keep rounded corners */
+  background: #fff0f5;           /* Keep the soft pink background */
+  width: fit-content;            /* Fit width to slots */
+  min-width: unset;              /* Cancel out any forced full width */
 }
 
     .bracelet-container::-webkit-scrollbar {
