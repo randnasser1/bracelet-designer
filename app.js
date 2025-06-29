@@ -420,6 +420,23 @@ function updateCartDisplay() {
         cartDiscountInfo.style.display = 'none';
         cartTotal.textContent = `Total: ${(subtotal + deliveryFee).toFixed(2)} JDs`;
     }
+    cartItemsContainer.innerHTML = itemsHTML;
+
+    // Add event listeners to all delete buttons
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', function() {
+            const index = parseInt(this.dataset.index);
+            removeFromCart(index);
+        });
+    });
+}
+function removeFromCart(index) {
+    if (index >= 0 && index < cart.length) {
+        cart.splice(index, 1);
+        updateCartDisplay();
+        // Optional: Show a confirmation message
+        showToast('Item removed from cart');
+    }
 }
 function updatePrice() {
     const priceData = calculatePrice(false);
