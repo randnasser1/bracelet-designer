@@ -142,7 +142,6 @@ async function captureBraceletDesign() {
         throw error;
     }
 }
-
 function calculatePrice(includeDelivery = false) {
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
@@ -186,12 +185,13 @@ function calculatePrice(includeDelivery = false) {
 
     // Check for discount eligibility
     const currentDate = new Date();
-    const discountEndDate = new Date('2025-07-25');
+    const discountEndDate = new Date('2024-07-25');
     let discountApplied = 0;
     let originalPrice = totalPrice;
     
-    if (currentDate <= discountEndDate && originalPrice >= 15) {  // Changed > to >= to include 15 JDs
-        discountApplied = originalPrice * 0.1;
+    if (currentDate <= discountEndDate && originalPrice >= 15) {
+        // Calculate discount but cap at 5 JDs
+        discountApplied = Math.min(originalPrice * 0.1, 5);
         totalPrice = originalPrice - discountApplied;
     }
 
@@ -213,7 +213,6 @@ function calculatePrice(includeDelivery = false) {
         delivery: 0
     };
 }
-
 async function uploadBraceletImage(imageFile) {
   try {
     // 1. Create storage reference
