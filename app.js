@@ -192,7 +192,7 @@ function calculatePrice(includeDelivery = false, isCartCalculation = false) {
 
     // Apply discount for single item display
     const currentDate = new Date();
-    const discountEndDate = new Date('2024-07-25');
+    const discountEndDate = new Date('2025-07-25');
     let discountApplied = 0;
     let originalPrice = totalPrice;
     
