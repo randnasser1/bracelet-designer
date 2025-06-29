@@ -437,8 +437,7 @@ function updateCartDisplay() {
     } else {
         cartTotal.textContent = `Total: ${total.toFixed(2)} JDs`;
     }
-}
-function updatePrice() {
+}function updatePrice() {
     const priceData = calculatePrice(false);
     const basePriceElement = document.getElementById('base-price');
     const charmPriceElement = document.getElementById('charm-price');
@@ -446,37 +445,24 @@ function updatePrice() {
     const discountMessageElement = document.getElementById('discount-message');
 
     const product = PRODUCTS[currentProduct];
-    const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
-    
-    let specialCount = 0;
-    let rareCount = 0;
-    let customCount = 0;
-
-    placedCharms.forEach(charm => {
-        const type = charm.dataset.type;
-        if (type === 'special') specialCount++;
-        else if (type === 'rare') rareCount++;
-        else if (type === 'custom') customCount++;
-    });
-
-    // Calculate prices
-    const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
     const subtotal = priceData.subtotal;
     const needsForDiscount = Math.max(0, 15 - subtotal).toFixed(2);
 
-    // Update base and charm prices
+    // Update base price display
     if (isFullGlam) {
-        basePriceElement.innerHTML = `<span>Full Glam Base:</span> <span>${product.fullGlam.toFixed(2)} JDs</span>`;
+        basePriceElement.innerHTML = `Full Glam Base: ${product.fullGlam.toFixed(2)} JDs`;
     } else {
-        basePriceElement.innerHTML = `<span>Base Price:</span> <span>${basePrice.toFixed(2)} JDs</span>`;
+        const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
+        basePriceElement.innerHTML = `Base Price: ${basePrice.toFixed(2)} JDs`;
     }
-    
-    // Update charm breakdown
-    charmPriceElement.textContent = `Charms: ${calculateCharmCosts(specialCount, rareCount, customCount, product)}`;
 
-    // Update total price and discount messaging
+    // Update charm breakdown
+    const charmText = getCharmBreakdownText();
+    charmPriceElement.textContent = charmText;
+
+    // Handle discount display
     if (subtotal < 15) {
-        totalPriceElement.innerHTML = `<span class="final-price">Total: ${priceData.total.toFixed(2)} JDs</span>`;
+        totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
         discountMessageElement.innerHTML = `
             <div class="discount-promo">
                 <i class="fas fa-tag"></i> Add ${needsForDiscount} JD more to get 10% OFF!
@@ -492,28 +478,34 @@ function updatePrice() {
                 </div>
                 <div class="savings-notice">You saved ${priceData.discount.toFixed(2)} JDs!</div>
             `;
-            discountMessageElement.innerHTML = `
-                <div class="discount-badge">10% OFF</div>
-            `;
+            discountMessageElement.innerHTML = `<div class="discount-badge">10% OFF</div>`;
         } else {
-            totalPriceElement.innerHTML = `<span class="final-price">Total: ${priceData.total.toFixed(2)} JDs</span>`;
+            totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
             discountMessageElement.innerHTML = '';
         }
     }
-
-    return priceData.total;
 }
 
-function calculateCharmCosts(special, rare, custom, product) {
-    let text = '';
+function getCharmBreakdownText() {
+    const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
+    let specialCount = 0, rareCount = 0, customCount = 0;
+
+    placedCharms.forEach(charm => {
+        const type = charm.dataset.type;
+        if (type === 'special') specialCount++;
+        else if (type === 'rare') rareCount++;
+        else if (type === 'custom') customCount++;
+    });
+
+    const product = PRODUCTS[currentProduct];
     const freeSpecials = isFullGlam ? product.baseSlots : product.includedSpecial;
-    const paidSpecials = Math.max(0, special - freeSpecials);
-    
-    text += `${Math.min(special, freeSpecials)}/${freeSpecials} free specials`;
+    const paidSpecials = Math.max(0, specialCount - freeSpecials);
+
+    let text = `Charms: ${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials`;
     if (paidSpecials > 0) text += `, ${paidSpecials} paid (+${(paidSpecials * 2).toFixed(2)} JD)`;
-    if (rare > 0) text += `, ${rare} rare (+${(rare * 3).toFixed(2)} JD)`;
-    if (custom > 0) text += `, ${custom} custom (+${(custom * 3.5).toFixed(2)} JD)`;
-    
+    if (rareCount > 0) text += `, ${rareCount} rare (+${(rareCount * 3).toFixed(2)} JD)`;
+    if (customCount > 0) text += `, ${customCount} custom (+${(customCount * 3.5).toFixed(2)} JD)`;
+
     return text;
 }
 
