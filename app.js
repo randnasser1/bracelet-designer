@@ -438,7 +438,6 @@ function updateCartDisplay() {
         cartTotal.textContent = `Total: ${total.toFixed(2)} JDs`;
     }
 }
-
 function updatePrice() {
     const priceData = calculatePrice(false);
     const basePriceElement = document.getElementById('base-price');
@@ -517,6 +516,7 @@ function calculateCharmCosts(special, rare, custom, product) {
     
     return text;
 }
+
 function initProduct(product) {
     if (!PRODUCTS[product]) return;
 
