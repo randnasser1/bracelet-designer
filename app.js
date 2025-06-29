@@ -142,12 +142,13 @@ async function captureBraceletDesign() {
         throw error;
     }
 }
+
 function calculatePrice(includeDelivery = false) {
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
     
     // Base price includes product base + size upgrade
-    let basePrice = product.basePrice + sizeData.price;
+    let basePrice = isFullGlam ? product.fullGlam : (product.basePrice + sizeData.price);
     let totalPrice = basePrice;
     
     // Material upgrades
@@ -171,17 +172,13 @@ function calculatePrice(includeDelivery = false) {
     });
 
     // Full Glam pricing
-    if (isFullGlam) {
-        totalPrice = product.fullGlam;
-        // Full Glam includes baseSlots worth of free special charms
-        const paidSpecials = Math.max(0, specialCount - product.baseSlots);
-        totalPrice += paidSpecials * 2; // Extra special charms beyond free limit
-    } else {
+    if (!isFullGlam) {
         // Regular pricing
         const includedSpecials = product.includedSpecial;
         const paidSpecials = Math.max(0, specialCount - includedSpecials);
         totalPrice += paidSpecials * 2; // Additional special charms
     }
+    // Note: Full Glam price already includes all special charms
 
     // Add rare and custom charm costs
     totalPrice += rareCount * 3;   // Rare charms cost 3 JDs each
@@ -193,21 +190,9 @@ function calculatePrice(includeDelivery = false) {
     let discountApplied = 0;
     let originalPrice = totalPrice;
     
-    if (currentDate <= discountEndDate && originalPrice > 15) {
+    if (currentDate <= discountEndDate && originalPrice >= 15) {  // Changed > to >= to include 15 JDs
         discountApplied = originalPrice * 0.1;
         totalPrice = originalPrice - discountApplied;
-        
-        // Show discount in UI
-        const discountInfo = document.getElementById('discount-info');
-        const discountAmount = document.getElementById('discount-amount');
-        if (discountInfo && discountAmount) {
-            discountInfo.style.display = 'block';
-            discountAmount.textContent = `10% Discount: -${discountApplied.toFixed(2)} JDs`;
-        }
-    } else {
-        // Hide discount info if not applicable
-        const discountInfo = document.getElementById('discount-info');
-        if (discountInfo) discountInfo.style.display = 'none';
     }
 
     // Add delivery fee if requested
@@ -451,7 +436,7 @@ function updatePrice() {
     const charmText = getCharmBreakdownText();
     charmPriceElement.textContent = charmText;
 
-    // Handle discount display
+    // Always show discount if applicable
     if (priceData.discount > 0) {
         totalPriceElement.innerHTML = `
             <div class="price-comparison">
@@ -462,16 +447,17 @@ function updatePrice() {
             <div class="savings-notice">You saved ${priceData.discount.toFixed(2)} JDs!</div>
         `;
         discountMessageElement.innerHTML = `<div class="discount-badge">10% OFF</div>`;
-    } else if (subtotal < 15) {
-        totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
-        discountMessageElement.innerHTML = `
-            <div class="discount-promo">
-                <i class="fas fa-tag"></i> Add ${needsForDiscount} JD more to get 10% OFF!
-            </div>
-        `;
     } else {
         totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
-        discountMessageElement.innerHTML = '';
+        if (subtotal < 15) {
+            discountMessageElement.innerHTML = `
+                <div class="discount-promo">
+                    <i class="fas fa-tag"></i> Add ${needsForDiscount} JD more to get 10% OFF!
+                </div>
+            `;
+        } else {
+            discountMessageElement.innerHTML = '';
+        }
     }
 }
 
