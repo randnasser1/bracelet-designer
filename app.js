@@ -142,11 +142,11 @@ async function captureBraceletDesign() {
         throw error;
     }
 }
-function calculatePrice(includeDelivery = false) {
+function calculatePrice(includeDelivery = false, isCartCalculation = false) {
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
     
-    // Base price includes product base + size upgrade
+    // Base price logic
     let basePrice = isFullGlam ? product.fullGlam : (product.basePrice + sizeData.price);
     let totalPrice = basePrice;
     
@@ -170,32 +170,37 @@ function calculatePrice(includeDelivery = false) {
         else if (type === 'custom') customCount++;
     });
 
-    // Full Glam pricing
+    // Pricing adjustments
     if (!isFullGlam) {
-        // Regular pricing
         const includedSpecials = product.includedSpecial;
         const paidSpecials = Math.max(0, specialCount - includedSpecials);
-        totalPrice += paidSpecials * 2; // Additional special charms
+        totalPrice += paidSpecials * 2;
     }
-    // Note: Full Glam price already includes all special charms
 
-    // Add rare and custom charm costs
-    totalPrice += rareCount * 3;   // Rare charms cost 3 JDs each
-    totalPrice += customCount * 3.5; // Custom charms cost 3.5 JDs each
+    totalPrice += rareCount * 3;
+    totalPrice += customCount * 3.5;
 
-    // Check for discount eligibility
+    // For cart calculations, return just the item subtotal without discount
+    if (isCartCalculation) {
+        return {
+            subtotal: totalPrice,
+            discount: 0,
+            total: totalPrice,
+            delivery: 0
+        };
+    }
+
+    // Apply discount for single item display
     const currentDate = new Date();
-    const discountEndDate = new Date('2025-07-25');
+    const discountEndDate = new Date('2024-07-25');
     let discountApplied = 0;
     let originalPrice = totalPrice;
     
     if (currentDate <= discountEndDate && originalPrice >= 15) {
-        // Calculate discount but cap at 5 JDs
         discountApplied = Math.min(originalPrice * 0.1, 5);
         totalPrice = originalPrice - discountApplied;
     }
 
-    // Add delivery fee if requested
     if (includeDelivery) {
         const deliveryFee = 2.5;
         return {
@@ -358,10 +363,21 @@ function updateCartDisplay() {
     }
     
     let itemsHTML = '';
-    let subtotal = 0;
+     const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+    const deliveryFee = 2.5;
     
+    // Calculate cart-level discount
+    const currentDate = new Date();
+    const discountEndDate = new Date('2024-07-25');
+    let discountApplied = 0;
+    
+    if (currentDate <= discountEndDate && subtotal >= 15) {
+        discountApplied = Math.min(subtotal * 0.1, 5);
+    }
+    
+    const total = subtotal - discountApplied + deliveryFee;
+    // Display items with their undiscounted prices
     cart.forEach((item, index) => {
-        subtotal += item.price;
         itemsHTML += `
             <div class="cart-item">
                 <div class="cart-item-info">
@@ -380,14 +396,8 @@ function updateCartDisplay() {
     });
     
     cartItemsContainer.innerHTML = itemsHTML;
-    
-    // Calculate discount
-    const priceData = calculatePrice(true); // Include delivery for cart total
-    let discountApplied = priceData.discount;
-    let total = priceData.total;
-    
     cartSubtotal.textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
-    document.getElementById('cart-delivery').textContent = `Delivery Fee: ${priceData.delivery.toFixed(2)} JDs`;
+    document.getElementById('cart-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
     
     if (discountApplied > 0) {
         cartDiscountInfo.style.display = 'block';
@@ -396,7 +406,7 @@ function updateCartDisplay() {
         cartTotal.innerHTML = `
             <div>
                 <span style="text-decoration: line-through; color: #999; margin-right: 8px;">
-                    ${(subtotal + priceData.delivery).toFixed(2)} JDs
+                    ${(subtotal + deliveryFee).toFixed(2)} JDs
                 </span>
                 <span style="font-weight: bold; color: #d6336c;">
                     ${total.toFixed(2)} JDs
@@ -408,10 +418,9 @@ function updateCartDisplay() {
         `;
     } else {
         cartDiscountInfo.style.display = 'none';
-        cartTotal.textContent = `Total: ${total.toFixed(2)} JDs`;
+        cartTotal.textContent = `Total: ${(subtotal + deliveryFee).toFixed(2)} JDs`;
     }
 }
-
 function updatePrice() {
     const priceData = calculatePrice(false);
     const basePriceElement = document.getElementById('base-price');
@@ -730,20 +739,20 @@ function setupCartFunctionality() {
         
         // Create cart item with the discounted price
         const cartItem = {
-            id: Date.now().toString(),
-            product: currentProduct,
-            symbol: '🍓',
-            size: currentSize,
-            isFullGlam: isFullGlam,
-            materialType: materialType,
-            price: priceData.total, // This should be the discounted price
-            designImage: designImage,
-            charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
-                src: img.src,
-                type: img.dataset.type
-            })),
-            timestamp: new Date().toISOString()
-        };
+    id: Date.now().toString(),
+    product: currentProduct,
+    symbol: '🍓',
+    size: currentSize,
+    isFullGlam: isFullGlam,
+    materialType: materialType,
+    price: priceData.subtotal, // Store the undiscounted price
+    designImage: designImage,
+    charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
+        src: img.src,
+        type: img.dataset.type
+    })),
+    timestamp: new Date().toISOString()
+};
             
         cart.push(cartItem);
         updateCartDisplay();
