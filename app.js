@@ -398,33 +398,21 @@ function updateCartDisplay() {
     cartItemsContainer.innerHTML = itemsHTML;
     
     // Calculate discount
-    const currentDate = new Date();
-    const discountEndDate = new Date('2024-07-25');
-    let discountApplied = 0;
-    let total = subtotal;
-    
-    if (currentDate <= discountEndDate && subtotal > 15) {
-        discountApplied = subtotal * 0.1;
-        total = subtotal - discountApplied;
-        
-        // Show discount in UI
-        cartDiscountInfo.style.display = 'block';
-        cartDiscountAmount.textContent = `10% Discount: -${discountApplied.toFixed(2)} JDs`;
-    } else {
-        cartDiscountInfo.style.display = 'none';
-    }
-    
-    const deliveryFee = 2.5;
-    total += deliveryFee;
+    const priceData = calculatePrice(true); // Include delivery for cart total
+    let discountApplied = priceData.discount;
+    let total = priceData.total;
     
     cartSubtotal.textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
-    document.getElementById('cart-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    document.getElementById('cart-delivery').textContent = `Delivery Fee: ${priceData.delivery.toFixed(2)} JDs`;
     
     if (discountApplied > 0) {
+        cartDiscountInfo.style.display = 'block';
+        cartDiscountAmount.textContent = `10% Discount: -${discountApplied.toFixed(2)} JDs`;
+        
         cartTotal.innerHTML = `
             <div>
                 <span style="text-decoration: line-through; color: #999; margin-right: 8px;">
-                    ${(subtotal + deliveryFee).toFixed(2)} JDs
+                    ${(subtotal + priceData.delivery).toFixed(2)} JDs
                 </span>
                 <span style="font-weight: bold; color: #d6336c;">
                     ${total.toFixed(2)} JDs
@@ -435,9 +423,12 @@ function updateCartDisplay() {
             </div>
         `;
     } else {
+        cartDiscountInfo.style.display = 'none';
         cartTotal.textContent = `Total: ${total.toFixed(2)} JDs`;
     }
-}function updatePrice() {
+}
+
+function updatePrice() {
     const priceData = calculatePrice(false);
     const basePriceElement = document.getElementById('base-price');
     const charmPriceElement = document.getElementById('charm-price');
@@ -461,7 +452,17 @@ function updateCartDisplay() {
     charmPriceElement.textContent = charmText;
 
     // Handle discount display
-    if (subtotal < 15) {
+    if (priceData.discount > 0) {
+        totalPriceElement.innerHTML = `
+            <div class="price-comparison">
+                <span class="original-price">${subtotal.toFixed(2)} JDs</span>
+                <span>→</span>
+                <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
+            </div>
+            <div class="savings-notice">You saved ${priceData.discount.toFixed(2)} JDs!</div>
+        `;
+        discountMessageElement.innerHTML = `<div class="discount-badge">10% OFF</div>`;
+    } else if (subtotal < 15) {
         totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
         discountMessageElement.innerHTML = `
             <div class="discount-promo">
@@ -469,20 +470,8 @@ function updateCartDisplay() {
             </div>
         `;
     } else {
-        if (priceData.discount > 0) {
-            totalPriceElement.innerHTML = `
-                <div class="price-comparison">
-                    <span class="original-price">${subtotal.toFixed(2)} JDs</span>
-                    <span>→</span>
-                    <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
-                </div>
-                <div class="savings-notice">You saved ${priceData.discount.toFixed(2)} JDs!</div>
-            `;
-            discountMessageElement.innerHTML = `<div class="discount-badge">10% OFF</div>`;
-        } else {
-            totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
-            discountMessageElement.innerHTML = '';
-        }
+        totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
+        discountMessageElement.innerHTML = '';
     }
 }
 
