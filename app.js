@@ -194,28 +194,18 @@ function calculatePrice(includeDelivery = false, isCartCalculation = false) {
     const currentDate = new Date();
     const discountEndDate = new Date('2025-07-25');
     let discountApplied = 0;
-    let originalPrice = totalPrice;
     
     if (currentDate <= discountEndDate && originalPrice >= 15) {
         discountApplied = Math.min(originalPrice * 0.1, 5);
         totalPrice = originalPrice - discountApplied;
     }
 
-    if (includeDelivery) {
-        const deliveryFee = 2.5;
-        return {
-            subtotal: originalPrice,
-            discount: discountApplied,
-            total: totalPrice + deliveryFee,
-            delivery: deliveryFee
-        };
-    }
-    
+    // For single items, we want to show the discounted price
     return {
         subtotal: originalPrice,
         discount: discountApplied,
         total: totalPrice,
-        delivery: 0
+        delivery: includeDelivery ? 2.5 : 0
     };
 }
 async function uploadBraceletImage(imageFile) {
@@ -755,17 +745,16 @@ function setupCartFunctionality() {
         const designImage = await captureBraceletDesign();
 
         // Get the price data - make sure this includes discount calculation
-        const priceData = calculatePrice(false);
-        
-        // Create cart item with the discounted price
-        const cartItem = {
+      const priceData = calculatePrice(false); // Get discounted price
+const cartItem = {
     id: Date.now().toString(),
     product: currentProduct,
     symbol: '🍓',
     size: currentSize,
     isFullGlam: isFullGlam,
     materialType: materialType,
-    price: priceData.subtotal, // Store the undiscounted price
+    price: priceData.total, // Store the discounted price
+    originalPrice: priceData.subtotal, // Store original for cart calculations
     designImage: designImage,
     charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
         src: img.src,
