@@ -142,19 +142,21 @@ async function captureBraceletDesign() {
         throw error;
     }
 }
-function calculatePrice(includeDelivery = false, isCartCalculation = false) {
+function calculatePrice(includeDelivery = false) {
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
     
-    // Base price logic
-    let basePrice = isFullGlam ? product.fullGlam : (product.basePrice + sizeData.price);
-    let totalPrice = basePrice;
+    // Calculate base price
+    let originalPrice = isFullGlam ? product.fullGlam : (product.basePrice + sizeData.price);
+    let totalPrice = originalPrice;
     
-    // Material upgrades
+    // Apply material upgrades
     if (materialType === 'gold') {
         totalPrice += 1;
+        originalPrice += 1; // Also update original price
     } else if (materialType === 'mix') {
         totalPrice += 2.5;
+        originalPrice += 2.5;
     }
 
     // Count all placed charms
@@ -170,29 +172,23 @@ function calculatePrice(includeDelivery = false, isCartCalculation = false) {
         else if (type === 'custom') customCount++;
     });
 
-    // Pricing adjustments
+    // Apply charm costs to both prices
     if (!isFullGlam) {
         const includedSpecials = product.includedSpecial;
         const paidSpecials = Math.max(0, specialCount - includedSpecials);
         totalPrice += paidSpecials * 2;
+        originalPrice += paidSpecials * 2;
     }
 
     totalPrice += rareCount * 3;
+    originalPrice += rareCount * 3;
+    
     totalPrice += customCount * 3.5;
+    originalPrice += customCount * 3.5;
 
-    // For cart calculations, return just the item subtotal without discount
-    if (isCartCalculation) {
-        return {
-            subtotal: totalPrice,
-            discount: 0,
-            total: totalPrice,
-            delivery: 0
-        };
-    }
-
-    // Apply discount for single item display
+    // Check for discount eligibility
     const currentDate = new Date();
-    const discountEndDate = new Date('2025-07-25');
+    const discountEndDate = new Date('2024-07-25');
     let discountApplied = 0;
     
     if (currentDate <= discountEndDate && originalPrice >= 15) {
@@ -200,12 +196,21 @@ function calculatePrice(includeDelivery = false, isCartCalculation = false) {
         totalPrice = originalPrice - discountApplied;
     }
 
-    // For single items, we want to show the discounted price
+    if (includeDelivery) {
+        const deliveryFee = 2.5;
+        return {
+            subtotal: originalPrice,
+            discount: discountApplied,
+            total: totalPrice + deliveryFee,
+            delivery: deliveryFee
+        };
+    }
+    
     return {
         subtotal: originalPrice,
         discount: discountApplied,
         total: totalPrice,
-        delivery: includeDelivery ? 2.5 : 0
+        delivery: 0
     };
 }
 async function uploadBraceletImage(imageFile) {
