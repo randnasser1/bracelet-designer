@@ -363,20 +363,24 @@ function updateCartDisplay() {
     }
     
     let itemsHTML = '';
-     const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+      const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
+    const discountedSubtotal = cart.reduce((sum, item) => sum + item.price, 0);
     const deliveryFee = 2.5;
     
-    // Calculate cart-level discount
+    // Calculate additional cart-level discount if applicable
     const currentDate = new Date();
     const discountEndDate = new Date('2024-07-25');
-    let discountApplied = 0;
+    let additionalDiscount = 0;
     
     if (currentDate <= discountEndDate && subtotal >= 15) {
-        discountApplied = Math.min(subtotal * 0.1, 5);
+        const potentialDiscount = subtotal * 0.1;
+        const alreadyDiscounted = subtotal - discountedSubtotal;
+        additionalDiscount = Math.min(potentialDiscount - alreadyDiscounted, 5 - alreadyDiscounted);
     }
     
-    const total = subtotal - discountApplied + deliveryFee;
-    // Display items with their undiscounted prices
+    const total = discountedSubtotal - additionalDiscount + deliveryFee;
+
+    // Display items with their discounted prices
     cart.forEach((item, index) => {
         itemsHTML += `
             <div class="cart-item">
@@ -396,33 +400,32 @@ function updateCartDisplay() {
     });
     
     cartItemsContainer.innerHTML = itemsHTML;
-    cartSubtotal.textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
+    cartSubtotal.textContent = `Subtotal: ${discountedSubtotal.toFixed(2)} JDs`;
     document.getElementById('cart-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
     
-    if (discountApplied > 0) {
+    if (additionalDiscount > 0) {
         cartDiscountInfo.style.display = 'block';
-        cartDiscountAmount.textContent = `10% Discount: -${discountApplied.toFixed(2)} JDs`;
+        cartDiscountAmount.textContent = `Additional Discount: -${additionalDiscount.toFixed(2)} JDs`;
         
         cartTotal.innerHTML = `
             <div>
                 <span style="text-decoration: line-through; color: #999; margin-right: 8px;">
-                    ${(subtotal + deliveryFee).toFixed(2)} JDs
+                    ${(discountedSubtotal + deliveryFee).toFixed(2)} JDs
                 </span>
                 <span style="font-weight: bold; color: #d6336c;">
                     ${total.toFixed(2)} JDs
                 </span>
             </div>
             <div style="color: #4CAF50; font-size: 0.9rem; margin-top: 4px;">
-                You saved ${discountApplied.toFixed(2)} JDs!
+                You saved ${(subtotal - discountedSubtotal + additionalDiscount).toFixed(2)} JDs!
             </div>
         `;
     } else {
         cartDiscountInfo.style.display = 'none';
-        cartTotal.textContent = `Total: ${(subtotal + deliveryFee).toFixed(2)} JDs`;
+        cartTotal.textContent = `Total: ${(discountedSubtotal + deliveryFee).toFixed(2)} JDs`;
     }
-    cartItemsContainer.innerHTML = itemsHTML;
 
-    // Add event listeners to all delete buttons
+    // Reattach event listeners
     document.querySelectorAll('.remove-item').forEach(button => {
         button.addEventListener('click', function() {
             const index = parseInt(this.dataset.index);
