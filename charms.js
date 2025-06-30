@@ -430,7 +430,7 @@ const rareCharms = [
   { src: 'rares/hgs/hgs9.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/hgs10.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/hgs11.png', category: 'hgs', quantity: 0 },
-  { src: 'rares/hgs/hgs12.png', category: 'hgs', quantity: 0 },
+  { src: 'rares/hgs/hgs12.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/hgs13.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/hgs14.png', category: 'hgs', quantity: 0 },
   { src: 'rares/hgs/hgs15.png', category: 'hgs', quantity: 0 },
