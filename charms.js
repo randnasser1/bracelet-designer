@@ -252,6 +252,8 @@ const specialCharms = [
 
 
     { src: 'special/new-collection/11.png', category: 'girly', quantity: 1 },
+        { src: 'special/new-collection/33.png', category: 'girly', quantity: 1 },
+
   { src: 'special/new-collection/29-gold.png', category: 'girly', quantity: 1 },
   { src: 'special/new-collection/30.png', category: 'girly' , quantity: 1 },
   { src: 'special/new-collection/31-gold.png', category: 'girly' , quantity: 1 },
@@ -384,7 +386,6 @@ const rareCharms = [
   { src: 'rares/new-collection/10.png', category: 'butterflies', quantity: 1 },
   { src: 'rares/new-collection/11-gold.png', category: 'butterflies', quantity: 1 },
   { src: 'rares/new-collection/12.png', category: 'butterflies', quantity: 6 },
-  { src: 'rares/new-collection/13-gold.png', category: 'butterflies', quantity: 6 },
   { src: 'rares/new-collection/14.png', category: 'butterflies', quantity: 6 },
   { src: 'rares/new-collection/16.png', category: 'butterflies', quantity: 5 },
   { src: 'rares/new-collection/17-gold.png', category: 'butterflies' , quantity: 6 },
@@ -493,6 +494,8 @@ const rareCharms = [
   { src: 'rares/new-collection/3x.png', category: 'hgs', quantity: 1 },
     { src: 'rares/new-collection/5x.png', category: 'hgs', quantity: 1 },
   { src: 'rares/new-collection/7x.png', category: 'hgs', quantity: 1 },
+    { src: 'rares/new-collection/13-gold.png', category: 'hgs', quantity: 6 },
+
   // long charms
   { src: 'rares/long/long.png', category: 'long', quantity: 0 },
   { src: 'rares/long/long2.png', category: 'long', quantity: 1 },
@@ -712,5 +715,3 @@ const rareCharms = [
   { src: 'rares/dangly/18-gold.png', category: 'dangly', quantity: 1 },
   { src: 'rares/dangly/19-gold.png', category: 'dangly', quantity: 1 },
 ];
-
-
