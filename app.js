@@ -125,21 +125,49 @@ window.orderFunctionalityInitialized = false;
 // Modify your captureBraceletDesign function to use this:
 async function captureBraceletDesign() {
     const jewelryPiece = document.getElementById('jewelry-piece');
-    const options = {
-        useCORS: true,
-        allowTaint: true,
-        scale: 1, // Reduce from 2 to 1 for smaller image
-        logging: false,
-        backgroundColor: null,
-        removeContainer: true // Clean up temporary elements
-    };
-
+    
+    // Temporarily remove scrolling and adjust styles for capture
+    const originalOverflow = jewelryPiece.style.overflowX;
+    const originalWhiteSpace = jewelryPiece.style.whiteSpace;
+    jewelryPiece.style.overflowX = 'visible';
+    jewelryPiece.style.whiteSpace = 'nowrap';
+    
+    // Get the full width of all slots
+    const slots = jewelryPiece.querySelectorAll('.slot');
+    let totalWidth = 0;
+    slots.forEach(slot => {
+        totalWidth += slot.offsetWidth + 4; // 4px for gap between slots
+    });
+    
+    // Temporarily set the width to show all slots
+    const originalWidth = jewelryPiece.style.width;
+    jewelryPiece.style.width = `${totalWidth}px`;
+    
     try {
+        const options = {
+            useCORS: true,
+            allowTaint: true,
+            scale: 2, // Higher quality
+            logging: false,
+            backgroundColor: null,
+            width: totalWidth,
+            height: jewelryPiece.offsetHeight,
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: totalWidth,
+            windowHeight: jewelryPiece.offsetHeight
+        };
+
         const canvas = await html2canvas(jewelryPiece, options);
-        return canvas.toDataURL('image/png'); // Use data URL instead of blob
+        return canvas.toDataURL('image/png');
     } catch (error) {
         console.error('Capture error:', error);
         throw error;
+    } finally {
+        // Restore original styles
+        jewelryPiece.style.overflowX = originalOverflow;
+        jewelryPiece.style.whiteSpace = originalWhiteSpace;
+        jewelryPiece.style.width = originalWidth;
     }
 }
 function calculatePrice(includeDelivery = false) {
