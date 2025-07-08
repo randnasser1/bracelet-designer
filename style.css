@@ -1377,6 +1377,21 @@ html[dir="rtl"] .charm-pool h3 {
     align-items: center;
     margin-right: 5px;
 }
+.bracelet-sticky-container {
+  position: sticky;
+  top: 0; /* Distance from top of viewport when stuck */
+  z-index: 1000; /* Ensure it stays above other content */
+  background: #fff0f5; /* Match your design */
+  padding: 10px 0;
+  margin-bottom: 20px;
+  width: 100%;
+}
+/* For mobile devices */
+@media (max-width: 768px) {
+  .bracelet-sticky-container {
+    top: 60px; /* Adjust based on your header height */
+  }
+}
 
 .control-btn {
     width: 24px;
