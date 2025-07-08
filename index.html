@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" ccontent="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Jewelry Designer</title>
@@ -110,8 +110,8 @@
 
 .bracelet-container {
     position: sticky;
-    top: 20px;
-    z-index: 100;
+    top: 0;
+    z-index: 1000; /* Ensure it stays above other elements */
     background: #fff0f5;
     padding: 10px 0;
     margin-bottom: 20px;
@@ -120,7 +120,9 @@
     max-width: 100%;
     overflow: hidden;
 }
-
+.main-content {
+    position: relative; /* This is important for sticky to work */
+}
 #jewelry-piece {
     display: flex;
     flex-wrap: nowrap;
@@ -737,34 +739,51 @@
     <p>Instagram: <a href="https://www.instagram.com/italiacharms.jo/">@italiacharm.jo</a></p>
   </div>
 </div>
- <div class="product-selector" style="margin-top: 1.5rem;">
+<div class="product-selector">
     <button class="product-btn active" data-type="bracelet">Bracelet</button>
     <button class="product-btn" data-type="anklet">Anklet</button>
     <button class="product-btn" data-type="necklace">Necklace</button>
     <button class="product-btn" data-type="ring">Ring</button>
-  </div>
+    <button class="product-btn" data-type="individual">Individual Charms</button>
+</div>
     
     <div class="controls">
-      <div class="control-group">
+    <!-- Size Selector (hidden for individual charms) -->
+    <div class="control-group" id="size-controls">
         <label for="size">Size:</label>
         <select id="size" class="btn">
-          <option value="15.2-16.2">15.2cm - 16.2cm (18 charms)</option>
-          <option value="16.2-17.1">16.2cm - 17.1cm (+0.5 JDs, 19 charms)</option>
-          <option value="17.1-18.1">17.1cm - 18.1cm (+1 JD, 20 charms)</option>
-          <option value="18.1-19.2">18.1cm - 19.2cm (+1.5 JDs, 21 charms)</option>
-          <option value="19.2-20">19.2cm - 20cm (+2 JDs, 22 charms)</option>
-          <option value="20-21">20cm - 21cm (+2.5 JDs, 23 charms)</option>
-          <option value="21-22">21cm - 22cm (+3 JDs, 24 charms)</option>
+            <option value="15.2-16.2">15.2cm - 16.2cm (18 charms)</option>
+            <option value="16.2-17.1">16.2cm - 17.1cm (+0.5 JDs, 19 charms)</option>
+            <!-- Other size options -->
         </select>
-      </div>
-      <div class="control-group">
+    </div>
+    
+    <!-- Material Selector -->
+    <div class="control-group">
         <label>Material:</label>
         <button class="material-option selected" data-material="silver">Silver</button>
         <button class="material-option gold" data-material="gold">Gold</button>
         <button class="material-option mix" data-material="mix">Mix</button>
-      </div>
-      <button id="full-glam-btn" class="btn">Full Glam</button>
     </div>
+    
+    <!-- Full Glam Toggle -->
+    <button id="full-glam-btn" class="btn">Full Glam</button>
+    
+<div id="individual-controls" style="display: none;">
+    <button id="decrease-slots" class="control-btn minus-btn">-</button>
+    <span id="slot-count">1</span>
+    <button id="increase-slots" class="control-btn plus-btn">+</button>
+</div>
+    </div>
+</div>  <h3>Add your charms below ↓</h3>
+
+    <div id="jewelry-piece"></div>
+</div>
+
+    </div>
+
+
+
       <!-- Add this before the jewelry piece container -->
   <div class="selected-charm-preview" id="selected-charm-preview">
     <img id="preview-charm-image" src="" alt="Selected Charm">
@@ -772,23 +791,25 @@
     <div class="charm-type" id="preview-charm-type"></div>
   </div>
 
-<div class="add-charms-label">Add your charms below ↓</div>
-    <div class="design-area">
-    <div class="bracelet-container">
-      <div id="jewelry-piece"></div>
-    </div>
+
+  
+
 <div class="price-display">
-  <div class="price-row" id="base-price">
-    <span>Base Price:</span>
-    <span class="original-price">10 JDs</span>
-  </div>
-  <div class="price-row" id="charm-price">
-    Charms: 0 JDs (0/2 free specials used)
-  </div>
-  <div id="total-price-container">
-    <div id="total-price"></div>
-    <div id="discount-message"></div>
-  </div>
+    <div class="price-row" id="base-price">
+        <span>Base Price:</span>
+        <span>3.00 JDs</span>
+    </div>
+    <div class="price-row" id="charm-price">
+        <span>Charms:</span>
+        <span>0.00 JDs</span>
+    </div>
+    <div class="price-row" id="slot-price" style="display: none;">
+        <!-- Not used in this simplified version -->
+    </div>
+    <div id="total-price-container">
+        <div id="total-price">Total: 3.00 JDs</div>
+        <div id="discount-message"></div>
+    </div>
 </div>
     <div class="action-buttons">
       <button class="btn download-btn" id="download-btn">
