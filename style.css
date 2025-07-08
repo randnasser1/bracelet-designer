@@ -1274,3 +1274,286 @@ html[dir="rtl"] .charm-pool h3 {
     }
 }
 
+/* Individual charm mode styles */
+#individual-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255,255,255,0.7);
+    padding: 0.8rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+#individual-controls button {
+    padding: 0.5rem 1rem;
+}
+
+#individual-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#slot-count {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 5px;
+    color: #d6336c;
+}
+
+.individual-slot {
+    background: transparent;
+    border: 2px dashed #d6336c;
+    position: relative;
+}
+
+.individual-slot:empty::after {
+    content: "+";
+    position: absolute;
+    color: #d6336c;
+    font-size: 1.8rem;
+    opacity: 0.5;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.individual-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}/* Add these styles */
+.slot-container {
+    position: relative;
+    display: inline-block;
+}
+
+
+.slot-control-btn:hover {
+    background: #a61e4d;
+    transform: scale(1.1);
+}
+
+.slot-control-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* For the last slot only */
+.slot-container:last-child .slot-control-btn.add-btn {
+    display: block;
+}
+
+.slot-container:not(:last-child) .slot-control-btn.add-btn {
+    display: none;
+}
+
+.slot-count-display {
+    font-weight: bold;
+    min-width: 80px;
+    text-align: center;
+}
+
+.slot-preview {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.slot-preview-item {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #d63363;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.slot-preview-item.active {
+    background: #d63363;
+}
+.slot-wrapper {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 5px;
+}
+
+.control-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: #ff85b3;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    transition: all 0.2s;
+}
+
+.control-btn:hover {
+    background: #d6336c;
+    transform: scale(1.1);
+}
+
+.control-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+}
+.slot-controls {
+    display: flex;
+    gap: 5px;
+    margin-left: 5px;
+}
+
+.slot-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ff85b3;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.slot-btn:hover {
+    background: #d6336c;
+    transform: scale(1.1);
+}
+
+.slot-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.remove-btn {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.add-btn {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.slot-control-btn {
+    width: 120px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+
+.slot-control-btn:hover {
+    background: #d6336c;
+    transform: scale(1.1);
+}
+
+.slot-control-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.slot-count-display {
+    font-weight: bold;
+    min-width: 80px;
+    text-align: center;
+}
+
+.slot-preview {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.slot-preview-item {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #d63363;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+.slot-control-btn i {
+    font-size: 12px;
+}
+.slot-preview-item.active {
+    background: #d63363;
+}
+
+.slot.adding {
+    animation: pulse 0.5s;
+}
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+.slot-container {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 2px; /* Reduced gap */
+}
+
+
+
+.add-slot-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ff85b3;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.add-slot-btn:hover {
+    background: #d6336c;
+    transform: scale(1.1);
+}
+
+.add-slot-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.add-slot-btn::after {
+    content: 'Add slot';
+    position: absolute;
+    top: -30px;
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+
+.add-slot-btn:hover::after {
+    opacity: 1;
+}
