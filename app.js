@@ -22,7 +22,8 @@ let paymentProofContainer;
 let orderConfirmation;
 let closeConfirmation;
 let selectedCharmPreview = null;
-
+let individualSlotCount = 1;
+const maxIndividualSlots = 10;
 // Constants
 const MAX_SLOT_SPACES = 16;
 const SIZE_CHARTS = {
@@ -53,13 +54,19 @@ const SIZE_CHARTS = {
         '9': { charms: 9, price: 1, display: '~9.0cm (+1 JD, 9 charms)' },
         '10': { charms: 10, price: 1.5, display: '~10.0cm (+1.5 JDs, 10 charms)' },
         '11': { charms: 11, price: 2, display: '~11.0cm (+2 JDs, 11 charms)' }
+    },
+    individual: { // Add this if you want individual charms to have sizes
+        'default': { charms: 1, price: 0, display: 'Individual Charm' }
     }
 };
+
 const PRODUCTS = {
     bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 1, fullGlam: 29 },
     anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 1, fullGlam: 42 },
     necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 1, fullGlam: 64 },
-    ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 }
+    ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 },
+    individual: { basePrice: 3, baseSlots: 1, includedSpecial: 0, fullGlam: 0 }
+
 };
 // Add this to your CHARM_SETS configuration
 const CHARM_SETS = {
@@ -121,67 +128,127 @@ let currentDesign = {
     imageData: null
 };
 window.orderFunctionalityInitialized = false;
-
+function createBaseSlot() {
+    const slot = document.createElement('div');
+    slot.className = 'slot';
+    // ... rest of slot creation
+    
+    // Add animation class
+    slot.classList.add('adding');
+    setTimeout(() => slot.classList.remove('adding'), 500);
+    
+    return slot;
+}
 // Modify your captureBraceletDesign function to use this:
 async function captureBraceletDesign() {
     const jewelryPiece = document.getElementById('jewelry-piece');
-    
-    // Temporarily remove scrolling and adjust styles for capture
-    const originalOverflow = jewelryPiece.style.overflowX;
-    const originalWhiteSpace = jewelryPiece.style.whiteSpace;
-    jewelryPiece.style.overflowX = 'visible';
-    jewelryPiece.style.whiteSpace = 'nowrap';
-    
-    // Get the full width of all slots
-    const slots = jewelryPiece.querySelectorAll('.slot');
-    let totalWidth = 0;
-    slots.forEach(slot => {
-        totalWidth += slot.offsetWidth + 4; // 4px for gap between slots
-    });
-    
-    // Temporarily set the width to show all slots
-    const originalWidth = jewelryPiece.style.width;
-    jewelryPiece.style.width = `${totalWidth}px`;
-    
+    if (!jewelryPiece) {
+        throw new Error('Jewelry piece container not found');
+    }
+
+    // Store original styles
+    const originalStyles = {
+        overflow: jewelryPiece.style.overflow,
+        flexWrap: jewelryPiece.style.flexWrap,
+        padding: jewelryPiece.style.padding
+    };
+
     try {
+        // Apply temporary styles for capture
+        jewelryPiece.style.overflow = 'visible';
+        jewelryPiece.style.flexWrap = 'nowrap';
+        jewelryPiece.style.padding = '5px';
+
+        // Calculate required width
+        const slots = jewelryPiece.querySelectorAll('.slot');
+        let totalWidth = Array.from(slots).reduce((sum, slot) => {
+            return sum + slot.offsetWidth + 4; // 4px for gap
+        }, 0);
+
+        // Set minimum width
+        totalWidth = Math.max(totalWidth, jewelryPiece.offsetWidth);
+
         const options = {
             useCORS: true,
-            allowTaint: true,
-            scale: 2, // Higher quality
-            logging: false,
+            allowTaint: false,
+            scale: 2,
+            logging: true,
             backgroundColor: null,
             width: totalWidth,
             height: jewelryPiece.offsetHeight,
             scrollX: 0,
             scrollY: 0,
             windowWidth: totalWidth,
-            windowHeight: jewelryPiece.offsetHeight
+            windowHeight: jewelryPiece.offsetHeight,
+            onclone: (clonedDoc) => {
+                // Ensure cloned elements have same visibility
+                const clonedElement = clonedDoc.getElementById('jewelry-piece');
+                if (clonedElement) {
+                    clonedElement.style.overflow = 'visible';
+                    clonedElement.style.flexWrap = 'nowrap';
+                }
+            }
         };
 
         const canvas = await html2canvas(jewelryPiece, options);
-        return canvas.toDataURL('image/png');
+        return canvas.toDataURL('image/png', 1.0);
+
     } catch (error) {
-        console.error('Capture error:', error);
-        throw error;
+        console.error('Capture failed:', error);
+        throw new Error('Could not generate design image. Please try again.');
     } finally {
         // Restore original styles
-        jewelryPiece.style.overflowX = originalOverflow;
-        jewelryPiece.style.whiteSpace = originalWhiteSpace;
-        jewelryPiece.style.width = originalWidth;
+        jewelryPiece.style.overflow = originalStyles.overflow;
+        jewelryPiece.style.flexWrap = originalStyles.flexWrap;
+        jewelryPiece.style.padding = originalStyles.padding;
     }
 }
 function calculatePrice(includeDelivery = false) {
+    // Handle individual charms separately
+    if (currentProduct === 'individual') {
+        const basePrice = 3; // Fixed base price for individual charms
+        let charmCost = 0;
+        
+        const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
+        placedCharms.forEach(charm => {
+            if (charm.dataset.type === 'special') charmCost += 2;
+            else if (charm.dataset.type === 'rare') charmCost += 3;
+            else if (charm.dataset.type === 'custom') charmCost += 3.5;
+        });
+        
+        const subtotal = basePrice + charmCost;
+        const total = includeDelivery ? subtotal + 2.5 : subtotal;
+        
+        return {
+            subtotal: subtotal,
+            discount: 0,
+            total: total,
+            delivery: includeDelivery ? 2.5 : 0
+        };
+    }
+
+    // For other products, first verify we have valid product and size data
+    if (!PRODUCTS[currentProduct] || !SIZE_CHARTS[currentProduct] || !SIZE_CHARTS[currentProduct][currentSize]) {
+        console.error(`Missing price data for ${currentProduct} size ${currentSize}`);
+        return {
+            subtotal: 0,
+            discount: 0,
+            total: 0,
+            delivery: 0
+        };
+    }
+
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
     
     // Calculate base price
     let originalPrice = isFullGlam ? product.fullGlam : (product.basePrice + sizeData.price);
     let totalPrice = originalPrice;
-    
+
     // Apply material upgrades
     if (materialType === 'gold') {
         totalPrice += 1;
-        originalPrice += 1; // Also update original price
+        originalPrice += 1;
     } else if (materialType === 'mix') {
         totalPrice += 2.5;
         originalPrice += 2.5;
@@ -470,44 +537,60 @@ function updatePrice() {
     const charmPriceElement = document.getElementById('charm-price');
     const totalPriceElement = document.getElementById('total-price');
     const discountMessageElement = document.getElementById('discount-message');
-
     const product = PRODUCTS[currentProduct];
     const subtotal = priceData.subtotal;
     const needsForDiscount = Math.max(0, 15 - subtotal).toFixed(2);
 
-    // Update base price display
-    if (isFullGlam) {
-        basePriceElement.innerHTML = `Full Glam Base: ${product.fullGlam.toFixed(2)} JDs`;
-    } else {
-        const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
-        basePriceElement.innerHTML = `Base Price: ${basePrice.toFixed(2)} JDs`;
-    }
-
-    // Update charm breakdown
-    const charmText = getCharmBreakdownText();
-    charmPriceElement.textContent = charmText;
-
-    // Always show discount if applicable
-    if (priceData.discount > 0) {
-        totalPriceElement.innerHTML = `
-            <div class="price-comparison">
-                <span class="original-price">${subtotal.toFixed(2)} JDs</span>
-                <span>→</span>
-                <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
-            </div>
-            <div class="savings-notice">You saved ${priceData.discount.toFixed(2)} JDs!</div>
+    if (currentProduct === 'individual') {
+        // For individual mode, show simple breakdown
+        basePriceElement.innerHTML = `
+            <span>Base Price:</span>
+            <span>3.00 JDs</span>
         `;
-        discountMessageElement.innerHTML = `<div class="discount-badge">10% OFF</div>`;
+        
+        const charmCost = priceData.total - 3;
+        charmPriceElement.innerHTML = `
+            <span>Charms:</span>
+            <span>${charmCost.toFixed(2)} JDs</span>
+        `;
+        
+        totalPriceElement.textContent = `Total: ${priceData.total.toFixed(2)} JDs`;
+        discountMessageElement.innerHTML = '';
     } else {
-        totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
-        if (subtotal < 15) {
-            discountMessageElement.innerHTML = `
-                <div class="discount-promo">
-                    <i class="fas fa-tag"></i> Add ${needsForDiscount} JD more to get 10% OFF!
-                </div>
-            `;
+        // Update base price display
+        if (isFullGlam) {
+            basePriceElement.innerHTML = `Full Glam Base: ${product.fullGlam.toFixed(2)} JDs`;
         } else {
-            discountMessageElement.innerHTML = '';
+            const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
+            basePriceElement.innerHTML = `Base Price: ${basePrice.toFixed(2)} JDs`;
+        }
+
+        // Update charm breakdown
+        const charmText = getCharmBreakdownText();
+        charmPriceElement.textContent = charmText;
+
+        // Always show discount if applicable
+        if (priceData.discount > 0) {
+            totalPriceElement.innerHTML = `
+                <div class="price-comparison">
+                    <span class="original-price">${subtotal.toFixed(2)} JDs</span>
+                    <span>→</span>
+                    <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
+                </div>
+                <div class="savings-notice">You saved ${priceData.discount.toFixed(2)} JDs!</div>
+            `;
+            discountMessageElement.innerHTML = '<div class="discount-badge">10% OFF</div>';
+        } else {
+            totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
+            if (subtotal < 15) {
+                discountMessageElement.innerHTML = `
+                    <div class="discount-promo">
+                        <i class="fas fa-tag"></i> Add ${needsForDiscount} JD more to get 10% OFF!
+                    </div>
+                `;
+            } else {
+                discountMessageElement.innerHTML = '';
+            }
         }
     }
 }
@@ -536,125 +619,171 @@ function getCharmBreakdownText() {
 }
 
 function initProduct(product) {
-    if (!PRODUCTS[product]) return;
+    // Validate the product type
+    const validProducts = ['bracelet', 'anklet', 'necklace', 'ring', 'individual'];
+    if (!validProducts.includes(product)) {
+        console.error(`Invalid product type: ${product}`);
+        return;
+    }
 
     currentProduct = product;
     
-    // Update size options based on product type
-    const sizeSelect = document.getElementById('size');
-    if (sizeSelect) {
-        // Clear existing options
-        sizeSelect.innerHTML = '';
-        
-        // Get the size chart for current product
-        const sizeChart = SIZE_CHARTS[product];
-        
-        // Add new options
-        Object.entries(sizeChart).forEach(([size, data]) => {
-            const option = document.createElement('option');
-            option.value = size;
-            option.textContent = data.display;
-            sizeSelect.appendChild(option);
-        });
-
-        // Reset to first size
-        currentSize = Object.keys(sizeChart)[0];
-        sizeSelect.value = currentSize;
-    }
-
-    // Reset material to silver
-    materialType = 'silver';
-    document.querySelectorAll('.material-option').forEach(opt => {
-        opt.classList.remove('selected');
-        if (opt.dataset.material === 'silver') {
-            opt.classList.add('selected');
+    // Reset to default size for the product (except individual)
+    if (product !== 'individual') {
+        // Safely get the first available size
+        const productSizes = SIZE_CHARTS[product];
+        if (productSizes && Object.keys(productSizes).length > 0) {
+            currentSize = Object.keys(productSizes)[0];
+        } else {
+            console.error(`No sizes defined for product: ${product}`);
+            currentSize = 'default';
         }
-    });
+    }
 
-    // Reset full glam
-    isFullGlam = false;
+    // Get UI elements
+    const individualControls = document.getElementById('individual-controls');
+    const sizeSelect = document.getElementById('size');
+    const materialSelector = document.querySelector('.material-selector');
     const fullGlamBtn = document.getElementById('full-glam-btn');
-    if (fullGlamBtn) {
-        fullGlamBtn.classList.remove('active');
+    const addCharmsLabel = document.querySelector('.add-charms-label');
+
+    // Handle individual charms mode
+    if (product === 'individual') {
+        // Show individual controls
+        if (individualControls) individualControls.style.display = 'flex';
+        
+        // Hide irrelevant elements
+        if (sizeSelect) sizeSelect.style.display = 'none';
+        if (materialSelector) materialSelector.style.display = 'none';
+        if (fullGlamBtn) fullGlamBtn.style.display = 'none';
+        if (addCharmsLabel) addCharmsLabel.style.display = 'none';
+        
+        // Reset and update
+        individualSlotCount = 1;
+        updateIndividualSlots();
+    } 
+    // Handle jewelry products (bracelet, anklet, necklace, ring)
+    else {
+        // Hide individual controls
+        if (individualControls) individualControls.style.display = 'none';
+        
+        // Show relevant elements
+        if (sizeSelect) {
+            sizeSelect.style.display = '';
+            updateSizeOptions(product);
+            sizeSelect.value = currentSize;
+        }
+        if (materialSelector) materialSelector.style.display = '';
+        if (fullGlamBtn) fullGlamBtn.style.display = '';
+        if (addCharmsLabel) addCharmsLabel.style.display = '';
+        
+        // Initialize jewelry piece with correct slots
+        initJewelryPiece();
+        
+        // Reset full glam mode when switching products
+        isFullGlam = false;
+        if (fullGlamBtn) fullGlamBtn.classList.remove('active');
     }
-
-    // Clear all slots and create new ones based on selected size
-    jewelryPiece.innerHTML = '';
-    maxSlots = SIZE_CHARTS[product][currentSize].charms;
-
-    for (let i = 0; i < maxSlots; i++) {
-        const slot = createBaseSlot();
-        jewelryPiece.appendChild(slot);
-    }
-
-    // Reset charm counts
-    specialCount = 0;
-    rareCount = 0;
-    customCount = 0;
-    includedSpecialUsed = 0;
-    usedCharms.clear();
-
-    // Update displays
+    
+    // Update material display
     updateBaseCharms();
-    updateCharmUsage();
+    
+    // Always update the price display
     updatePrice();
-
-    // Add product-specific class to body for CSS targeting
-    document.body.classList.remove('product-bracelet', 'product-anklet', 'product-necklace', 'product-ring');
-    document.body.classList.add(`product-${product}`);
+}
+function updateSizeOptions(product) {
+    const sizeSelect = document.getElementById('size');
+    if (!sizeSelect) return;
+    
+    sizeSelect.innerHTML = '';
+    
+    const sizes = SIZE_CHARTS[product];
+    if (!sizes) return;
+    
+    Object.entries(sizes).forEach(([size, data]) => {
+        const option = document.createElement('option');
+        option.value = size;
+        option.textContent = data.display;
+        sizeSelect.appendChild(option);
+    });
 }
 
-function setupEventListeners() {
-     try {
-        const productBtns = document.querySelectorAll('.product-btn');
-        const materialOptions = document.querySelectorAll('.material-option');
-        const sizeSelect = document.getElementById('size');
-        const fullGlamBtn = document.getElementById('full-glam-btn');
-        const downloadBtn = document.getElementById('download-btn');
-        const pricingToggle = document.getElementById('pricing-toggle');
-        
-        // Move the pricing toggle listener outside the if block
-        if (pricingToggle) {
-            pricingToggle.addEventListener('click', () => {
-                const pricingInfo = document.querySelector('.pricing-info');
-                if (pricingInfo) {
-                    pricingInfo.classList.toggle('visible');
-                    
-                    // Update button text based on state
-                    const btnText = pricingToggle.querySelector('.btn-text');
-                    if (btnText) {
-                        btnText.textContent = pricingInfo.classList.contains('visible') 
-                            ? 'Hide Pricing' 
-                            : 'Pricing';
-                    }
-                }
-            });
+function updateBaseCharms() {
+    const slots = document.querySelectorAll('.slot');
+    slots.forEach((slot, index) => {
+        const baseImg = slot.querySelector('img[data-type="base"]');
+        if (baseImg) {
+            if (materialType === 'silver') {
+                baseImg.src = 'basecharms/silver.png';
+            } else if (materialType === 'gold') {
+                baseImg.src = 'basecharms/gold.png';
+            } else if (materialType === 'mix') {
+                const isGold = index % 2 === 0;
+                baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
+            }
         }
+    });
+}
 
-        // The rest of your event listeners...
-        productBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const product = btn.dataset.type;
-                productBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+function createSlotWithControls(index, isLast = false) {
+    const container = document.createElement('div');
+    container.className = 'slot-container';
+    
+    // Create the slot
+    const slot = document.createElement('div');
+    slot.className = 'slot individual-slot';
+    slot.dataset.index = index;
+    
+    // Add base charm
+    const img = document.createElement('img');
+    img.src = materialType === 'silver' ? 'basecharms/silver.png' : 'basecharms/gold.png';
+    img.dataset.type = 'base';
+    slot.appendChild(img);
+    
+    // Add click handler
+    slot.addEventListener('click', function() {
+        handleSlotClick(this);
+    });
+    
+    // Create the add button (only for last slot)
+    if (isLast) {
+        const addBtn = document.createElement('button');
+        addBtn.className = 'add-slot-btn';
+        addBtn.innerHTML = '+';
+        addBtn.title = 'Add another charm';
+        addBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (individualSlotCount < maxIndividualSlots) {
+                individualSlotCount++;
+                updateIndividualSlots();
+                updatePrice();
+            }
+        });
+        
+        container.appendChild(slot);
+        container.appendChild(addBtn);
+    } else {
+        container.appendChild(slot);
+    }
+    
+    return container;
+}
+function setupEventListeners() {
+    try {
+        // Product selection buttons
+        document.querySelectorAll('.product-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const product = this.dataset.type;
+                document.querySelectorAll('.product-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
                 initProduct(product);
             });
         });
-        
 
-       document.getElementById('translate-btn').addEventListener('click', function() {
-  // Find the Google Translate dropdown and click it
-  const googleDropdown = document.querySelector('.goog-te-menu-value');
-  if (googleDropdown) {
-    googleDropdown.click();
-  } else {
-    // Fallback in case Google Translate hasn't fully loaded
-    alert('Translation is loading... Please try again in a moment.');
-  }
-});
-        materialOptions.forEach(option => {
+        // Material selection
+        document.querySelectorAll('.material-option').forEach(option => {
             option.addEventListener('click', () => {
-                materialOptions.forEach(opt => opt.classList.remove('selected'));
+                document.querySelectorAll('.material-option').forEach(opt => opt.classList.remove('selected'));
                 option.classList.add('selected');
                 materialType = option.dataset.material;
                 updateBaseCharms();
@@ -662,11 +791,17 @@ function setupEventListeners() {
             });
         });
 
-        sizeSelect.addEventListener('change', () => {
-            updateJewelrySize(sizeSelect.value);
-            updatePrice();
-        });
+        // Size selector
+        const sizeSelect = document.getElementById('size');
+        if (sizeSelect) {
+            sizeSelect.addEventListener('change', () => {
+                updateJewelrySize(sizeSelect.value);
+                updatePrice();
+            });
+        }
 
+        // Full glam toggle
+        const fullGlamBtn = document.getElementById('full-glam-btn');
         if (fullGlamBtn) {
             fullGlamBtn.addEventListener('click', () => {
                 isFullGlam = !isFullGlam;
@@ -675,14 +810,11 @@ function setupEventListeners() {
             });
         }
 
+        // Download design button
+        const downloadBtn = document.getElementById('download-btn');
         if (downloadBtn) {
             downloadBtn.addEventListener('click', async () => {
                 try {
-                    const jewelryPiece = document.getElementById('jewelry-piece');
-                    if (!jewelryPiece) {
-                        throw new Error('Jewelry piece container not found');
-                    }
-
                     downloadBtn.disabled = true;
                     downloadBtn.textContent = 'Generating...';
 
@@ -709,13 +841,188 @@ function setupEventListeners() {
             });
         }
 
+        // Individual charm slot controls
+        const decreaseSlotsBtn = document.getElementById('decrease-slots');
+        const increaseSlotsBtn = document.getElementById('increase-slots');
+        const slotCountDisplay = document.getElementById('slot-count');
+
+        if (decreaseSlotsBtn && increaseSlotsBtn && slotCountDisplay) {
+            decreaseSlotsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (individualSlotCount > 1) {
+                    individualSlotCount--;
+                    updateIndividualSlots();
+                    updatePrice();
+                    slotCountDisplay.textContent = individualSlotCount;
+                }
+            });
+
+            increaseSlotsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (individualSlotCount < maxIndividualSlots) {
+                    individualSlotCount++;
+                    updateIndividualSlots();
+                    updatePrice();
+                    slotCountDisplay.textContent = individualSlotCount;
+                }
+            });
+        }
+
+        // Pricing toggle
+        const pricingToggle = document.getElementById('pricing-toggle');
+        if (pricingToggle) {
+            pricingToggle.addEventListener('click', () => {
+                const pricingInfo = document.querySelector('.pricing-info');
+                if (pricingInfo) {
+                    pricingInfo.classList.toggle('visible');
+                    const btnText = pricingToggle.querySelector('.btn-text');
+                    if (btnText) {
+                        btnText.textContent = pricingInfo.classList.contains('visible') 
+                            ? 'Hide Pricing' 
+                            : 'Pricing';
+                    }
+                }
+            });
+        }
+
+        // Translation button
+        document.getElementById('translate-btn')?.addEventListener('click', function() {
+            const googleDropdown = document.querySelector('.goog-te-menu-value');
+            if (googleDropdown) {
+                googleDropdown.click();
+            } else {
+                alert('Translation is loading... Please try again in a moment.');
+            }
+        });
+
+        // Setup other functionality
         setupCategoryTabs();
         setupCartFunctionality();
+        setupCustomCharmHandlers();
 
     } catch (error) {
         console.error('Error setting up event listeners:', error);
     }
 }
+// Update the updateIndividualSlots function:
+function updateIndividualSlots() {
+    // Store existing charms before clearing
+    const existingCharms = [];
+    const slots = jewelryPiece.querySelectorAll('.slot');
+    
+    slots.forEach(slot => {
+        const charm = slot.querySelector('img:not([data-type="base"])');
+        if (charm) {
+            existingCharms.push({
+                src: charm.src,
+                type: charm.dataset.type,
+                isLong: slot.classList.contains('long-slot'),
+                isDangly: slot.classList.contains('has-dangly')
+            });
+        }
+    });
+
+    // Clear and rebuild with correct number of slots
+    jewelryPiece.innerHTML = '';
+    
+    for (let i = 0; i < individualSlotCount; i++) {
+        const slotContainer = document.createElement('div');
+        slotContainer.className = 'slot-container';
+        
+        const slot = createBaseSlot();
+        slotContainer.appendChild(slot);
+        
+        // Reapply existing charm if we have one for this position
+        if (i < existingCharms.length) {
+            const charmData = existingCharms[i];
+            
+            if (charmData.isLong) {
+                // Handle long charm placement
+                if (i + 1 < individualSlotCount) {
+                    const longContainer = document.createElement('div');
+                    longContainer.className = 'slot long-slot';
+                    longContainer.style.width = '180px';
+                    longContainer.style.height = '100px';
+                    
+                    const longCharm = document.createElement('img');
+                    longCharm.src = charmData.src;
+                    longCharm.className = 'long-charm';
+                    longCharm.dataset.type = charmData.type;
+                    longCharm.style.width = '180px';
+                    longCharm.style.height = '100px';
+                    longContainer.appendChild(longCharm);
+                    
+                    slot.replaceWith(longContainer);
+                    jewelryPiece.children[i].remove(); // Remove the next slot
+                    
+                    longContainer.addEventListener('click', () => handleSlotClick(longContainer));
+                    i++; // Skip next slot since long charm takes 2 slots
+                }
+            } 
+            else if (charmData.isDangly) {
+                // Handle dangly charm
+                slot.classList.add('has-dangly');
+                slot.style.height = '192px';
+                
+                const danglyImg = document.createElement('img');
+                danglyImg.src = charmData.src;
+                danglyImg.className = 'dangly-charm';
+                danglyImg.dataset.type = charmData.type;
+                danglyImg.style.width = '88px';
+                danglyImg.style.height = '192px';
+                
+                slot.innerHTML = '';
+                slot.appendChild(danglyImg);
+            } 
+            else {
+                // Regular charm
+                const charmImg = document.createElement('img');
+                charmImg.src = charmData.src;
+                charmImg.dataset.type = charmData.type;
+                charmImg.style.width = '88px';
+                charmImg.style.height = '88px';
+                
+                slot.innerHTML = '';
+                slot.appendChild(charmImg);
+            }
+        }
+        
+        // Add controls to last slot only
+        if (i === individualSlotCount - 1) {
+            const controls = document.createElement('div');
+            controls.className = 'slot-controls';
+            
+            const minusBtn = document.createElement('button');
+            minusBtn.className = 'control-btn minus-btn';
+            minusBtn.textContent = '-';
+            minusBtn.disabled = individualSlotCount <= 1;
+            minusBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                individualSlotCount--;
+                updateIndividualSlots();
+                updatePrice();
+            });
+            
+            const plusBtn = document.createElement('button');
+            plusBtn.className = 'control-btn plus-btn';
+            plusBtn.textContent = '+';
+            plusBtn.disabled = individualSlotCount >= maxIndividualSlots;
+            plusBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                individualSlotCount++;
+                updateIndividualSlots();
+                updatePrice();
+            });
+            
+            controls.appendChild(minusBtn);
+            controls.appendChild(plusBtn);
+            slotContainer.appendChild(controls);
+        }
+        
+        jewelryPiece.appendChild(slotContainer);
+    }
+}
+
 
 function setupCartFunctionality() {
     const cartElements = {
@@ -841,95 +1148,53 @@ function blobToBase64(blob) {
         reader.readAsDataURL(blob);
     });
 }
+// Add these functions BEFORE setupOrderFunctionality()
 
-function setupOrderFunctionality() {
-    // First get ALL required elements
-    orderModal = document.getElementById('order-modal');
-    orderForm = document.getElementById('order-form');
-    orderIdSpan = document.getElementById('order-id');
-    payCliqOption = document.getElementById('pay-cliq');
-    paymentProofContainer = document.getElementById('payment-proof-container');
-    orderConfirmation = document.getElementById('order-confirmation');
-    closeConfirmation = document.getElementById('close-confirmation');
-    cancelOrderBtn = document.getElementById('cancel-order');
-    payCliqRadio = document.getElementById('pay-cliq');
-    placeOrderBtn = document.getElementById('order-btn');
-    
-    // Check for missing critical elements
-    const requiredElements = [
-        orderModal, orderForm, orderIdSpan, 
-        document.getElementById('order-subtotal'),
-        document.getElementById('order-delivery'),
-        document.getElementById('order-total-price'),
-        cancelOrderBtn,
-        placeOrderBtn
-    ];
-    
-    const missingElements = requiredElements
-        .map((el, i) => !el ? ['order-modal','order-form','order-id',
-                              'order-subtotal','order-delivery',
-                              'order-total-price','cancel-order-btn',
-                              'place-order-btn'][i] : null)
-        .filter(Boolean);
-    
-    if (missingElements.length > 0) {
-        console.error('Missing required elements:', missingElements.join(', '));
-        alert('Some order components failed to load. Please refresh the page.');
+function handlePaymentChange(e) {
+    if (paymentProofContainer) {
+        paymentProofContainer.style.display = e.target.checked ? 'block' : 'none';
+        if (e.target.checked) {
+            document.getElementById('payment-proof').required = true;
+        } else {
+            document.getElementById('payment-proof').required = false;
+        }
+    }
+}
+
+function handlePlaceOrderClick() {
+    if (cart.length === 0) {
+        alert('Your cart is empty!');
         return;
     }
-
-    // Remove any existing event listeners to prevent duplicates
-    orderForm.removeEventListener('submit', handleFormSubmit);
-    placeOrderBtn.removeEventListener('click', handlePlaceOrderClick);
-    cancelOrderBtn.removeEventListener('click', handleCancelOrder);
-    if (closeConfirmation) closeConfirmation.removeEventListener('click', handleCloseConfirmation);
-    if (payCliqRadio) payCliqRadio.removeEventListener('change', handlePaymentChange);
-
-    function handlePaymentChange(e) {
-        if (paymentProofContainer) {
-            paymentProofContainer.style.display = e.target.checked ? 'block' : 'none';
-            if (e.target.checked) {
-                document.getElementById('payment-proof').required = true;
-            } else {
-                document.getElementById('payment-proof').required = false;
-            }
-        }
-    }
-
-    function handlePlaceOrderClick() {
-        if (cart.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-        
-        // Calculate and display order summary
-        const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-        const deliveryFee = 2.5;
-        const total = subtotal + deliveryFee;
-        
-        document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
-        document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
-        document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
-
-        document.body.classList.add('modal-open');
-        orderModal.classList.add('active');
-    }
     
-    function handleCancelOrder() {
-        orderModal.classList.remove('active');
-        document.body.classList.remove('modal-open');
-        if (orderForm) orderForm.reset();
-        if (paymentProofContainer) paymentProofContainer.style.display = 'none';
-    }
+    // Calculate and display order summary
+    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+    const deliveryFee = 2.5;
+    const total = subtotal + deliveryFee;
+    
+    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
+    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
 
-    function handleCloseConfirmation() {
-        orderConfirmation.classList.remove('active');
-        document.body.classList.remove('modal-open');
-        // Reset the designer after successful order
-        initProduct('bracelet');
-    }
+    document.body.classList.add('modal-open');
+    orderModal.classList.add('active');
+}
 
-    async function handleFormSubmit(e) {
+function handleCancelOrder() {
+    orderModal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+    if (orderForm) orderForm.reset();
+    if (paymentProofContainer) paymentProofContainer.style.display = 'none';
+}
+
+function handleCloseConfirmation() {
+    orderConfirmation.classList.remove('active');
+    document.body.classList.remove('modal-open');
+    // Reset the designer after successful order
+    initProduct('bracelet');
+}
+
+async function handleFormSubmit(e) {
     e.preventDefault();
     console.log('Form submission started');
 
@@ -1091,37 +1356,99 @@ function setupOrderFunctionality() {
         submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Order';
     }
 }
-    // Add event listeners
-    orderForm.addEventListener('submit', handleFormSubmit);
-    placeOrderBtn.addEventListener('click', handlePlaceOrderClick);
-    cancelOrderBtn.addEventListener('click', handleCancelOrder);
-    closeConfirmation.addEventListener('click', handleCloseConfirmation);
-    payCliqRadio.addEventListener('change', handlePaymentChange);
+function setupOrderFunctionality() {
+    // First get ALL required elements
+    orderModal = document.getElementById('order-modal');
+    orderForm = document.getElementById('order-form');
+    orderIdSpan = document.getElementById('order-id');
+    payCliqOption = document.getElementById('pay-cliq');
+    paymentProofContainer = document.getElementById('payment-proof-container');
+    orderConfirmation = document.getElementById('order-confirmation');
+    closeConfirmation = document.getElementById('close-confirmation');
+    cancelOrderBtn = document.getElementById('cancel-order');
+    payCliqRadio = document.getElementById('pay-cliq');
+    placeOrderBtn = document.getElementById('order-btn');
+    
+    // Check for missing critical elements
+    const missingElements = [];
+    if (!orderModal) missingElements.push('order-modal');
+    if (!orderForm) missingElements.push('order-form');
+    if (!orderIdSpan) missingElements.push('order-id');
+    if (!cancelOrderBtn) missingElements.push('cancel-order-btn');
+    if (!placeOrderBtn) missingElements.push('place-order-btn');
+    
+    if (missingElements.length > 0) {
+        console.error('Missing required elements:', missingElements.join(', '));
+        alert('Some order components failed to load. Please refresh the page.');
+        return;
+    }
+
+    // Remove any existing event listeners to prevent duplicates
+    if (orderForm) orderForm.removeEventListener('submit', handleFormSubmit);
+    if (placeOrderBtn) placeOrderBtn.removeEventListener('click', handlePlaceOrderClick);
+    if (cancelOrderBtn) cancelOrderBtn.removeEventListener('click', handleCancelOrder);
+    if (closeConfirmation) closeConfirmation.removeEventListener('click', handleCloseConfirmation);
+    if (payCliqRadio) payCliqRadio.removeEventListener('change', handlePaymentChange);
+
+    // Add event listeners only if elements exist
+    if (orderForm) orderForm.addEventListener('submit', handleFormSubmit);
+    if (placeOrderBtn) placeOrderBtn.addEventListener('click', handlePlaceOrderClick);
+    if (cancelOrderBtn) cancelOrderBtn.addEventListener('click', handleCancelOrder);
+    if (closeConfirmation) closeConfirmation.addEventListener('click', handleCloseConfirmation);
+    if (payCliqRadio) payCliqRadio.addEventListener('change', handlePaymentChange);
 
     // Initialize payment proof container state
-    paymentProofContainer.style.display = 'none';
+    if (paymentProofContainer) {
+        paymentProofContainer.style.display = 'none';
+    }
 
     console.log('Order functionality initialized successfully');
     window.orderFunctionalityInitialized = true;
 }
-
 function initJewelryPiece() {
     const jewelryPiece = document.getElementById('jewelry-piece');
     if (!jewelryPiece) {
-        console.error('Jewelry piece container not found');
+        console.error("Jewelry piece container not found!");
         return;
     }
-    
+
+    // Clear existing slots
     jewelryPiece.innerHTML = '';
-    
-    // Create slots based on initial size
-    const initialSlots = SIZE_CHARTS[currentProduct][currentSize].charms;
-    for (let i = 0; i < initialSlots; i++) {
-        const slot = createBaseSlot();
+
+    // For individual charms, use the individualSlotCount
+    if (currentProduct === 'individual') {
+        updateIndividualSlots();
+        return;
+    }
+
+    // For other products, get number of slots from SIZE_CHARTS
+    const slotCount = SIZE_CHARTS[currentProduct][currentSize].charms;
+
+    // Create slots
+    for (let i = 0; i < slotCount; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+        
+        // Create base charm image
+        const img = document.createElement('img');
+        img.src = materialType === 'silver' ? 'basecharms/silver.png' : 'basecharms/gold.png';
+        img.alt = 'Base charm';
+        img.dataset.type = 'base';
+        
+        // Add image to slot
+        slot.appendChild(img);
+        
+        // Add click handler
+        slot.addEventListener('click', function() {
+            handleSlotClick(this);
+        });
+        
+        // Add slot to jewelry piece
         jewelryPiece.appendChild(slot);
     }
+    
+    console.log(`Created ${slotCount} slots for ${currentProduct} size ${currentSize}`);
 }
-
 function createSlots(slotCount) {
     for (let i = 0; i < slotCount; i++) {
         const slot = document.createElement('div');
@@ -2067,6 +2394,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             db = firebase.firestore();
             storage = firebase.storage();
+            setupOrderFunctionality();
             window.firebaseInitialized = true;
         }
 
@@ -2160,28 +2488,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const braceletContainer = document.querySelector('.bracelet-container');
     const jewelryPiece = document.getElementById('jewelry-piece');
     
-    // Calculate when to make it sticky
     function updateStickyHeader() {
-        const rect = braceletContainer.getBoundingClientRect();
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        if (scrollTop > rect.top) {
-            braceletContainer.classList.add('sticky-active');
-            // Adjust width when sticky
-            jewelryPiece.style.maxWidth = window.innerWidth - 40 + 'px';
-        } else {
-            braceletContainer.classList.remove('sticky-active');
-            // Reset width when not sticky
-            jewelryPiece.style.maxWidth = '';
-        }
+    const braceletContainer = document.querySelector('.bracelet-container');
+    if (!braceletContainer) return;
+    
+    const scrollY = window.scrollY;
+    if (scrollY > 100) {
+        braceletContainer.classList.add('sticky-active');
+        braceletContainer.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+    } else {
+        braceletContainer.classList.remove('sticky-active');
+        braceletContainer.style.boxShadow = 'none';
     }
-    
-    // Run on scroll and resize
-    window.addEventListener('scroll', updateStickyHeader);
-    window.addEventListener('resize', updateStickyHeader);
-    
-    // Initial check
-    updateStickyHeader();
+}
+
+// Run on scroll and resize
+window.addEventListener('scroll', updateStickyHeader);
+window.addEventListener('resize', updateStickyHeader);
+
+// Initial check
+updateStickyHeader();
 });
 document.addEventListener('DOMContentLoaded', function() {
     const jewelryPiece = document.getElementById('jewelry-piece');
