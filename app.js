@@ -1498,14 +1498,20 @@ function handleSlotClick(slot) {
     const charmSrc = selectedCharm.dataset.charm;
     const charmSet = getCharmSet(charmSrc);
     
-    if (charmSet) {
-      // Check if we're adding the first charm of a set
-      const placedCharms = Array.from(document.querySelectorAll('.slot img:not([data-type="base"])'))
-        .map(img => img.dataset.charm);
-      
-      const hasOtherSetCharms = placedCharms.some(src => 
-        charmSet.charms.some(charm => src.includes(charm))
-      );
+     if (selectedCharm) {
+        const quantity = parseInt(selectedCharm.dataset.quantity) || 1;
+        if (quantity <= 0) {
+            alert('This charm is out of stock!');
+            selectedCharm.classList.remove('selected');
+            selectedCharm = null;
+            return;
+        }
+        
+        // Rest of your existing code...
+        placeSelectedCharm(slot);
+    } else if (slot.querySelector('img:not([data-type="base"])')) {
+        removeCharmFromSlot(slot);
+    }
       
       // If this is the first charm of a set, just warn but allow adding
       if (!hasOtherSetCharms) {
@@ -1563,6 +1569,13 @@ function addCharmToSlot(slot, src, type, isSoldOut) {
 }
 
 function placeSelectedCharm(slot) {
+    const quantity = parseInt(selectedCharm.dataset.quantity) || 1;
+if (quantity <= 0) {
+    alert('This charm is out of stock!');
+    selectedCharm.classList.remove('selected');
+    selectedCharm = null;
+    return;
+}
     const charmSrc = selectedCharm.dataset.charm;
     const charmType = selectedCharm.dataset.type;
     let quantity = parseInt(selectedCharm.dataset.quantity) || 1;
