@@ -216,9 +216,15 @@ function calculatePrice(includeDelivery = false) {
         
         const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
         placedCharms.forEach(charm => {
-            if (charm.dataset.type === 'special') charmCost += 2;
-            else if (charm.dataset.type === 'rare') charmCost += 3;
-            else if (charm.dataset.type === 'custom') charmCost += 3.5;
+            if (charm.classList.contains('long-charm')) {
+                charmCost += 6; // Long charm price
+            } else if (charm.dataset.type === 'special') {
+                charmCost += 2;
+            } else if (charm.dataset.type === 'rare') {
+                charmCost += 3;
+            } else if (charm.dataset.type === 'custom') {
+                charmCost += 3.5;
+            }
         });
         
         const subtotal = basePrice + charmCost;
@@ -229,17 +235,6 @@ function calculatePrice(includeDelivery = false) {
             discount: 0,
             total: total,
             delivery: includeDelivery ? 2.5 : 0
-        };
-    }
-
-    // For other products, first verify we have valid product and size data
-    if (!PRODUCTS[currentProduct] || !SIZE_CHARTS[currentProduct] || !SIZE_CHARTS[currentProduct][currentSize]) {
-        console.error(`Missing price data for ${currentProduct} size ${currentSize}`);
-        return {
-            subtotal: 0,
-            discount: 0,
-            total: 0,
-            delivery: 0
         };
     }
 
@@ -260,16 +255,20 @@ function calculatePrice(includeDelivery = false) {
     }
 
     // Count all placed charms
-    const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
     let specialCount = 0;
     let rareCount = 0;
     let customCount = 0;
+    let longCount = 0;
 
     placedCharms.forEach(charm => {
-        const type = charm.dataset.type;
-        if (type === 'special') specialCount++;
-        else if (type === 'rare') rareCount++;
-        else if (type === 'custom') customCount++;
+        if (charm.classList.contains('long-charm')) {
+            longCount++;
+        } else {
+            const type = charm.dataset.type;
+            if (type === 'special') specialCount++;
+            else if (type === 'rare') rareCount++;
+            else if (type === 'custom') customCount++;
+        }
     });
 
     // Apply charm costs to both prices
@@ -285,6 +284,10 @@ function calculatePrice(includeDelivery = false) {
     
     totalPrice += customCount * 3.5;
     originalPrice += customCount * 3.5;
+    
+    // Add long charm pricing
+    totalPrice += longCount * 6;
+    originalPrice += longCount * 6;
 
     // Check for discount eligibility
     const currentDate = new Date();
@@ -400,38 +403,40 @@ function getCharmSet(charmSrc) {
   );
 }
  function updateSelectedCharmPreview(charmElement) {
-      if (!charmElement) return;
-      
-      const preview = document.getElementById('selected-charm-preview');
-      const previewImage = document.getElementById('preview-charm-image');
-      const previewName = document.getElementById('preview-charm-name');
-      const previewType = document.getElementById('preview-charm-type');
-      
-      previewImage.src = charmElement.src;
-      
-      // Extract charm name from src (you can customize this)
-      const charmSrc = charmElement.src;
-      let charmName = 'Custom Charm';
-      
-      if (charmSrc.includes('special/')) {
+    if (!charmElement) return;
+    
+    const preview = document.getElementById('selected-charm-preview');
+    const previewImage = document.getElementById('preview-charm-image');
+    const previewName = document.getElementById('preview-charm-name');
+    const previewType = document.getElementById('preview-charm-type');
+    
+    previewImage.src = charmElement.src;
+    
+    // Extract charm name from src
+    const charmSrc = charmElement.src;
+    let charmName = 'Custom Charm';
+    
+    if (charmSrc.includes('special/')) {
         charmName = charmSrc.split('special/')[1].split('.')[0].replace(/-/g, ' ').replace(/_/g, ' ');
-      } else if (charmSrc.includes('rare/')) {
+    } else if (charmSrc.includes('rare/')) {
         charmName = charmSrc.split('rare/')[1].split('.')[0].replace(/-/g, ' ').replace(/_/g, ' ');
-      }
-      
-      previewName.textContent = charmName.charAt(0).toUpperCase() + charmName.slice(1);
-      
-      if (charmElement.dataset.type === 'special') {
-        previewType.textContent = 'Special Charm (+2 JDs)';
-      } else if (charmElement.dataset.type === 'rare') {
-        previewType.textContent = 'Rare Charm (+3 JDs)';
-      } else {
-        previewType.textContent = 'Custom Charm (+3.5 JDs)';
-      }
-      
-      preview.classList.add('active');
-      selectedCharmPreview = charmElement;
     }
+    
+    previewName.textContent = charmName.charAt(0).toUpperCase() + charmName.slice(1);
+    
+    if (charmElement.classList.contains('long-charm')) {
+        previewType.textContent = 'Long Charm (+6 JDs)';
+    } else if (charmElement.dataset.type === 'special') {
+        previewType.textContent = 'Special Charm (+2 JDs)';
+    } else if (charmElement.dataset.type === 'rare') {
+        previewType.textContent = 'Rare Charm (+3 JDs)';
+    } else {
+        previewType.textContent = 'Custom Charm (+3.5 JDs)';
+    }
+    
+    preview.classList.add('active');
+    selectedCharmPreview = charmElement;
+}
     
     // Function to hide the charm preview
     function hideSelectedCharmPreview() {
@@ -602,13 +607,17 @@ function updatePrice() {
 
 function getCharmBreakdownText() {
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
-    let specialCount = 0, rareCount = 0, customCount = 0;
+    let specialCount = 0, rareCount = 0, customCount = 0, longCount = 0;
 
     placedCharms.forEach(charm => {
-        const type = charm.dataset.type;
-        if (type === 'special') specialCount++;
-        else if (type === 'rare') rareCount++;
-        else if (type === 'custom') customCount++;
+        if (charm.classList.contains('long-charm')) {
+            longCount++;
+        } else {
+            const type = charm.dataset.type;
+            if (type === 'special') specialCount++;
+            else if (type === 'rare') rareCount++;
+            else if (type === 'custom') customCount++;
+        }
     });
 
     const product = PRODUCTS[currentProduct];
@@ -619,6 +628,7 @@ function getCharmBreakdownText() {
     if (paidSpecials > 0) text += `, ${paidSpecials} paid (+${(paidSpecials * 2).toFixed(2)} JD)`;
     if (rareCount > 0) text += `, ${rareCount} rare (+${(rareCount * 3).toFixed(2)} JD)`;
     if (customCount > 0) text += `, ${customCount} custom (+${(customCount * 3.5).toFixed(2)} JD)`;
+    if (longCount > 0) text += `, ${longCount} long (+${(longCount * 6).toFixed(2)} JD)`;
 
     return text;
 }
