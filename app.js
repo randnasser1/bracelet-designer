@@ -253,6 +253,7 @@ function calculatePrice(includeDelivery = false) {
         totalPrice += 2.5;
         originalPrice += 2.5;
     }
+    const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
 
     // Count all placed charms
     let specialCount = 0;
