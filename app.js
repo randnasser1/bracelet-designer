@@ -68,7 +68,6 @@ const PRODUCTS = {
     individual: { basePrice: 3, baseSlots: 1, includedSpecial: 0, fullGlam: 0 }
 
 };
-// Add this to your CHARM_SETS configuration
 const CHARM_SETS = {
   bestFriends: {
     charms: ['best.png', 'ends.png', 'fri.png'],
@@ -87,6 +86,12 @@ const CHARM_SETS = {
   },
   loveSet: {
     charms: ['rares/love/6.png', 'rares/love/7.png'],
+    message: 'Love charms must be in 2 different items',
+    requiredCount: 2,
+      isDangly: true
+  },
+  dophinset: {
+    charms: ['rares/love/c218.png', 'rares/love/c219.png'],
     message: 'Love charms must be in 2 different items',
     requiredCount: 2,
       isDangly: true
