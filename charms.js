@@ -951,4 +951,3 @@ const rareCharms = [
   { src: 'rares/newc2r/c296.png', category: 'newc2r', quantity: 1 },
   { src: 'rares/newc2r/c297.png', category: 'newc2r', quantity: 1 },
 ];
-
