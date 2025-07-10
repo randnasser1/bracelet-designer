@@ -3053,3 +3053,78 @@ width: 100px !important;
 .fa-ring:before {
     content: "\f713"; /* Using diamond icon as ring */
 }
+.material-option {
+    padding: 0.5rem 1rem;
+    border-radius: 50px; /* Fully rounded */
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.material-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.material-option.selected {
+    border-color: #d6336c;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #d6336c;
+}
+
+/* Material specific styles */
+.material-option.silver {
+    background: #e0e0e0;
+    color: #333;
+    border: 1px solid #b0b0b0;
+}
+
+.material-option.gold {
+    background: linear-gradient(135deg, #ffd700, #daa520);
+    color: #333;
+    border: 1px solid #c79400;
+}
+
+.material-option.mix {
+    background: linear-gradient(90deg, #e0e0e0 50%, #ffd700 50%);
+    color: #333;
+    border: 1px solid #b0b0b0;
+    position: relative;
+    overflow: hidden;
+}
+
+.material-option.mix::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 100%;
+    background: rgba(0,0,0,0.2);
+}
+
+/* Icons */
+.material-option i {
+    font-size: 0.9rem;
+}
+
+/* Specific icon colors */
+.material-option.silver i {
+    color: #606060;
+}
+
+.material-option.gold i {
+    color: #8a6d00;
+}
+
+.material-option.mix i {
+    background: linear-gradient(90deg, #606060 50%, #8a6d00 50%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
