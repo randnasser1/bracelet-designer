@@ -441,7 +441,7 @@ body {
     background: white;
     border-radius: 16px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.15);
-    z-index: 1000;
+    z-index: 1100;
     display: none;
     overflow: hidden;
     flex-direction: column;
