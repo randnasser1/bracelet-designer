@@ -177,43 +177,51 @@ body {
 
 
 /* Jewelry piece slots */
-.slot {
-    width: 88px;
-    height: 88px;
-    position: relative;
-}
 
-.slot img {
-    width: 88px;
-    height: 88px;
-    object-fit: contain;
-}
+
 
 /* Long charm in jewelry piece */
+
 .slot.long-slot {
-    width: 180px !important;
-    height: 100px !important;
-    grid-column: span 2;
-}
+  width: 150px !important; /* Force 2x width */
+  height: 100px !important;
+  margin-right: 0 !important;
+  flex: 0 0 168px !important; /* Prevent flex shrinking */
+} 
 .slot.long-slot img.long-charm {
     width: 150px !important;
     height: 100px !important;
     object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+        margin-right: 0; /* Remove any extra margin */
+
 }
+
 .slot.long-slot .long-charm {
     width: 150px;
     height: 100px;
+      position: relative;
+          z-index: 2;
+
 }
 
 /* Dangly charm in jewelry piece */
 .slot.has-dangly {
-    height: 200px;
+    height: 220px;
 }
 
 .slot.has-dangly img.dangly-charm {
     width: 100px !important;
-    height: 200px !important;
+    height: 220px !important;
     object-fit: contain;
+        z-index: 2;
+
+}
+.slot.long-slot img[data-type="base"] {
+    position: absolute;
+    z-index: 1;
 }
 
 /* ==================== */
@@ -1377,15 +1385,7 @@ html[dir="rtl"] .charm-pool h3 {
     align-items: center;
     margin-right: 5px;
 }
-.bracelet-sticky-container {
-  position: sticky;
-  top: 0; /* Distance from top of viewport when stuck */
-  z-index: 1000; /* Ensure it stays above other content */
-  background: #fff0f5; /* Match your design */
-  padding: 10px 0;
-  margin-bottom: 20px;
-  width: 100%;
-}
+
 /* For mobile devices */
 @media (max-width: 768px) {
   .bracelet-sticky-container {
@@ -1495,7 +1495,7 @@ html[dir="rtl"] .charm-pool h3 {
 
 .slot-preview {
     display: flex;
-    gap: 5px;
+    gap: 0px;
     margin-top: 10px;
 }
 
@@ -1571,4 +1571,1485 @@ html[dir="rtl"] .charm-pool h3 {
 
 .add-slot-btn:hover::after {
     opacity: 1;
+}
+
+.slot.special-base {
+    pointer-events: none;
+    margin: 0 auto;
+    position: relative;
+}
+
+.slot.special-base::after {
+    content: "Drag charms here";
+    position: absolute;
+    bottom: -30px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #d6336c;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Special Product Containers */
+.special-product-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1px;
+    align-items: center;
+    padding: 20px;
+    background: #fff0f5;
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
+/* Base Image Container */
+.product-base-container {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+}
+
+/* Base Images */
+.product-base-image {
+    pointer-events: none;
+    object-fit: contain;
+}
+
+/* Keychain specific */
+.keychain-container .product-base-image {
+    width: 150px;
+    margin-right: 20px;
+}
+
+/* Watch specific */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+    width: 200px;
+    margin: 0 20px;
+}
+
+/* Slots */
+.slot {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    flex-shrink: 0;
+    cursor: pointer;
+    background: transparent;
+}
+
+
+
+
+/* Scrollbar */
+.special-product-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.special-product-container::-webkit-scrollbar-track {
+    background: #ffe6f0;
+    border-radius: 10px;
+}
+
+.special-product-container::-webkit-scrollbar-thumb {
+    background: #d6336c;
+    border-radius: 10px;
+}
+/* Watch Pool Styles */
+.watch-pool-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    justify-content: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: #fff0f5;
+    border-radius: 16px;
+}
+
+.watch-option {
+    position: relative;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.watch-option:hover:not(.sold-out) {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
+}
+
+.watch-option.sold-out {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.watch-option img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 2px solid #f5a0c2;
+}
+
+.sold-out-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(214, 51, 108, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+.slot {
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+}
+
+
+.product-base-container {
+    scroll-snap-align: center;
+}
+
+/* For the watch base image */
+.product-base-image {
+    pointer-events: none;
+    object-fit: contain;
+}
+
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+  width: auto; /* Let it size naturally */
+  max-width: 300px; /* Maximum size */
+  height: 120px; /* Fixed height for consistency */
+  object-fit: contain;
+  margin: 0 15px;
+  flex-shrink: 0;
+}
+/* Add this to ensure proper container cleanup */
+.watch-pool-container {
+    transition: opacity 0.3s ease;
+}
+
+.watch-pool-container.removing {
+    opacity: 0;
+    pointer-events: none;
+}
+/* Ensure proper alignment for keychain */
+.keychain-container {
+  justify-content: flex-start; /* Align to start for scrolling */
+  min-height: auto;
+  padding-bottom: 15px; /* Space for scrollbar */
+}
+.keychain-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.keychain-container::-webkit-scrollbar-thumb {
+  background: #d6336c;
+  border-radius: 4px;
+}
+/* Keychain base specific styling */
+.keychain-container .product-base-image {
+    margin-right: 10px;
+}
+
+.slot {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    margin: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.slot img[data-type="base"] {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.slot img:not([data-type="base"]) {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+/* For watches/keychains */
+.special-product-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0px; /* Reduced from 15px */
+    align-items: center;
+    padding: 10px; /* Reduced from 20px */
+    scroll-snap-type: x mandatory;
+}
+
+.product-base-container {
+    scroll-snap-align: center;
+    margin: 0 10px; /* Consistent spacing */
+}
+
+/* For long charms */
+.slot.long-slot {
+    width: 180px !important;
+    height: 100px !important;
+    margin: 0 2px; /* Consistent margin */
+}
+
+
+
+#jewelry-piece {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0px;
+    padding: 10px;
+    background: #fff0f5;
+    border-radius: 16px;
+    margin: 0 auto;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* For individual mode */
+#jewelry-piece.individual-container {
+    justify-content: flex-start;
+}
+/* Temporary debug styles */
+.slot {
+    border: 1px dashed rgba(214, 51, 108, 0.3);
+}
+
+.slot:hover {
+    border-color: #d6336c;
+}
+
+#jewelry-piece {
+    outline: 2px solid rgba(0,0,255,0.2);
+}.slot-container {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.slot-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    margin-left: 8px;
+}
+
+.control-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #d6336c;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.2s;
+}
+
+.control-btn:hover {
+    background: #a61e4d;
+    transform: scale(1.1);
+}
+
+.control-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Make jewelry piece background transparent */
+#jewelry-piece {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Reduce gap between slots */
+#jewelry-piece {
+  gap: 0px; /* Reduced from 4px */
+}
+
+/* Remove dashed borders from slots */
+.slot {
+  border: none !important;
+}
+
+/* Unstick watch pool and adjust its styling */
+.watch-pool-container {
+  position: static;
+  margin: 15px auto;
+  background: #fff0f5;
+  border-radius: 16px;
+  padding: 15px;
+}
+
+/* Adjust individual slot controls positioning */
+.slot-container {
+  margin-right: 4px; /* Reduced from 8px */
+}
+
+.slot-controls {
+  margin-left: 4px; /* Reduced from 8px */
+}
+/* Reduce gap between slots in all jewelry pieces */
+#jewelry-piece {
+  gap: 0px; /* Remove gap completely or set to 1px if you want minimal spacing */
+  padding: 2px; /* Reduce padding inside the container */
+}
+
+/* Adjust slot margins */
+.slot {
+  margin: 0; /* Remove any margins */
+  padding: 0; /* Remove any padding */
+}
+
+/* For special products (watches, keychains) */
+.special-product-container {
+  gap: 0px; /* Remove gap between slots */
+  padding: 2px; /* Reduce padding */
+}
+
+/* For individual charm mode */
+#jewelry-piece.individual-container .slot-container {
+  margin-right: 2px; /* Reduced from larger value */
+}
+
+/* If you have any specific slot styles for different products, adjust them similarly */
+.bracelet-container .slot,
+.anklet-container .slot,
+.necklace-container .slot,
+.ring-container .slot {
+  margin: 0;
+  padding: 0;
+}
+
+/* Make sure base images don't create extra space */
+.slot img {
+  display: block; /* Remove any default inline spacing */
+}
+/* FORCE NO GAPS (add this at the end of your CSS) */
+#jewelry-piece * {
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+.slot {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+/* Fix for Flexbox gaps (if using flex) */
+#jewelry-piece {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 !important;
+}
+/* Keep jewelry piece sticky */
+.bracelet-sticky-container {
+  position: sticky !important;
+  top: 0;
+  z-index: 1000;
+  background: #fff0f5;
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+
+/* Ensure watches pool scrolls normally */
+.watch-pool-container {
+  position: static !important;/* Removes sticky behavior */
+  margin: 20px auto; /* Add spacing */
+}
+.bracelet-container {
+      position: sticky !important;
+      top: 0;
+      z-index: 1000;
+      background: #fff0f5;
+      padding: 10px 0;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    
+    #jewelry-piece {
+      display: flex;
+      overflow-x: auto;
+      padding: 10px;
+      background: #fff0f5;
+      border-radius: 16px;
+    }
+    
+    /* Normal scrolling for all charm pools */
+    .charm-pools {
+      position: static !important; /* Remove any sticky positioning */
+      overflow-y: auto;
+    }
+    
+    /* Specifically target watch pool to ensure it scrolls */
+    .watch-pool-container {
+      position: static !important; /* Force remove sticky */
+      overflow-y: visible;
+    }
+    
+    .slot {
+      width: 84px;
+      height: 84px;
+      flex-shrink: 0;
+    }
+
+    /* Add these styles to your CSS file */
+
+#jewelry-piece {
+    display: flex;
+    align-items: center; /* Vertical centering */
+    justify-content: center;
+    min-width: min-content;  /* Horizontal centering */
+    min-height: 200px; /* Give it some minimum height */
+    padding: 20px 0;
+}
+
+/* For watches specifically */
+.watch-container, .apple-watch-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    height: 70%;
+}
+
+/* Make slots align properly */
+.slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px;
+}
+
+/* Watch base image styling */
+
+img[src*="watch1.png"],
+img[src*="watch2.png"], 
+img[src*="watch3.png"],
+img[src*="watch4.png"],
+img[src*="watch5.png"]{
+    width: 400px !important;  /* Adjust this value to your preferred size */
+    height: auto !important;
+    object-fit: contain;
+    margin: 0 20px;
+}/* Center the jewelry piece vertically */
+
+
+img[src*="apple-watch-base.png"] {
+    width: 500px !important;  /* Adjust this value to your preferred size */
+    height: auto !important;
+    object-fit: contain;
+    margin: 0 0px;
+}/* Center the jewelry piece vertically */
+
+
+/* Normal size for other jewelry pieces */
+#jewelry-piece:not(.watch-container):not(.apple-watch-container) {
+    min-height: auto;
+    padding: 0px 0;
+}
+
+/* Watch pool stays small */
+.watch-pool-container img {
+    width: 100px !important;
+    height: 100px !important;
+}
+
+/* Vertical centering only when needed */
+.watch-container,
+.apple-watch-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+/* Normal jewelry pieces */
+.bracelet-container,
+.keychain-container,
+.anklet-container,
+.necklace-container,
+.ring-container {
+    min-height: auto;
+    padding: 0px 0;
+}
+
+
+
+/* Smaller watch bases for mobile */
+@media (max-width: 768px) {
+    .watch-container .product-base-image,
+    .apple-watch-container .product-base-image {
+        width: 200px;
+        max-height: 200px;
+        margin: 0 10px;
+    }
+}
+
+/* Watch pool stays small on all devices */
+.watch-pool-container img {
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: contain;
+}
+
+/* Mobile adjustments for watch pool */
+@media (max-width: 480px) {
+    .watch-pool-container img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+}
+
+/* Vertical centering for watches only */
+.watch-container,
+.apple-watch-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+@media (max-width: 768px) {
+    .watch-container,
+    .apple-watch-container {
+        min-height: 150px;
+    }
+}
+
+/* Normal jewelry pieces stay compact */
+.bracelet-container,
+.keychain-container,
+.anklet-container,
+.necklace-container,
+.ring-container {
+    min-height: auto;
+    padding: 0px 0;
+    justify-content: center;
+}
+
+/* Mobile horizontal scrolling for jewelry pieces */
+@media (max-width: 768px) {
+    #jewelry-piece {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        padding-bottom: 10px;
+    }
+    
+    .slot {
+        flex: 0 0 70px;
+        width: 70px;
+        height: 70px;
+    }
+}
+
+/* Special mobile handling for watches */
+@media (max-width: 480px) {
+    .watch-container .product-base-image,
+    .apple-watch-container .product-base-image {
+        width: 200px;
+        max-height: 200px;
+    }
+    
+    .watch-container,
+    .apple-watch-container {
+        min-height: 120px;
+    }
+}
+
+/* Main container */
+.bracelet-container {
+  width: 100%;
+  overflow-x: auto;
+  padding: 10px 0;
+  background: #fff0f5;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Jewelry piece element */
+#jewelry-piece {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  padding: 0;
+  margin: 0 auto;
+  width: max-content; /* Better than min-content for this case */
+  min-width: 100%; /* Ensures it takes at least full container width */
+}
+
+/* Individual slots */
+.slot {
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+  margin: 0;
+  padding: 0;
+  scroll-snap-align: start;
+}
+
+/* Watch base styling */
+.product-base-container {
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  display: flex;
+  align-items: center;
+}
+
+
+
+/* Main container */
+.bracelet-container {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  overflow-x: auto;
+  padding: 10px 0;
+  background: #fff0f5;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scrollbar-width: thin; /* For Firefox */
+}
+
+/* Hide scrollbar when not needed */
+.bracelet-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+/* Jewelry piece element */
+#jewelry-piece {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  padding: 10px;
+  margin: 0 auto;
+  width: max-content;
+  min-width: 100%;
+  scroll-snap-type: x mandatory;
+}
+
+/* Individual slots */
+.slot {
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+  margin: 0;
+  padding: 0;
+  scroll-snap-align: center;
+}
+/* Watch containers */
+.watch-container, 
+.apple-watch-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+/* Watch base images */
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .watch-container .product-base-image,
+  .apple-watch-container .product-base-image {
+    max-width: 200px;
+    height: 100px;
+    margin: 0 10px;
+  }
+  
+  .slot {
+    flex: 0 0 70px;
+    width: 70px;
+    height: 70px;
+  }
+}
+/* Individual charm mode */
+#jewelry-piece.individual-container {
+  justify-content: flex-start;
+  padding-bottom: 15px; /* Space for scrollbar */
+}
+
+/* Always show scrollbar for individual charms */
+#jewelry-piece.individual-container::-webkit-scrollbar {
+  height: 8px;
+  display: block;
+}
+
+#jewelry-piece.individual-container::-webkit-scrollbar-thumb {
+  background: #d6336c;
+  border-radius: 4px;
+}
+
+/* Watch pool container */
+.watch-pool-container {
+  position: static;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+  margin: 20px auto;
+  padding: 15px;
+  background: #fff0f5;
+  border-radius: 16px;
+  max-width: 800px;
+}
+
+.watch-option {
+  width: 100px;
+  height: 100px;
+  position: relative;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .watch-pool-container {
+    gap: 2px;
+    padding: 10px;
+  }
+  
+  .watch-option {
+    width: 80px;
+    height: 80px;
+  }
+}
+/* Scroll indicators */
+.bracelet-container {
+  position: relative;
+}
+
+.bracelet-container::before,
+.bracelet-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.bracelet-container::before {
+  left: 0;
+  background: linear-gradient(to right, #fff0f5, rgba(255,240,245,0));
+}
+
+.bracelet-container::after {
+  right: 0;
+  background: linear-gradient(to left, #fff0f5, rgba(255,240,245,0));
+}
+
+/* Only show when scrolled */
+.bracelet-container.scroll-start::before,
+.bracelet-container.scroll-end::after {
+  display: none;
+}
+
+.bracelet-container:not(.scroll-start)::before {
+  display: block;
+}
+
+.bracelet-container:not(.scroll-end)::after {
+  display: block;
+}
+
+/* Ensure jewelry piece takes full width */
+#jewelry-piece {
+  width: 100%;
+  min-width: 100%;
+}
+
+/* Keychain base image */
+.keychain-container .product-base-image {
+  width: 120px;
+  height: auto;
+  margin-right: 15px;
+}
+
+/* Watch slots positioning */
+.watch-container .slot,
+.apple-watch-container .slot {
+  margin: 0 2px;
+}
+
+/* Force scrollbar visibility */
+.bracelet-container {
+  scrollbar-width: auto; /* For Firefox */
+  overflow-x: auto;
+}
+
+.bracelet-container::-webkit-scrollbar {
+  height: 8px;
+  display: block;
+}
+
+/* Watch Base Container */
+.product-base-container {
+  position: relative;
+  z-index: 2; /* Ensure it stays above other elements */
+}
+
+/* Watch Base Images */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+  width: auto !important;
+  height: 120px !important;
+  max-width: 300px !important;
+  object-fit: contain;
+  margin: 0 15px;
+  display: block;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .watch-container .product-base-image,
+  .apple-watch-container .product-base-image {
+    height: 100px !important;
+    max-width: 200px !important;
+    margin: 0 10px;
+  }
+}
+
+/* Jewelry Piece Container */
+#jewelry-piece {
+  scroll-behavior: smooth;
+  scroll-padding: 0 50%;
+}
+
+/* Slots */
+.slot {
+  scroll-snap-align: center;
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+}
+
+/* Base container styles */
+#jewelry-piece {
+  scroll-behavior: smooth;
+}
+
+/* Keychain specific styles */
+.keychain-container {
+  justify-content: flex-start;
+}
+.keychain-container .product-base-image {
+  width: 120px;
+  height: auto;
+  margin-right: 15px;
+}
+
+/* Watch/Apple Watch specific styles */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+  width: auto;
+  height: 120px;
+  max-width: 300px;
+  object-fit: contain;
+}
+
+/* Slot styles */
+.slot {
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+  margin: 0 2px;
+  scroll-snap-align: start;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .watch-container .product-base-image,
+  .apple-watch-container .product-base-image {
+    height: 100px;
+    max-width: 200px;
+  }
+  
+  .slot {
+    flex: 0 0 70px;
+    width: 70px;
+    height: 70px;
+  }
+}
+/* Base charm size adjustments */
+.slot img[data-type="base"] {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: all 0.3s ease;
+}
+
+/* Specifically for watch base charms */
+.watch-container .watch-base-charm img[data-type="base"],
+.apple-watch-container .watch-base-charm img[data-type="base"] {
+  width: 50% !important;
+  height: 50% !important;
+  transform: translate(50%, 50%); /* Center the smaller charm */
+}
+
+/* Regular slot styling remains unchanged */
+.slot {
+  width: 84px;
+  height: 84px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Make sure the base image stays full size */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+  width: auto !important;
+  height: 120px !important;
+  max-width: 300px !important;
+}
+/* Base slot styling */
+.slot {
+  position: relative;
+  flex-shrink: 0;
+  margin: 0 1px; /* Reduced from 2px */
+}
+
+/* Watch-specific base charm sizing */
+.watch-container .slot,
+.apple-watch-container .slot {
+  width: 84px;
+  height: 84px;
+}
+
+/* Make base charms smaller */
+.watch-container .slot > img[data-type="base"],
+.apple-watch-container .slot > img[data-type="base"] {
+  width: 42px !important;
+  height: 42px !important;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Reduce gap between slots specifically for watches */
+.watch-container,
+.apple-watch-container {
+  gap: 2px !important; /* Reduced from 4px */
+}
+
+/* Main base images stay full size */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+  width: auto !important;
+  height: 120px !important;
+  max-width: 300px !important;
+  margin: 0 10px !important; /* Adjusted from 15px */
+}
+/* Ultra-compact spacing option */
+.watch-container .slot,
+.apple-watch-container .slot {
+  margin: 0 !important;
+  position: relative;
+}
+
+.watch-container .slot::after,
+.apple-watch-container .slot::after {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background: rgba(214, 51, 108, 0.2);
+}
+
+/* Base slot styling - now size-specific */
+.slot {
+  position: relative;
+  flex-shrink: 0;
+  margin: 0 1px; /* Reduced gap */
+}
+
+/* Default slot size (for bracelets, necklaces, etc.) */
+.bracelet-container .slot,
+.anklet-container .slot, 
+.necklace-container .slot,
+.ring-container .slot,
+.keychain-container .slot {
+  width: 84px;
+  height: 84px;
+}
+
+/* Smaller slots for watches */
+.watch-container .slot,
+.apple-watch-container .slot {
+  width: 40px; /* Reduced from 84px */
+  height: 40px;
+}
+
+/* Base charm images - proportional to slot size */
+.slot > img[data-type="base"] {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Main watch base images stay large */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+  width: auto;
+  height: 120px;
+  max-width: 300px;
+  margin: 0 10px;
+}
+@media (max-width: 768px) {
+  .watch-container .slot,
+  .apple-watch-container .slot {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .watch-container .product-base-image,
+  .apple-watch-container .product-base-image {
+    height: 100px;
+    max-width: 250px;
+  }
+}
+/* Watch-specific slot sizing */
+.watch-container .slot,
+.apple-watch-container .slot,
+.watch-slot {
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 1px !important;
+  flex: 0 0 40px !important;
+}
+
+/* Watch container styles */
+.watch-container, .apple-watch-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    align-items: center;
+    padding: 10px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Watch base image */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+    width: auto;
+    height: 120px;
+    max-width: 300px;
+    margin: 0 15px;
+    flex-shrink: 0;
+}
+
+/* Slot styles */
+.slot {
+    position: relative;
+    flex-shrink: 0;
+    margin: 0 1px;
+}
+
+/* Watch-specific slot sizes */
+.watch-container .slot,
+.apple-watch-container .slot {
+    width: 40px;
+    height: 40px;
+}
+
+/* Long charm styles */
+.slot.long-slot {
+    width: 40px;
+    height: 80px;
+}
+
+
+/* Charm images */
+.slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Scrollbar styling */
+.watch-container::-webkit-scrollbar,
+.apple-watch-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.watch-container::-webkit-scrollbar-thumb,
+.apple-watch-container::-webkit-scrollbar-thumb {
+    background: #d6336c;
+    border-radius: 4px;
+}/* Watch-specific styles */
+.watch-container .slot,
+.apple-watch-container .slot {
+    width: 40px !important;
+    height: 40px !important;
+    margin: 0 1px !important;
+}
+
+/* Dangly charms on watches */
+.watch-container .has-dangly,
+.apple-watch-container .has-dangly {
+    height: 80px !important; /* 2x normal slot height */
+}
+
+.watch-container .dangly-charm,
+.apple-watch-container .dangly-charm {
+    width: 40px !important;
+    height: 80px !important; /* 1:2 ratio */
+    object-fit: contain !important;
+}
+
+/* Long charms on watches */
+.watch-container .long-slot,
+.apple-watch-container .long-slot {
+    width: 80px !important; /* 2 slots wide */
+    height: 40px !important; /* normal height */
+}
+
+.watch-container .long-charm,
+.apple-watch-container .long-charm {
+    width: 80px !important;
+    height: 40px !important; /* 2:1 ratio */
+    object-fit: contain !important;
+}
+
+
+
+.watch-container .slot.has-dangly,
+.apple-watch-container .slot.has-dangly
+ {
+    height: 120px;
+}
+.watch-container .slot.has-dangly img.dangly-charm ,
+.apple-watch-container .slot.has-dangly img.dangly-charm {
+    width: 50px !important;
+    height: 120px !important;
+    object-fit: contain;
+}
+
+
+
+.watch-container .slot.long-slot img.long-charm ,
+.apple-watch-container  .slot.long-slot img.long-charm 
+ {
+   width: 100px !important;
+    height: 50px !important;
+    object-fit: contain;
+      object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;            }
+
+
+.watch-container .slot.long-slot .long-charm ,
+.apple-watch-container .slot.long-slot .long-charm {
+width: 100px !important;
+    height: 50px !important;
+        object-fit: contain;
+         position: relative;      /* For proper z-index */
+    z-index: 1;             /* Ensure it stays above base */
+}
+
+
+.watch-container .slot.long-slot, 
+.apple-watch-container.slot.long-slot  {
+  width: 100px !important; /* Force 2x width */
+  height: 50px !important;
+  margin-right: 0 !important;
+  flex: 0 0 100px !important; /* Prevent flex shrinking */
+} 
+
+
+/* Long charm in pool */
+.charms-grid .long-charm {
+    width: 150px !important;
+    height: 100px !important;
+    grid-column: span 2;
+}
+
+.slot.long-slot img {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+ .slot.has-dangly {
+      width: 100px !important;
+
+    height: 220px;
+}
+.slot.has-dangly img.dangly-charm {
+    width: 90px !important;
+    height: 220px !important;
+    object-fit: contain;
+}
+
+
+.slot.long-slot .long-charm {
+    width: 100px !important;
+    height: 220px !important;
+      position: relative;
+          z-index: 1;
+
+}
+
+.watch-container .slot.long-slot img, 
+.apple-watch-container .slot.long-slot img {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.watch-container .slot.has-dangly img, 
+.apple-watch-container .slot.has-dangly  img {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+
+/* Long charm container - spans 2 slots */
+.slot.long-slot {
+  width: 168px !important; /* Force 2x width */
+  height: 84px !important;
+  margin-right: 0 !important;
+  flex: 0 0 168px !important; /* Prevent flex shrinking */
+}
+
+/* Watch-specific long charm */
+.watch-container .slot.long-slot,
+.apple-watch-container .slot.long-slot {
+  width: 80px !important;
+  height: 40px !important;
+  flex: 0 0 80px !important;
+}
+
+/* Long charm image - fills container */
+.slot.long-slot img.long-charm {
+  position: absolute;
+  width: 168px !important;
+  height: 84px !important;
+  left: 0;
+  top: 0;
+}
+
+/* Watch long charm image */
+.watch-container .slot.long-slot img.long-charm,
+.apple-watch-container .slot.long-slot img.long-charm {
+  width: 80px !important;
+  height: 40px !important;
+}
+
+/* Remove base image for long slots */
+.slot.long-slot img[data-type="base"] {
+  display: none;
+}
+
+/* Hide sold-out styling ONLY for dangly charms (both regular and large) */
+.dangly-charm.sold-out,
+.slot.has-dangly img.dangly-charm.sold-out {
+    display: none !important;
+}
+
+/* Keep sold-out styling for all other charms (regular, long, etc.) */
+.charm.sold-out:not(.dangly-charm) {
+    opacity: 0.5;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.charm.sold-out:not(.dangly-charm)::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: 1;
+    border-radius: 4px;
+}
+
+
+
+/* Base styles for love/dolphin sets (bracelet mode) */
+.slot img[src*="rares/love/"],
+.slot img[src*="rares/love/c2"] {
+    width: 90px !important;
+    height: 220px !important;
+    object-fit: contain;
+}
+
+/* Watch-specific scaling (40x20) */
+.watch-container .slot img[src*="rares/love/"],
+.apple-watch-container .slot img[src*="rares/love/"],
+.watch-container .slot img[src*="rares/love/c2"],
+.apple-watch-container .slot img[src*="rares/love/c2"] {
+  width: 80px !important;
+  height: 40px !important;
+}
+
+/* Hide sold-out for these sets */
+.slot img[src*="rares/love/"].sold-out,
+.slot img[src*="rares/love/c2"].sold-out {
+    display: none !important;
+}
+
+/* Force standard size for charm pool items */
+.charms-grid .charm {
+    width: 84px !important;
+    height: 84px !important;
+    margin: 2px;
+}
+
+/* Specific styles for long/dangly charms in pool */
+.charms-grid .long-charm {
+    width: 168px !important;  /* 2x width for long charms */
+    height: 84px !important;
+    grid-column: span 2;
+}
+
+.charms-grid .dangly-charm {
+    width: 84px !important;
+    height: 168px !important; /* 2x height for dangly */
+    grid-row: span 2;
+}
+
+/* Watch-specific overrides ONLY for jewelry piece */
+.watch-container .slot,
+.apple-watch-container .slot {
+    width: 40px !important;
+    height: 40px !important;
+}
+
+/* Explicitly exclude charm pools from watch scaling */
+.watch-container .charms-grid .charm,
+.apple-watch-container .charms-grid .charm {
+    width: 84px !important;
+    height: 84px !important;
+}
+/* Individual mode slots */
+#jewelry-piece.individual-container .slot {
+    width: 84px !important;
+    height: 84px !important;
+    margin: 0 4px 4px 0; /* Tighten vertical spacing */
+}
+
+/* Individual base charms */
+#jewelry-piece.individual-container .slot img[data-type="base"] {
+    width: 84px !important;
+    height: 84px !important;
+    object-fit: contain;
+}
+
+/* Individual charm controls */
+.slot-controls {
+    height: 30px; /* Reduced from default */
+    margin-top: 4px; /* Tighter spacing */
+}
+
+/* Visual indicator for empty slots */
+.individual-slot:empty::after {
+    font-size: 2rem; /* Smaller "+" icon */
+    opacity: 0.3;
+}
+
+.product-selector {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.product-btn {
+    background: #ff85b3;
+    color: white;
+    border: none;
+    border-radius: 50px; /* Fully rounded ends */
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.product-btn:hover {
+    background: #ff5fa3;
+    transform: translateY(-2px);
+}
+
+.product-btn.active {
+    background: #d6336c;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #d6336c;
+}
+
+.product-btn i {
+    font-size: 1rem;
+}
+
+/* Custom icons for jewelry types */
+.fa-bracelet:before {
+    content: "\f0c1"; /* Using link icon as bracelet */
+}
+
+.fa-anklet:before {
+    content: "\f0c1"; /* Using link icon as anklet */
+}
+
+.fa-necklace:before {
+    content: "\f0c1"; /* Using necklace icon */
+}
+
+.fa-ring:before {
+    content: "\f713"; /* Using diamond icon as ring */
 }
