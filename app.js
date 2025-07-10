@@ -1,5 +1,3 @@
-// Initialize Firebase
-let jewelryPiece;
 let specialCharmsGrid;
 let rareCharmsGrid;
 let customCharmUpload;
@@ -23,11 +21,12 @@ let orderConfirmation;
 let closeConfirmation;
 let selectedCharmPreview = null;
 let individualSlotCount = 1;
+let watchPoolContainer = null; // Add this with your other global variables
 const maxIndividualSlots = 10;
 // Constants
 const MAX_SLOT_SPACES = 16;
 const SIZE_CHARTS = {
-    bracelet: {
+     bracelet: {
         '15.2-16.2': { charms: 18, price: 0, display: '15.2cm - 16.2cm (18 charms)' },
         '16.2-17.1': { charms: 19, price: 0.5, display: '16.2cm - 17.1cm (+0.5 JDs, 19 charms)' },
         '17.1-18.1': { charms: 20, price: 1, display: '17.1cm - 18.1cm (+1 JD, 20 charms)' },
@@ -36,6 +35,32 @@ const SIZE_CHARTS = {
         '20-21': { charms: 23, price: 2.5, display: '20cm - 21cm (+2.5 JDs, 23 charms)' },
         '21-22': { charms: 24, price: 3, display: '21cm - 22cm (+3 JDs, 24 charms)' }
     },
+    // Watch sizes (same as bracelet but charm count reduced by 4)
+    'watch': {
+        '15.2-16.2': { charms: 14, price: 0, display: '15.2cm - 16.2cm (14 charms)' },
+        '16.2-17.1': { charms: 15, price: 0.5, display: '16.2cm - 17.1cm (+0.5 JDs, 15 charms)' },
+        '17.1-18.1': { charms: 16, price: 1, display: '17.1cm - 18.1cm (+1 JD, 16 charms)' },
+        '18.1-19.2': { charms: 17, price: 1.5, display: '18.1cm - 19.2cm (+1.5 JDs, 17 charms)' },
+        '19.2-20': { charms: 18, price: 2, display: '19.2cm - 20cm (+2 JDs, 18 charms)' },
+        '20-21': { charms: 19, price: 2.5, display: '20cm - 21cm (+2.5 JDs, 19 charms)' },
+        '21-22': { charms: 20, price: 3, display: '21cm - 22cm (+3 JDs, 20 charms)' }
+    },
+    // Apple Watch sizes (same as bracelet but charm count reduced by 5)
+    'apple-watch': {
+        '15.2-16.2': { charms: 13, price: 0, display: '15.2cm - 16.2cm (13 charms)' },
+        '16.2-17.1': { charms: 14, price: 0.5, display: '16.2cm - 17.1cm (+0.5 JDs, 14 charms)' },
+        '17.1-18.1': { charms: 15, price: 1, display: '17.1cm - 18.1cm (+1 JD, 15 charms)' },
+        '18.1-19.2': { charms: 16, price: 1.5, display: '18.1cm - 19.2cm (+1.5 JDs, 16 charms)' },
+        '19.2-20': { charms: 17, price: 2, display: '19.2cm - 20cm (+2 JDs, 17 charms)' },
+        '20-21': { charms: 18, price: 2.5, display: '20cm - 21cm (+2.5 JDs, 18 charms)' },
+        '21-22': { charms: 19, price: 3, display: '21cm - 22cm (+3 JDs, 19 charms)' }
+    },
+   'keychain': {
+    '5 charms': { charms: 5, price: 0, display: '5 charms' },
+    '6 charms': { charms: 6, price: 1, display: '6 charms' },
+    '7 charms': { charms: 7, price: 2, display: '7 charms'},
+},
+    
     anklet: {
         '21-22': { charms: 23, price: 0, display: '21cm - 22cm (23 charms)' },
         '22-23': { charms: 24, price: 0.5, display: '22cm - 23cm (+0.5 JDs, 24 charms)' },
@@ -65,9 +90,48 @@ const PRODUCTS = {
     anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 1, fullGlam: 42 },
     necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 1, fullGlam: 64 },
     ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 },
-    individual: { basePrice: 3, baseSlots: 1, includedSpecial: 0, fullGlam: 0 }
-
+    individual: { basePrice: 3, baseSlots: 1, includedSpecial: 0, fullGlam: 0 },
+    'watch': { basePrice: 20, baseSlots: 14, includedSpecial: 1, fullGlam: 35 }, // Bracelet charms -4
+    'apple-watch': { basePrice: 18, baseSlots: 13, includedSpecial: 1, fullGlam: 32 }, // Bracelet charms -5
+    'keychain': { basePrice: 6, baseSlots: 5, includedSpecial: 1, fullGlam: 13 }
 };
+let currentWatchBase = 'basecharms/watch1.png'; // Default watch base
+
+
+const WATCH_POOL = [
+    {
+        id: 'watch1',
+        name: 'Classic White center Silver Square Watch',
+        image: 'basecharms/watch1.png',
+        soldOut: false
+    },
+    {
+        id: 'watch2',
+        name: 'Black center Silver Heart Watch',
+        image: 'basecharms/watch2.png',
+        soldOut: false
+    },
+    {
+        id: 'watch3',
+        name: 'Green center Gold Heart Watch ',
+        image: 'basecharms/watch3.png',
+        soldOut: true  // This one is sold out
+    },
+    {
+        id: 'watch4',
+        name: 'Black center Silver Circular Watch',
+        image: 'basecharms/watch4.png',
+        soldOut: false
+    },
+     {
+        id: 'watch5',
+        name: 'White center Silver Square Watch',
+        image: 'basecharms/watch5.png',
+        soldOut: false
+    },
+];
+
+// Add this to your CHARM_SETS configuration
 const CHARM_SETS = {
   bestFriends: {
     charms: ['best.png', 'ends.png', 'fri.png'],
@@ -84,18 +148,20 @@ const CHARM_SETS = {
     message: 'Soulmates charms must be in 2 different items',
     requiredCount: 2
   },
-  loveSet: {
-    charms: ['rares/love/6.png', 'rares/love/7.png'],
-    message: 'Love charms must be in 2 different items',
-    requiredCount: 2,
-      isDangly: true
-  },
-  dophinset: {
-    charms: ['rares/love/c218.png', 'rares/love/c219.png'],
-    message: 'Love charms must be in 2 different items',
-    requiredCount: 2,
-      isDangly: true
-  }
+loveSet: {
+        charms: ['rares/love/6.png', 'rares/love/7.png'],
+        message: 'Love charms must be in 2 different items',
+        requiredCount: 2,
+        isDangly: true,  // Forces dangly behavior
+        watchScaling: 0.5 // 50% smaller on watches
+    },
+    dophinset: {
+        charms: ['rares/love/c218.png', 'rares/love/c219.png'],
+        message: 'Dolphin charms must be in 2 different items',
+        requiredCount: 2,
+        isDangly: true,
+        watchScaling: 0.5
+    }
 };
 
 function getCharmSet(charmSrc) {
@@ -136,11 +202,31 @@ window.orderFunctionalityInitialized = false;
 function createBaseSlot() {
     const slot = document.createElement('div');
     slot.className = 'slot';
-    // ... rest of slot creation
     
-    // Add animation class
-    slot.classList.add('adding');
-    setTimeout(() => slot.classList.remove('adding'), 500);
+    // Special handling for watches
+    const isWatch = currentProduct === 'watch' || currentProduct === 'apple-watch';
+    
+    if (isWatch) {
+        slot.style.cssText = `
+            width: 40px;
+            height: 40px;
+            margin: 0 1px;
+            flex-shrink: 0;
+        `;
+    }
+
+    // Base charm image
+    const baseImg = document.createElement('img');
+    baseImg.src = materialType === 'silver' ? 'basecharms/silver.png' : 'basecharms/gold.png';
+    baseImg.dataset.type = 'base';
+    baseImg.style.width = '100%';
+    baseImg.style.height = '100%';
+    baseImg.style.objectFit = 'contain';
+    slot.appendChild(baseImg);
+    
+    slot.addEventListener('click', function() {
+        handleSlotClick(this);
+    });
     
     return slot;
 }
@@ -216,8 +302,8 @@ function calculatePrice(includeDelivery = false) {
         
         const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
         placedCharms.forEach(charm => {
-            if (charm.classList.contains('long-charm')) {
-                charmCost += 6; // Long charm price
+            if (charm.dataset.type === 'long') {
+                charmCost += 6; // Long charms cost 6 JD
             } else if (charm.dataset.type === 'special') {
                 charmCost += 2;
             } else if (charm.dataset.type === 'rare') {
@@ -228,13 +314,29 @@ function calculatePrice(includeDelivery = false) {
         });
         
         const subtotal = basePrice + charmCost;
-        const total = includeDelivery ? subtotal + 2.5 : subtotal;
+        const delivery = includeDelivery ? 2.5 : 0;
+        const total = subtotal + delivery;
         
         return {
             subtotal: subtotal,
             discount: 0,
             total: total,
-            delivery: includeDelivery ? 2.5 : 0
+            delivery: delivery,
+            basePrice: basePrice,
+            charmCost: charmCost
+        };
+    }
+
+    // Verify valid product and size data
+    if (!PRODUCTS[currentProduct] || !SIZE_CHARTS[currentProduct] || !SIZE_CHARTS[currentProduct][currentSize]) {
+        console.error(`Missing price data for ${currentProduct} size ${currentSize}`);
+        return {
+            subtotal: 0,
+            discount: 0,
+            total: 0,
+            delivery: 0,
+            basePrice: 0,
+            charmCost: 0
         };
     }
 
@@ -253,22 +355,24 @@ function calculatePrice(includeDelivery = false) {
         totalPrice += 2.5;
         originalPrice += 2.5;
     }
-    const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
 
-    // Count all placed charms
+    // Count all placed charms and calculate costs
+    const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
     let specialCount = 0;
     let rareCount = 0;
     let customCount = 0;
-    let longCount = 0;
+    let longCharmCount = 0;
 
     placedCharms.forEach(charm => {
-        if (charm.classList.contains('long-charm')) {
-            longCount++;
-        } else {
-            const type = charm.dataset.type;
-            if (type === 'special') specialCount++;
-            else if (type === 'rare') rareCount++;
-            else if (type === 'custom') customCount++;
+        const type = charm.dataset.type;
+        if (type === 'long') {
+            longCharmCount++;
+        } else if (type === 'special') {
+            specialCount++;
+        } else if (type === 'rare') {
+            rareCount++;
+        } else if (type === 'custom') {
+            customCount++;
         }
     });
 
@@ -280,15 +384,15 @@ function calculatePrice(includeDelivery = false) {
         originalPrice += paidSpecials * 2;
     }
 
+    // Add costs for rare, custom, and long charms
     totalPrice += rareCount * 3;
     originalPrice += rareCount * 3;
     
     totalPrice += customCount * 3.5;
     originalPrice += customCount * 3.5;
     
-    // Add long charm pricing
-    totalPrice += longCount * 6;
-    originalPrice += longCount * 6;
+    totalPrice += longCharmCount * 6; // Long charms cost 6 JD each
+    originalPrice += longCharmCount * 6;
 
     // Check for discount eligibility
     const currentDate = new Date();
@@ -306,7 +410,13 @@ function calculatePrice(includeDelivery = false) {
             subtotal: originalPrice,
             discount: discountApplied,
             total: totalPrice + deliveryFee,
-            delivery: deliveryFee
+            delivery: deliveryFee,
+            basePrice: isFullGlam ? product.fullGlam : product.basePrice + sizeData.price,
+            charmCost: totalPrice - (isFullGlam ? product.fullGlam : product.basePrice + sizeData.price),
+            longCharmCount: longCharmCount,
+            specialCount: specialCount,
+            rareCount: rareCount,
+            customCount: customCount
         };
     }
     
@@ -314,7 +424,13 @@ function calculatePrice(includeDelivery = false) {
         subtotal: originalPrice,
         discount: discountApplied,
         total: totalPrice,
-        delivery: 0
+        delivery: 0,
+        basePrice: isFullGlam ? product.fullGlam : product.basePrice + sizeData.price,
+        charmCost: totalPrice - (isFullGlam ? product.fullGlam : product.basePrice + sizeData.price),
+        longCharmCount: longCharmCount,
+        specialCount: specialCount,
+        rareCount: rareCount,
+        customCount: customCount
     };
 }
 async function uploadBraceletImage(imageFile) {
@@ -404,40 +520,38 @@ function getCharmSet(charmSrc) {
   );
 }
  function updateSelectedCharmPreview(charmElement) {
-    if (!charmElement) return;
-    
-    const preview = document.getElementById('selected-charm-preview');
-    const previewImage = document.getElementById('preview-charm-image');
-    const previewName = document.getElementById('preview-charm-name');
-    const previewType = document.getElementById('preview-charm-type');
-    
-    previewImage.src = charmElement.src;
-    
-    // Extract charm name from src
-    const charmSrc = charmElement.src;
-    let charmName = 'Custom Charm';
-    
-    if (charmSrc.includes('special/')) {
+      if (!charmElement) return;
+      
+      const preview = document.getElementById('selected-charm-preview');
+      const previewImage = document.getElementById('preview-charm-image');
+      const previewName = document.getElementById('preview-charm-name');
+      const previewType = document.getElementById('preview-charm-type');
+      
+      previewImage.src = charmElement.src;
+      
+      // Extract charm name from src (you can customize this)
+      const charmSrc = charmElement.src;
+      let charmName = 'Custom Charm';
+      
+      if (charmSrc.includes('special/')) {
         charmName = charmSrc.split('special/')[1].split('.')[0].replace(/-/g, ' ').replace(/_/g, ' ');
-    } else if (charmSrc.includes('rare/')) {
+      } else if (charmSrc.includes('rare/')) {
         charmName = charmSrc.split('rare/')[1].split('.')[0].replace(/-/g, ' ').replace(/_/g, ' ');
-    }
-    
-    previewName.textContent = charmName.charAt(0).toUpperCase() + charmName.slice(1);
-    
-    if (charmElement.classList.contains('long-charm')) {
-        previewType.textContent = 'Long Charm (+6 JDs)';
-    } else if (charmElement.dataset.type === 'special') {
+      }
+      
+      previewName.textContent = charmName.charAt(0).toUpperCase() + charmName.slice(1);
+      
+      if (charmElement.dataset.type === 'special') {
         previewType.textContent = 'Special Charm (+2 JDs)';
-    } else if (charmElement.dataset.type === 'rare') {
+      } else if (charmElement.dataset.type === 'rare') {
         previewType.textContent = 'Rare Charm (+3 JDs)';
-    } else {
+      } else {
         previewType.textContent = 'Custom Charm (+3.5 JDs)';
+      }
+      
+      preview.classList.add('active');
+      selectedCharmPreview = charmElement;
     }
-    
-    preview.classList.add('active');
-    selectedCharmPreview = charmElement;
-}
     
     // Function to hide the charm preview
     function hideSelectedCharmPreview() {
@@ -549,26 +663,42 @@ function updatePrice() {
     const totalPriceElement = document.getElementById('total-price');
     const discountMessageElement = document.getElementById('discount-message');
     const product = PRODUCTS[currentProduct];
-    const subtotal = priceData.subtotal;
-    const needsForDiscount = Math.max(0, 15 - subtotal).toFixed(2);
 
     if (currentProduct === 'individual') {
-        // For individual mode, show simple breakdown
         basePriceElement.innerHTML = `
             <span>Base Price:</span>
             <span>3.00 JDs</span>
         `;
         
         const charmCost = priceData.total - 3;
+        let charmText = '';
+        
+        // Build detailed charm breakdown
+        if (priceData.longCharmCount > 0) {
+            charmText += `${priceData.longCharmCount} long (${(priceData.longCharmCount * 6).toFixed(2)} JD)`;
+        }
+        if (priceData.specialCount > 0) {
+            if (charmText) charmText += ', ';
+            charmText += `${priceData.specialCount} special (${(priceData.specialCount * 2).toFixed(2)} JD)`;
+        }
+        if (priceData.rareCount > 0) {
+            if (charmText) charmText += ', ';
+            charmText += `${priceData.rareCount} rare (${(priceData.rareCount * 3).toFixed(2)} JD)`;
+        }
+        if (priceData.customCount > 0) {
+            if (charmText) charmText += ', ';
+            charmText += `${priceData.customCount} custom (${(priceData.customCount * 3.5).toFixed(2)} JD)`;
+        }
+        
         charmPriceElement.innerHTML = `
             <span>Charms:</span>
-            <span>${charmCost.toFixed(2)} JDs</span>
+            <span>${charmText || '0.00 JD'}</span>
         `;
         
         totalPriceElement.textContent = `Total: ${priceData.total.toFixed(2)} JDs`;
         discountMessageElement.innerHTML = '';
     } else {
-        // Update base price display
+        // For non-individual products
         if (isFullGlam) {
             basePriceElement.innerHTML = `Full Glam Base: ${product.fullGlam.toFixed(2)} JDs`;
         } else {
@@ -576,15 +706,38 @@ function updatePrice() {
             basePriceElement.innerHTML = `Base Price: ${basePrice.toFixed(2)} JDs`;
         }
 
-        // Update charm breakdown
-        const charmText = getCharmBreakdownText();
-        charmPriceElement.textContent = charmText;
+        // Build detailed charm breakdown text
+        let charmText = '';
+        const freeSpecials = isFullGlam ? product.baseSlots : product.includedSpecial;
+        const paidSpecials = Math.max(0, priceData.specialCount - freeSpecials);
 
-        // Always show discount if applicable
+        if (freeSpecials > 0) {
+            charmText += `${Math.min(priceData.specialCount, freeSpecials)}/${freeSpecials} free specials`;
+        }
+        if (paidSpecials > 0) {
+            if (charmText) charmText += ', ';
+            charmText += `${paidSpecials} paid special (+${(paidSpecials * 2).toFixed(2)} JD)`;
+        }
+        if (priceData.rareCount > 0) {
+            if (charmText) charmText += ', ';
+            charmText += `${priceData.rareCount} rare (+${(priceData.rareCount * 3).toFixed(2)} JD)`;
+        }
+        if (priceData.customCount > 0) {
+            if (charmText) charmText += ', ';
+            charmText += `${priceData.customCount} custom (+${(priceData.customCount * 3.5).toFixed(2)} JD)`;
+        }
+        if (priceData.longCharmCount > 0) {
+            if (charmText) charmText += ', ';
+            charmText += `${priceData.longCharmCount} long (+${(priceData.longCharmCount * 6).toFixed(2)} JD)`;
+        }
+
+        charmPriceElement.textContent = charmText || 'No charms added';
+
+        // Handle discount display
         if (priceData.discount > 0) {
             totalPriceElement.innerHTML = `
                 <div class="price-comparison">
-                    <span class="original-price">${subtotal.toFixed(2)} JDs</span>
+                    <span class="original-price">${priceData.subtotal.toFixed(2)} JDs</span>
                     <span>→</span>
                     <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
                 </div>
@@ -593,10 +746,10 @@ function updatePrice() {
             discountMessageElement.innerHTML = '<div class="discount-badge">10% OFF</div>';
         } else {
             totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
-            if (subtotal < 15) {
+            if (priceData.subtotal < 15) {
                 discountMessageElement.innerHTML = `
                     <div class="discount-promo">
-                        <i class="fas fa-tag"></i> Add ${needsForDiscount} JD more to get 10% OFF!
+                        <i class="fas fa-tag"></i> Add ${(15 - priceData.subtotal).toFixed(2)} JD more to get 10% OFF!
                     </div>
                 `;
             } else {
@@ -608,17 +761,13 @@ function updatePrice() {
 
 function getCharmBreakdownText() {
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
-    let specialCount = 0, rareCount = 0, customCount = 0, longCount = 0;
+    let specialCount = 0, rareCount = 0, customCount = 0;
 
     placedCharms.forEach(charm => {
-        if (charm.classList.contains('long-charm')) {
-            longCount++;
-        } else {
-            const type = charm.dataset.type;
-            if (type === 'special') specialCount++;
-            else if (type === 'rare') rareCount++;
-            else if (type === 'custom') customCount++;
-        }
+        const type = charm.dataset.type;
+        if (type === 'special') specialCount++;
+        else if (type === 'rare') rareCount++;
+        else if (type === 'custom') customCount++;
     });
 
     const product = PRODUCTS[currentProduct];
@@ -629,74 +778,335 @@ function getCharmBreakdownText() {
     if (paidSpecials > 0) text += `, ${paidSpecials} paid (+${(paidSpecials * 2).toFixed(2)} JD)`;
     if (rareCount > 0) text += `, ${rareCount} rare (+${(rareCount * 3).toFixed(2)} JD)`;
     if (customCount > 0) text += `, ${customCount} custom (+${(customCount * 3.5).toFixed(2)} JD)`;
-    if (longCount > 0) text += `, ${longCount} long (+${(longCount * 6).toFixed(2)} JD)`;
 
     return text;
 }
-
-function initProduct(product) {
-    // Validate the product type
-    const validProducts = ['bracelet', 'anklet', 'necklace', 'ring', 'individual'];
-    if (!validProducts.includes(product)) {
-        console.error(`Invalid product type: ${product}`);
-        return;
+function initWatchPool() {
+    // Remove existing watch pool if it exists
+    if (watchPoolContainer && watchPoolContainer.parentNode) {
+        watchPoolContainer.parentNode.removeChild(watchPoolContainer);
     }
 
-    currentProduct = product;
+    watchPoolContainer = document.createElement('div');
+    watchPoolContainer.className = 'watch-pool-container';
+    watchPoolContainer.style.display = 'flex';
+    watchPoolContainer.style.flexWrap = 'wrap';
+    watchPoolContainer.style.justifyContent = 'center';
+    watchPoolContainer.style.gap = '15px';
+    watchPoolContainer.style.margin = '20px auto';
+    watchPoolContainer.style.padding = '15px';
+    watchPoolContainer.style.background = '#fff0f5';
+    watchPoolContainer.style.borderRadius = '16px';
     
-    // Reset to default size for the product (except individual)
-    if (product !== 'individual') {
-        // Safely get the first available size
-        const productSizes = SIZE_CHARTS[product];
-        if (productSizes && Object.keys(productSizes).length > 0) {
-            currentSize = Object.keys(productSizes)[0];
+    WATCH_POOL.forEach(watch => {
+        const watchOption = document.createElement('div');
+        watchOption.className = 'watch-option';
+        if (watch.soldOut) watchOption.classList.add('sold-out');
+        
+        const watchImg = document.createElement('img');
+        watchImg.src = watch.image;
+        watchImg.style.width = '100px';
+        watchImg.style.height = '100px';
+        watchImg.style.objectFit = 'contain';
+        watchOption.appendChild(watchImg);
+        
+        if (watch.soldOut) {
+            const soldOutLabel = document.createElement('div');
+            soldOutLabel.className = 'sold-out-label';
+            soldOutLabel.textContent = 'SOLD OUT';
+            watchOption.appendChild(soldOutLabel);
         } else {
-            console.error(`No sizes defined for product: ${product}`);
-            currentSize = 'default';
+            watchOption.addEventListener('click', () => {
+                currentWatchBase = watch.image;
+                updateWatchBase();
+            });
+        }
+        
+        watchPoolContainer.appendChild(watchOption);
+    });
+    
+    // Insert watch pool in the correct location
+    const specialCharmsPool = document.querySelector('.charm-pool');
+    if (specialCharmsPool) {
+        specialCharmsPool.parentNode.insertBefore(watchPoolContainer, specialCharmsPool);
+    } else {
+        // Fallback to inserting after jewelry piece
+        const jewelryPiece = document.getElementById('jewelry-piece');
+        if (jewelryPiece) {
+            jewelryPiece.parentNode.insertBefore(watchPoolContainer, jewelryPiece.nextSibling);
         }
     }
+}
+function centerScrollOnLoad() {
+  const jewelryPiece = document.getElementById('jewelry-piece');
+  if (jewelryPiece) {
+    // Calculate center position after a small delay to allow rendering
+    setTimeout(() => {
+      jewelryPiece.scrollLeft = (jewelryPiece.scrollWidth - jewelryPiece.clientWidth) / 2;
+    }, 100);
+  }
+}
 
-    // Get UI elements
+// Call this after initializing the jewelry piece
+document.addEventListener('DOMContentLoaded', centerScrollOnLoad);
+
+function initSpecialProductWithBase(productType) {
+  const jewelryPiece = document.getElementById('jewelry-piece');
+  jewelryPiece.innerHTML = '';
+  jewelryPiece.className = `${productType}-container`;
+  
+  // Base styles for all types
+  jewelryPiece.style.cssText = `
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    align-items: center;
+    padding: 10px;
+    min-width: 100%;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  `;
+  
+  const slotCount = SIZE_CHARTS[productType][currentSize].charms;
+
+  if (productType === 'keychain') {
+    // Restore keychain functionality
+    jewelryPiece.style.justifyContent = 'flex-start';
+    
+    const baseContainer = document.createElement('div');
+    baseContainer.className = 'product-base-container';
+    baseContainer.style.flexShrink = '0';
+    
+    const baseImg = document.createElement('img');
+    baseImg.src = 'basecharms/keychain-base.png';
+    baseImg.className = 'product-base-image';
+    baseImg.style.cssText = `
+      width: 120px;
+      height: auto;
+      object-fit: contain;
+    `;
+    baseContainer.appendChild(baseImg);
+    jewelryPiece.appendChild(baseContainer);
+    
+    for (let i = 0; i < slotCount; i++) {
+      jewelryPiece.appendChild(createBaseSlot());
+    }
+  } 
+  else if (productType === 'watch' || productType === 'apple-watch') {
+    // Revised watch initialization that keeps all charms visible
+    jewelryPiece.style.justifyContent = 'flex-start'; // Changed back to flex-start
+    
+    const slotsBefore = Math.floor(slotCount / 2);
+    const slotsAfter = slotCount - slotsBefore;
+
+    // Add left slots directly to jewelry piece
+    for (let i = 0; i < slotsBefore; i++) {
+      jewelryPiece.appendChild(createBaseSlot());
+    }
+
+    // Create base container
+    const baseContainer = document.createElement('div');
+    baseContainer.className = 'product-base-container';
+    baseContainer.style.cssText = `
+      flex-shrink: 0;
+      margin: 0 15px;
+      display: flex;
+      justify-content: center;
+    `;
+    
+    const baseImg = document.createElement('img');
+    baseImg.className = 'product-base-image';
+    baseImg.src = productType === 'watch' 
+      ? (currentWatchBase || 'basecharms/watch-base.png')
+      : 'basecharms/apple-watch-base.png';
+    baseImg.style.cssText = `
+      width: auto;
+      height: 120px;
+      max-width: 300px;
+      object-fit: contain;
+    `;
+    
+    baseContainer.appendChild(baseImg);
+    jewelryPiece.appendChild(baseContainer);
+
+    // Add right slots directly to jewelry piece
+    for (let i = 0; i < slotsAfter; i++) {
+      jewelryPiece.appendChild(createBaseSlot());
+    }
+
+    // Calculate initial scroll position to center the base
+    setTimeout(() => {
+      const baseElement = jewelryPiece.querySelector('.product-base-container');
+      if (baseElement) {
+        const containerCenter = jewelryPiece.clientWidth / 2;
+        const baseCenter = baseElement.offsetLeft + (baseElement.offsetWidth / 2);
+        const scrollPosition = baseCenter - containerCenter;
+        
+        jewelryPiece.scrollLeft = scrollPosition;
+      }
+    }, 100);
+  }
+}
+// Unified slot click handler
+function handleSlotClick(slot) {
+    if (selectedCharm) {
+        placeSelectedCharm(slot);
+    } else {
+        const existingCharm = slot.querySelector('img:not([data-type="base"])');
+        if (existingCharm) {
+            removeCharmFromSlot(slot);
+        }
+    }
+}
+
+function updateWatchBase() {
+    const baseImg = document.querySelector('.product-base-image');
+    if (baseImg && currentWatchBase) {
+        baseImg.src = currentWatchBase;
+    }
+}
+function initStandardJewelry(productType) {
+    const jewelryPiece = document.getElementById('jewelry-piece');
+    
+    // Normal jewelry piece styling
+    jewelryPiece.className = '';
+    jewelryPiece.style.display = 'flex';
+    jewelryPiece.style.flexWrap = 'wrap';
+    jewelryPiece.style.gap = '4px';
+    jewelryPiece.style.justifyContent = 'center';
+
+    // Create normal slots with editable bases
+    const slotCount = SIZE_CHARTS[productType][currentSize].charms;
+    for (let i = 0; i < slotCount; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+        
+        // Normal base charm (editable)
+        const baseImg = document.createElement('img');
+        baseImg.src = materialType === 'silver' ? 'basecharms/silver.png' : 'basecharms/gold.png';
+        baseImg.dataset.type = 'base';
+        baseImg.style.width = '100%';
+        baseImg.style.height = '100%';
+        
+        slot.appendChild(baseImg);
+        jewelryPiece.appendChild(slot);
+    }
+}
+
+function centerJewelryPiece() {
+  const jewelryPiece = document.getElementById('jewelry-piece');
+  if (!jewelryPiece) return;
+  
+  // Don't center if it's a keychain (we want left-aligned)
+  if (jewelryPiece.classList.contains('keychain-container')) return;
+  
+  // Calculate center position
+  const centerScroll = (jewelryPiece.scrollWidth - jewelryPiece.clientWidth) / 2;
+  
+  // Apply with smooth behavior
+  jewelryPiece.scrollTo({
+    left: centerScroll,
+    behavior: 'auto' // Changed from 'smooth' for immediate centering
+  });
+  
+  // Update scroll indicators
+  updateScrollIndicators();
+}
+
+// Call this after initializing jewelry piece and after any updates
+document.addEventListener('DOMContentLoaded', function() {
+  centerJewelryPiece();
+  
+  // Also center when window resizes
+  window.addEventListener('resize', centerJewelryPiece);
+});
+
+function initProduct(product) {
+    // Clean up any existing watch pool
+    if (watchPoolContainer && watchPoolContainer.parentNode) {
+        watchPoolContainer.parentNode.removeChild(watchPoolContainer);
+        watchPoolContainer = null;
+    }
+
+    // Set the current product
+    currentProduct = product;
+    
+    // Set default size based on product type
+    if (product === 'keychain') {
+        currentSize = '5 charms';
+    } 
+    else if (product === 'watch' || product === 'apple-watch') {
+        currentSize = '15.2-16.2';
+    } 
+    else if (product !== 'individual') {
+        // For other products, use their first available size
+        const sizes = Object.keys(SIZE_CHARTS[product]);
+        if (sizes.length > 0) {
+            currentSize = sizes[0];
+        }
+    }
+if (product === 'watch' ) {
+        currentSize = '15.2-16.2';
+        // Initialize watch pool after a small delay to ensure DOM is ready
+        setTimeout(() => {
+            initWatchPool();
+            updateWatchBase();
+        }, 50);
+    }
+    // Update UI elements
     const individualControls = document.getElementById('individual-controls');
-    const sizeSelect = document.getElementById('size');
+    const sizeControls = document.getElementById('size-controls');
     const materialSelector = document.querySelector('.material-selector');
     const fullGlamBtn = document.getElementById('full-glam-btn');
     const addCharmsLabel = document.querySelector('.add-charms-label');
+    const jewelryPiece = document.getElementById('jewelry-piece');
 
-    // Handle individual charms mode
-    if (product === 'individual') {
+    // Reset design state
+    jewelryPiece.innerHTML = '';
+    selectedCharm = null;
+    hideSelectedCharmPreview();
+    usedCharms.clear();
+
+    // Update size dropdown
+    updateSizeOptions(product);
+
+    // Handle product-specific UI
+    if (product === 'watch' || product === 'apple-watch' || product === 'keychain') {
+        // Hide/show appropriate controls
+        if (individualControls) individualControls.style.display = 'none';
+        if (sizeControls) sizeControls.style.display = 'block';
+        if (materialSelector) materialSelector.style.display = 'none';
+        if (fullGlamBtn) fullGlamBtn.style.display = 'none';
+        
+        // Initialize with special base image and slots
+        initSpecialProductWithBase(product);
+    } 
+    else if (product === 'individual') {
         // Show individual controls
         if (individualControls) individualControls.style.display = 'flex';
         
         // Hide irrelevant elements
-        if (sizeSelect) sizeSelect.style.display = 'none';
+        if (sizeControls) sizeControls.style.display = 'none';
         if (materialSelector) materialSelector.style.display = 'none';
         if (fullGlamBtn) fullGlamBtn.style.display = 'none';
         if (addCharmsLabel) addCharmsLabel.style.display = 'none';
         
-        // Reset and update
+        // Initialize individual slots
         individualSlotCount = 1;
         updateIndividualSlots();
     } 
-    // Handle jewelry products (bracelet, anklet, necklace, ring)
     else {
-        // Hide individual controls
+        // Standard jewelry products (bracelet, anklet, necklace, ring)
         if (individualControls) individualControls.style.display = 'none';
+        if (sizeControls) sizeControls.style.display = 'block';
+        if (materialSelector) materialSelector.style.display = 'flex';
+        if (fullGlamBtn) fullGlamBtn.style.display = 'block';
+        if (addCharmsLabel) addCharmsLabel.style.display = 'block';
         
-        // Show relevant elements
-        if (sizeSelect) {
-            sizeSelect.style.display = '';
-            updateSizeOptions(product);
-            sizeSelect.value = currentSize;
-        }
-        if (materialSelector) materialSelector.style.display = '';
-        if (fullGlamBtn) fullGlamBtn.style.display = '';
-        if (addCharmsLabel) addCharmsLabel.style.display = '';
-        
-        // Initialize jewelry piece with correct slots
+        // Initialize jewelry piece
         initJewelryPiece();
         
-        // Reset full glam mode when switching products
+        // Reset full glam mode
         isFullGlam = false;
         if (fullGlamBtn) fullGlamBtn.classList.remove('active');
     }
@@ -704,24 +1114,117 @@ function initProduct(product) {
     // Update material display
     updateBaseCharms();
     
-    // Always update the price display
+    // Update product button active state
+    document.querySelectorAll('.product-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.type === product) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Update price display
     updatePrice();
+setTimeout(() => {
+    centerJewelryPiece();
+  }, 100);
+}
+
+function updateScrollIndicators() {
+  const container = document.querySelector('.bracelet-container');
+  if (!container) return;
+  
+  const jewelryPiece = document.getElementById('jewelry-piece');
+  const scrollLeft = jewelryPiece.scrollLeft;
+  const maxScroll = jewelryPiece.scrollWidth - jewelryPiece.clientWidth;
+  
+  container.classList.toggle('scroll-start', scrollLeft <= 10);
+  container.classList.toggle('scroll-end', scrollLeft >= maxScroll - 10);
+}
+
+// Add event listener
+document.getElementById('jewelry-piece')?.addEventListener('scroll', updateScrollIndicators);
+
+// Initial check
+updateScrollIndicators();
+
+
+// Make sure your event listener is set up correctly:
+document.getElementById('size')?.addEventListener('change', function() {
+    updateJewelrySize(this.value);
+});
+
+// Set up product change listeners
+document.querySelectorAll('.product-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const product = this.dataset.type;
+        initProduct(product);
+    });
+});
+function checkSelectionSetup() {
+    console.log('Current product:', currentProduct);
+    console.log('Current size:', currentSize);
+    
+    const sizeSelect = document.getElementById('size');
+    if (sizeSelect) {
+        console.log('Size selector options:', sizeSelect.options);
+        console.log('Selected value:', sizeSelect.value);
+    } else {
+        console.error('Size selector not found!');
+    }
+    
+    console.log('SIZE_CHARTS:', SIZE_CHARTS[currentProduct]);
+}
+function handleWatchSlotClick(slot) {
+    if (selectedCharm) {
+        // Remove existing charm if clicked again
+        const existingCharm = slot.querySelector('img:not([data-type="base"])');
+        if (existingCharm) {
+            slot.removeChild(existingCharm);
+            return;
+        }
+        
+        // Add new charm
+        const charmImg = document.createElement('img');
+        charmImg.src = selectedCharm.src;
+        charmImg.dataset.type = selectedCharm.dataset.type;
+        charmImg.style.position = 'absolute';
+        charmImg.style.width = '70%';
+        charmImg.style.height = '70%';
+        charmImg.style.top = '15%';
+        charmImg.style.left = '15%';
+        charmImg.style.objectFit = 'contain';
+        slot.appendChild(charmImg);
+    }
 }
 function updateSizeOptions(product) {
     const sizeSelect = document.getElementById('size');
-    if (!sizeSelect) return;
-    
+    if (!sizeSelect) {
+        console.error('Size selector not found!');
+        return;
+    }
+
+    // Clear existing options
     sizeSelect.innerHTML = '';
-    
+
+    // Get available sizes for this product
     const sizes = SIZE_CHARTS[product];
     if (!sizes) return;
-    
+
+    // Add new options
     Object.entries(sizes).forEach(([size, data]) => {
         const option = document.createElement('option');
         option.value = size;
         option.textContent = data.display;
         sizeSelect.appendChild(option);
     });
+
+    // Set default selection
+    if (sizes[currentSize]) {
+        sizeSelect.value = currentSize;
+    } else {
+        currentSize = Object.keys(sizes)[0];
+        sizeSelect.value = currentSize;
+    }
 }
 
 function updateBaseCharms() {
@@ -809,12 +1312,12 @@ function setupEventListeners() {
 
         // Size selector
         const sizeSelect = document.getElementById('size');
-        if (sizeSelect) {
-            sizeSelect.addEventListener('change', () => {
-                updateJewelrySize(sizeSelect.value);
-                updatePrice();
-            });
-        }
+if (sizeSelect) {
+    sizeSelect.addEventListener('change', () => {
+        updateJewelrySize(sizeSelect.value);
+        updatePrice(); // Force price update immediately
+    });
+}
 
         // Full glam toggle
         const fullGlamBtn = document.getElementById('full-glam-btn');
@@ -921,8 +1424,9 @@ function setupEventListeners() {
     }
 }
 // Update the updateIndividualSlots function:
+
 function updateIndividualSlots() {
-    // Store existing charms before clearing
+    // First collect existing charms before clearing
     const existingCharms = [];
     const slots = jewelryPiece.querySelectorAll('.slot');
     
@@ -938,107 +1442,89 @@ function updateIndividualSlots() {
         }
     });
 
-    // Clear and rebuild with correct number of slots
+    // Clear and rebuild
     jewelryPiece.innerHTML = '';
+    jewelryPiece.className = 'individual-container';
     
     for (let i = 0; i < individualSlotCount; i++) {
         const slotContainer = document.createElement('div');
         slotContainer.className = 'slot-container';
         
-        const slot = createBaseSlot();
-        slotContainer.appendChild(slot);
-        
-        // Reapply existing charm if we have one for this position
-        if (i < existingCharms.length) {
-            const charmData = existingCharms[i];
+        const slot = document.createElement('div');
+        slot.className = 'slot individual-slot';
+        slot.style.width = '84px';
+        slot.style.height = '84px';
+
+        // Add base charm
+        const baseImg = document.createElement('img');
+        baseImg.src = materialType === 'silver' ? 'basecharms/silver.png' : 'basecharms/gold.png';
+        baseImg.dataset.type = 'base';
+        baseImg.style.width = '84px';
+        baseImg.style.height = '84px';
+        slot.appendChild(baseImg);
+
+        // Add existing charm if available
+        if (existingCharms[i]) {
+            const charmImg = document.createElement('img');
+            charmImg.src = existingCharms[i].src;
+            charmImg.dataset.type = existingCharms[i].type;
+            charmImg.style.width = '84px';
+            charmImg.style.height = '84px';
             
-            if (charmData.isLong) {
-                // Handle long charm placement
-                if (i + 1 < individualSlotCount) {
-                    const longContainer = document.createElement('div');
-                    longContainer.className = 'slot long-slot';
-                    longContainer.style.width = '180px';
-                    longContainer.style.height = '100px';
-                    
-                    const longCharm = document.createElement('img');
-                    longCharm.src = charmData.src;
-                    longCharm.className = 'long-charm';
-                    longCharm.dataset.type = charmData.type;
-                    longCharm.style.width = '180px';
-                    longCharm.style.height = '100px';
-                    longContainer.appendChild(longCharm);
-                    
-                    slot.replaceWith(longContainer);
-                    jewelryPiece.children[i].remove(); // Remove the next slot
-                    
-                    longContainer.addEventListener('click', () => handleSlotClick(longContainer));
-                    i++; // Skip next slot since long charm takes 2 slots
-                }
+            if (existingCharms[i].isLong) {
+                slot.style.width = '168px'; // 2x width for long charms
+                charmImg.classList.add('long-charm');
             } 
-            else if (charmData.isDangly) {
-                // Handle dangly charm
+            else if (existingCharms[i].isDangly) {
+                slot.style.height = '168px'; // 2x height for dangly
                 slot.classList.add('has-dangly');
-                slot.style.height = '192px';
-                
-                const danglyImg = document.createElement('img');
-                danglyImg.src = charmData.src;
-                danglyImg.className = 'dangly-charm';
-                danglyImg.dataset.type = charmData.type;
-                danglyImg.style.width = '88px';
-                danglyImg.style.height = '192px';
-                
-                slot.innerHTML = '';
-                slot.appendChild(danglyImg);
-            } 
-            else {
-                // Regular charm
-                const charmImg = document.createElement('img');
-                charmImg.src = charmData.src;
-                charmImg.dataset.type = charmData.type;
-                charmImg.style.width = '88px';
-                charmImg.style.height = '88px';
-                
-                slot.innerHTML = '';
-                slot.appendChild(charmImg);
+                charmImg.classList.add('dangly-charm');
             }
+            
+            slot.appendChild(charmImg);
         }
-        
-        // Add controls to last slot only
+
+        slotContainer.appendChild(slot);
+
+        // Add controls to last slot
         if (i === individualSlotCount - 1) {
             const controls = document.createElement('div');
             controls.className = 'slot-controls';
             
             const minusBtn = document.createElement('button');
             minusBtn.className = 'control-btn minus-btn';
-            minusBtn.textContent = '-';
+            minusBtn.innerHTML = '-';
             minusBtn.disabled = individualSlotCount <= 1;
             minusBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                individualSlotCount--;
-                updateIndividualSlots();
-                updatePrice();
+                if (individualSlotCount > 1) {
+                    individualSlotCount--;
+                    updateIndividualSlots();
+                    updatePrice();
+                }
             });
             
             const plusBtn = document.createElement('button');
             plusBtn.className = 'control-btn plus-btn';
-            plusBtn.textContent = '+';
+            plusBtn.innerHTML = '+';
             plusBtn.disabled = individualSlotCount >= maxIndividualSlots;
             plusBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                individualSlotCount++;
-                updateIndividualSlots();
-                updatePrice();
+                if (individualSlotCount < maxIndividualSlots) {
+                    individualSlotCount++;
+                    updateIndividualSlots();
+                    updatePrice();
+                }
             });
             
             controls.appendChild(minusBtn);
             controls.appendChild(plusBtn);
             slotContainer.appendChild(controls);
         }
-        
+
         jewelryPiece.appendChild(slotContainer);
     }
 }
-
 
 function setupCartFunctionality() {
     const cartElements = {
@@ -1422,48 +1908,32 @@ function setupOrderFunctionality() {
     window.orderFunctionalityInitialized = true;
 }
 function initJewelryPiece() {
-    const jewelryPiece = document.getElementById('jewelry-piece');
-    if (!jewelryPiece) {
-        console.error("Jewelry piece container not found!");
-        return;
-    }
+  const jewelryPiece = document.getElementById('jewelry-piece');
+  jewelryPiece.innerHTML = '';
+  
+  // Remove any extra classes that might affect sizing
+  jewelryPiece.className = '';
+  
+  // For watches/apple watches, use special initialization
+  if (currentProduct === 'watch' || currentProduct === 'apple-watch' || currentProduct === 'keychain') {
+    initSpecialProductWithBase(currentProduct);
+    return;
+  }
+  
+  // For individual charms
+  if (currentProduct === 'individual') {
+    updateIndividualSlots();
+    return;
+  }
 
-    // Clear existing slots
-    jewelryPiece.innerHTML = '';
-
-    // For individual charms, use the individualSlotCount
-    if (currentProduct === 'individual') {
-        updateIndividualSlots();
-        return;
-    }
-
-    // For other products, get number of slots from SIZE_CHARTS
-    const slotCount = SIZE_CHARTS[currentProduct][currentSize].charms;
-
-    // Create slots
-    for (let i = 0; i < slotCount; i++) {
-        const slot = document.createElement('div');
-        slot.className = 'slot';
-        
-        // Create base charm image
-        const img = document.createElement('img');
-        img.src = materialType === 'silver' ? 'basecharms/silver.png' : 'basecharms/gold.png';
-        img.alt = 'Base charm';
-        img.dataset.type = 'base';
-        
-        // Add image to slot
-        slot.appendChild(img);
-        
-        // Add click handler
-        slot.addEventListener('click', function() {
-            handleSlotClick(this);
-        });
-        
-        // Add slot to jewelry piece
-        jewelryPiece.appendChild(slot);
-    }
-    
-    console.log(`Created ${slotCount} slots for ${currentProduct} size ${currentSize}`);
+  // Create slots with exact fit
+  const slotCount = SIZE_CHARTS[currentProduct][currentSize].charms;
+  for (let i = 0; i < slotCount; i++) {
+    jewelryPiece.appendChild(createBaseSlot());
+  }
+  
+  // Center the scroll after creation
+  centerScrollOnLoad();
 }
 function createSlots(slotCount) {
     for (let i = 0; i < slotCount; i++) {
@@ -1493,33 +1963,6 @@ function createSlots(slotCount) {
 
 
 
-function handleSlotClick(slot) {
-  if (selectedCharm) {
-    const charmSrc = selectedCharm.dataset.charm;
-    const charmSet = getCharmSet(charmSrc);
-    
-    if (charmSet) {
-      // Check if we're adding the first charm of a set
-      const placedCharms = Array.from(document.querySelectorAll('.slot img:not([data-type="base"])'))
-        .map(img => img.dataset.charm);
-      
-      const hasOtherSetCharms = placedCharms.some(src => 
-        charmSet.charms.some(charm => src.includes(charm))
-      );
-      
-      // If this is the first charm of a set, just warn but allow adding
-      if (!hasOtherSetCharms) {
-        if (!confirm(`${charmSet.message}\n\nDo you want to add this charm anyway?`)) {
-          return;
-        }
-      }
-    }
-    
-    placeSelectedCharm(slot);
-  } else if (slot.querySelector('img:not([data-type="base"])')) {
-    removeCharmFromSlot(slot);
-  }
-}
 
 function addCharmToSlot(slot, src, type, isSoldOut) {
   const charmSet = getCharmSet(src);
@@ -1564,57 +2007,94 @@ function addCharmToSlot(slot, src, type, isSoldOut) {
 function placeSelectedCharm(slot) {
     if (!selectedCharm) return;
 
-    const charmSrc = selectedCharm.dataset.charm;
+    const isWatch = currentProduct === 'watch' || currentProduct === 'apple-watch';
+    const baseSize = isWatch ? 40 : 84;
+    const charmSrc = selectedCharm.src;
     const charmType = selectedCharm.dataset.type;
-    let quantity = parseInt(selectedCharm.dataset.quantity) || 1;
+    
+    // Check if part of special sets
+    const isLoveSet = CHARM_SETS.loveSet.charms.some(c => charmSrc.includes(c));
+    const isDolphinSet = CHARM_SETS.dophinset.charms.some(c => charmSrc.includes(c));
+    const isSpecialSet = isLoveSet || isDolphinSet;
+    const isDanglyCharm = selectedCharm.classList.contains('dangly-charm') || isSpecialSet;
     const isLongCharm = selectedCharm.classList.contains('long-charm');
-    const isDanglyCharm = selectedCharm.classList.contains('dangly-charm');
-    const isCustom = charmType === 'custom';
 
-    // 1. Validate charm can be placed
-    if (!isCustom) {
-        // Check stock for non-custom charms
-        if (quantity <= 0) {
-            alert('This charm is out of stock!');
-            selectedCharm.classList.remove('selected');
-            selectedCharm = null;
-            return;
-        }
-
-        // Check if charm is already used (for single-quantity charms)
-        if (quantity === 1 && usedCharms.has(charmSrc)) {
-            alert('You can only add this charm once!');
-            selectedCharm.classList.remove('selected');
-            selectedCharm = null;
-            return;
-        }
+    // Remove existing charm if any
+    const existingCharm = slot.querySelector('img:not([data-type="base"])');
+    if (existingCharm) {
+        removeCharmFromSlot(slot);
     }
 
-    // 2. Handle special charm types
+    // Handle long charms (6 JDs)
     if (isLongCharm) {
-        handleLongCharmPlacement(slot, charmSrc, charmType);
-    } else if (isDanglyCharm) {
-        handleDanglyCharmPlacement(slot, charmSrc, charmType);
-    } else {
-        handleRegularCharmPlacement(slot, charmSrc, charmType);
+        const slotIndex = Array.from(jewelryPiece.children).indexOf(slot);
+        if (slotIndex + 1 >= jewelryPiece.children.length) {
+            alert("Not enough space for a long charm!");
+            return;
+        }
+
+        const longContainer = document.createElement('div');
+        longContainer.className = 'slot long-slot';
+        longContainer.style.width = `${baseSize * 2}px`;
+        longContainer.style.height = `${baseSize}px`;
+        longContainer.dataset.price = '6'; // Mark as 6 JD charm
+
+        const longCharm = document.createElement('img');
+        longCharm.src = selectedCharm.src;
+        longCharm.className = 'long-charm';
+        longCharm.dataset.type = 'long'; // Special type for pricing
+        longCharm.dataset.price = '6';   // 6 JD price
+        longCharm.style.objectFit = 'contain';
+        longContainer.appendChild(longCharm);
+
+        slot.replaceWith(longContainer);
+        jewelryPiece.children[slotIndex + 1].remove();
+        longContainer.addEventListener('click', () => handleSlotClick(longContainer));
+    }
+    // Handle dangly charms and special sets
+    else if (isDanglyCharm) {
+        slot.classList.add('has-dangly');
+        slot.style.height = `${baseSize * 2}px`;
+
+        const charmImg = document.createElement('img');
+        charmImg.src = selectedCharm.src;
+        charmImg.className = 'dangly-charm';
+        charmImg.dataset.type = charmType;
+        charmImg.style.objectFit = 'contain';
+        
+        if (isWatch) {
+            charmImg.style.width = '40px';
+            charmImg.style.height = '80px';
+        }
+
+        slot.innerHTML = '';
+        slot.appendChild(charmImg);
+    }
+    // Regular charm placement
+    else {
+        const charmImg = document.createElement('img');
+        charmImg.src = selectedCharm.src;
+        charmImg.dataset.type = charmType;
+        charmImg.style.objectFit = 'contain';
+
+        slot.innerHTML = '';
+        if (!isWatch) {
+            const baseImg = document.createElement('img');
+            baseImg.src = materialType === 'silver' ? 'basecharms/silver.png' : 'basecharms/gold.png';
+            baseImg.dataset.type = 'base';
+            slot.appendChild(baseImg);
+        }
+        slot.appendChild(charmImg);
     }
 
-    // 3. Update inventory and UI
-    if (!isCustom) {
-        updateCharmInventory(charmSrc, quantity - 1);
-    } else {
-        usedCharms.add(charmSrc);
-    }
-
-    // 4. Clean up selection
+    // Update UI
     selectedCharm.classList.remove('selected');
     selectedCharm = null;
-    hideSelectedCharmPreview();
     updatePrice();
 }
 
 // Helper functions for specific charm types
-function handleLongCharmPlacement(slot, charmSrc, charmType) {
+function handleLongCharmPlacement(slot, charmSrc, charmType, isWatch, baseSize) {
     const slotIndex = Array.from(jewelryPiece.children).indexOf(slot);
     
     if (slotIndex + 1 >= jewelryPiece.children.length) {
@@ -1624,15 +2104,23 @@ function handleLongCharmPlacement(slot, charmSrc, charmType) {
     
     const longContainer = document.createElement('div');
     longContainer.className = 'slot long-slot';
-    longContainer.style.cssText = 'width:180px; height:100px; grid-column:span 2;';
+    
+    // Set dimensions based on product type
+    if (isWatch) {
+        longContainer.style.width = `${baseSize}px`;
+        longContainer.style.height = `${baseSize * 2}px`; // 1:2 ratio for watches
+    } else {
+        longContainer.style.width = `${baseSize * 2}px`;
+        longContainer.style.height = `${baseSize}px`; // 2:1 ratio for others
+    }
     
     const longCharm = createCharmImage(
         selectedCharm.src, 
         charmSrc, 
         charmType, 
         'long-charm', 
-        '180px', 
-        '100px'
+        '100%', 
+        '100%'
     );
     
     slot.replaceWith(longContainer);
@@ -1641,17 +2129,23 @@ function handleLongCharmPlacement(slot, charmSrc, charmType) {
     longContainer.addEventListener('click', () => handleSlotClick(longContainer));
 }
 
-function handleDanglyCharmPlacement(slot, charmSrc, charmType) {
+function handleDanglyCharmPlacement(slot, charmSrc, charmType, isWatch, baseSize) {
     slot.classList.add('has-dangly');
-    slot.style.cssText = 'height:192px; position:relative;';
+    
+    // Set dimensions based on product type
+    if (isWatch) {
+        slot.style.height = `${baseSize * 2}px`; // 1:2 ratio for watches
+    } else {
+        slot.style.height = `${baseSize * 2}px`; // 1:2 ratio for others
+    }
     
     const danglyImg = createCharmImage(
         selectedCharm.src,
         charmSrc,
         charmType,
         'dangly-charm',
-        '88px',
-        '192px'
+        '100%',
+        '100%'
     );
     
     slot.innerHTML = '';
@@ -1664,31 +2158,77 @@ function handleRegularCharmPlacement(slot, charmSrc, charmType) {
         charmSrc,
         charmType,
         '',
-        '88px',
-        '88px'
+        '100%',
+        '100%'
     );
     
     slot.innerHTML = '';
     slot.appendChild(charmImg);
 }
 
-// Generic charm image creator
-function createCharmImage(src, dataSrc, type, extraClass, width, height) {
-    const img = document.createElement('img');
-    img.src = src.startsWith('data:') ? src : dataSrc;
-    img.dataset.type = type;
-    img.dataset.charm = dataSrc;
-    img.style.cssText = `width:${width}; height:${height}; object-fit:contain;`;
+
+function removeCharmFromSlot(slot) {
+    const isLongSlot = slot.classList.contains('long-slot');
     
-    if (extraClass) img.classList.add(extraClass);
-    if (selectedCharm.classList.contains('sold-out')) {
-        img.classList.add('sold-out');
+    if (isLongSlot) {
+        // Restore hidden slot
+        const hiddenSlotId = slot.dataset.hiddenSlotId;
+        if (hiddenSlotId) {
+            const hiddenSlot = document.getElementById(hiddenSlotId);
+            if (hiddenSlot) {
+                hiddenSlot.style.display = '';
+                hiddenSlot.innerHTML = '';
+                const baseImg = document.createElement('img');
+                baseImg.src = materialType === 'silver' ? 'basecharms/silver.png' : 'basecharms/gold.png';
+                baseImg.dataset.type = 'base';
+                hiddenSlot.appendChild(baseImg);
+            }
+        }
+        
+        // Create new regular slot
+        const newSlot = document.createElement('div');
+        newSlot.className = 'slot';
+        const baseImg = document.createElement('img');
+        baseImg.src = materialType === 'silver' ? 'basecharms/silver.png' : 'basecharms/gold.png';
+        baseImg.dataset.type = 'base';
+        newSlot.appendChild(baseImg);
+        newSlot.addEventListener('click', () => handleSlotClick(newSlot));
+        
+        slot.replaceWith(newSlot);
+    } else {
+        // Regular charm removal
+        const charm = slot.querySelector('img:not([data-type="base"])');
+        if (!charm) return;
+        
+        slot.removeChild(charm);
+    }
+    
+    updatePrice();
+}
+function createCharm(src, alt, type, isDangly = false) {
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = alt;
+    img.className = 'charm';
+    img.dataset.type = type;
+    
+    if (src.includes('long')) {
+        img.classList.add('long-charm');
+        img.style.width = '150px';
+        img.style.height = '100px';
+    } 
+    else if (isDangly || src.includes('dangly')) {
+        img.classList.add('dangly-charm');
+        img.style.width = '84px';
+        img.style.height = '168px';
+    } 
+    else {
+        img.style.width = '84px';
+        img.style.height = '84px';
     }
     
     return img;
 }
-
-// Update charm quantities in UI and data
 function updateCharmInventory(charmSrc, newQuantity) {
     // Update quantity in DOM
     document.querySelectorAll(`.charm[data-charm="${charmSrc}"]`).forEach(charmEl => {
@@ -1707,102 +2247,89 @@ function updateCharmInventory(charmSrc, newQuantity) {
     const charmData = allCharms.find(c => c.src === charmSrc);
     if (charmData) charmData.quantity = newQuantity;
 }
-function removeCharmFromSlot(slot) {
-    const charm = slot.querySelector('img:not([data-type="base"])');
-    if (!charm) return;
+// Updates charm quantity in the pool
+function updateCharmQuantity(charmSrc) {
+    let quantity = parseInt(selectedCharm.dataset.quantity) || 1;
+    quantity--;
+    selectedCharm.dataset.quantity = quantity;
     
-    const isDangly = charm.classList.contains('dangly-charm') || 
-                    (getCharmSet(charm.dataset.charm)?.isDangly);
-    
-    const charmSrc = charm.dataset.charm;
-    const charmType = charm.dataset.type;
-    const isLong = slot.classList.contains('long-slot');
-    
-    // Get the slot index before removal
-    const slotIndex = Array.from(jewelryPiece.children).indexOf(slot);
-    
-    // Remove the slot completely
-    slot.remove();
-    
-    if (isLong) {
-        // For long charms, we need to add back two regular slots
-        const newSlot1 = createBaseSlot();
-        const newSlot2 = createBaseSlot();
-        
-        // Insert them at the correct position
-        if (slotIndex >= 0) {
-            jewelryPiece.insertBefore(newSlot1, jewelryPiece.children[slotIndex]);
-            jewelryPiece.insertBefore(newSlot2, jewelryPiece.children[slotIndex + 1]);
-        } else {
-            // If for some reason we couldn't get the index, append to end
-            jewelryPiece.appendChild(newSlot1);
-            jewelryPiece.appendChild(newSlot2);
+    document.querySelectorAll(`.charm[data-charm="${charmSrc}"]`).forEach(charmEl => {
+        charmEl.dataset.quantity = quantity;
+        if (quantity <= 0) {
+            charmEl.classList.add('out-of-stock');
+            charmEl.style.opacity = '0.5';
+            charmEl.style.cursor = 'not-allowed';
+            usedCharms.add(charmSrc);
         }
-    } else {
-        // For regular charms, just add one slot back
-        const newSlot = createBaseSlot();
-        
-        if (slotIndex >= 0) {
-            jewelryPiece.insertBefore(newSlot, jewelryPiece.children[slotIndex]);
-        } else {
-            jewelryPiece.appendChild(newSlot);
-        }
-        
-        // Remove dangly class if present
-        if (isDangly) {
-            newSlot.classList.remove('has-dangly');
-        }
-    }
-    
-    // For non-custom charms, restore quantity
-    if (charmType !== 'custom') {
-        // Find the charm in our data
-        let charmData;
-        if (charmType === 'special') {
-            charmData = specialCharms.find(c => c.src === charmSrc);
-        } else if (charmType === 'rare') {
-            charmData = rareCharms.find(c => c.src === charmSrc);
-        }
-        
-        if (charmData) {
-            // Increment quantity
-            charmData.quantity = (charmData.quantity || 0) + 1;
-            
-            // Update all instances of this charm in the UI
-            document.querySelectorAll(`.charm[data-charm="${charmSrc}"]`).forEach(charmEl => {
-                charmEl.dataset.quantity = charmData.quantity;
-                charmEl.classList.remove('out-of-stock');
-                charmEl.style.opacity = '1';
-                charmEl.style.cursor = 'pointer';
-                
-                // Remove from usedCharms if quantity is now > 0
-                if (charmData.quantity > 0) {
-                    usedCharms.delete(charmSrc);
-                }
-            });
-        }
-    } else {
-        // For custom charms, just remove from used set
-        usedCharms.delete(charmSrc);
-    }
-    
-    updateCharmUsage();
-    updatePrice();
+    });
 }
 
+// Restores charm quantity when removed
+function restoreCharmQuantity(charmSrc, charmType) {
+    // Find charm in our data
+    let charmData;
+    if (charmType === 'special') {
+        charmData = specialCharms.find(c => c.src === charmSrc);
+    } else if (charmType === 'rare') {
+        charmData = rareCharms.find(c => c.src === charmSrc);
+    }
+    
+    if (charmData) {
+        // Increment quantity
+        charmData.quantity = (charmData.quantity || 0) + 1;
+        
+        // Update all instances of this charm in the UI
+        document.querySelectorAll(`.charm[data-charm="${charmSrc}"]`).forEach(charmEl => {
+            charmEl.dataset.quantity = charmData.quantity;
+            charmEl.classList.remove('out-of-stock');
+            charmEl.style.opacity = '1';
+            charmEl.style.cursor = 'pointer';
+            
+            // Remove from usedCharms if quantity is now > 0
+            if (charmData.quantity > 0) {
+                usedCharms.delete(charmSrc);
+            }
+        });
+    }
+}
+
+// Handles long charm removal (restores 2 slots)
+function handleLongCharmRemoval(slot, slotIndex) {
+    slot.remove();
+    
+    const newSlot1 = createBaseSlot();
+    const newSlot2 = createBaseSlot();
+    
+    if (slotIndex >= 0) {
+        jewelryPiece.insertBefore(newSlot1, jewelryPiece.children[slotIndex]);
+        jewelryPiece.insertBefore(newSlot2, jewelryPiece.children[slotIndex + 1]);
+    } else {
+        jewelryPiece.appendChild(newSlot1);
+        jewelryPiece.appendChild(newSlot2);
+    }
+}
 function createBaseSlot() {
     const slot = document.createElement('div');
     slot.className = 'slot';
-    const img = document.createElement('img');
-    img.src = materialType === 'silver' ? 'basecharms/silver.png' : 'basecharms/gold.png';
-    img.dataset.type = 'base';
-    slot.appendChild(img);
+    
+    // Set smaller slot size for watches
+    if (currentProduct === 'watch' || currentProduct === 'apple-watch') {
+        slot.style.width = '40px';
+        slot.style.height = '40px';
+        slot.style.margin = '0 1px';
+    }
+
+    const baseImg = document.createElement('img');
+    baseImg.src = materialType === 'silver' ? 'basecharms/silver.png' : 'basecharms/gold.png';
+    baseImg.dataset.type = 'base';
+    slot.appendChild(baseImg);
+    
     slot.addEventListener('click', function() {
         handleSlotClick(this);
     });
+    
     return slot;
 }
-
 function initCharms() {
     updateSpecialCharmsDisplay();
     updateRareCharmsDisplay();
@@ -2133,30 +2660,28 @@ async function saveDesignPermanently(blob) {
     throw error;
   }
 }
-
-
 function createCharm(src, alt, type, isDangly = false) {
     const img = document.createElement('img');
     img.src = src;
     img.alt = alt;
     img.className = 'charm';
     img.dataset.type = type;
-    img.dataset.charm = src;
     
-    const charmSet = getCharmSet(src);
-    const shouldBeDangly = isDangly || (charmSet && charmSet.isDangly);
+    const isWatchView = currentProduct === 'watch' || currentProduct === 'apple-watch';
     
-    if (shouldBeDangly || src.includes('dangly')) {
+    if (isDangly || src.includes('dangly')) {
         img.classList.add('dangly-charm');
-        img.style.width = '72px';  // Consistent pool size
-        img.style.height = '132px'; // Consistent pool size
-    } else if (src.includes('long')) {
+        img.style.width = isWatchView ? '80px' : '168px';
+        img.style.height = isWatchView ? '40px' : '84px';
+    } 
+    else if (src.includes('long')) {
         img.classList.add('long-charm');
-        img.style.width = '150px';  // Consistent pool size
-        img.style.height = '75px';  // Consistent pool size
-    } else {
-        img.style.width = '75px';
-        img.style.height = '75px';
+        img.style.width = isWatchView ? '40px' : '84px';
+        img.style.height = isWatchView ? '80px' : '168px';
+    } 
+    else {
+        img.style.width = isWatchView ? '40px' : '84px';
+        img.style.height = isWatchView ? '40px' : '84px';
     }
     
     return img;
@@ -2187,6 +2712,8 @@ function updateBaseCharms() {
                 const isGold = index % 2 === 0;
                 baseImg.src = isGold ? 'basecharms/gold.png' : 'basecharms/silver.png';
             }
+            // Ensure base charm stays locked
+            baseImg.dataset.locked = 'true';
         }
     });
 }
@@ -2300,102 +2827,21 @@ function setupCustomCharmHandlers() {
 }
 
 function updateJewelrySize(size) {
-    // Get the size chart for current product
-    const sizeChart = SIZE_CHARTS[currentProduct];
-    
-    // Verify the size exists for current product
-    if (!sizeChart || !sizeChart[size]) return;
-    
-    const oldSize = currentSize;
-    currentSize = size;
-    
-    // Update max slots based on current product and size
-    maxSlots = sizeChart[size].charms;
-    
-    // Get current charm configuration before changing size
-    const currentConfig = [];
-    const slots = Array.from(jewelryPiece.children);
-    slots.forEach(slot => {
-        const charm = slot.querySelector('img:not([data-type="base"])');
-        if (charm) {
-            currentConfig.push({
-                isLong: slot.classList.contains('long-slot'),
-                src: charm.dataset.charm,
-                type: charm.dataset.type,
-                isSoldOut: charm.classList.contains('sold-out')
-            });
-        } else {
-            currentConfig.push(null);
-        }
-    });
-
-    // Clear and rebuild with new size
-    jewelryPiece.innerHTML = '';
-    
-    // Create new slots
-    for (let i = 0; i < maxSlots; i++) {
-        const slot = createBaseSlot();
-        jewelryPiece.appendChild(slot);
-    }
-
-    // Reapply charms up to new size limit
-    let slotIndex = 0;
-    let charmsAdded = 0;
-    
-    currentConfig.forEach((config, i) => {
-        if (charmsAdded >= maxSlots) return;
-        
-        if (config) {
-            const currentSlot = jewelryPiece.children[slotIndex];
-            if (!currentSlot) return;
-            
-            if (config.isLong && slotIndex < maxSlots - 1) {
-                // Handle long charm placement
-                const nextSlot = jewelryPiece.children[slotIndex + 1];
-                if (nextSlot && charmsAdded < maxSlots - 1) {
-                    const longContainer = document.createElement('div');
-                    longContainer.className = 'slot long-slot';
-                    
-                    const longCharm = document.createElement('img');
-                    longCharm.src = config.src;
-                    longCharm.className = 'long-charm';
-                    longCharm.dataset.type = config.type;
-                    longCharm.dataset.charm = config.src;
-                    
-                    if (config.isSoldOut) {
-                        longCharm.classList.add('sold-out');
-                    }
-                    
-                    longContainer.appendChild(longCharm);
-                    currentSlot.replaceWith(longContainer);
-                    nextSlot.remove();
-                    
-                    longContainer.addEventListener('click', function() {
-                        handleSlotClick(this);
-                    });
-                    
-                    slotIndex += 2;
-                    charmsAdded += 2;
-                }
-            } else if (!config.isLong) {
-                // Regular charm placement
-                addCharmToSlot(currentSlot, config.src, config.type, config.isSoldOut);
-                slotIndex++;
-                charmsAdded++;
-            }
-        } else {
-            slotIndex++;
-        }
-    });
-
-    // If increasing size, add empty slots if needed
-    while (jewelryPiece.children.length < maxSlots) {
-        const slot = createBaseSlot();
-        jewelryPiece.appendChild(slot);
-    }
-    
-    updateCharmUsage();
-    updatePrice();
+  currentSize = size;
+  
+  // Special handling for watches and keychains
+  if (currentProduct === 'watch' || currentProduct === 'apple-watch' || currentProduct === 'keychain') {
+    initSpecialProductWithBase(currentProduct);
+  } else {
+    initJewelryPiece();
+  }
+  
+  updatePrice();
+  
+  // Ensure proper display after size change
+  setTimeout(() => {
+    centerJewelryPiece();
+  }, 100);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
