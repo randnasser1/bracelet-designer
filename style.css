@@ -441,10 +441,11 @@ body {
     background: white;
     border-radius: 16px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.15);
-    z-index: 1100;
+    z-index: 1100; /* Higher than jewelry piece */
     display: none;
     overflow: hidden;
     flex-direction: column;
+    
 }
 
 .cart-preview.active {
@@ -2711,179 +2712,6 @@ img[src*="apple-watch-base.png"] {
     object-fit: contain;
 }
 
-/* Scrollbar styling */
-.watch-container::-webkit-scrollbar,
-.apple-watch-container::-webkit-scrollbar {
-    height: 8px;
-}
-
-.watch-container::-webkit-scrollbar-thumb,
-.apple-watch-container::-webkit-scrollbar-thumb {
-    background: #d6336c;
-    border-radius: 4px;
-}/* Watch-specific styles */
-.watch-container .slot,
-.apple-watch-container .slot {
-    width: 40px !important;
-    height: 40px !important;
-    margin: 0 1px !important;
-}
-
-/* Dangly charms on watches */
-.watch-container .has-dangly,
-.apple-watch-container .has-dangly {
-    height: 80px !important; /* 2x normal slot height */
-}
-
-.watch-container .dangly-charm,
-.apple-watch-container .dangly-charm {
-    width: 40px !important;
-    height: 80px !important; /* 1:2 ratio */
-    object-fit: contain !important;
-}
-
-/* Long charms on watches */
-.watch-container .long-slot,
-.apple-watch-container .long-slot {
-    width: 80px !important; /* 2 slots wide */
-    height: 40px !important; /* normal height */
-}
-
-.watch-container .long-charm,
-.apple-watch-container .long-charm {
-    width: 80px !important;
-    height: 40px !important; /* 2:1 ratio */
-    object-fit: contain !important;
-}
-
-
-
-.watch-container .slot.has-dangly,
-.apple-watch-container .slot.has-dangly
- {
-    height: 120px;
-}
-.watch-container .slot.has-dangly img.dangly-charm ,
-.apple-watch-container .slot.has-dangly img.dangly-charm {
-    width: 50px !important;
-    height: 120px !important;
-    object-fit: contain;
-}
-
-
-
-.watch-container .slot.long-slot img.long-charm ,
-.apple-watch-container  .slot.long-slot img.long-charm 
- {
-   width: 100px !important;
-    height: 50px !important;
-    object-fit: contain;
-      object-fit: contain;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 2;            }
-
-
-.watch-container .slot.long-slot .long-charm ,
-.apple-watch-container .slot.long-slot .long-charm {
-width: 100px !important;
-    height: 50px !important;
-        object-fit: contain;
-         position: relative;      /* For proper z-index */
-    z-index: 1;             /* Ensure it stays above base */
-}
-
-
-.watch-container .slot.long-slot, 
-.apple-watch-container.slot.long-slot  {
-  width: 100px !important; /* Force 2x width */
-  height: 50px !important;
-  margin-right: 0 !important;
-  flex: 0 0 100px !important; /* Prevent flex shrinking */
-} 
-
-
-/* Long charm in pool */
-.charms-grid .long-charm {
-    width: 150px !important;
-    height: 100px !important;
-    grid-column: span 2;
-}
-
-.slot.long-slot img {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
- .slot.has-dangly {
-      width: 100px !important;
-
-    height: 220px;
-}
-.slot.has-dangly img.dangly-charm {
-    width: 90px !important;
-    height: 220px !important;
-    object-fit: contain;
-}
-
-
-.slot.long-slot .long-charm {
-    width: 100px !important;
-    height: 220px !important;
-      position: relative;
-          z-index: 1;
-
-}
-
-.watch-container .slot.long-slot img, 
-.apple-watch-container .slot.long-slot img {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.watch-container .slot.has-dangly img, 
-.apple-watch-container .slot.has-dangly  img {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-
-
-/* Long charm container - spans 2 slots */
-.slot.long-slot {
-  width: 168px !important; /* Force 2x width */
-  height: 84px !important;
-  margin-right: 0 !important;
-  flex: 0 0 168px !important; /* Prevent flex shrinking */
-}
-
-/* Watch-specific long charm */
-.watch-container .slot.long-slot,
-.apple-watch-container .slot.long-slot {
-  width: 80px !important;
-  height: 40px !important;
-  flex: 0 0 80px !important;
-}
-
-/* Long charm image - fills container */
-.slot.long-slot img.long-charm {
-  position: absolute;
-  width: 168px !important;
-  height: 84px !important;
-  left: 0;
-  top: 0;
-}
-
-/* Watch long charm image */
-.watch-container .slot.long-slot img.long-charm,
-.apple-watch-container .slot.long-slot img.long-charm {
-  width: 80px !important;
-  height: 40px !important;
-}
 
 /* Remove base image for long slots */
 .slot.long-slot img[data-type="base"] {
@@ -2915,30 +2743,6 @@ width: 100px !important;
     border-radius: 4px;
 }
 
-
-
-/* Base styles for love/dolphin sets (bracelet mode) */
-.slot img[src*="rares/love/"],
-.slot img[src*="rares/love/c2"] {
-    width: 90px !important;
-    height: 220px !important;
-    object-fit: contain;
-}
-
-/* Watch-specific scaling (40x20) */
-.watch-container .slot img[src*="rares/love/"],
-.apple-watch-container .slot img[src*="rares/love/"],
-.watch-container .slot img[src*="rares/love/c2"],
-.apple-watch-container .slot img[src*="rares/love/c2"] {
-  width: 80px !important;
-  height: 40px !important;
-}
-
-/* Hide sold-out for these sets */
-.slot img[src*="rares/love/"].sold-out,
-.slot img[src*="rares/love/c2"].sold-out {
-    display: none !important;
-}
 
 /* Force standard size for charm pool items */
 .charms-grid .charm {
@@ -3127,4 +2931,217 @@ width: 100px !important;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+}
+.charm-set-warning {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.warning-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+.warning-content h3 {
+    color: #d6336c;
+    margin-top: 0;
+}
+
+.confirm-btn {
+    background: #d6336c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+ .slot.has-dangly {
+      width: 100px !important;
+
+    height: 220px;
+}
+.slot.has-dangly img.dangly-charm {
+    width: 90px !important;
+    height: 220px !important;
+    object-fit: contain;
+}
+
+/* Scrollbar styling */
+.watch-container::-webkit-scrollbar,
+.apple-watch-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.watch-container::-webkit-scrollbar-thumb,
+.apple-watch-container::-webkit-scrollbar-thumb {
+    background: #d6336c;
+    border-radius: 4px;
+}/* Watch-specific styles */
+.watch-container .slot,
+.apple-watch-container .slot {
+    width: 40px !important;
+    height: 40px !important;
+    margin: 0 1px !important;
+}
+
+/* Dangly charms on watches */
+.watch-container .has-dangly,
+.apple-watch-container .has-dangly {
+    height: 80px !important; /* 2x normal slot height */
+}
+
+.watch-container .dangly-charm,
+.apple-watch-container .dangly-charm {
+    width: 40px !important;
+    height: 80px !important; /* 1:2 ratio */
+    object-fit: contain !important;
+}
+
+/* Long charms on watches */
+.watch-container .long-slot,
+.apple-watch-container .long-slot {
+    width: 80px !important; /* 2 slots wide */
+    height: 40px !important; /* normal height */
+}
+
+.watch-container .long-charm,
+.apple-watch-container .long-charm {
+    width: 80px !important;
+    height: 40px !important; /* 2:1 ratio */
+    object-fit: contain !important;
+}
+
+
+
+.watch-container .slot.has-dangly,
+.apple-watch-container .slot.has-dangly
+ {
+    height: 120px;
+}
+.watch-container .slot.has-dangly img.dangly-charm ,
+.apple-watch-container .slot.has-dangly img.dangly-charm {
+    width: 50px !important;
+    height: 120px !important;
+    object-fit: contain;
+}
+
+
+
+.watch-container .slot.long-slot img.long-charm ,
+.apple-watch-container  .slot.long-slot img.long-charm 
+ {
+   width: 100px !important;
+    height: 50px !important;
+    object-fit: contain;
+      object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;            }
+
+
+.watch-container .slot.long-slot .long-charm ,
+.apple-watch-container .slot.long-slot .long-charm {
+width: 100px !important;
+    height: 50px !important;
+        object-fit: contain;
+         position: relative;      /* For proper z-index */
+    z-index: 1;             /* Ensure it stays above base */
+}
+
+
+.watch-container .slot.long-slot, 
+.apple-watch-container.slot.long-slot  {
+  width: 100px !important; /* Force 2x width */
+  height: 50px !important;
+  margin-right: 0 !important;
+  flex: 0 0 100px !important; /* Prevent flex shrinking */
+} 
+
+
+/* Long charm in pool */
+.charms-grid .long-charm {
+    width: 150px !important;
+    height: 100px !important;
+    grid-column: span 2;
+}
+
+.slot.long-slot img {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+
+
+.slot.long-slot .long-charm {
+    width: 100px !important;
+    height: 220px !important;
+      position: relative;
+          z-index: 1;
+
+}
+
+.watch-container .slot.long-slot img, 
+.apple-watch-container .slot.long-slot img {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.watch-container .slot.has-dangly img, 
+.apple-watch-container .slot.has-dangly  img {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+
+/* Long charm container - spans 2 slots */
+.slot.long-slot {
+  width: 168px !important; /* Force 2x width */
+  height: 84px !important;
+  margin-right: 0 !important;
+  flex: 0 0 168px !important; /* Prevent flex shrinking */
+}
+
+/* Watch-specific long charm */
+.watch-container .slot.long-slot,
+.apple-watch-container .slot.long-slot {
+  width: 80px !important;
+  height: 40px !important;
+  flex: 0 0 80px !important;
+}
+
+/* Long charm image - fills container */
+.slot.long-slot img.long-charm {
+  position: absolute;
+  width: 168px !important;
+  height: 84px !important;
+  left: 0;
+  top: 0;
+}
+
+/* Watch long charm image */
+.watch-container .slot.long-slot img.long-charm,
+.apple-watch-container .slot.long-slot img.long-charm {
+  width: 80px !important;
+  height: 40px !important;
 }
