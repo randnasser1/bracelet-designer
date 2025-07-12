@@ -1714,86 +1714,117 @@ function setupCartFunctionality() {
         cartElements.cartPreview.classList.remove('active');
     });
 
-    document.getElementById('order-btn').addEventListener('click', function() {
-        if (cart.length === 0) {
-            alert('Your cart is empty!');
+    addToCartBtn.addEventListener('click', async () => {
+    try {
+        // First validate charm sets in current design
+        const currentCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'))
+            .map(img => ({ src: img.src, type: img.dataset.type }));
+        
+        const invalidSets = validateCharmsForSets(currentCharms);
+        if (invalidSets.length > 0) {
+            const errorMessages = invalidSets.map(set => 
+                `• ${set.name}: ${set.message}\n  (Problem: ${set.problem})`
+            ).join('\n\n');
+            
+            showCustomWarningModal(
+                `Cannot Add to Cart!\n\nDesign has invalid charm sets:\n\n${errorMessages}\n\n` +
+                'Please fix these issues before adding to cart.'
+            );
             return;
         }
-        
-        document.getElementById('order-modal').classList.add('active');
-        document.body.classList.add('modal-open');
-        
-        const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-        const deliveryFee = 2.5;
-        const total = subtotal + deliveryFee;
-        
-        document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
-        document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
-        document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
-    });
 
-  document.getElementById('add-to-cart-bottom').addEventListener('click', async () => {
-    const addToCartBtn = document.getElementById('add-to-cart-bottom');
-    
-    try {
+        // If validation passes, proceed with adding to cart
         addToCartBtn.disabled = true;
         addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
-        // Capture the design image
         const designImage = await captureBraceletDesign();
-
-        // Get the price data - make sure this includes discount calculation
-      const priceData = calculatePrice(false); // Get discounted price
-const cartItem = {
-    id: Date.now().toString(),
-    product: currentProduct,
-    symbol: '🍓',
-    size: currentSize,
-    isFullGlam: isFullGlam,
-    materialType: materialType,
-    price: priceData.total, // Store the discounted price
-    originalPrice: priceData.subtotal, // Store original for cart calculations
-    designImage: designImage,
-    charms: Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => ({
-        src: img.src,
-        type: img.dataset.type
-    })),
-    timestamp: new Date().toISOString()
-};
-            
+        const priceData = calculatePrice(false);
+        
+        const cartItem = {
+            id: Date.now().toString(),
+            product: currentProduct,
+            symbol: '🍓',
+            size: currentSize,
+            isFullGlam: isFullGlam,
+            materialType: materialType,
+            price: priceData.total,
+            originalPrice: priceData.subtotal,
+            designImage: designImage,
+            charms: currentCharms,
+            timestamp: new Date().toISOString()
+        };
+        
         cart.push(cartItem);
         updateCartDisplay();
         
-        alert('Design added to cart!');
+        showToast('Design added to cart!');
         cartPreview.classList.add('active');
         
     } catch (error) {
         console.error('Error adding to cart:', error);
-        alert('Could not add design to cart. Please try again.');
+        showToast('Could not add design to cart', 'error');
     } finally {
         addToCartBtn.disabled = false;
         addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
     }
 });
-}
-function validateCharmSets() {
-    const invalidSets = [];
-    const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])')).map(img => img.src);
+// 2. Update the checkout button event listener
+placeOrderBtn.addEventListener('click', function() {
+    if (cart.length === 0) {
+        showToast('Your cart is empty!', 'error');
+        return;
+    }
     
-    // Check each charm set requirement
-    Object.values(CHARM_SETS).forEach(set => {
-        const foundCharms = set.charms.filter(charm => 
-            placedCharms.some(placed => placed.includes(charm))
-        );
+    // Validate before showing order modal
+    const invalidSets = validateCartForCheckout();
+    if (invalidSets.length > 0) {
+        const errorMessages = invalidSets.map(set => 
+            `• ${set.name}: ${set.message}\n  (Problem: ${set.problem})`
+        ).join('\n\n');
         
-        // If some but not all charms from set are present
-        if (foundCharms.length > 0 && foundCharms.length < set.requiredCount) {
-            invalidSets.push(set);
+        showCustomWarningModal(
+            `Cannot Checkout!\n\nYour cart has invalid charm sets:\n\n${errorMessages}\n\n` +
+            'Please complete these sets or remove the charms.'
+        );
+        return;
+    }
+    
+    // If validation passes, show order modal
+    orderModal.classList.add('active');
+    document.body.classList.add('modal-open');
+    
+    // Calculate order totals
+    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+    const deliveryFee = 2.5;
+    const total = subtotal + deliveryFee;
+    
+    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
+    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
+});
+}
+function validateCharmsForSets(charms) {
+    const invalidSets = [];
+    const currentItemCharmSrcs = charms.map(c => c.src);
+
+    // Check for sets with multiple charms in this item
+    Object.values(CHARM_SETS).forEach(set => {
+        const charmsInItem = set.charms.filter(setCharm => 
+            currentItemCharmSrcs.some(src => src.includes(setCharm))
+        ).length;
+        
+        if (charmsInItem > 1) {
+            invalidSets.push({
+                name: set.name,
+                message: set.message,
+                problem: `Multiple charms in same item (${charmsInItem} found)`
+            });
         }
     });
-    
+
     return invalidSets;
 }
+
 
 function blobToBase64(blob) {
     return new Promise((resolve, reject) => {
@@ -2176,30 +2207,30 @@ function addCharmToSlot(slot, src, type, isSoldOut) {
 }
 
 function showCustomWarningModal(message) {
-    // Create or show existing warning modal
-    let warningModal = document.getElementById('charm-set-warning-modal');
+    let warningModal = document.getElementById('custom-warning-modal');
     
     if (!warningModal) {
         warningModal = document.createElement('div');
-        warningModal.id = 'charm-set-warning-modal';
-        warningModal.className = 'charm-set-warning';
+        warningModal.id = 'custom-warning-modal';
+        warningModal.className = 'modal warning-modal';
         warningModal.innerHTML = `
-            <div class="warning-content">
-                <h3>Set Requirement Notice</h3>
-                <p>${message}</p>
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <div class="warning-message">${message}</div>
                 <button class="confirm-btn">OK, I Understand</button>
             </div>
         `;
         document.body.appendChild(warningModal);
         
-        // Add click handler for the button
+        warningModal.querySelector('.close-btn').addEventListener('click', () => {
+            warningModal.style.display = 'none';
+        });
         warningModal.querySelector('.confirm-btn').addEventListener('click', () => {
             warningModal.style.display = 'none';
         });
-    } else {
-        warningModal.querySelector('p').textContent = message;
     }
     
+    warningModal.querySelector('.warning-message').innerHTML = message;
     warningModal.style.display = 'flex';
 }
 // Helper functions for specific charm types
@@ -2287,7 +2318,27 @@ function placeSelectedCharm(slot) {
             return;
         }
     }
+ if (charmSet) {
+        // Check if any part of this set is already in current item
+        const currentItemCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'))
+            .map(img => img.src);
+        
+        const setCharmsInItem = charmSet.charms.some(setCharm => 
+            currentItemCharms.some(charm => charm.includes(setCharm))
+        );
+        
+        if (setCharmsInItem) {
+            alert(`${charmSet.message}\n\nCannot add multiple charms from this set to the same item.`);
+            return;
+        }
 
+        // Check if adding would complete the set in cart
+        if (wouldCompleteSetInCart(charmSet)) {
+            if (!confirm(`${charmSet.message}\n\nYou're about to complete this set. Continue?`)) {
+                return;
+            }
+        }
+    }
     // Remove existing charm if any
     const existingCharm = slot.querySelector('img:not([data-type="base"])');
     if (existingCharm) {
@@ -2520,6 +2571,66 @@ function createCharm(src, alt, type, isDangly = false) {
     }
     
     return img;
+}
+
+function wouldCompleteSetInCart(charmSet) {
+    const allCharmsInCart = cart.flatMap(item => item.charms.map(c => c.src));
+    const currentSetCharms = charmSet.charms.filter(charm => 
+        allCharmsInCart.some(c => c.includes(charm))
+    ).length;
+    
+    return currentSetCharms + 1 === charmSet.requiredCount;
+}
+function validateCartForCheckout() {
+    const invalidSets = [];
+    const allCharmsInCart = cart.flatMap(item => item.charms.map(c => c.src));
+
+    Object.values(CHARM_SETS).forEach(set => {
+        // Check for incomplete sets
+        const foundCharms = set.charms.filter(charm => 
+            allCharmsInCart.some(c => c.includes(charm))
+        ).length;
+        
+        if (foundCharms > 0 && foundCharms < set.requiredCount) {
+            invalidSets.push({
+                name: set.name,
+                message: set.message,
+                problem: `Incomplete set (${foundCharms}/${set.requiredCount} charms)`
+            });
+        }
+        
+        // Check for multiple charms from same set in single items
+        cart.forEach(item => {
+            const charmsInItem = set.charms.filter(setCharm => 
+                item.charms.some(c => c.src.includes(setCharm))
+            ).length;
+            
+            if (charmsInItem > 1) {
+                invalidSets.push({
+                    name: set.name,
+                    message: set.message,
+                    problem: `Multiple charms in "${item.product}" item`
+                });
+            }
+        });
+    });
+
+    return invalidSets;
+}
+function beforeCheckout() {
+    const invalidSets = validateCartForCheckout();
+    if (invalidSets.length > 0) {
+        const errorMessages = invalidSets.map(set => 
+            `• ${set.name}: ${set.message}\n  (Current: ${set.current}/${set.required})`
+        ).join('\n\n');
+        
+        showCustomWarningModal(
+            `Cannot Checkout!\n\nYou have incomplete charm sets:\n\n${errorMessages}\n\n` +
+            'Please complete these sets or remove the charms.'
+        );
+        return false;
+    }
+    return true;
 }
 function updateCharmInventory(charmSrc, newQuantity) {
     // Update quantity in DOM
