@@ -297,8 +297,7 @@ const specialCharms = [
   { src: 'special/teddy/128-gold.png', category: 'teddy', quantity: 9 },
   { src: 'special/teddy/teddy5.png', category: 'teddy', quantity: 9 },
   { src: 'special/teddy/teddy6.png', category: 'teddy', quantity: 11 },
-   // girly charms
-  { src: 'special/new-collection/11.png', category: 'girly', quantity: 1 },
+    { src: 'special/new-collection/11.png', category: 'girly', quantity: 1 },
   { src: 'special/new-collection/33.png', category: 'girly', quantity: 1 },
   { src: 'special/new-collection/29-gold.png', category: 'girly', quantity: 1 },
   { src: 'special/new-collection/30.png', category: 'girly', quantity: 1 },
@@ -501,7 +500,8 @@ const specialCharms = [
 ];
 
 const rareCharms = [
- 
+  // girly charms
+
   // butterflies charms
   { src: 'rares/new-collection/10.png', category: 'butterflies', quantity: 1 },
   { src: 'rares/new-collection/11-gold.png', category: 'butterflies', quantity: 1 },
@@ -558,7 +558,7 @@ const rareCharms = [
   { src: 'rares/gold/gold8.png', category: 'gold', quantity: 1 },
   { src: 'rares/gold/gold9.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold10.png', category: 'gold', quantity: 0 },
-  { src: 'rares/gold/gold11.png', category: 'gold', quantity: 2 },
+  { src: 'rares/gold/gold11.png', category: 'gold', quantity: 1 },
   { src: 'rares/gold/gold12.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold13.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold14.png', category: 'gold', quantity: 1 },
@@ -620,13 +620,13 @@ const rareCharms = [
   { src: 'rares/love/19.png', category: 'love', quantity: 1 },
   { src: 'rares/love/love.png', category: 'love', quantity: 1 },
   { src: 'rares/love/love2.png', category: 'love', quantity: 1 },
-  { src: 'rares/love/love3.png', category: 'love', quantity: 1 },
+  { src: 'rares/love/love3.png', category: 'love', quantity: 0 },
   { src: 'rares/love/love4.png', category: 'love', quantity: 0 },
   { src: 'rares/love/love5.png', category: 'love', quantity: 1 },
   { src: 'rares/love/love6.png', category: 'love', quantity: 0 },
   { src: 'rares/love/love7.png', category: 'love', quantity: 0 },
   { src: 'rares/love/love8.png', category: 'love', quantity: 3 },
-  { src: 'rares/love/love9.png', category: 'love', quantity: 3 },
+  { src: 'rares/love/love9.png', category: 'love', quantity: 2 },
   { src: 'rares/love/love10.png', category: 'love', quantity: 1 },
   { src: 'rares/love/love11.png', category: 'love', quantity: 1 },
   { src: 'rares/love/mrmrs1.png', category: 'love', quantity: 1 },
@@ -715,7 +715,7 @@ const rareCharms = [
   { src: 'rares/dangly/127-gold.png', category: 'dangly', quantity: 1 },
   { src: 'rares/dangly/128.png', category: 'dangly', quantity: 1 },
   { src: 'rares/dangly/129.png', category: 'dangly', quantity: 1 },
-  { src: 'rares/dangly/13.png', category: 'dangly', quantity: 1 },
+  { src: 'rares/dangly/13.png', category: 'dangly', quantity: 0 },
   { src: 'rares/dangly/130-gold.png', category: 'dangly', quantity: 1 },
   { src: 'rares/dangly/131-gold.png', category: 'dangly', quantity: 0 },
   { src: 'rares/dangly/132.png', category: 'dangly', quantity: 0 },
@@ -726,7 +726,7 @@ const rareCharms = [
   { src: 'rares/dangly/137-gold.png', category: 'dangly', quantity: 1 },
   { src: 'rares/dangly/138.png', category: 'dangly', quantity: 1 },
   { src: 'rares/dangly/139-gold.png', category: 'dangly', quantity: 1 },
-  { src: 'rares/dangly/14-gold.png', category: 'dangly', quantity: 1 },
+  { src: 'rares/dangly/14-gold.png', category: 'dangly', quantity: 0 },
   { src: 'rares/dangly/140.png', category: 'dangly', quantity: 1 },
   { src: 'rares/dangly/141-gold.png', category: 'dangly', quantity: 1 },
   { src: 'rares/dangly/142.png', category: 'dangly', quantity: 1 },
@@ -952,3 +952,5 @@ const rareCharms = [
   { src: 'rares/newc2r/c296.png', category: 'newc2r', quantity: 1 },
   { src: 'rares/newc2r/c297.png', category: 'newc2r', quantity: 1 },
 ];
+
+// Make data available
