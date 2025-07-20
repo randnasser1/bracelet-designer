@@ -22,8 +22,8 @@ const specialCharms = [
   { src: 'special/8ball/46-gold.png', category: '8ball', quantity: 1 },
   { src: 'special/8ball/47-gold.png', category: '8ball', quantity: 1 },
   { src: 'special/8ball/48.png', category: '8ball', quantity: 1 },
-  { src: 'special/8ball/48-gold.png', category: '8ball', quantity: 1 },
-  { src: 'special/8ball/49.png', category: '8ball', quantity: 1 },
+  { src: 'special/8ball/48-gold.png', category: '8ball', quantity: 0 },
+  { src: 'special/8ball/49.png', category: '8ball', quantity: 0 },
   { src: 'special/8ball/49-gold.png', category: '8ball', quantity: 1 },
   { src: 'special/8ball/50.png', category: '8ball', quantity: 1 },
   { src: 'special/8ball/x23.png', category: '8ball', quantity: 1 },
@@ -296,9 +296,7 @@ const specialCharms = [
   { src: 'special/teddy/teddy4.png', category: 'teddy', quantity: 9 },
   { src: 'special/teddy/128-gold.png', category: 'teddy', quantity: 9 },
   { src: 'special/teddy/teddy5.png', category: 'teddy', quantity: 9 },
-  { src: 'special/teddy/teddy6.png', category: 'teddy', quantity: 11 },
-   // girly charms
-  { src: 'special/new-collection/11.png', category: 'girly', quantity: 1 },
+  { src: 'special/teddy/teddy6.png', category: 'teddy', quantity: 11 },  { src: 'special/new-collection/11.png', category: 'girly', quantity: 1 },
   { src: 'special/new-collection/33.png', category: 'girly', quantity: 1 },
   { src: 'special/new-collection/29-gold.png', category: 'girly', quantity: 1 },
   { src: 'special/new-collection/30.png', category: 'girly', quantity: 1 },
@@ -501,7 +499,8 @@ const specialCharms = [
 ];
 
 const rareCharms = [
- 
+  // girly charms
+
   // butterflies charms
   { src: 'rares/new-collection/10.png', category: 'butterflies', quantity: 1 },
   { src: 'rares/new-collection/11-gold.png', category: 'butterflies', quantity: 1 },
@@ -952,5 +951,3 @@ const rareCharms = [
   { src: 'rares/newc2r/c296.png', category: 'newc2r', quantity: 1 },
   { src: 'rares/newc2r/c297.png', category: 'newc2r', quantity: 1 },
 ];
-
-
