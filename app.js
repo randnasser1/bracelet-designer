@@ -112,7 +112,7 @@ const WATCH_POOL = [
         id: 'watch2',
         name: 'Black center Silver Heart Watch',
         image: 'basecharms/watch2.png',
-        soldOut: false
+        soldOut: true
     },
     {
         id: 'watch3',
