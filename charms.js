@@ -661,7 +661,7 @@ const rareCharms = [
   { src: 'rares/sanrio/83-gold.png', category: 'sanrio', quantity: 9 },
   // sporty charms
   { src: 'rares/sporty/sporty.png', category: 'sporty', quantity: 1 },
-  { src: 'rares/sporty/18-gold.png', category: 'sporty', quantity: 0 },
+  { src: 'rares/sporty/18-gold.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty2.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty3.png', category: 'sporty', quantity: 4 },
   { src: 'rares/sporty/sporty4.png', category: 'sporty', quantity: 2 },
