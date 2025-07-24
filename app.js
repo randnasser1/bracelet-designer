@@ -29,75 +29,73 @@ const charmQuantities = {}; // Tracks remaining quantities
 // Constants
 const MAX_SLOT_SPACES = 16;
 const SIZE_CHARTS = {
-     bracelet: {
+    bracelet: {
         '15.2-16.2': { charms: 18, price: 0, display: '15.2cm - 16.2cm (18 charms)' },
-        '16.2-17.1': { charms: 19, price: 0.5, display: '16.2cm - 17.1cm (+0.5 JDs, 19 charms)' },
-        '17.1-18.1': { charms: 20, price: 1, display: '17.1cm - 18.1cm (+1 JD, 20 charms)' },
-        '18.1-19.2': { charms: 21, price: 1.5, display: '18.1cm - 19.2cm (+1.5 JDs, 21 charms)' },
-        '19.2-20': { charms: 22, price: 2, display: '19.2cm - 20cm (+2 JDs, 22 charms)' },
-        '20-21': { charms: 23, price: 2.5, display: '20cm - 21cm (+2.5 JDs, 23 charms)' },
-        '21-22': { charms: 24, price: 3, display: '21cm - 22cm (+3 JDs, 24 charms)' }
+        '16.2-17.1': { charms: 19, price: 3, display: '16.2cm - 17.1cm (+3 AED, 19 charms)' },
+        '17.1-18.1': { charms: 20, price: 6, display: '17.1cm - 18.1cm (+6 AED, 20 charms)' },
+        '18.1-19.2': { charms: 21, price: 8, display: '18.1cm - 19.2cm (+8 AED, 21 charms)' },
+        '19.2-20': { charms: 22, price: 11, display: '19.2cm - 20cm (+11 AED, 22 charms)' },
+        '20-21': { charms: 23, price: 13, display: '20cm - 21cm (+13 AED, 23 charms)' },
+        '21-22': { charms: 24, price: 16, display: '21cm - 22cm (+16 AED, 24 charms)' }
     },
-    // Watch sizes (same as bracelet but charm count reduced by 4)
     'watch': {
         '15.2-16.2': { charms: 14, price: 0, display: '15.2cm - 16.2cm (14 charms)' },
-        '16.2-17.1': { charms: 15, price: 0.5, display: '16.2cm - 17.1cm (+0.5 JDs, 15 charms)' },
-        '17.1-18.1': { charms: 16, price: 1, display: '17.1cm - 18.1cm (+1 JD, 16 charms)' },
-        '18.1-19.2': { charms: 17, price: 1.5, display: '18.1cm - 19.2cm (+1.5 JDs, 17 charms)' },
-        '19.2-20': { charms: 18, price: 2, display: '19.2cm - 20cm (+2 JDs, 18 charms)' },
-        '20-21': { charms: 19, price: 2.5, display: '20cm - 21cm (+2.5 JDs, 19 charms)' },
-        '21-22': { charms: 20, price: 3, display: '21cm - 22cm (+3 JDs, 20 charms)' }
+        '16.2-17.1': { charms: 15, price: 3, display: '16.2cm - 17.1cm (+3 AED, 15 charms)' },
+        '17.1-18.1': { charms: 16, price: 6, display: '17.1cm - 18.1cm (+6 AED, 16 charms)' },
+        '18.1-19.2': { charms: 17, price: 8, display: '18.1cm - 19.2cm (+8 AED, 17 charms)' },
+        '19.2-20': { charms: 18, price: 11, display: '19.2cm - 20cm (+11 AED, 18 charms)' },
+        '20-21': { charms: 19, price: 13, display: '20cm - 21cm (+13 AED, 19 charms)' },
+        '21-22': { charms: 20, price: 16, display: '21cm - 22cm (+16 AED, 20 charms)' }
     },
-    // Apple Watch sizes (same as bracelet but charm count reduced by 5)
     'apple-watch': {
         '15.2-16.2': { charms: 13, price: 0, display: '15.2cm - 16.2cm (13 charms)' },
-        '16.2-17.1': { charms: 14, price: 0.5, display: '16.2cm - 17.1cm (+0.5 JDs, 14 charms)' },
-        '17.1-18.1': { charms: 15, price: 1, display: '17.1cm - 18.1cm (+1 JD, 15 charms)' },
-        '18.1-19.2': { charms: 16, price: 1.5, display: '18.1cm - 19.2cm (+1.5 JDs, 16 charms)' },
-        '19.2-20': { charms: 17, price: 2, display: '19.2cm - 20cm (+2 JDs, 17 charms)' },
-        '20-21': { charms: 18, price: 2.5, display: '20cm - 21cm (+2.5 JDs, 18 charms)' },
-        '21-22': { charms: 19, price: 3, display: '21cm - 22cm (+3 JDs, 19 charms)' }
+        '16.2-17.1': { charms: 14, price: 3, display: '16.2cm - 17.1cm (+3 AED, 14 charms)' },
+        '17.1-18.1': { charms: 15, price: 6, display: '17.1cm - 18.1cm (+6 AED, 15 charms)' },
+        '18.1-19.2': { charms: 16, price: 8, display: '18.1cm - 19.2cm (+8 AED, 16 charms)' },
+        '19.2-20': { charms: 17, price: 11, display: '19.2cm - 20cm (+11 AED, 17 charms)' },
+        '20-21': { charms: 18, price: 13, display: '20cm - 21cm (+13 AED, 18 charms)' },
+        '21-22': { charms: 19, price: 16, display: '21cm - 22cm (+16 AED, 19 charms)' }
     },
-   'keychain': {
-    '5 charms': { charms: 5, price: 0, display: '5 charms' },
-    '6 charms': { charms: 6, price: 1, display: '6 charms' },
-    '7 charms': { charms: 7, price: 2, display: '7 charms'},
-},
-    
+    'keychain': {
+        '5 charms': { charms: 5, price: 0, display: '5 charms' },
+        '6 charms': { charms: 6, price: 6, display: '6 charms' },
+        '7 charms': { charms: 7, price: 11, display: '7 charms' },
+    },
     anklet: {
         '21-22': { charms: 23, price: 0, display: '21cm - 22cm (23 charms)' },
-        '22-23': { charms: 24, price: 0.5, display: '22cm - 23cm (+0.5 JDs, 24 charms)' },
-        '23-24': { charms: 25, price: 1, display: '23cm - 24cm (+1 JD, 25 charms)' },
-        '24-25': { charms: 26, price: 1.5, display: '24cm - 25cm (+1.5 JDs, 26 charms)' }
+        '22-23': { charms: 24, price: 3, display: '22cm - 23cm (+3 AED, 24 charms)' },
+        '23-24': { charms: 25, price: 6, display: '23cm - 24cm (+6 AED, 25 charms)' },
+        '24-25': { charms: 26, price: 8, display: '24cm - 25cm (+8 AED, 26 charms)' }
     },
     necklace: {
         '32-33': { charms: 34, price: 0, display: '32cm - 33cm (34 charms)' },
-        '33-34': { charms: 35, price: 0.5, display: '33cm - 34cm (+0.5 JDs, 35 charms)' },
-        '34-35': { charms: 36, price: 1, display: '34cm - 35cm (+1 JD, 36 charms)' },
-        '35-36': { charms: 37, price: 1.5, display: '35cm - 36cm (+1.5 JDs, 37 charms)' }
+        '33-34': { charms: 35, price: 3, display: '33cm - 34cm (+3 AED, 35 charms)' },
+        '34-35': { charms: 36, price: 6, display: '34cm - 35cm (+6 AED, 36 charms)' },
+        '35-36': { charms: 37, price: 8, display: '35cm - 36cm (+8 AED, 37 charms)' }
     },
     ring: {
         '7': { charms: 7, price: 0, display: '~7.0cm (7 charms)' },
-        '8': { charms: 8, price: 0.5, display: '~8.0cm (+0.5 JDs, 8 charms)' },
-        '9': { charms: 9, price: 1, display: '~9.0cm (+1 JD, 9 charms)' },
-        '10': { charms: 10, price: 1.5, display: '~10.0cm (+1.5 JDs, 10 charms)' },
-        '11': { charms: 11, price: 2, display: '~11.0cm (+2 JDs, 11 charms)' }
+        '8': { charms: 8, price: 3, display: '~8.0cm (+3 AED, 8 charms)' },
+        '9': { charms: 9, price: 6, display: '~9.0cm (+6 AED, 9 charms)' },
+        '10': { charms: 10, price: 8, display: '~10.0cm (+8 AED, 10 charms)' },
+        '11': { charms: 11, price: 11, display: '~11.0cm (+11 AED, 11 charms)' }
     },
-    individual: { // Add this if you want individual charms to have sizes
+    individual: {
         'default': { charms: 1, price: 0, display: 'Individual Charm' }
     }
 };
 
 const PRODUCTS = {
-    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 1, fullGlam: 29 },
-    anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 1, fullGlam: 42 },
-    necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 1, fullGlam: 64 },
-    ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 },
-    individual: { basePrice: 3, baseSlots: 1, includedSpecial: 0, fullGlam: 0 },
-    'watch': { basePrice: 20, baseSlots: 14, includedSpecial: 1, fullGlam: 35 }, // Bracelet charms -4
-    'apple-watch': { basePrice: 18, baseSlots: 13, includedSpecial: 1, fullGlam: 32 }, // Bracelet charms -5
-    'keychain': { basePrice: 6, baseSlots: 5, includedSpecial: 1, fullGlam: 13 }
+    bracelet: { basePrice: 52, baseSlots: 18, includedSpecial: 1, fullGlam: 29 },
+    anklet: { basePrice: 78, baseSlots: 23, includedSpecial: 1, fullGlam: 42 },
+    necklace: { basePrice: 115, baseSlots: 34, includedSpecial: 1, fullGlam: 64 },
+    ring: { basePrice: 39, baseSlots: 7, includedSpecial: 1, fullGlam: 15 },
+    individual: { basePrice: 16, baseSlots: 1, includedSpecial: 0, fullGlam: 0 },
+    'watch': { basePrice: 104, baseSlots: 14, includedSpecial: 1, fullGlam: 35 },
+    'apple-watch': { basePrice: 94, baseSlots: 13, includedSpecial: 1, fullGlam: 32 },
+    'keychain': { basePrice: 32, baseSlots: 5, includedSpecial: 1, fullGlam: 13 }
 };
+
 let currentWatchBase = 'basecharms/watch1.png'; // Default watch base
 
 
@@ -383,24 +381,24 @@ function showSetWarning(charmSet) {
 function calculatePrice(includeDelivery = false) {
     // Handle individual charms separately
     if (currentProduct === 'individual') {
-        const basePrice = 3; // Base price per individual charm
+        const basePrice = 16 ; // Base price per individual charm
         let charmCost = 0;
         
         const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
         placedCharms.forEach(charm => {
             if (charm.dataset.type === 'special') {
-                charmCost += 2;
+                charmCost += 11 ;
             } else if (charm.dataset.type === 'rare') {
-                charmCost += 3;
+                charmCost += 16 ;
             } else if (charm.dataset.type === 'custom') {
-                charmCost += 3.5;
+                charmCost += 18;
             } else if (charm.classList.contains('long-charm')) {
-                charmCost += 6;
+                charmCost += 31;
             }
         });
         
         const subtotal = basePrice * individualSlotCount + charmCost;
-        const delivery = includeDelivery ? 2.5 : 0;
+        const delivery = includeDelivery ? 20 : 0;
         const total = subtotal + delivery;
         
         return {
@@ -433,11 +431,11 @@ function calculatePrice(includeDelivery = false) {
 
     // Apply material upgrades
     if (materialType === 'gold') {
-        totalPrice += 1;
-        originalPrice += 1;
+        totalPrice += 6;
+        originalPrice += 6;
     } else if (materialType === 'mix') {
-        totalPrice += 2.5;
-        originalPrice += 2.5;
+        totalPrice += 13;
+        originalPrice += 13;
     }
 
     // Count all placed charms and calculate costs
@@ -469,18 +467,18 @@ function calculatePrice(includeDelivery = false) {
     }
 
     // Add costs for rare, custom, and long charms
-    totalPrice += rareCount * 3;
-    originalPrice += rareCount * 3;
+    totalPrice += rareCount * 16;
+    originalPrice += rareCount * 16;
     
-    totalPrice += customCount * 3.5;
-    originalPrice += customCount * 3.5;
+    totalPrice += customCount * 18;
+    originalPrice += customCount * 18;
     
-    totalPrice += longCharmCount * 6; // Long charms cost 6 JD each
-    originalPrice += longCharmCount * 6;
+    totalPrice += longCharmCount * 31; // Long charms cost 6 JD each
+    originalPrice += longCharmCount * 31;
 
     // Check for discount eligibility
     const currentDate = new Date();
-    const discountEndDate = new Date('2025-07-25');
+    const discountEndDate = new Date('2024-07-25');
     let discountApplied = 0;
     
     if (currentDate <= discountEndDate && originalPrice >= 15) {
@@ -489,7 +487,7 @@ function calculatePrice(includeDelivery = false) {
     }
 
     if (includeDelivery) {
-        const deliveryFee = 2.5;
+        const deliveryFee = 20;
         return {
             subtotal: originalPrice,
             discount: discountApplied,
@@ -626,11 +624,11 @@ function getCharmSet(charmSrc) {
       previewName.textContent = charmName.charAt(0).toUpperCase() + charmName.slice(1);
       
       if (charmElement.dataset.type === 'special') {
-        previewType.textContent = 'Special Charm (+2 JDs)';
+        previewType.textContent = 'Special Charm (+11 AED)';
       } else if (charmElement.dataset.type === 'rare') {
-        previewType.textContent = 'Rare Charm (+3 JDs)';
+        previewType.textContent = 'Rare Charm (+16 AED)';
       } else {
-        previewType.textContent = 'Custom Charm (+3.5 JDs)';
+        previewType.textContent = 'Custom Charm (+18 AED)';
       }
       
       preview.classList.add('active');
@@ -655,8 +653,8 @@ function updateCartDisplay() {
     
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
-        cartSubtotal.textContent = 'Subtotal: 0.00 JDs';
-        cartTotal.textContent = 'Total: 0.00 JDs';
+        cartSubtotal.textContent = 'Subtotal: 0.00 AED';
+        cartTotal.textContent = 'Total: 0.00 AED';
         cartDiscountInfo.style.display = 'none';
         return;
     }
@@ -664,7 +662,7 @@ function updateCartDisplay() {
     let itemsHTML = '';
       const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
     const discountedSubtotal = cart.reduce((sum, item) => sum + item.price, 0);
-    const deliveryFee = 2.5;
+    const deliveryFee = 20;
     
     // Calculate additional cart-level discount if applicable
     const currentDate = new Date();
@@ -688,7 +686,7 @@ function updateCartDisplay() {
                     <div class="cart-item-details">
                         <div>${item.product} (${item.size})</div>
                         <div>${item.materialType}</div>
-                        <div>${item.price.toFixed(2)} JDs</div>
+                        <div>${item.price.toFixed(2)} AED</div>
                     </div>
                 </div>
                 <button class="remove-item" data-index="${index}">
@@ -699,29 +697,29 @@ function updateCartDisplay() {
     });
     
     cartItemsContainer.innerHTML = itemsHTML;
-    cartSubtotal.textContent = `Subtotal: ${discountedSubtotal.toFixed(2)} JDs`;
-    document.getElementById('cart-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    cartSubtotal.textContent = `Subtotal: ${discountedSubtotal.toFixed(2)} AED`;
+    document.getElementById('cart-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} AED`;
     
     if (additionalDiscount > 0) {
         cartDiscountInfo.style.display = 'block';
-        cartDiscountAmount.textContent = `Additional Discount: -${additionalDiscount.toFixed(2)} JDs`;
+        cartDiscountAmount.textContent = `Additional Discount: -${additionalDiscount.toFixed(2)} AED`;
         
         cartTotal.innerHTML = `
             <div>
                 <span style="text-decoration: line-through; color: #999; margin-right: 8px;">
-                    ${(discountedSubtotal + deliveryFee).toFixed(2)} JDs
+                    ${(discountedSubtotal + deliveryFee).toFixed(2)} AED
                 </span>
                 <span style="font-weight: bold; color: #d6336c;">
-                    ${total.toFixed(2)} JDs
+                    ${total.toFixed(2)} AED
                 </span>
             </div>
             <div style="color: #4CAF50; font-size: 0.9rem; margin-top: 4px;">
-                You saved ${(subtotal - discountedSubtotal + additionalDiscount).toFixed(2)} JDs!
+                You saved ${(subtotal - discountedSubtotal + additionalDiscount).toFixed(2)} AED!
             </div>
         `;
     } else {
         cartDiscountInfo.style.display = 'none';
-        cartTotal.textContent = `Total: ${(discountedSubtotal + deliveryFee).toFixed(2)} JDs`;
+        cartTotal.textContent = `Total: ${(discountedSubtotal + deliveryFee).toFixed(2)} AED`;
     }
 
     // Reattach event listeners
@@ -751,46 +749,43 @@ function updatePrice() {
     if (currentProduct === 'individual') {
         basePriceElement.innerHTML = `
             <span>Base Price:</span>
-            <span>3.00 JDs</span>
+            <span>16 AED</span>
         `;
         
-        const charmCost = priceData.total - 3;
+        const charmCost = priceData.total - 16;
         let charmText = '';
         
-        // Build detailed charm breakdown
         if (priceData.longCharmCount > 0) {
-            charmText += `${priceData.longCharmCount} long (${(priceData.longCharmCount * 6).toFixed(2)} JD)`;
+            charmText += `${priceData.longCharmCount} long (${Math.round(priceData.longCharmCount * 31)} AED)`;
         }
         if (priceData.specialCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.specialCount} special (${(priceData.specialCount * 2).toFixed(2)} JD)`;
+            charmText += `${priceData.specialCount} special (${Math.round(priceData.specialCount * 11)} AED)`;
         }
         if (priceData.rareCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.rareCount} rare (${(priceData.rareCount * 3).toFixed(2)} JD)`;
+            charmText += `${priceData.rareCount} rare (${Math.round(priceData.rareCount * 16)} AED)`;
         }
         if (priceData.customCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.customCount} custom (${(priceData.customCount * 3.5).toFixed(2)} JD)`;
+            charmText += `${priceData.customCount} custom (${Math.round(priceData.customCount * 18)} AED)`;
         }
         
         charmPriceElement.innerHTML = `
             <span>Charms:</span>
-            <span>${charmText || '0.00 JD'}</span>
+            <span>${charmText || '0 AED'}</span>
         `;
         
-        totalPriceElement.textContent = `Total: ${priceData.total.toFixed(2)} JDs`;
+        totalPriceElement.textContent = `Total: ${Math.round(priceData.total)} AED`;
         discountMessageElement.innerHTML = '';
     } else {
-        // For non-individual products
         if (isFullGlam) {
-            basePriceElement.innerHTML = `Full Glam Base: ${product.fullGlam.toFixed(2)} JDs`;
+            basePriceElement.innerHTML = `Full Glam Base: ${Math.round(product.fullGlam)} AED`;
         } else {
             const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
-            basePriceElement.innerHTML = `Base Price: ${basePrice.toFixed(2)} JDs`;
+            basePriceElement.innerHTML = `Base Price: ${Math.round(basePrice)} AED`;
         }
 
-        // Build detailed charm breakdown text
         let charmText = '';
         const freeSpecials = isFullGlam ? product.baseSlots : product.includedSpecial;
         const paidSpecials = Math.max(0, priceData.specialCount - freeSpecials);
@@ -800,40 +795,39 @@ function updatePrice() {
         }
         if (paidSpecials > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${paidSpecials} paid special (+${(paidSpecials * 2).toFixed(2)} JD)`;
+            charmText += `${paidSpecials} paid special (+${Math.round(paidSpecials * 11)} AED)`;
         }
         if (priceData.rareCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.rareCount} rare (+${(priceData.rareCount * 3).toFixed(2)} JD)`;
+            charmText += `${priceData.rareCount} rare (+${Math.round(priceData.rareCount * 16)} AED)`;
         }
         if (priceData.customCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.customCount} custom (+${(priceData.customCount * 3.5).toFixed(2)} JD)`;
+            charmText += `${priceData.customCount} custom (+${Math.round(priceData.customCount * 18)} AED)`;
         }
         if (priceData.longCharmCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.longCharmCount} long (+${(priceData.longCharmCount * 6).toFixed(2)} JD)`;
+            charmText += `${priceData.longCharmCount} long (+${Math.round(priceData.longCharmCount * 31)} AED)`;
         }
 
         charmPriceElement.textContent = charmText || 'No charms added';
 
-        // Handle discount display
         if (priceData.discount > 0) {
             totalPriceElement.innerHTML = `
                 <div class="price-comparison">
-                    <span class="original-price">${priceData.subtotal.toFixed(2)} JDs</span>
+                    <span class="original-price">${Math.round(priceData.subtotal)} AED</span>
                     <span>→</span>
-                    <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
+                    <span class="discounted-price">${Math.round(priceData.total)} AED</span>
                 </div>
-                <div class="savings-notice">You saved ${priceData.discount.toFixed(2)} JDs!</div>
+                <div class="savings-notice">You saved ${Math.round(priceData.discount)} AED!</div>
             `;
             discountMessageElement.innerHTML = '<div class="discount-badge">10% OFF</div>';
         } else {
-            totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
-            if (priceData.subtotal < 15) {
+            totalPriceElement.innerHTML = `Total: ${Math.round(priceData.total)} AED`;
+            if (priceData.subtotal < 78) {
                 discountMessageElement.innerHTML = `
                     <div class="discount-promo">
-                        <i class="fas fa-tag"></i> Add ${(15 - priceData.subtotal).toFixed(2)} JD more to get 10% OFF!
+                        <i class="fas fa-tag"></i> Add ${Math.round(78 - priceData.subtotal)} AED more to get 10% OFF!
                     </div>
                 `;
             } else {
@@ -842,6 +836,7 @@ function updatePrice() {
         }
     }
 }
+
 
 function getCharmBreakdownText() {
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
@@ -859,9 +854,9 @@ function getCharmBreakdownText() {
     const paidSpecials = Math.max(0, specialCount - freeSpecials);
 
     let text = `Charms: ${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials`;
-    if (paidSpecials > 0) text += `, ${paidSpecials} paid (+${(paidSpecials * 2).toFixed(2)} JD)`;
-    if (rareCount > 0) text += `, ${rareCount} rare (+${(rareCount * 3).toFixed(2)} JD)`;
-    if (customCount > 0) text += `, ${customCount} custom (+${(customCount * 3.5).toFixed(2)} JD)`;
+    if (paidSpecials > 0) text += `, ${paidSpecials} paid (+${(paidSpecials * 11).toFixed(2)} JD)`;
+    if (rareCount > 0) text += `, ${rareCount} rare (+${(rareCount * 16).toFixed(2)} JD)`;
+    if (customCount > 0) text += `, ${customCount} custom (+${(customCount * 18).toFixed(2)} JD)`;
 
     return text;
 }
@@ -1795,12 +1790,12 @@ placeOrderBtn.addEventListener('click', function() {
     
     // Calculate order totals
     const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-    const deliveryFee = 2.5;
+    const deliveryFee = 20;
     const total = subtotal + deliveryFee;
     
-    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
-    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
-    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
+    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} AED`;
+    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} AED`;
+    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} AED`;
 });
 }
 function validateCharmsForSets(charms) {
@@ -1858,12 +1853,12 @@ function handlePlaceOrderClick() {
     
     // Calculate and display order summary
     const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-    const deliveryFee = 2.5;
+    const deliveryFee = 20;
     const total = subtotal + deliveryFee;
     
-    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
-    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
-    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
+    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} AED`;
+    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} AED`;
+    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} AED`;
 
     document.body.classList.add('modal-open');
     orderModal.classList.add('active');
@@ -1971,7 +1966,7 @@ async function handleFormSubmit(e) {
 
         // 4. Calculate order totals
         const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-        const deliveryFee = 2.5;
+        const deliveryFee = 20;
         const total = subtotal + deliveryFee;
         
         // 5. Create order data
