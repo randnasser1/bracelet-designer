@@ -440,7 +440,21 @@
       position: relative;
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
-    
+    #country {
+  padding: 0.5rem;
+  border: 1px solid #f5a0c2;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  width: 100%;
+}
+
+#location {
+  padding: 0.5rem;
+  border: 1px solid #f5a0c2;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  width: 100%;
+}
     .order-modal-content {
       background: white;
       padding: 2rem;
@@ -622,12 +636,6 @@
   </button>
 
 
-  
-<div class="promotion-banner">
-  <h3 style="color: white;">✨ LIMITED TIME OFFER ✨</h3>
-  <h3 style="color: white; font-size: 2em;">10% OFF</h3>
-  <p>all orders above 15 JDs! Valid until July 25</p>
-</div>
 
 <div class="top-action-buttons">
  <button id="pricing-toggle" class="btn">
@@ -647,37 +655,33 @@
     <span class="btn-text">Instagram</span>
   </a>
 </div>
+
 <div class="pricing-info">
   <h3>Pricing Information</h3>
   <h3 style="text-align: left;">Pricing Information</h3>
 
-  
   <div class="pricing-grid">
     <div class="pricing-category">
       <h4>Base Prices</h4>
-            <ul style="text-align: left;">
-
-      <ul>
-        <li><strong>Bracelet:</strong> 10 JDs (18)</li>
-        <li><strong>Anklet:</strong> 15 JDs (23)</li>
-        <li><strong>Necklace:</strong> 22 JDs (34)</li>
-        <li><strong>Ring:</strong> 7.5 JDs (7)</li>
+      <ul style="text-align: left;">
+        <li><strong>Bracelet:</strong> 52 AED</li>
+        <li><strong>Anklet:</strong> 78 AED</li>
+        <li><strong>Necklace:</strong> 115 AED</li>
+        <li><strong>Ring:</strong> 39 AED</li>
       </ul>
     </div>
-    
+
     <div class="pricing-category">
       <h4>Upgrades</h4>
-            <ul style="text-align: left;">
-
-      <ul>
-        <li><strong>Gold:</strong> +1 JD</li>
-        <li><strong>Mix:</strong> +2.5 JDs</li>
-        <li><strong>Special:</strong> +2 JDs</li>
-        <li><strong>Rare:</strong> +3 JDs</li>
-        <li><strong>Custom:</strong> +3.5 JDs</li>
+      <ul style="text-align: left;">
+        <li><strong>Gold:</strong> +6 AED</li>
+        <li><strong>Mix:</strong> +13 AED</li>
+        <li><strong>Special:</strong> +11 AED</li>
+        <li><strong>Rare:</strong> +16 AED</li>
+        <li><strong>Custom:</strong> +19 AED</li>
       </ul>
     </div>
-    
+
 </div>
   <div class="contact-info">
     <h4>Contact Us</h4>
@@ -729,12 +733,12 @@
     </div>
     
    <div class="cart-footer">
-  <div id="cart-subtotal">Subtotal: 0.00 JDs</div>
+  <div id="cart-subtotal">Subtotal: 0.00 AEDs</div>
   <div id="cart-discount-info" style="display: none;">
-    <span id="cart-discount-amount">10% Discount: -1.00 JDs</span>
+    <span id="cart-discount-amount">10% Discount: -1.00 AEDs</span>
   </div>
-  <div id="cart-delivery">Delivery Fee: 2.50 JDs</div>
-  <div class="cart-total">Total: 0.00 JDs</div>
+  <div id="cart-delivery">Delivery Fee: 20 AED</div>
+  <div class="cart-total">Total: 0.00 AED</div>
 </div>
       <button id="order-btn" class="btn order-btn">Place Order</button>
     </div>
@@ -775,7 +779,6 @@
         <label for="size">Size:</label>
         <select id="size" class="btn">
             <option value="15.2-16.2">15.2cm - 16.2cm (18 charms)</option>
-            <option value="16.2-17.1">16.2cm - 17.1cm (+0.5 JDs, 19 charms)</option>
             <!-- Other size options -->
         </select>
     </div>
@@ -822,17 +825,17 @@
 <div class="price-display">
     <div class="price-row" id="base-price">
         <span>Base Price:</span>
-        <span>3.00 JDs</span>
+        <span>16 AED</span>
     </div>
     <div class="price-row" id="charm-price">
         <span>Charms:</span>
-        <span>0.00 JDs</span>
+        <span>0.00 AED</span>
     </div>
     <div class="price-row" id="slot-price" style="display: none;">
         <!-- Not used in this simplified version -->
     </div>
     <div id="total-price-container">
-        <div id="total-price">Total: 3.00 JDs</div>
+        <div id="total-price">Total: 16.00 AED</div>
         <div id="discount-message"></div>
     </div>
 </div>
@@ -849,7 +852,7 @@
             <!-- watch charms will be here -->
         <!-- Special Charms -->
         <div class="charm-pool">
-            <h3>Special Charms (+2 JDs each after first 18 in Full Glam)</h3>
+            <h3>Special Charms (+11 AED each)</h3>
             <div class="category-tabs" id="special-categories">
                 <button class="category-tab" data-category="newc2s">NEW Collection⭐!!</button>
 
@@ -878,7 +881,7 @@
 
         <!-- Rare Charms -->
         <div class="charm-pool">
-            <h3>Rare Charms (+3 JDs each)</h3>
+            <h3>Rare Charms (+16 AED each)</h3>
           <div class="size-note" style="text-align: center; font-style: italic; margin-bottom: 10px;">
         Note: The size of *dangly* charms is accurate in reference to the metal charm, not the bracelet.
     </div>
@@ -898,6 +901,7 @@
                 <button class="category-tab" data-category="long">Long</button>
 
                 <button class="category-tab" data-category="graduation">Grad🎓✧˖°</button>
+                <button class="category-tab" data-category="long">Long</button>
               
                 <button class="category-tab active" data-category="all">All</button>
             </div>
@@ -909,7 +913,7 @@
   </div>
 <!-- Custom Charms -->
 <div class="charm-pool">
-    <h3>Custom Charms (+3.5 JDs each)</h3>
+    <h3>Custom Charms (18 AED each)</h3>
     <div class="custom-charm-upload">
         <input type="file" id="custom-charm-upload" accept="image/*" style="display: none;">
         <button class="btn" onclick="document.getElementById('custom-charm-upload').click()">
@@ -955,25 +959,20 @@
           <label for="phone2">Second Phone Number (Optional)</label>
           <input type="tel" id="phone2" name="phone2">
         </div>
-        
-        <div class="form-group">
-          <label for="governorate">Governorate*</label>
-          <select id="governorate" name="governorate" required>
-              <option value="">Select Governorate</option>
-              <option value="Amman">Amman</option>
-              <option value="Irbid">Irbid</option>
-              <option value="Zarqa">Zarqa</option>
-              <option value="Balqa">Balqa</option>
-              <option value="Madaba">Madaba</option>
-              <option value="Jerash">Jerash</option>
-              <option value="Ajloun">Ajloun</option>
-              <option value="Aqaba">Aqaba</option>
-              <option value="Mafraq">Mafraq</option>
-              <option value="Tafilah">Tafilah</option>
-              <option value="Karak">Karak</option>
-              <option value="Ma'an">Ma'an</option>
-          </select>
-      </div>
+<div class="form-group">
+  <label for="city">City*</label>
+  <select id="city" name="city" required>
+    <option value="">Select City</option>
+    <option value="Abu Dhabi">Abu Dhabi</option>
+    <option value="Dubai">Dubai</option>
+    <option value="Sharjah">Sharjah</option>
+    <option value="Ajman">Ajman</option>
+    <option value="Umm Al Quwain">Umm Al Quwain</option>
+    <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+    <option value="Fujairah">Fujairah</option>
+  </select>
+</div>
+
         
         <div class="form-group">
           <label for="address">Full Address Details الموقع بالتفصيل*</label>
@@ -997,9 +996,9 @@
           <input type="file" id="payment-proof" name="payment-proof" accept="image/*">
         </div>
           <div class="order-summary">
-        <div id="order-subtotal">Subtotal: 0.00 JDs</div>
-        <div id="order-delivery">Delivery Fee: 2.50 JDs</div>
-        <div id="order-total-price">Total: 0.00 JDs</div>
+        <div id="order-subtotal">Subtotal: 0.00 AEDs</div>
+        <div id="order-delivery">Delivery Fee: 20 AEDs</div>
+        <div id="order-total-price">Total: 0.00 AEDs</div>
       </div>
 
         
