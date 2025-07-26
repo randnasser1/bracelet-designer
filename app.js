@@ -1894,7 +1894,8 @@ async function handleFormSubmit(e) {
         );
         return;
     }
-        console.log('Form submission started');
+
+    console.log('Form submission started');
 
     const form = e.target;
     const submitButton = form.querySelector('button[type="submit"]');
@@ -1909,7 +1910,7 @@ async function handleFormSubmit(e) {
     try {
         // 1. Validate form fields
         const formData = new FormData(form);
-        const requiredFields = ['full-name', 'phone', 'governorate', 'address', 'payment'];
+        const requiredFields = ['full-name', 'phone', 'city', 'area', 'street-name', 'apartment-no', 'payment'];
         const missingFields = requiredFields.filter(field => !formData.get(field));
         
         if (missingFields.length > 0) {
@@ -1969,15 +1970,23 @@ async function handleFormSubmit(e) {
         const deliveryFee = 20;
         const total = subtotal + deliveryFee;
         
-        // 5. Create order data
+        // 5. Create order data with the new address fields
         const orderData = {
             clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
             customer: {
                 name: formData.get('full-name'),
                 phone: formData.get('phone'),
                 phone2: formData.get('phone2') || null,
-                governorate: formData.get('governorate'),
-                address: formData.get('address'),
+                city: formData.get('city'),
+                address: {
+                    area: formData.get('area'),
+                    streetName: formData.get('street-name'),
+                    buildingName: formData.get('building-name') || null,
+                    apartmentNo: formData.get('apartment-no'),
+                    floorNo: formData.get('floor-no') || null,
+                    postalCode: formData.get('postal-code') || null,
+                    additionalDetails: formData.get('additional-address') || null
+                },
                 notes: formData.get('notes') || null
             },
             paymentMethod: formData.get('payment'),
