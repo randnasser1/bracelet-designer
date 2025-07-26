@@ -1920,7 +1920,14 @@ async function handleFormSubmit(e) {
         if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
             throw new Error('Payment proof is required for Cliq payments');
         }
-        
+        // In your handleFormSubmit function:
+        if (formData.get('payment') === 'PayPal') {
+        const paypalTransactionId = formData.get('paypal_transaction_id');
+        if (!paypalTransactionId) {
+            throw new Error('PayPal payment not completed');
+        }
+        orderData.paymentProofUrl = `https://www.paypal.com/activity/payment/${paypalTransactionId}`;
+        }
         // 2. Validate charm sets across all cart items
         const allCharms = cart.flatMap(item => item.charms.map(charm => charm.src));
         const invalidSets = [];
@@ -1990,7 +1997,13 @@ async function handleFormSubmit(e) {
                 notes: formData.get('notes') || null
             },
             paymentMethod: formData.get('payment'),
-            items: cartWithImages.map(item => ({
+            paymentStatus: formData.get('payment') === 'PayPal' ? 'paid' : 'pending',
+            paymentDetails: formData.get('payment') === 'PayPal' ? {
+                transactionId: formData.get('paypal_transaction_id'),
+                amount: total,
+                currency: 'AED'
+            } : null,
+              items: cartWithImages.map(item => ({
                 product: item.product,
                 size: item.size,
                 price: item.price,
@@ -3181,8 +3194,43 @@ function setupCategoryTabs() {
         updateRareCharmsDisplay();
     }
 }
+<script src="https://www.paypal.com/sdk/js?client-id=AeyGQxvN058IPUHXDS6FO-lyG2Q5IlA9wxsPwpT0ZnGz09UNzR4dvVoFYGTNYMGFjfYJ21sn2Pa0OJ0i&currency=USD"></script>
+  document.getElementById('pay-paypal').addEventListener('change', function() {
+    if(this.checked) {
+      document.getElementById('paypal-button-container').style.display = 'block';
+      document.getElementById('payment-proof-container').style.display = 'none';
+    }
+  });
 
-function setupCustomCharmHandlers() {
+  // Initialize PayPal Button
+  paypal.Buttons({
+    createOrder: function(data, actions) {
+      const total = parseFloat(document.getElementById('order-total-price').textContent.replace('Total: ', '').replace(' AED', ''));
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: total.toFixed(2),
+            currency_code: "AED"
+          }
+        }]
+      });
+    },
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details) {
+        // Store PayPal transaction ID in hidden field
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'paypal_transaction_id';
+        input.value = details.id;
+        document.getElementById('order-form').appendChild(input);
+        
+        // Submit the form
+        document.getElementById('order-form').submit();
+      });
+    }
+  }).render('#paypal-button-container');
+
+  function setupCustomCharmHandlers() {
     // Get DOM elements
     const customCharmUpload = document.getElementById('custom-charm-upload');
     const customCharmPreview = document.getElementById('custom-charm-preview');
