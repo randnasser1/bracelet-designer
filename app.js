@@ -3194,7 +3194,7 @@ function setupCategoryTabs() {
         updateRareCharmsDisplay();
     }
 }
-<script src="https://www.paypal.com/sdk/js?client-id=AeyGQxvN058IPUHXDS6FO-lyG2Q5IlA9wxsPwpT0ZnGz09UNzR4dvVoFYGTNYMGFjfYJ21sn2Pa0OJ0i&currency=USD"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AW0Y7ND9-yr29-7LJ1iPlWhgNQcfQ5XY8fmrq3WhrbV8kNJNWvlJ_0KXjnalKJ9pYWoWD1LyukcRwr3u&currency=USD"></script>
   document.getElementById('pay-paypal').addEventListener('change', function() {
     if(this.checked) {
       document.getElementById('paypal-button-container').style.display = 'block';
