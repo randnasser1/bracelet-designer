@@ -3194,7 +3194,6 @@ function setupCategoryTabs() {
         updateRareCharmsDisplay();
     }
 }
-<script src="https://www.paypal.com/sdk/js?client-id=AV6wdMHgwewWOkQ-K0IBdWO41OI1Y6WuLaoTJoXcF6zDX_tdRsUadUNuOUK_clN5cnqnDiKPEa8R072b&currency=AED"></script>
   document.getElementById('pay-paypal').addEventListener('change', function() {
     if(this.checked) {
       document.getElementById('paypal-button-container').style.display = 'block';
