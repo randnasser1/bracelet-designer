@@ -17,6 +17,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
   <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AV6wdMHgwewWOkQ-K0IBdWO41OI1Y6WuLaoTJoXcF6zDX_tdRsUadUNuOUK_clN5cnqnDiKPEa8R072b&currency=AED"></script>
 
   <script src="app.js" defer></script>
   <style>
@@ -1011,16 +1012,23 @@
       </div>
       
       <div class="payment-options">
-        <h3>Payment Method*</h3>
-        <div class="payment-option">
-          <input type="radio" id="pay-cliq" name="payment" value="Cliq" required>
-          <label for="pay-cliq">Pay with Cliq (00962788838118)</label>
-        </div>
-        <div class="payment-option">
-          <input type="radio" id="pay-cash" name="payment" value="Cash" required checked>
-          <label for="pay-cash">Cash on Delivery</label>
-        </div>
-      </div>
+  <h3>Payment Method*</h3>
+  
+  <!-- Existing Cash on Delivery option -->
+  <div class="payment-option">
+    <input type="radio" id="pay-cash" name="payment" value="Cash" required checked>
+    <label for="pay-cash">Cash on Delivery</label>
+  </div>
+  
+  <!-- PayPal Option -->
+  <div class="payment-option">
+    <input type="radio" id="pay-paypal" name="payment" value="PayPal" required>
+    <label for="pay-paypal">Pay with PayPal</label>
+  </div>
+  
+  <!-- PayPal Button (hidden until selected) -->
+  <div id="paypal-button-container" style="display:none; margin-top:15px;"></div>
+</div>
       
       <div id="payment-proof-container" style="display: none;">
         <label for="payment-proof">Upload Payment Proof (required for Cliq)</label>
