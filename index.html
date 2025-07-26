@@ -707,17 +707,12 @@
 <!-- Header Section -->
 <div class="header-container" style="margin-bottom: -10px;">
   <h1 class="main-title" style="margin-bottom: 0.2rem;">Italia Charms</h1>
-  <p class="location-subheader" style="margin: 0 0 0.2rem 0;">
-  Currently in the UAE 
-  <img src="https://flagcdn.com/16x12/ae.png" 
-       alt="UAE Flag" 
-       style="width:16px; height:12px; vertical-align:middle; margin-left:4px;">
-  Back in Amman starting September 29
+  <p class="location-subheader"style="margin: 0 0 0.2rem 0;">
+  Located in Jordan 
   <img src="https://flagcdn.com/16x12/jo.png" 
        alt="Jordan Flag" 
        style="width:16px; height:12px; vertical-align:middle; margin-left:4px;">
 </p>
-
   <p style="margin: 0.1rem 0 0.5rem 0;">౨ৎ ˖ ࣪⊹ •🍓•⊹₊ ⋆୨ৎ</p>
   <p class="subtitle" style="margin-top: 0.3rem;">Create Your Perfect Jewelry</p>
 </div>
@@ -944,79 +939,110 @@
   </div>
 
   <!-- Order Form Modal -->
-  <div class="modal" id="order-modal">
-    <div class="order-modal-content">
-      <h2>Place Your Order</h2>
+<!-- Order Form Modal -->
+<div class="modal" id="order-modal">
+  <div class="order-modal-content">
+    <h2>Place Your Order</h2>
 
-      <form id="order-form">
-        <div class="form-group">
-          <label for="full-name">Full Name*</label>
-          <input type="text" id="full-name" name="full-name" required>
-          
-        </div>
-        
-        <div class="form-group">
-          <label for="phone">Phone Number*</label>
-          <input type="tel" id="phone" name="phone" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="phone2">Second Phone Number (Optional)</label>
-          <input type="tel" id="phone2" name="phone2">
-        </div>
-<div class="form-group">
-  <label for="city">City*</label>
-  <select id="city" name="city" required>
-    <option value="">Select City</option>
-    <option value="Abu Dhabi">Abu Dhabi</option>
-    <option value="Dubai">Dubai</option>
-    <option value="Sharjah">Sharjah</option>
-    <option value="Ajman">Ajman</option>
-    <option value="Umm Al Quwain">Umm Al Quwain</option>
-    <option value="Ras Al Khaimah">Ras Al Khaimah</option>
-    <option value="Fujairah">Fujairah</option>
-  </select>
-</div>
+    <form id="order-form">
+      <div class="form-group">
+        <label for="full-name">Full Name*</label>
+        <input type="text" id="full-name" name="full-name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="phone">Phone Number*</label>
+        <input type="tel" id="phone" name="phone" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="phone2">Second Phone Number (Optional)</label>
+        <input type="tel" id="phone2" name="phone2">
+      </div>
 
-        
-        <div class="form-group">
-          <label for="address">Full Address Details الموقع بالتفصيل*</label>
-          <input type="text" id="address" name="address" required>
+      <div class="form-group">
+        <label for="city">City*</label>
+        <select id="city" name="city" required>
+          <option value="">Select City</option>
+          <option value="Abu Dhabi">Abu Dhabi</option>
+          <option value="Dubai">Dubai</option>
+          <option value="Sharjah">Sharjah</option>
+          <option value="Ajman">Ajman</option>
+          <option value="Umm Al Quwain">Umm Al Quwain</option>
+          <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+          <option value="Fujairah">Fujairah</option>
+        </select>
+      </div>
+
+      <!-- Add the new address fields here -->
+      <div class="form-group">
+        <label for="area">Area*</label>
+        <input type="text" id="area" name="area" required>
+      </div>
+
+      <div class="form-group">
+        <label for="street-name">Street Name*</label>
+        <input type="text" id="street-name" name="street-name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="building-name">Building Name</label>
+        <input type="text" id="building-name" name="building-name">
+      </div>
+
+      <div class="form-group">
+        <label for="apartment-no">Apartment No*</label>
+        <input type="text" id="apartment-no" name="apartment-no" required>
+      </div>
+
+      <div class="form-group">
+        <label for="floor-no">Floor No</label>
+        <input type="text" id="floor-no" name="floor-no">
+      </div>
+
+      <div class="form-group">
+        <label for="postal-code">Postal / Zip Code</label>
+        <input type="text" id="postal-code" name="postal-code">
+      </div>
+
+      <div class="form-group">
+        <label for="additional-address">Additional Address Details</label>
+        <textarea id="additional-address" name="additional-address" rows="2"></textarea>
+      </div>
+      
+      <div class="payment-options">
+        <h3>Payment Method*</h3>
+        <div class="payment-option">
+          <input type="radio" id="pay-cliq" name="payment" value="Cliq" required>
+          <label for="pay-cliq">Pay with Cliq (00962788838118)</label>
         </div>
-        
-        <div class="payment-options">
-          <h3>Payment Method*</h3>
-          <div class="payment-option">
-            <input type="radio" id="pay-cliq" name="payment" value="Cliq" required>
-            <label for="pay-cliq">Pay with Cliq (00962788838118)</label>
-          </div>
-          <div class="payment-option">
-            <input type="radio" id="pay-cash" name="payment" value="Cash" required checked>
-            <label for="pay-cash">Cash on Delivery</label>
-          </div>
+        <div class="payment-option">
+          <input type="radio" id="pay-cash" name="payment" value="Cash" required checked>
+          <label for="pay-cash">Cash on Delivery</label>
         </div>
-        
-        <div id="payment-proof-container" style="display: none;">
-          <label for="payment-proof">Upload Payment Proof (required for Cliq)</label>
-          <input type="file" id="payment-proof" name="payment-proof" accept="image/*">
-        </div>
-          <div class="order-summary">
+      </div>
+      
+      <div id="payment-proof-container" style="display: none;">
+        <label for="payment-proof">Upload Payment Proof (required for Cliq)</label>
+        <input type="file" id="payment-proof" name="payment-proof" accept="image/*">
+      </div>
+      
+      <div class="order-summary">
         <div id="order-subtotal">Subtotal: 0.00 AEDs</div>
         <div id="order-delivery">Delivery Fee: 20 AEDs</div>
         <div id="order-total-price">Total: 0.00 AEDs</div>
       </div>
-
-        
-        <div class="order-buttons">
-          <button type="submit" class="btn confirm-order-btn">
-            <i class="fas fa-check-circle"></i> Confirm Order
-          </button>
-          <button type="button" class="btn cancel-btn" id="cancel-order">
-            <i class="fas fa-times-circle"></i> Cancel 
-          </button>
-        </div>
-      </form>
-    </div>
+      
+      <div class="order-buttons">
+        <button type="submit" class="btn confirm-order-btn">
+          <i class="fas fa-check-circle"></i> Confirm Order
+        </button>
+        <button type="button" class="btn cancel-btn" id="cancel-order">
+          <i class="fas fa-times-circle"></i> Cancel 
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
   <!-- Order Confirmation Modal -->
