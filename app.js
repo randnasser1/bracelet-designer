@@ -1997,6 +1997,10 @@ async function handleFormSubmit(e) {
                 notes: formData.get('notes') || null
             },
             paymentMethod: formData.get('payment'),
+                currency: "AED",
+    amountAED: totalAED,
+    amountUSD: totalUSD,  // Only for PayPal payments
+    exchangeRate: AED_TO_USD_RATE,  // Only for PayPal payments
             paymentStatus: formData.get('payment') === 'PayPal' ? 'paid' : 'pending',
             paymentDetails: formData.get('payment') === 'PayPal' ? {
                 transactionId: formData.get('paypal_transaction_id'),
@@ -3202,33 +3206,93 @@ function setupCategoryTabs() {
   });
 
   // Initialize PayPal Button
-  paypal.Buttons({
+// Add this conversion rate (update it periodically)
+const AED_TO_USD_RATE = 0.27; // Example rate, check current rate
+
+paypal.Buttons({
     createOrder: function(data, actions) {
-      const total = parseFloat(document.getElementById('order-total-price').textContent.replace('Total: ', '').replace(' AED', ''));
-      return actions.order.create({
-        purchase_units: [{
-          amount: {
-            value: total.toFixed(2),
-            currency_code: "AED"
-          }
-        }]
-      });
+        // Get total in AED from your display
+        const totalAED = parseFloat(
+            document.getElementById('order-total-price')
+                .textContent
+                .replace('Total: ', '')
+                .replace(' AED', '')
+        );
+        
+        // Convert to USD only at payment time
+        const totalUSD = (totalAED * AED_TO_USD_RATE).toFixed(2);
+        
+        return actions.order.create({
+            purchase_units: [{
+                amount: {
+                    value: totalUSD,
+                    currency_code: "USD"
+                }
+            }]
+        });
     },
     onApprove: function(data, actions) {
-      return actions.order.capture().then(function(details) {
-        // Store PayPal transaction ID in hidden field
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'paypal_transaction_id';
-        input.value = details.id;
-        document.getElementById('order-form').appendChild(input);
-        
-        // Submit the form
-        document.getElementById('order-form').submit();
-      });
+        return actions.order.capture().then(function(details) {
+            // Store both AED and USD amounts
+            const transactionDetails = {
+                paypal_transaction_id: details.id,
+                amount_aed: totalAED,
+                amount_usd: totalUSD,
+                exchange_rate: AED_TO_USD_RATE
+            };
+            
+            // Add hidden fields to form
+            const form = document.getElementById('order-form');
+            for (const [key, value] of Object.entries(transactionDetails)) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                form.appendChild(input);
+            }
+            
+            // Submit form
+            form.submit();
+        });
+    },
+    onError: function(err) {
+        console.error('PayPal error:', err);
+        showToast('Payment failed: ' + err.message, 'error');
     }
-  }).render('#paypal-button-container');
+}).render('#paypal-button-container');
 
+function showOrderConfirmation(orderData) {
+    // Display AED amount to user
+    document.getElementById('confirmation-total').textContent = 
+        `${orderData.total.toFixed(2)} AED`;
+    
+    // For PayPal payments, show USD conversion
+    if (orderData.paymentMethod === 'PayPal') {
+        const usdAmount = (orderData.total * AED_TO_USD_RATE).toFixed(2);
+        document.getElementById('confirmation-usd').textContent = 
+            `(~${usdAmount} USD)`;
+        document.getElementById('confirmation-usd').style.display = 'inline';
+    } else {
+        document.getElementById('confirmation-usd').style.display = 'none';
+    }
+}
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
   function setupCustomCharmHandlers() {
     // Get DOM elements
     const customCharmUpload = document.getElementById('custom-charm-upload');
