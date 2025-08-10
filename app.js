@@ -1866,7 +1866,8 @@ function handleCloseConfirmation() {
 
 async function handleFormSubmit(e) {
     e.preventDefault();
-    
+        const paymentMethod = form.querySelector('input[name="payment"]:checked').value;
+
     // Validate charm sets
     const incompleteSets = validateAllSetsInCart();
     if (incompleteSets.length > 0) {
@@ -1904,7 +1905,7 @@ async function handleFormSubmit(e) {
         }
          
     // Skip PayPal validation for COD orders
-    if (paymentMethod === 'COD') {
+    if (formData.get('payment') === 'cash') {
         // Directly submit the form without PayPal processing
         submitOrderForm(form, null);
         return;
