@@ -1906,12 +1906,14 @@ async function handleFormSubmit(e) {
         if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
             throw new Error('Payment proof is required for Cliq payments');
         }
-        // In your handleFormSubmit function:
-        if (formData.get('payment') === 'PayPal') {
-        const paypalTransactionId = formData.get('paypal_transaction_id');
-        if (!paypalTransactionId) {
-            throw new Error('PayPal payment not completed');
-        }
+                // For cash payment, no additional handling needed
+            if (paymentMethod === 'cash') {
+            
+            }
+               // For PayPal, let the PayPal button handler do its job
+            if (paymentMethod === 'PayPal') {
+                return; // PayPal button will handle submission
+            }
         orderData.paymentProofUrl = `https://www.paypal.com/activity/payment/${paypalTransactionId}`;
         }
         // 2. Validate charm sets across all cart items
@@ -3195,57 +3197,50 @@ function setupCategoryTabs() {
 // Add this conversion rate (update it periodically)
 const AED_TO_USD_RATE = 0.27; // Example rate, check current rate
 
-paypal.Buttons({
-    createOrder: function(data, actions) {
-        // Get total in AED from your display
-        const totalAED = parseFloat(
-            document.getElementById('order-total-price')
-                .textContent
-                .replace('Total: ', '')
-                .replace(' AED', '')
-        );
+// KEEP THIS BUT MODIFY IT:
+document.getElementById('pay-paypal').addEventListener('change', function() {
+    const paypalContainer = document.getElementById('paypal-button-container');
+    const proofContainer = document.getElementById('payment-proof-container');
+    
+    if(this.checked) {
+        paypalContainer.style.display = 'block';
+        proofContainer.style.display = 'none';
         
-        // Convert to USD only at payment time
-        const totalUSD = (totalAED * AED_TO_USD_RATE).toFixed(2);
-        
-        return actions.order.create({
-            purchase_units: [{
-                amount: {
-                    value: totalUSD,
-                    currency_code: "USD"
-                }
-            }]
-        });
-    },
-    onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
-            // Store both AED and USD amounts
-            const transactionDetails = {
-                paypal_transaction_id: details.id,
-                amount_aed: totalAED,
-                amount_usd: totalUSD,
-                exchange_rate: AED_TO_USD_RATE
-            };
-            
-            // Add hidden fields to form
-            const form = document.getElementById('order-form');
-            for (const [key, value] of Object.entries(transactionDetails)) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value;
-                form.appendChild(input);
+        // Initialize PayPal ONLY when selected
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                const totalElement = document.getElementById('order-total-price');
+                const totalAED = parseFloat(totalElement.textContent.replace('Total: ', '').replace(' AED', ''));
+                const totalUSD = (totalAED * AED_TO_USD_RATE).toFixed(2);
+                
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: totalUSD,
+                            currency_code: "USD"
+                        }
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    // Add hidden fields for PayPal transaction
+                    const form = document.getElementById('order-form');
+                    const paypalIdInput = document.createElement('input');
+                    paypalIdInput.type = 'hidden';
+                    paypalIdInput.name = 'paypal_transaction_id';
+                    paypalIdInput.value = details.id;
+                    form.appendChild(paypalIdInput);
+                    
+                    form.submit();
+                });
             }
-            
-            // Submit form
-            form.submit();
-        });
-    },
-    onError: function(err) {
-        console.error('PayPal error:', err);
-        showToast('Payment failed: ' + err.message, 'error');
+        }).render('#paypal-button-container');
+    } else {
+        paypalContainer.style.display = 'none';
     }
-}).render('#paypal-button-container');
+});
+
 
 function showOrderConfirmation(orderData) {
     // Display AED amount to user
