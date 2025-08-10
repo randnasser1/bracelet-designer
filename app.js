@@ -3191,7 +3191,12 @@ function setupCategoryTabs() {
         updateRareCharmsDisplay();
     }
 }
-
+document.getElementById('pay-cash').addEventListener('change', function() {
+    if(this.checked) {
+        document.getElementById('paypal-button-container').style.display = 'none';
+        document.getElementById('payment-proof-container').style.display = 'none';
+    }
+});
 document.getElementById('pay-paypal').addEventListener('change', function() {
     if(this.checked) {
         document.getElementById('paypal-button-container').style.display = 'block';
