@@ -744,19 +744,19 @@ function updatePrice() {
         let charmText = '';
         
         if (priceData.longCharmCount > 0) {
-            charmText += `${priceData.longCharmCount} long (${Math.round(priceData.longCharmCount * 31)} AED)`;
+            charmText += `${priceData.longCharmCount} long (${priceData.longCharmCount * 31} AED)`;
         }
         if (priceData.specialCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.specialCount} special (${Math.round(priceData.specialCount * 11)} AED)`;
+            charmText += `${priceData.specialCount} special (${priceData.specialCount * 11} AED)`;
         }
         if (priceData.rareCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.rareCount} rare (${Math.round(priceData.rareCount * 16)} AED)`;
+            charmText += `${priceData.rareCount} rare (${priceData.rareCount * 16} AED)`;
         }
         if (priceData.customCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.customCount} custom (${Math.round(priceData.customCount * 18)} AED)`;
+            charmText += `${priceData.customCount} custom (${priceData.customCount * 18} AED)`;
         }
         
         charmPriceElement.innerHTML = `
@@ -764,14 +764,14 @@ function updatePrice() {
             <span>${charmText || '0 AED'}</span>
         `;
         
-        totalPriceElement.textContent = `Total: ${Math.round(priceData.total)} AED`;
+        totalPriceElement.textContent = `Total: ${priceData.total} AED`;
         discountMessageElement.innerHTML = '';
     } else {
         if (isFullGlam) {
-            basePriceElement.innerHTML = `Full Glam Base: ${Math.round(product.fullGlam)} AED`;
+            basePriceElement.innerHTML = `Full Glam Base: ${product.fullGlam} AED`;
         } else {
             const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
-            basePriceElement.innerHTML = `Base Price: ${Math.round(basePrice)} AED`;
+            basePriceElement.innerHTML = `Base Price: ${basePrice} AED`;
         }
 
         let charmText = '';
@@ -783,19 +783,19 @@ function updatePrice() {
         }
         if (paidSpecials > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${paidSpecials} paid special (+${Math.round(paidSpecials * 11)} AED)`;
+            charmText += `${paidSpecials} paid special (+${paidSpecials * 11} AED)`;
         }
         if (priceData.rareCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.rareCount} rare (+${Math.round(priceData.rareCount * 16)} AED)`;
+            charmText += `${priceData.rareCount} rare (+${priceData.rareCount * 16} AED)`;
         }
         if (priceData.customCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.customCount} custom (+${Math.round(priceData.customCount * 18)} AED)`;
+            charmText += `${priceData.customCount} custom (+${priceData.customCount * 18} AED)`;
         }
         if (priceData.longCharmCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.longCharmCount} long (+${Math.round(priceData.longCharmCount * 31)} AED)`;
+            charmText += `${priceData.longCharmCount} long (+${priceData.longCharmCount * 31} AED)`;
         }
 
         charmPriceElement.textContent = charmText || 'No charms added';
@@ -803,19 +803,19 @@ function updatePrice() {
         if (priceData.discount > 0) {
             totalPriceElement.innerHTML = `
                 <div class="price-comparison">
-                    <span class="original-price">${Math.round(priceData.subtotal)} AED</span>
+                    <span class="original-price">${priceData.subtotal} AED</span>
                     <span>→</span>
-                    <span class="discounted-price">${Math.round(priceData.total)} AED</span>
+                    <span class="discounted-price">${priceData.total} AED</span>
                 </div>
-                <div class="savings-notice">You saved ${Math.round(priceData.discount)} AED!</div>
+                <div class="savings-notice">You saved ${priceData.discount} AED!</div>
             `;
             discountMessageElement.innerHTML = '<div class="discount-badge">10% OFF</div>';
         } else {
-            totalPriceElement.innerHTML = `Total: ${Math.round(priceData.total)} AED`;
+            totalPriceElement.innerHTML = `Total: ${priceData.total} AED`;
             if (priceData.subtotal < 78) {
                 discountMessageElement.innerHTML = `
                     <div class="discount-promo">
-                        <i class="fas fa-tag"></i> Add ${Math.round(78 - priceData.subtotal)} AED more to get 10% OFF!
+                        <i class="fas fa-tag"></i> Add ${78 - priceData.subtotal} AED more to get 10% OFF!
                     </div>
                 `;
             } else {
@@ -824,8 +824,6 @@ function updatePrice() {
         }
     }
 }
-
-
 function getCharmBreakdownText() {
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
     let specialCount = 0, rareCount = 0, customCount = 0;
