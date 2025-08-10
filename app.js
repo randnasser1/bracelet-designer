@@ -1902,6 +1902,13 @@ async function handleFormSubmit(e) {
         if (missingFields.length > 0) {
             throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
         }
+         
+    // Skip PayPal validation for COD orders
+    if (paymentMethod === 'COD') {
+        // Directly submit the form without PayPal processing
+        submitOrderForm(form, null);
+        return;
+    }
         
         if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
             throw new Error('Payment proof is required for Cliq payments');
@@ -3184,26 +3191,37 @@ function setupCategoryTabs() {
         updateRareCharmsDisplay();
     }
 }
-  document.getElementById('pay-paypal').addEventListener('change', function() {
+ document.getElementById('pay-cod').addEventListener('change', function() {
     if(this.checked) {
-      document.getElementById('paypal-button-container').style.display = 'block';
-      document.getElementById('payment-proof-container').style.display = 'none';
+        document.getElementById('paypal-button-container').style.display = 'none';
+        document.getElementById('payment-proof-container').style.display = 'none';
     }
-  });
+});
 
-  // Initialize PayPal Button
+document.getElementById('pay-paypal').addEventListener('change', function() {
+    if(this.checked) {
+        document.getElementById('paypal-button-container').style.display = 'block';
+        document.getElementById('payment-proof-container').style.display = 'none';
+    }
+});
+
+document.getElementById('pay-cliq').addEventListener('change', function() {
+    if(this.checked) {
+        document.getElementById('paypal-button-container').style.display = 'none';
+        document.getElementById('payment-proof-container').style.display = 'block';
+    }
+});
 // Add this conversion rate (update it periodically)
 const AED_TO_USD_RATE = 0.27; // Example rate, check current rate
 
 paypal.Buttons({
     createOrder: function(data, actions) {
         // Get total in AED from your display
-        const totalAED = parseFloat(
-            document.getElementById('order-total-price')
-                .textContent
-                .replace('Total: ', '')
-                .replace(' AED', '')
-        );
+        const totalText = document.getElementById('order-total-price').textContent;
+        const totalAED = parseFloat(totalText.replace('Total: ', '').replace(' AED', ''));
+        
+        // Store the AED amount in a variable accessible to onApprove
+        window.orderTotalAED = totalAED;
         
         // Convert to USD only at payment time
         const totalUSD = (totalAED * AED_TO_USD_RATE).toFixed(2);
@@ -3219,7 +3237,11 @@ paypal.Buttons({
     },
     onApprove: function(data, actions) {
         return actions.order.capture().then(function(details) {
-            // Store both AED and USD amounts
+            // Use the stored AED amount
+            const totalAED = window.orderTotalAED;
+            const totalUSD = (totalAED * AED_TO_USD_RATE).toFixed(2);
+            
+            // Store transaction details
             const transactionDetails = {
                 paypal_transaction_id: details.id,
                 amount_aed: totalAED,
@@ -3247,6 +3269,78 @@ paypal.Buttons({
     }
 }).render('#paypal-button-container');
 
+async function submitOrderForm(form, paypalData) {
+    const submitButton = form.querySelector('button[type="submit"]');
+    
+    try {
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        // Process the order data
+        const orderData = await prepareOrderData(form, paypalData);
+        
+        // Submit to Firestore
+        const orderRef = await db.collection('orders').add(orderData);
+        
+        // Clear cart and show confirmation
+        cart.length = 0;
+        updateCartDisplay();
+        form.reset();
+        
+        orderIdSpan.textContent = orderRef.id;
+        orderModal.classList.remove('active');
+        orderConfirmation.classList.add('active');
+        
+    } catch (error) {
+        console.error('Order submission failed:', error);
+        showToast(error.message || 'Order submission failed', 'error');
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Order';
+    }
+}
+
+async function prepareOrderData(form, paypalData) {
+    const formData = new FormData(form);
+    const paymentMethod = formData.get('payment');
+    
+    // Calculate order totals
+    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+    const deliveryFee = 20;
+    const total = subtotal + deliveryFee;
+    
+    // Prepare order data
+    const orderData = {
+        clientOrderId: `ORDER-${Date.now()}`,
+        customer: {
+            name: formData.get('full-name'),
+            phone: formData.get('phone'),
+            // ... other customer fields
+        },
+        paymentMethod: paymentMethod,
+        paymentStatus: paymentMethod === 'PayPal' ? 'paid' : 'pending',
+        paymentDetails: paypalData || null,
+        items: cart.map(item => ({
+            // ... item details
+        })),
+        subtotal: subtotal,
+        deliveryFee: deliveryFee,
+        total: total,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        status: 'pending'
+    };
+    
+    // Handle payment proof for Cliq
+    if (paymentMethod === 'Cliq') {
+        const paymentProofFile = document.getElementById('payment-proof').files[0];
+        if (paymentProofFile) {
+            const proofUrl = await uploadPaymentProof(paymentProofFile, orderData.clientOrderId);
+            orderData.paymentProofUrl = proofUrl;
+        }
+    }
+    
+    return orderData;
+}
 function showOrderConfirmation(orderData) {
     // Display AED amount to user
     document.getElementById('confirmation-total').textContent = 
