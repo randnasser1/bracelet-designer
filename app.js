@@ -3233,15 +3233,6 @@ paypal.Buttons({
     },
     onApprove: function(data, actions) {
         return actions.order.capture().then(function(details) {
-            // Get the total again when capturing the order
-            const totalAED = parseFloat(
-                document.getElementById('order-total-price')
-                    .textContent
-                    .replace('Total: ', '')
-                    .replace(' AED', '')
-            );
-            const totalUSD = (totalAED * AED_TO_USD_RATE).toFixed(2);
-            
             // Store both AED and USD amounts
             const transactionDetails = {
                 paypal_transaction_id: details.id,
