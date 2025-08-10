@@ -381,19 +381,19 @@ function showSetWarning(charmSet) {
 function calculatePrice(includeDelivery = false) {
     // Handle individual charms separately
     if (currentProduct === 'individual') {
-        const basePrice = 16 ; // Base price per individual charm
+        const basePrice = 16; // Base price per individual charm
         let charmCost = 0;
         
         const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
         placedCharms.forEach(charm => {
             if (charm.dataset.type === 'special') {
-                charmCost += 11 ;
+                charmCost += 11; // Special charm cost
             } else if (charm.dataset.type === 'rare') {
-                charmCost += 16 ;
+                charmCost += 16; // Rare charm cost
             } else if (charm.dataset.type === 'custom') {
-                charmCost += 18;
+                charmCost += 18; // Custom charm cost
             } else if (charm.classList.contains('long-charm')) {
-                charmCost += 31;
+                charmCost += 31; // Long charm cost
             }
         });
         
@@ -409,19 +409,7 @@ function calculatePrice(includeDelivery = false) {
         };
     }
 
-    // Verify valid product and size data
-    if (!PRODUCTS[currentProduct] || !SIZE_CHARTS[currentProduct] || !SIZE_CHARTS[currentProduct][currentSize]) {
-        console.error(`Missing price data for ${currentProduct} size ${currentSize}`);
-        return {
-            subtotal: 0,
-            discount: 0,
-            total: 0,
-            delivery: 0,
-            basePrice: 0,
-            charmCost: 0
-        };
-    }
-
+    // Regular products calculation
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
     
@@ -458,22 +446,22 @@ function calculatePrice(includeDelivery = false) {
         }
     });
 
-    // Apply charm costs to both prices
+    // Apply charm costs
     if (!isFullGlam) {
         const includedSpecials = product.includedSpecial;
         const paidSpecials = Math.max(0, specialCount - includedSpecials);
-        totalPrice += paidSpecials * 2;
-        originalPrice += paidSpecials * 2;
+        totalPrice += paidSpecials * 11; // 11 AED per special charm
+        originalPrice += paidSpecials * 11;
     }
 
     // Add costs for rare, custom, and long charms
-    totalPrice += rareCount * 16;
+    totalPrice += rareCount * 16; // 16 AED per rare charm
     originalPrice += rareCount * 16;
     
-    totalPrice += customCount * 18;
+    totalPrice += customCount * 18; // 18 AED per custom charm
     originalPrice += customCount * 18;
     
-    totalPrice += longCharmCount * 31; // Long charms cost 6 JD each
+    totalPrice += longCharmCount * 31; // 31 AED per long charm
     originalPrice += longCharmCount * 31;
 
     // Check for discount eligibility
