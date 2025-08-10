@@ -3191,12 +3191,6 @@ function setupCategoryTabs() {
         updateRareCharmsDisplay();
     }
 }
- document.getElementById('pay-cod').addEventListener('change', function() {
-    if(this.checked) {
-        document.getElementById('paypal-button-container').style.display = 'none';
-        document.getElementById('payment-proof-container').style.display = 'none';
-    }
-});
 
 document.getElementById('pay-paypal').addEventListener('change', function() {
     if(this.checked) {
@@ -3205,12 +3199,7 @@ document.getElementById('pay-paypal').addEventListener('change', function() {
     }
 });
 
-document.getElementById('pay-cliq').addEventListener('change', function() {
-    if(this.checked) {
-        document.getElementById('paypal-button-container').style.display = 'none';
-        document.getElementById('payment-proof-container').style.display = 'block';
-    }
-});
+
 // Add this conversion rate (update it periodically)
 const AED_TO_USD_RATE = 0.27; // Example rate, check current rate
 
