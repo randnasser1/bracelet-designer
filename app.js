@@ -1905,7 +1905,7 @@ async function handleFormSubmit(e) {
         }
          
     // Skip PayPal validation for COD orders
-    if (formData.get('payment') === 'cash') {
+    if (formData.get('payment') === 'Cash') {
         // Directly submit the form without PayPal processing
         submitOrderForm(form, null);
         return;
