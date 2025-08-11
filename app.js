@@ -3197,10 +3197,12 @@ const AED_TO_USD_RATE = 0.27; // Example rate, check current rate
 paypal.Buttons({
     style: {
         layout: 'vertical',  // or 'horizontal'
-        // Add this to disable billing address collection
+        // Disable funding options if needed (credit, card, etc.)
         disableFunding: 'card,credit',
-        // This will remove the billing address section
-        billingAddress: 'hidden'
+        // Remove billing address fields
+        billingAddress: 'hidden',
+        // Remove shipping address (if applicable)
+        shippingAddress: 'none'
     },
     createOrder: function(data, actions) {
         if (!document.getElementById('pay-paypal').checked) {
@@ -3216,16 +3218,17 @@ paypal.Buttons({
         // Convert to USD only at payment time
         const totalUSD = (totalAED * AED_TO_USD_RATE).toFixed(2);
         
-        return actions.order.create({
+          return actions.order.create({
             purchase_units: [{
                 amount: {
                     value: totalUSD,
                     currency_code: "USD"
                 }
             }],
-            // This helps remove address fields
+            // Ensure no shipping/billing address is collected
             application_context: {
-                shipping_preference: 'NO_SHIPPING'
+                shipping_preference: 'NO_SHIPPING',
+                user_action: 'PAY_NOW' // Skip review page
             }
         });
     },
