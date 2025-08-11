@@ -3195,6 +3195,13 @@ function setupCategoryTabs() {
 const AED_TO_USD_RATE = 0.27; // Example rate, check current rate
 
 paypal.Buttons({
+    style: {
+        layout: 'vertical',  // or 'horizontal'
+        // Add this to disable billing address collection
+        disableFunding: 'card,credit',
+        // This will remove the billing address section
+        billingAddress: 'hidden'
+    },
     createOrder: function(data, actions) {
         if (!document.getElementById('pay-paypal').checked) {
             return;
@@ -3215,7 +3222,11 @@ paypal.Buttons({
                     value: totalUSD,
                     currency_code: "USD"
                 }
-            }]
+            }],
+            // This helps remove address fields
+            application_context: {
+                shipping_preference: 'NO_SHIPPING'
+            }
         });
     },
     onApprove: function(data, actions) {
