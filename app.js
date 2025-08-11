@@ -1863,29 +1863,34 @@ function handleCloseConfirmation() {
     // Reset the designer after successful order
     initProduct('bracelet');
 }
-
+document.querySelectorAll('input[name="payment"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        if (this.value === 'PayPal') {
+            document.getElementById('paypal-button-container').style.display = 'block';
+            document.getElementById('payment-proof-container').style.display = 'none';
+        } else if (this.value === 'Cliq') {
+            document.getElementById('paypal-button-container').style.display = 'none';
+            document.getElementById('payment-proof-container').style.display = 'block';
+        } else { // Cash
+            document.getElementById('paypal-button-container').style.display = 'none';
+            document.getElementById('payment-proof-container').style.display = 'none';
+        }
+    });
+});
 async function handleFormSubmit(e) {
     e.preventDefault();
-        const paymentMethod = form.querySelector('input[name="payment"]:checked').value;
-
-    // Validate charm sets
-    const incompleteSets = validateAllSetsInCart();
-    if (incompleteSets.length > 0) {
-        const errorMessages = incompleteSets.map(set => 
-            `• ${set.name}: ${set.message}\n  (You have ${set.currentCount}/${set.requiredCount} charms)`
-        ).join('\n\n');
-        
-        showCustomWarningModal(
-            `Cannot Checkout!\n\nYou have incomplete charm sets:\n\n${errorMessages}\n\n` +
-            'Please complete these sets or remove the charms.'
-        );
-        return;
-    }
-
-    console.log('Form submission started');
-
     const form = e.target;
     const submitButton = form.querySelector('button[type="submit"]');
+    
+    // Get payment method first
+    const paymentMethod = form.querySelector('input[name="payment"]:checked').value;
+
+    // Skip PayPal validation for COD orders
+    if (paymentMethod === 'Cash') {
+        // Directly submit the form without PayPal processing
+        await submitOrderForm(form, null);
+        return;
+    }
 
     // Prevent multiple submissions
     if (window.orderSubmissionInProgress) return;
@@ -1903,24 +1908,17 @@ async function handleFormSubmit(e) {
         if (missingFields.length > 0) {
             throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
         }
-         
-    // Skip PayPal validation for COD orders
-    if (formData.get('payment') === 'Cash') {
-        // Directly submit the form without PayPal processing
-        submitOrderForm(form, null);
-        return;
-    }
         
         if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
             throw new Error('Payment proof is required for Cliq payments');
         }
-        // In your handleFormSubmit function:
-        if (formData.get('payment') === 'PayPal') {
-        const paypalTransactionId = formData.get('paypal_transaction_id');
-        if (!paypalTransactionId) {
-            throw new Error('PayPal payment not completed');
-        }
-        orderData.paymentProofUrl = `https://www.paypal.com/activity/payment/${paypalTransactionId}`;
+
+        // PayPal-specific validation
+        if (paymentMethod === 'PayPal') {
+            const paypalTransactionId = formData.get('paypal_transaction_id');
+            if (!paypalTransactionId) {
+                throw new Error('PayPal payment not completed');
+            }
         }
         // 2. Validate charm sets across all cart items
         const allCharms = cart.flatMap(item => item.charms.map(charm => charm.src));
@@ -3192,25 +3190,15 @@ function setupCategoryTabs() {
         updateRareCharmsDisplay();
     }
 }
-document.getElementById('pay-cash').addEventListener('change', function() {
-    if(this.checked) {
-        document.getElementById('paypal-button-container').style.display = 'none';
-        document.getElementById('payment-proof-container').style.display = 'none';
-    }
-});
-document.getElementById('pay-paypal').addEventListener('change', function() {
-    if(this.checked) {
-        document.getElementById('paypal-button-container').style.display = 'block';
-        document.getElementById('payment-proof-container').style.display = 'none';
-    }
-});
-
 
 // Add this conversion rate (update it periodically)
 const AED_TO_USD_RATE = 0.27; // Example rate, check current rate
 
 paypal.Buttons({
     createOrder: function(data, actions) {
+        if (!document.getElementById('pay-paypal').checked) {
+            return;
+        }
         // Get total in AED from your display
         const totalText = document.getElementById('order-total-price').textContent;
         const totalAED = parseFloat(totalText.replace('Total: ', '').replace(' AED', ''));
