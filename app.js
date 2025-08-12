@@ -380,8 +380,8 @@ function showSetWarning(charmSet) {
 }
 function calculatePrice(includeDelivery = false) {
     // Handle individual charms separately
-    if (currentProduct === 'individual') {
-        const basePrice = 16; // Base price per individual charm
+   if (currentProduct === 'individual') {
+        const basePrice = 16; // Flat base price (only charged once)
         let charmCost = 0;
         
         const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
@@ -397,8 +397,7 @@ function calculatePrice(includeDelivery = false) {
             }
         });
         
-        // Only charge for placed charms, not empty slots
-        const subtotal = placedCharms.length * basePrice + charmCost;
+        const subtotal = basePrice + charmCost; // Only base 16 AED + charms
         const delivery = includeDelivery ? 20 : 0;
         const total = subtotal + delivery;
         
