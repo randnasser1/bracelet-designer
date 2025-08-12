@@ -397,7 +397,8 @@ function calculatePrice(includeDelivery = false) {
             }
         });
         
-        const subtotal = basePrice * individualSlotCount + charmCost;
+        // Only charge for placed charms, not empty slots
+        const subtotal = placedCharms.length * basePrice + charmCost;
         const delivery = includeDelivery ? 20 : 0;
         const total = subtotal + delivery;
         
@@ -409,7 +410,7 @@ function calculatePrice(includeDelivery = false) {
         };
     }
 
-    // Regular products calculation
+    // Rest of the function remains the same
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
     
