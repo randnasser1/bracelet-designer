@@ -2062,7 +2062,7 @@ async function handleFormSubmit(e) {
         }
         
         // 7. Submit to Firestore
-        const orderRef = await db.collection('uaeorders').add(orderData);
+        const orderRef = await db.collection('orders').add(orderData);
         console.log('Order submitted with ID:', orderRef.id);
 
         // 8. Clear cart and reset form
@@ -3290,7 +3290,7 @@ async function submitOrderForm(form, paypalData) {
         const orderData = await prepareOrderData(form, paypalData);
         
         // Submit to Firestore
-        const orderRef = await db.collection('uaeorders').add(orderData);
+        const orderRef = await db.collection('orders').add(orderData);
         
         // Clear cart and show confirmation
         cart.length = 0;
