@@ -539,39 +539,52 @@ async function uploadBraceletImage(imageFile) {
   }
 }
 // Helper function to upload images to Firebase Storage
-async function uploadImageToFirebase(imageFile, folder = 'designs/') {
-  try {
-    // 1. Create a unique filename
-    const timestamp = Date.now();
-    const fileName = `${folder}${timestamp}_${imageFile.name}`;
-    
-    // 2. Create storage reference
-    const storageRef = firebase.storage().ref();
-    const fileRef = storageRef.child(fileName);
-    
-    // 3. Start upload
-    const uploadTask = fileRef.put(imageFile);
-    
-    // 4. Return a promise that resolves with download URL
-    return new Promise((resolve, reject) => {
-      uploadTask.on('state_changed',
-        null, // Progress handler (optional)
-        (error) => reject(error),
-        async () => {
-          try {
-            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-            resolve(downloadURL);
-          } catch (error) {
-            reject(error);
-          }
+async function uploadImageToFirebase(imageData, folder = 'designs/') {
+    try {
+        // Convert data URL to blob if needed
+        let blob;
+        if (typeof imageData === 'string' && imageData.startsWith('data:')) {
+            const response = await fetch(imageData);
+            blob = await response.blob();
+        } else if (imageData instanceof Blob) {
+            blob = imageData;
+        } else {
+            throw new Error('Invalid image data format');
         }
-      );
-    });
-    
-  } catch (error) {
-    console.error('Upload error:', error);
-    throw error;
-  }
+
+        // Create storage reference
+        const timestamp = Date.now();
+        const fileName = `${folder}${timestamp}_design.png`;
+        const storageRef = firebase.storage().ref(fileName);
+        
+        // Upload with metadata
+        const uploadTask = storageRef.put(blob, {
+            contentType: 'image/png',
+            customMetadata: {
+                uploadedBy: 'customer',
+                uploadedAt: new Date().toISOString()
+            }
+        });
+
+        // Return download URL when complete
+        return new Promise((resolve, reject) => {
+            uploadTask.on('state_changed',
+                null, // Progress handler (optional)
+                (error) => reject(error),
+                async () => {
+                    try {
+                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                        resolve(downloadURL);
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+            );
+        });
+    } catch (error) {
+        console.error('Upload error:', error);
+        throw error;
+    }
 }
 function updateJewelryPiece() {
     const jewelryPiece = document.getElementById('jewelry-piece');
@@ -2049,7 +2062,7 @@ async function handleFormSubmit(e) {
         }
         
         // 7. Submit to Firestore
-        const orderRef = await db.collection('orders').add(orderData);
+        const orderRef = await db.collection('uaeorders').add(orderData);
         console.log('Order submitted with ID:', orderRef.id);
 
         // 8. Clear cart and reset form
@@ -3277,7 +3290,7 @@ async function submitOrderForm(form, paypalData) {
         const orderData = await prepareOrderData(form, paypalData);
         
         // Submit to Firestore
-        const orderRef = await db.collection('orders').add(orderData);
+        const orderRef = await db.collection('uaeorders').add(orderData);
         
         // Clear cart and show confirmation
         cart.length = 0;
@@ -3306,19 +3319,50 @@ async function prepareOrderData(form, paypalData) {
     const deliveryFee = 20;
     const total = subtotal + deliveryFee;
     
-    // Prepare order data
+    // Prepare order data with all address fields
     const orderData = {
-        clientOrderId: `ORDER-${Date.now()}`,
+        clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
         customer: {
             name: formData.get('full-name'),
             phone: formData.get('phone'),
-            // ... other customer fields
+            phone2: formData.get('phone2') || null,
+            city: formData.get('city'),
+            address: {
+                area: formData.get('area'),
+                streetName: formData.get('street-name'),
+                buildingName: formData.get('building-name') || null,
+                apartmentNo: formData.get('apartment-no'),
+                floorNo: formData.get('floor-no') || null,
+                postalCode: formData.get('postal-code') || null,
+                additionalDetails: formData.get('additional-address') || null
+            },
+            notes: formData.get('notes') || null
         },
         paymentMethod: paymentMethod,
         paymentStatus: paymentMethod === 'PayPal' ? 'paid' : 'pending',
         paymentDetails: paypalData || null,
-        items: cart.map(item => ({
-            // ... item details
+        items: await Promise.all(cart.map(async (item) => {
+            // Upload design image if it exists
+            let imageUrl = null;
+            if (item.designImage) {
+                try {
+                    const blob = await (await fetch(item.designImage)).blob();
+                    imageUrl = await uploadImageToFirebase(blob, 'designs/');
+                } catch (error) {
+                    console.error('Error uploading design image:', error);
+                }
+            }
+            
+            return {
+                product: item.product,
+                size: item.size,
+                price: item.price,
+                imageUrl: imageUrl,
+                isFullGlam: item.isFullGlam,
+                materialType: item.materialType,
+                charms: item.charms,
+                timestamp: new Date().toISOString()
+            };
         })),
         subtotal: subtotal,
         deliveryFee: deliveryFee,
@@ -3331,8 +3375,12 @@ async function prepareOrderData(form, paypalData) {
     if (paymentMethod === 'Cliq') {
         const paymentProofFile = document.getElementById('payment-proof').files[0];
         if (paymentProofFile) {
-            const proofUrl = await uploadPaymentProof(paymentProofFile, orderData.clientOrderId);
-            orderData.paymentProofUrl = proofUrl;
+            try {
+                const proofUrl = await uploadPaymentProof(paymentProofFile, orderData.clientOrderId);
+                orderData.paymentProofUrl = proofUrl;
+            } catch (error) {
+                console.error('Error uploading payment proof:', error);
+            }
         }
     }
     
