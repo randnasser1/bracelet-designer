@@ -25,7 +25,7 @@ let watchPoolContainer = null; // Add this with your other global variables
 const maxIndividualSlots = 10;
 const globalUsedCharms = new Map(); // Change from Set to Map to track quantities
 const charmQuantities = {}; // Tracks remaining quantities
-
+const disableCOD = true; // Set this to false to show COD option again
 // Constants
 const MAX_SLOT_SPACES = 16;
 const SIZE_CHARTS = {
@@ -1877,6 +1877,9 @@ function handleCloseConfirmation() {
     initProduct('bracelet');
 }
 document.querySelectorAll('input[name="payment"]').forEach(radio => {
+    // Skip COD radio if disabled
+    if (disableCOD && radio.value === 'Cash') return;
+    
     radio.addEventListener('change', function() {
         if (this.value === 'PayPal') {
             document.getElementById('paypal-button-container').style.display = 'block';
@@ -1884,7 +1887,7 @@ document.querySelectorAll('input[name="payment"]').forEach(radio => {
         } else if (this.value === 'Cliq') {
             document.getElementById('paypal-button-container').style.display = 'none';
             document.getElementById('payment-proof-container').style.display = 'block';
-        } else { // Cash
+        } else if (this.value === 'Cash') {
             document.getElementById('paypal-button-container').style.display = 'none';
             document.getElementById('payment-proof-container').style.display = 'none';
         }
@@ -1898,13 +1901,11 @@ async function handleFormSubmit(e) {
     // Get payment method first
     const paymentMethod = form.querySelector('input[name="payment"]:checked').value;
 
-    // Skip PayPal validation for COD orders
-    if (paymentMethod === 'Cash') {
-        // Directly submit the form without PayPal processing
+    // Skip PayPal validation for COD orders (only if COD is enabled)
+    if (paymentMethod === 'Cash' && !disableCOD) {
         await submitOrderForm(form, null);
         return;
     }
-
     // Prevent multiple submissions
     if (window.orderSubmissionInProgress) return;
     window.orderSubmissionInProgress = true;
@@ -3539,7 +3540,21 @@ document.addEventListener('DOMContentLoaded', () => {
         orderConfirmation = document.getElementById('order-confirmation');
         closeConfirmation = document.getElementById('close-confirmation');
         orderIdSpan = document.getElementById('order-id');
-
+        const disableCOD = true; // Set to true to hide COD option
+        
+        if (disableCOD) {
+            const codOption = document.getElementById('pay-cash');
+            if (codOption) {
+                codOption.closest('.payment-option').style.display = 'none';
+                
+                // Check PayPal by default if COD is disabled
+                const paypalOption = document.getElementById('pay-paypal');
+                if (paypalOption) {
+                    paypalOption.checked = true;
+                    document.getElementById('paypal-button-container').style.display = 'block';
+                }
+            }
+        }
         // Set default product to bracelet
         currentProduct = 'bracelet';
         currentSize = '15.2-16.2';
