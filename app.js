@@ -1,3 +1,4 @@
+
 let specialCharmsGrid;
 let rareCharmsGrid;
 let customCharmUpload;
@@ -3210,14 +3211,13 @@ const AED_TO_USD_RATE = 0.27; // Example rate, check current rate
 
 paypal.Buttons({
     style: {
-        layout: 'vertical',
-        // Enable Apple Pay and other funding sources
-        fundingSource: paypal.FUNDING.APPLEPAY,
-        // Optional: Disable unwanted funding sources
-        disableFunding: 'venmo,paylater', // Keep 'card,credit' if you want them
-        color: 'gold',
-        shape: 'rect',
-        label: 'checkout'
+        layout: 'vertical',  // or 'horizontal'
+        // Disable funding options if needed (credit, card, etc.)
+        disableFunding: 'card,credit',
+        // Remove billing address fields
+        billingAddress: 'hidden',
+        // Remove shipping address (if applicable)
+        shippingAddress: 'none'
     },
     createOrder: function(data, actions) {
         if (!document.getElementById('pay-paypal').checked) {
@@ -3281,13 +3281,6 @@ paypal.Buttons({
     }
 }).render('#paypal-button-container');
 
-// Add Apple Pay mark if available
-if (paypal.Marks.isEligible()) {
-    document.getElementById('apple-pay-mark').style.display = 'block';
-    paypal.Marks({
-        fundingSource: paypal.FUNDING.APPLEPAY
-    }).render('#apple-pay-mark');
-}
 async function submitOrderForm(form, paypalData) {
     const submitButton = form.querySelector('button[type="submit"]');
     
