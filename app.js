@@ -470,7 +470,7 @@ function calculatePrice(includeDelivery = false) {
     const discountEndDate = new Date('2025-09-28');
     let discountApplied = 0;
     
-    if (currentDate <= discountEndDate && originalPrice >= 15) {
+    if (currentDate <= discountEndDate && originalPrice >= 75) {
         discountApplied = Math.min(originalPrice * 0.1, 5);
         totalPrice = originalPrice - discountApplied;
     }
