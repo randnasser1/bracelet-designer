@@ -747,7 +747,15 @@ function updatePrice() {
     const totalPriceElement = document.getElementById('total-price');
     const discountMessageElement = document.getElementById('discount-message');
     const product = PRODUCTS[currentProduct];
-
+if (document.getElementById('pay-delivery-only')?.checked) {
+    // Show only delivery fee as payable
+    document.getElementById('order-subtotal').textContent = `Items Total: ${subtotal.toFixed(2)} AED (Pay Later)`;
+    document.getElementById('order-delivery').textContent = `Delivery Fee: 20.00 AED (Pay Now)`;
+    document.getElementById('order-total-price').textContent = `Total Now: 20.00 AED`;
+  } else {
+    // Normal full payment
+    document.getElementById('order-total-price').textContent = `Total: ${(subtotal + deliveryFee).toFixed(2)} AED`;
+  }
     if (currentProduct === 'individual') {
         basePriceElement.innerHTML = `
             <span>Base Price:</span>
@@ -1882,7 +1890,18 @@ document.querySelectorAll('input[name="payment"]').forEach(radio => {
     if (disableCOD && radio.value === 'Cash') return;
     
     radio.addEventListener('change', function() {
-        if (this.value === 'PayPal') {
+         if (this.value === 'DeliveryFeePlusCOD') {
+            // Show only 20 AED as payable amount
+            const subtotal = calculateSubtotal(); // Your existing function
+            document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} AED (Pay Later)`;
+            document.getElementById('order-delivery').textContent = `Delivery Fee: 20.00 AED (Pay Now)`;
+            document.getElementById('order-total-price').textContent = `Total Now: 20.00 AED`;
+            
+            // Hide other payment containers
+            document.getElementById('paypal-button-container').style.display = 'none';
+            document.getElementById('payment-proof-container').style.display = 'none';
+        }
+        else if (this.value === 'PayPal') {
             document.getElementById('paypal-button-container').style.display = 'block';
             document.getElementById('payment-proof-container').style.display = 'none';
         } else if (this.value === 'Cliq') {
@@ -1902,11 +1921,28 @@ async function handleFormSubmit(e) {
     // Get payment method first
     const paymentMethod = form.querySelector('input[name="payment"]:checked').value;
 
+
+  if (paymentMethod === 'DeliveryOnlyCOD') {
+    // Submit to Firebase with payment flag
+    await db.collection('orders').add({
+      ...orderData,
+      paymentType: 'delivery_partial',
+      paidNow: 20,
+      dueOnDelivery: orderData.subtotal,
+      status: 'pending_payment' // Add this status
+    });
     // Skip PayPal validation for COD orders (only if COD is enabled)
     if (paymentMethod === 'Cash' && !disableCOD) {
         await submitOrderForm(form, null);
         return;
     }
+          // Show confirmation
+    orderConfirmation.innerHTML = `
+      <h3>Delivery Fee Paid!</h3>
+      <p>You'll pay ${orderData.subtotal} AED when your order arrives</p>
+    `;
+    return;
+  }
     // Prevent multiple submissions
     if (window.orderSubmissionInProgress) return;
     window.orderSubmissionInProgress = true;
