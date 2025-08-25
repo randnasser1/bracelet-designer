@@ -27,7 +27,7 @@ let watchPoolContainer = null; // Add this with your other global variables
 const maxIndividualSlots = 10;
 const globalUsedCharms = new Map(); // Change from Set to Map to track quantities
 const charmQuantities = {}; // Tracks remaining quantities
-const disableCOD = true; // Set this to false to show COD option again
+const disableCOD = false; // Set this to false to show COD option again
 // Constants
 const MAX_SLOT_SPACES = 16;
 const SIZE_CHARTS = {
