@@ -10,7 +10,7 @@
   <link href="style.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" crossorigin="anonymous"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Parisienne&display=swap" rel="stylesheet">
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -21,288 +21,205 @@
 <script src="https://www.paypal.com/sdk/js?client-id=AV6wdMHgwewWOkQ-K0IBdWO41OI1Y6WuLaoTJoXcF6zDX_tdRsUadUNuOUK_clN5cnqnDiKPEa8R072b&components=buttons,marks,funding-eligibility&enable-funding=applepay"></script>
   <script src="app.js" defer></script>
   <style>
-    :root {
-      --primary-pink: #ff6b9d;
-      --secondary-pink: #ff8fab;
-      --accent-pink: #ffc2d4;
-      --light-pink: #fff0f5;
-      --dark-pink: #e91e63;
-      --gradient-primary: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
-      --gradient-secondary: linear-gradient(135deg, #ffc2d4 0%, #fff0f5 100%);
-      --text-dark: #2d3748;
-      --text-light: #718096;
-      --white: #ffffff;
-      --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-      --shadow-lg: 0 8px 25px rgba(0,0,0,0.15);
-      --border-radius: 16px;
-      --border-radius-sm: 8px;
-      --spacing-xs: 0.25rem;
-      --spacing-sm: 0.5rem;
-      --spacing-md: 1rem;
-      --spacing-lg: 1.5rem;
-      --spacing-xl: 2rem;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #fff0f5 0%, #fce4ec 50%, #f8bbd9 100%);
-      color: var(--text-dark);
+      font-family: 'Poppins', sans-serif;
+      background: #ffe6f0;
+      color: #333;
       margin: 0;
-      padding: var(--spacing-md);
-      line-height: 1.6;
-      min-height: 100vh;
+      padding: 1rem;
     }
 
     h1, h2, h3 {
-      font-family: 'Playfair Display', serif;
-      color: var(--dark-pink);
-      margin-bottom: var(--spacing-md);
+      color: #d6336c;
+      margin-bottom: 1rem;
       text-align: center;
-      font-weight: 600;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: var(--spacing-sm);
-    }
-
-    h2 {
-      font-size: 1.75rem;
-    }
-
-    h3 {
-      font-size: 1.25rem;
-      font-weight: 500;
     }
 
     .main-content {
-      max-width: 1200px;
+      max-width: 1000px;
       margin: 0 auto;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(10px);
-      border-radius: var(--border-radius);
-      padding: var(--spacing-xl);
-      box-shadow: var(--shadow-lg);
     }
 
     .product-selector {
       display: flex;
       justify-content: center;
-      gap: var(--spacing-sm);
-      margin-bottom: var(--spacing-lg);
+      gap: 1rem;
+      margin-bottom: 1rem;
       flex-wrap: wrap;
     }
 
     .product-btn {
-      background: var(--white);
-      color: var(--primary-pink);
-      border: 2px solid var(--accent-pink);
-      border-radius: var(--border-radius-sm);
-      padding: var(--spacing-sm) var(--spacing-md);
+      background: #ff85b3;
+      color: white;
+      : none;
+      -radius: 8px;
+      padding: 0.6rem 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s ease;
       font-size: 0.9rem;
-      font-family: 'Inter', sans-serif;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .product-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: var(--gradient-primary);
-      transition: left 0.3s ease;
-      z-index: -1;
-    }
-
-    .product-btn:hover::before {
-      left: 0;
-    }
-
-    .product-btn:hover {
-      color: var(--white);
-      border-color: var(--primary-pink);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
     }
 
     .product-btn.active {
-      background: var(--gradient-primary);
-      color: var(--white);
-      border-color: var(--primary-pink);
-      box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.3);
+      background: #d6336c;
+      box-shadow: 0 0 0 2px white, 0 0 0 4px #d6336c;
     }
 
     .controls {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: var(--spacing-md);
-      margin-bottom: var(--spacing-lg);
+      gap: 0.8rem;
+      margin-bottom: 1rem;
     }
 
     .control-group {
-      background: var(--white);
-      padding: var(--spacing-md);
-      border-radius: var(--border-radius-sm);
+      background: rgba(255, 255, 255, 0.7);
+      padding: 0.6rem;
+      -radius: 10px;
       display: flex;
       align-items: center;
-      gap: var(--spacing-sm);
+      gap: 0.5rem;
       font-size: 0.9rem;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--accent-pink);
     }
 
     .btn {
-      background: var(--gradient-primary);
-      color: var(--white);
-      border: none;
-      border-radius: var(--border-radius-sm);
-      padding: var(--spacing-sm) var(--spacing-md);
+      background: #ff85b3;
+      color: white;
+      : none;
+      -radius: 8px;
+      padding: 0.5rem 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s ease;
       font-size: 0.9rem;
-      font-family: 'Inter', sans-serif;
-      position: relative;
-      overflow: hidden;
     }
 
     .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+      background: #ff5fa3;
     }
 
     .download-btn {
-      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      background: #4CAF50;
     }
 
     .order-btn {
-      background: var(--gradient-primary);
+      background: #d6336c;
     }
 
-    .bracelet-container {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: var(--white);
-      padding: var(--spacing-md) 0;
-      margin-bottom: var(--spacing-lg);
-      border-bottom: 1px solid var(--accent-pink);
-      width: 100%;
-      max-width: 100%;
-      overflow: hidden;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-sm);
-    }
-
-    #jewelry-piece {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 4px;
-      padding: var(--spacing-md);
-      background: var(--white);
-      border-radius: var(--border-radius);
-      width: auto;
-      margin: 0 auto;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      max-width: 100vw;
-      box-sizing: border-box;
-      box-shadow: var(--shadow-sm);
-      border: 2px solid var(--accent-pink);
-    }
+.bracelet-container {
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Ensure it stays above other elements */
+    background: #fff0f5;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f5a0c2;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+.main-content {
+    position: relative; /* This is important for sticky to work */
+}
+#jewelry-piece {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    padding: 10px;
+    background: #fff0f5;
+    border-radius: 16px;
+    width: auto;
+    margin: 0 auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100vw;
+    box-sizing: border-box;
+}
 
     .design-area {
-      background: transparent;
-      padding: 0;
-      margin: 0;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+.bracelet-container {
+    background: transparent;
+}
+
+#jewelry-piece {
+    background: #fff0f5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+    .bracelet-container::-webkit-scrollbar {
+      height: 6px;
     }
 
     .bracelet-container::-webkit-scrollbar-track {
-      background: var(--light-pink);
-      border-radius: 3px;
+      background: #fff0f5;
+      -radius: 3px;
     }
 
     .bracelet-container::-webkit-scrollbar-thumb {
-      background: var(--secondary-pink);
-      border-radius: 3px;
+      background: #ff85b3;
+      -radius: 3px;
     }
+.slot {
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+  margin: 0;
+  padding: 0;
+  background: transparent;        /* Removes the pink background */
+  : none;                   /* Removes the dashed  */
+  -radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+}
 
-    .slot {
-      flex: 0 0 84px;
-      width: 84px;
-      height: 84px;
-      margin: 0;
-      padding: 0;
-      background: rgba(255, 255, 255, 0.5);
-      border: 2px dashed var(--accent-pink);
-      border-radius: var(--border-radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .slot:hover {
-      border-color: var(--primary-pink);
-      background: rgba(255, 107, 157, 0.1);
-    }
 
     .slot:empty::after {
       content: "+";
       position: absolute;
-      color: var(--primary-pink);
-      font-size: 1.5rem;
+      color: #d6336c;
+      font-size: 1.2rem;
       opacity: 0.5;
-      font-weight: 300;
     }
 
+
+
+  
     .charm-pools {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-lg);
-      margin-top: var(--spacing-lg);
+      gap: 1rem;
+      margin-top: 1rem;
     }
 
     .charm-pool {
-      background: var(--white);
-      border: 1px solid var(--accent-pink);
-      border-radius: var(--border-radius);
-      padding: var(--spacing-lg);
-      box-shadow: var(--shadow-sm);
+      background: #fff0f5;
+      : 1px solid #f5a0c2;
+      -radius: 16px;
+      padding: 0.8rem;
     }
 
     .charm-pool h3 {
-      color: var(--dark-pink);
+      color: #a61e4d;
       margin-top: 0;
-      font-size: 1.1rem;
-      margin-bottom: var(--spacing-sm);
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
       text-align: center;
-      font-weight: 600;
     }
 
     .charms-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--spacing-sm);
+      gap: 8px;
       justify-content: center;
     }
 
@@ -310,25 +227,23 @@
       width: 45px;
       height: 45px;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.2s;
       object-fit: contain;
       position: relative;
-      border-radius: var(--border-radius-sm);
     }
 
     .charm:hover {
-      transform: scale(1.15);
-      box-shadow: var(--shadow-md);
+      transform: scale(1.1);
     }
 
     .special {
-      border: 2px solid var(--secondary-pink);
-      border-radius: var(--border-radius-sm);
+      : 2px solid #ff85b3;
+      -radius: 8px;
     }
 
     .rare {
-      border: 2px solid #9c27b0;
-      border-radius: var(--border-radius-sm);
+      : 2px solid purple;
+      -radius: 8px;
     }
 
     .charm.sold-out {
@@ -345,16 +260,15 @@
       position: absolute;
       top: -8px;
       right: -8px;
-      background: var(--primary-pink);
-      color: var(--white);
+      background: #d6336c;
+      color: white;
       width: 16px;
       height: 16px;
-      border-radius: 50%;
+      -radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 10px;
-      font-weight: bold;
     }
 
     .sold-out-label {
@@ -362,23 +276,23 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(255, 107, 157, 0.9);
-      color: var(--white);
-      padding: var(--spacing-xs) var(--spacing-sm);
-      border-radius: var(--border-radius-sm);
+      background: rgba(214, 51, 108, 0.8);
+      color: white;
+      padding: 2px 6px;
+      -radius: 4px;
       font-size: 0.7rem;
       font-weight: bold;
     }
 
     .pricing-info {
       display: none;
-      background: var(--white);
-      border: 1px solid var(--accent-pink);
-      border-radius: var(--border-radius);
-      padding: var(--spacing-lg);
-      margin: var(--spacing-lg) auto;
+      background: #fff0f5;
+      : 1px solid #f5a0c2;
+      -radius: 16px;
+      padding: 1rem;
+      margin: 1rem auto;
       max-width: 600px;
-      box-shadow: var(--shadow-md);
+      box-shadow: 0 2px 8px rgba(214, 51, 108, 0.1);
     }
 
     .pricing-info.visible {
@@ -387,131 +301,120 @@
 
     .pricing-toggle {
       text-align: center;
-      margin: var(--spacing-lg) 0;
+      margin: 1rem 0;
     }
 
     .pricing-toggle-btn {
-      background: var(--gradient-primary);
-      color: var(--white);
-      border: none;
-      border-radius: 20px;
-      padding: var(--spacing-sm) var(--spacing-lg);
+      background: #ff85b3;
+      color: white;
+      : none;
+      -radius: 20px;
+      padding: 0.5rem 1.5rem;
       cursor: pointer;
       font-size: 0.9rem;
       font-weight: 600;
-      transition: all 0.3s ease;
-      box-shadow: var(--shadow-sm);
-      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .pricing-toggle-btn:hover {
-      background: var(--dark-pink);
+      background: #d6336c;
       transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
     }
 
     .highlight {
-      color: var(--dark-pink);
+      color: #d6336c;
       font-weight: 600;
     }
 
     .selected {
-      box-shadow: 0 0 0 3px var(--primary-pink);
+      box-shadow: 0 0 0 3px #d6336c;
     }
 
     .material-selector {
       display: flex;
-      gap: var(--spacing-sm);
+      gap: 0.5rem;
       flex-wrap: wrap;
     }
 
     .material-option {
-      padding: var(--spacing-sm) var(--spacing-md);
-      border-radius: var(--border-radius-sm);
+      padding: 0.4rem 0.8rem;
+      -radius: 8px;
       cursor: pointer;
-      border: 2px solid transparent;
-      transition: all 0.3s ease;
+      : 2px solid transparent;
+      transition: all 0.2s;
       font-size: 0.8rem;
-      font-weight: 500;
     }
 
     .material-option.selected {
-      border-color: var(--primary-pink);
-      background: rgba(255, 107, 157, 0.1);
+      -color: #d6336c;
+      background: rgba(214, 51, 108, 0.1);
     }
 
     .material-option.silver {
-      background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
-      color: var(--text-dark);
-    }
+  background: #e0e0e0;
+  color: #333;
+}
 
-    .material-option.gold {
-      background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
-      color: var(--text-dark);
-    }
+.material-option.gold {
+  background: linear-gradient(135deg, #ffd700, #daa520);
+  color: #333;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+}
 
-    .material-option.mix {
-      background: linear-gradient(90deg, #e8eaf6 50%, #fff8e1 50%);
-      color: var(--text-dark);
-      position: relative;
-      overflow: hidden;
-    }
+.material-option.mix {
+  background: linear-gradient(90deg, #e0e0e0 50%, #ffd700 50%);
+  color: #333;
+  position: relative;
+  overflow: hidden;
+}
 
-    .material-option.mix::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      width: 1px;
-      height: 100%;
-      background: rgba(0,0,0,0.2);
-    }
-
+.material-option.mix::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: rgba(0,0,0,0.2);
+}
     /* Order Form Styles */
     .order-form {
-      background: var(--white);
-      padding: var(--spacing-xl);
-      border-radius: var(--border-radius);
-      margin: var(--spacing-lg) auto;
+      background: white;
+      padding: 1.5rem;
+      -radius: 12px;
+      margin: 1rem auto;
       max-width: 500px;
-      box-shadow: var(--shadow-lg);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     
     .form-group {
-      margin-bottom: var(--spacing-lg);
+      margin-bottom: 1rem;
     }
     
     .form-group label {
       display: block;
-      margin-bottom: var(--spacing-sm);
+      margin-bottom: 0.5rem;
       font-weight: 600;
-      color: var(--dark-pink);
-      font-family: 'Inter', sans-serif;
+      color: #d6336c;
     }
     
     .form-group input, .form-group select {
       width: 100%;
-      padding: var(--spacing-sm);
-      border: 2px solid var(--accent-pink);
-      border-radius: var(--border-radius-sm);
-      font-family: 'Inter', sans-serif;
-      transition: border-color 0.3s ease;
-    }
-
-    .form-group input:focus, .form-group select:focus {
-      outline: none;
-      border-color: var(--primary-pink);
-      box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.1);
+      padding: 0.5rem;
+      : 1px solid #f5a0c2;
+      -radius: 8px;
+      font-family: 'Poppins', sans-serif;
     }
     
     .payment-options {
-      margin: var(--spacing-lg) 0;
+      margin: 1rem 0;
     }
     
     .payment-option {
       display: flex;
       align-items: center;
-      margin-bottom: var(--spacing-sm);
+      margin-bottom: 0.5rem;
     }
     
     /* Modal styles */
@@ -523,101 +426,97 @@
       width: 100%;
       height: 100%;
       background-color: rgba(0,0,0,0.5);
-      backdrop-filter: blur(5px);
       z-index: 1000;
       justify-content: center;
       align-items: center;
     }
     
     .modal-content {
-      background: var(--white);
-      padding: var(--spacing-xl);
-      border-radius: var(--border-radius);
+      background: white;
+      padding: 20px;
+      -radius: 10px;
       max-width: 300px;
       width: 100%;
       text-align: center;
       position: relative;
-      box-shadow: var(--shadow-lg);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
+    #country {
+  padding: 0.5rem;
+  border: 1px solid #f5a0c2;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  width: 100%;
+}
 
-    #country, #location {
-      padding: var(--spacing-sm);
-      border: 2px solid var(--accent-pink);
-      border-radius: var(--border-radius-sm);
-      font-family: 'Inter', sans-serif;
-      width: 100%;
-    }
-
+#location {
+  padding: 0.5rem;
+  border: 1px solid #f5a0c2;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  width: 100%;
+}
     .order-modal-content {
-      background: var(--white);
-      padding: var(--spacing-xl);
-      border-radius: var(--border-radius);
+      background: white;
+      padding: 2rem;
+      -radius: 12px;
       max-width: 500px;
       width: 90%;
-      box-shadow: var(--shadow-lg);
     }
     
     .modal-buttons {
       display: flex;
       justify-content: center;
-      gap: var(--spacing-md);
-      margin-top: var(--spacing-lg);
+      gap: 10px;
+      margin-top: 20px;
     }
     
     .modal-btn {
-      padding: var(--spacing-sm) var(--spacing-md);
-      border-radius: var(--border-radius-sm);
-      border: none;
+      padding: 8px 16px;
+      -radius: 5px;
+      : none;
       cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      font-weight: 500;
-      transition: all 0.3s ease;
     }
     
     .modal-btn.confirm {
-      background: var(--gradient-primary);
-      color: var(--white);
+      background-color: #d6336c;
+      color: white;
     }
     
     .modal-btn.cancel {
-      background-color: #f5f5f5;
-      color: var(--text-dark);
+      background-color: #e0e0e0;
     }
 
     .action-buttons {
       display: flex;
       justify-content: center;
-      gap: var(--spacing-lg);
-      margin: var(--spacing-lg) 0;
+      gap: 1rem;
+      margin: 1rem 0;
     }
     
     /* Subcategory styles */
     .category-tabs {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--spacing-sm);
+      gap: 0.5rem;
       justify-content: center;
-      margin-bottom: var(--spacing-sm);
+      margin-bottom: 0.5rem;
     }
 
     .category-tab {
-      background: var(--accent-pink);
-      color: var(--white);
-      border: none;
-      border-radius: 16px;
-      padding: var(--spacing-xs) var(--spacing-md);
+      background: #f5a0c2;
+      color: white;
+      : none;
+      -radius: 16px;
+      padding: 0.3rem 0.8rem;
       font-size: 0.8rem;
       cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: 'Inter', sans-serif;
-      font-weight: 500;
+      transition: all 0.2s;
     }
 
     .category-tab.active {
-      background: var(--gradient-primary);
+      background: #d6336c;
       font-weight: bold;
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
     }
 
     /* Custom charm upload */
@@ -625,20 +524,19 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--spacing-sm);
-      margin-bottom: var(--spacing-lg);
+      gap: 0.5rem;
+      margin-bottom: 1rem;
     }
 
     .custom-charm-preview {
       width: 50px;
       height: 50px;
-      border: 2px dashed var(--primary-pink);
-      border-radius: var(--border-radius-sm);
+      : 2px dashed #d6336c;
+      -radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: rgba(255, 107, 157, 0.05);
     }
 
     .custom-charm-preview img {
@@ -647,91 +545,88 @@
       object-fit: contain;
     }
 
-    /* Mobile-specific fixes */
-    @media (max-width: 480px) {
-      body {
-        padding: var(--spacing-sm);
-      }
-
-      .main-content {
-        padding: var(--spacing-lg);
-      }
-
-      h1 {
-        font-size: 2rem;
-      }
-
-      .slot {
-        flex: 0 0 18vw;
+ /* Mobile-specific fixes */
+@media (max-width: 480px) {
+    /* Adjust slot sizing for mobile */
+    .slot {
+        flex: 0 0 18vw; /* Use viewport units for responsive sizing */
         width: 18vw;
         height: 18vw;
-        min-width: 0;
-      }
-      
-      .slot img {
+        min-width: 0; /* Allow flex shrinking */
+    }
+    
+    /* Ensure images fit properly in slots */
+    .slot img {
         width: 100%;
         height: 100%;
         object-fit: contain;
-      }
-      
-      #jewelry-piece {
-        gap: 2px;
-        padding: var(--spacing-sm);
+    }
+    
+    /* Adjust jewelry piece container */
+    #jewelry-piece {
+        gap: 2px; /* Reduce gap on mobile */
+        padding: 5px;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-      }
-      
-      .slot.long-slot {
-        width: 36vw !important;
+    }
+    
+    /* Special handling for long charms on mobile */
+    .slot.long-slot {
+        width: 36vw !important; /* Double width for long charms */
         height: 18vw !important;
-      }
-      
-      .slot.long-slot img.long-charm {
+    }
+    
+    .slot.long-slot img.long-charm {
         width: 100% !important;
         height: 100% !important;
-      }
-      
-      .slot.has-dangly {
-        height: 36vw !important;
-      }
-      
-      .slot.has-dangly img.dangly-charm {
+    }
+    
+    /* Special handling for dangly charms on mobile */
+    .slot.has-dangly {
+        height: 36vw !important; /* Double height for dangly */
+    }
+    
+    .slot.has-dangly img.dangly-charm {
         width: 100% !important;
         height: 100% !important;
-      }
-      
-      .charms-grid {
+    }
+    
+    /* Adjust charm pools for mobile */
+    .charms-grid {
         grid-template-columns: repeat(auto-fill, minmax(20vw, 1fr));
-        gap: var(--spacing-sm);
-      }
-      
-      .charms-grid .charm {
+        gap: 8px;
+    }
+    
+    /* Special charm sizing in pools */
+    .charms-grid .charm {
         width: 20vw;
         height: 20vw;
-      }
-      
-      .charms-grid .long-charm {
+    }
+    
+    /* Long charm sizing in pools */
+    .charms-grid .long-charm {
         width: 40vw;
         height: 20vw;
-      }
-      
-      .charms-grid .dangly-charm {
+    }
+    
+    /* Dangly charm sizing in pools */
+    .charms-grid .dangly-charm {
         width: 20vw;
         height: 40vw;
-      }
-      
-      .charm-name, .charm-type {
+    }
+    
+    /* Prevent charm text from being too small */
+    .charm-name, .charm-type {
         font-size: 12px !important;
-      }
     }
-
-    /* For desktop screens */
-    @media (min-width: 768px) {
-      .cart-preview {
-        right: 20px;
-        width: 350px;
-      }
-    }
+}
+/* For desktop screens */
+@media (min-width: 768px) {
+  .cart-preview {
+    right: 20px;
+    width: 350px; /* Slightly larger on desktop */
+  }
+}
   </style>
 </head>
 <body>
@@ -742,23 +637,22 @@
   </button>
 
   <div class="promotion-banner">
-  <div class="promotion-content">
-    <h3 style="color: white; font-family: 'Playfair Display', serif;">✨ LIMITED TIME OFFER ✨</h3>
-    <h3 style="color: white; font-size: 2em; font-family: 'Playfair Display', serif; margin: 0.5rem 0;">10% OFF</h3>
-    <p style="font-family: 'Inter', sans-serif;">all orders above 75 AED! Limited Time Offer!</p>
-  </div>
+  <h3 style="color: white;">✨ LIMITED TIME OFFER ✨</h3>
+  <h3 style="color: white; font-size: 2em;">10% OFF</h3>
+  <p>all orders above 75 AED! Limited Time Offer!</p>
 </div>
 
+
+
 <div class="top-action-buttons">
-  <button id="pricing-toggle" class="btn">
-    <i class="fas fa-tag"></i>
-    <span class="btn-text">Pricing</span>
-  </button>
-  <button id="translate-btn" class="btn translate-btn">
-    <i class="fas fa-language"></i>
-    <span class="btn-text">العربية</span>
-  </button>
-  <div id="google_translate_element" style="display:none"></div>
+ <button id="pricing-toggle" class="btn">
+  <i class="fas fa-tag"></i>
+  <span class="btn-text">Pricing</span>
+<button id="translate-btn" class="btn translate-btn">
+  <i class="fas fa-language"></i>
+  <span class="btn-text">العربية</span>
+</button>
+<div id="google_translate_element" style="display:none"></div>
   <a href="https://wa.me/962788838118" class="btn whatsapp-btn" target="_blank">
     <i class="fab fa-whatsapp"></i>
     <span class="btn-text">WhatsApp</span>
@@ -770,11 +664,12 @@
 </div>
 
 <div class="pricing-info">
-  <h3 style="font-family: 'Playfair Display', serif;">Pricing Information</h3>
+  <h3>Pricing Information</h3>
+  <h3 style="text-align: left;">Pricing Information</h3>
 
   <div class="pricing-grid">
     <div class="pricing-category">
-      <h4 style="font-family: 'Inter', sans-serif; color: var(--dark-pink);">Base Prices</h4>
+      <h4>Base Prices</h4>
       <ul style="text-align: left;">
         <li><strong>Bracelet:</strong> 52 AED</li>
         <li><strong>Anklet:</strong> 78 AED</li>
@@ -784,7 +679,7 @@
     </div>
 
     <div class="pricing-category">
-      <h4 style="font-family: 'Inter', sans-serif; color: var(--dark-pink);">Upgrades</h4>
+      <h4>Upgrades</h4>
       <ul style="text-align: left;">
         <li><strong>Gold:</strong> +6 AED</li>
         <li><strong>Mix:</strong> +13 AED</li>
@@ -794,43 +689,50 @@
       </ul>
     </div>
 
-  </div>
+</div>
   <div class="contact-info">
-    <h4 style="font-family: 'Inter', sans-serif; color: var(--dark-pink);">Contact Us</h4>
+    <h4>Contact Us</h4>
+          <ul style="text-align: left;">
+
     <p>WhatsApp: <a href="https://wa.me/962788838118">0788838118</a></p>
     <p>Instagram: <a href="https://www.instagram.com/italiacharms.jo/">@italiacharm.jo</a></p>
   </div>
 </div>
 
+
   <!-- Welcome Popup -->
 <div class="welcome-popup" id="welcome-popup">
   <div class="welcome-content">
     <button class="welcome-close" id="welcome-close">&times;</button>
-    <h2 style="font-family: 'Playfair Display', serif;">Welcome to Italia Charms!</h2>
-    <p>As a special gift, you get FREE special charms with your order!!🧸🍓</p>
+    <h2>Welcome to Italia Charms!</h2>
+<p>As a special gift, you get FREE special charms with your order!!🧸🍓</p>
     <p>Start designing your perfect jewelry piece now!</p>
+
     <button class="btn" id="start-designing-btn">Let's Design!</button>
   </div>
 </div>
 
+  
 <!-- Header Section -->
 <div class="header-container" style="margin-bottom: -10px;">
-  <h1 class="main-title" style="margin-bottom: 0.2rem; font-family: 'Playfair Display', serif;">Italia Charms</h1>
-  <p class="location-subheader" style="margin: 0 0 0.2rem 0; font-family: 'Inter', sans-serif;">
-    Located in Jordan 
-    <img src="https://flagcdn.com/16x12/jo.png" 
-         alt="Jordan Flag" 
-         style="width:16px; height:12px; vertical-align:middle; margin-left:4px;">
-  </p>
+  <h1 class="main-title" style="margin-bottom: 0.2rem;">Italia Charms</h1>
+  <p class="location-subheader"style="margin: 0 0 0.2rem 0;">
+  Located in Jordan 
+  <img src="https://flagcdn.com/16x12/jo.png" 
+       alt="Jordan Flag" 
+       style="width:16px; height:12px; vertical-align:middle; margin-left:4px;">
+</p>
   <p style="margin: 0.1rem 0 0.5rem 0;">౨ৎ ˖ ࣪⊹ •🍓•⊹₊ ⋆୨ৎ</p>
-  <p class="subtitle" style="margin-top: 0.3rem; font-family: 'Inter', sans-serif;">Create Your Perfect Jewelry</p>
+  <p class="subtitle" style="margin-top: 0.3rem;">Create Your Perfect Jewelry</p>
 </div>
-<div id="google_translate_element"></div>
+  <div id="google_translate_element"></div>
+  <!-- Cart Button -->
+
 
   <!-- Cart Preview Panel -->
   <div id="cart-preview" class="cart-preview">
     <div class="cart-preview-header">
-      <h3 style="font-family: 'Inter', sans-serif;">Shopping Cart</h3>
+      <h3>Shopping Cart</h3>
       <button class="cart-close-btn">
         <i class="fas fa-times"></i>
       </button>
@@ -839,193 +741,204 @@
       <div class="empty-cart">Your cart is empty</div>
     </div>
     
-    <div class="cart-footer">
-      <div id="cart-subtotal">Subtotal: 0.00 AEDs</div>
-      <div id="cart-discount-info" style="display: none;">
-        <span id="cart-discount-amount">10% Discount: -1.00 AEDs</span>
-      </div>
-      <div id="cart-delivery">Delivery Fee: 20 AED</div>
-      <div class="cart-total">Total: 0.00 AED</div>
-    </div>
+   <div class="cart-footer">
+  <div id="cart-subtotal">Subtotal: 0.00 AEDs</div>
+  <div id="cart-discount-info" style="display: none;">
+    <span id="cart-discount-amount">10% Discount: -1.00 AEDs</span>
+  </div>
+  <div id="cart-delivery">Delivery Fee: 20 AED</div>
+  <div class="cart-total">Total: 0.00 AED</div>
+</div>
       <button id="order-btn" class="btn order-btn">Place Order</button>
     </div>
   </div>
 
   <div class="main-content">
-    <div class="product-selector">
-      <button class="product-btn active" data-type="bracelet">
+
+<div class="product-selector">
+    <button class="product-btn active" data-type="bracelet">
         <i class="fas fa-bracelet"></i> Bracelet
-      </button>
-      <button class="product-btn" data-type="anklet">
+    </button>
+    <button class="product-btn" data-type="anklet">
         <i class="fas fa-anklet"></i> Anklet
-      </button>
-      <button class="product-btn" data-type="necklace">
+    </button>
+    <button class="product-btn" data-type="necklace">
         <i class="fas fa-necklace"></i> Necklace
-      </button>
-      <button class="product-btn" data-type="ring">
+    </button>
+    <button class="product-btn" data-type="ring">
         <i class="fas fa-ring"></i> Ring
-      </button>
-      <button class="product-btn" data-type="individual">
+    </button>
+    <button class="product-btn" data-type="individual">
         <i class="fas fa-gem"></i> Individual Charms
-      </button>
-      <button class="product-btn" data-type="watch">
+    </button>
+    <button class="product-btn" data-type="watch">
         <i class="fas fa-clock"></i> Watch
-      </button>
-      <button class="product-btn" data-type="apple-watch">
+    </button>
+    <button class="product-btn" data-type="apple-watch">
         <i class="fab fa-apple"></i> Apple Watch Strap
-      </button>
-      <button class="product-btn" data-type="keychain">
+    </button>
+    <button class="product-btn" data-type="keychain">
         <i class="fas fa-key"></i> Keychain
-      </button>
-    </div>
+    </button>
+</div>
     
     <div class="controls">
-      <!-- Size Selector (hidden for individual charms) -->
-      <div class="control-group" id="size-controls">
+    <!-- Size Selector (hidden for individual charms) -->
+    <div class="control-group" id="size-controls">
         <label for="size">Size:</label>
         <select id="size" class="btn">
-          <option value="15.2-16.2">15.2cm - 16.2cm (18 charms)</option>
-          <!-- Other size options -->
+            <option value="15.2-16.2">15.2cm - 16.2cm (18 charms)</option>
+            <!-- Other size options -->
         </select>
-      </div>
-      
-      <!-- Material Selector -->
-      <div class="control-group">
+    </div>
+    
+    <!-- Material Selector -->
+    <div class="control-group">
         <label>Material:</label>
         <button class="material-option selected" data-material="silver">Silver</button>
         <button class="material-option gold" data-material="gold">Gold</button>
         <button class="material-option mix" data-material="mix">Mix</button>
-      </div>
-      
-      <!-- Full Glam Toggle -->
-      <button id="full-glam-btn" class="btn">Full Glam</button>
-      
-      <div id="individual-controls" style="display: none;">
-        <button id="decrease-slots" class="control-btn minus-btn">-</button>
-        <span id="slot-count">1</span>
-        <button id="increase-slots" class="control-btn plus-btn">+</button>
-      </div>
     </div>
-
-    <h3 style="font-family: 'Inter', sans-serif;">Add your charms below ↓</h3>
     
-    <!-- Add this before the jewelry piece container -->
-    <div class="selected-charm-preview" id="selected-charm-preview">
-      <img id="preview-charm-image" src="" alt="Selected Charm">
-      <div class="charm-name" id="preview-charm-name"></div>
-      <div class="charm-type" id="preview-charm-type"></div>
+    <!-- Full Glam Toggle -->
+    <button id="full-glam-btn" class="btn">Full Glam</button>
+    
+<div id="individual-controls" style="display: none;">
+    <button id="decrease-slots" class="control-btn minus-btn">-</button>
+    <span id="slot-count">1</span>
+    <button id="increase-slots" class="control-btn plus-btn">+</button>
+</div>
     </div>
-
-    <div class="bracelet-container">
-      <div id="jewelry-piece">
-        <!-- Slots will be added here -->
-      </div>
-    </div>
+</div>  <h3>Add your charms below ↓</h3>
+  <!-- Add this before the jewelry piece container -->
+  <div class="selected-charm-preview" id="selected-charm-preview">
+    <img id="preview-charm-image" src="" alt="Selected Charm">
+    <div class="charm-name" id="preview-charm-name"></div>
+    <div class="charm-type" id="preview-charm-type"></div>
   </div>
 
-  <div class="price-display">
+   <div class="bracelet-container">
+    <div id="jewelry-piece">
+      <!-- Slots will be added here -->
+    </div>
+  </div>
+  
+    </div>
+
+
+
+    
+
+  
+
+<div class="price-display">
     <div class="price-row" id="base-price">
-      <span>Base Price:</span>
-      <span>16 AED</span>
+        <span>Base Price:</span>
+        <span>16 AED</span>
     </div>
     <div class="price-row" id="charm-price">
-      <span>Charms:</span>
-      <span>0.00 AED</span>
+        <span>Charms:</span>
+        <span>0.00 AED</span>
     </div>
     <div class="price-row" id="slot-price" style="display: none;">
-      <!-- Not used in this simplified version -->
+        <!-- Not used in this simplified version -->
     </div>
     <div id="total-price-container">
-      <div id="total-price">Total: 16.00 AED</div>
-      <div id="discount-message"></div>
+        <div id="total-price">Total: 16.00 AED</div>
+        <div id="discount-message"></div>
     </div>
-  </div>
-
-
-  <div class="action-buttons">
-    <button class="btn download-btn" id="download-btn">
-      <i class="fas fa-download"></i> Download Design
-    </button>
-    <button class="btn add-to-cart-btn" id="add-to-cart-bottom">
-      <i class="fas fa-cart-plus"></i> Add to Cart
-    </button>
-  </div>
-
-  <div class="charm-pools">
-    <!-- watch charms will be here -->
-    <!-- Special Charms -->
-    <div class="charm-pool">
-      <h3>Special Charms (+11 AED each)</h3>
-      <div class="category-tabs" id="special-categories">
-        <button class="category-tab" data-category="newc2s">NEW Collection⭐!!</button>
-        <button class="category-tab" data-category="teddy">Teddy Bears˚ʚ🧸ɞ˚</button>
-        <button class="category-tab" data-category="girly">Girly</button>
-        <button class="category-tab" data-category="bows">Bows🎀</button>
-        <button class="category-tab" data-category="beach">Beach🌊🐚🫧</button>
-        <button class="category-tab" data-category="red">Red</button>
-        <button class="category-tab" data-category="cute">First collection</button>
-        <button class="category-tab" data-category="cutespecials">Cute</button>
-        <button class="category-tab" data-category="flowers">Flowers🌷</button>
-        <button class="category-tab" data-category="8ball">8 Ball🎱</button>
-        <button class="category-tab" data-category="fruity">Fruity✩🍉₊˚🍓⁺₊✧</button>
-        <button class="category-tab" data-category="mushrooms">Mushrooms🍄</button>
-        <button class="category-tab" data-category="simple">Simple & Cute</button>
-        <button class="category-tab active" data-category="all">All</button>
-      </div>
-
-      <div class="charms-grid" id="special-charms">
-        <!-- Special charms will be added here by JS -->
-      </div>
+</div>
+    <div class="action-buttons">
+      <button class="btn download-btn" id="download-btn">
+        <i class="fas fa-download"></i> Download Design
+      </button>
+      <button class="btn add-to-cart-btn" id="add-to-cart-bottom">
+        <i class="fas fa-cart-plus"></i> Add to Cart
+      </button>
     </div>
 
-    <!-- Rare Charms -->
-    <div class="charm-pool">
-      <h3>Rare Charms (+16 AED each)</h3>
-      <div class="size-note" style="text-align: center; font-style: italic; margin-bottom: 10px;">
+    <div class="charm-pools">
+            <!-- watch charms will be here -->
+        <!-- Special Charms -->
+        <div class="charm-pool">
+            <h3>Special Charms (+11 AED each)</h3>
+            <div class="category-tabs" id="special-categories">
+                <button class="category-tab" data-category="newc2s">NEW Collection⭐!!</button>
+
+                <button class="category-tab" data-category="teddy">Teddy Bears˚ʚ🧸ɞ˚</button>
+                            <button class="category-tab" data-category="girly">Girly</button>
+
+                <button class="category-tab" data-category="bows">Bows🎀</button>
+                <button class="category-tab" data-category="beach">Beach🌊🐚🫧</button>
+                <button class="category-tab" data-category="red">Red</button>
+                <button class="category-tab" data-category="cute">First collection</button>
+                <button class="category-tab" data-category="cutespecials">Cute</button>
+                              <button class="category-tab" data-category="flowers">Flowers🌷</button>
+
+                <button class="category-tab" data-category="8ball">8 Ball🎱</button>
+                            <button class="category-tab" data-category="fruity">Fruity✩🍉₊˚🍓⁺₊✧</button>
+
+                <button class="category-tab" data-category="mushrooms">Mushrooms🍄</button>
+                <button class="category-tab" data-category="simple">Simple & Cute</button>
+                <button class="category-tab active" data-category="all">All</button>
+            </div>
+
+            <div class="charms-grid" id="special-charms">
+                <!-- Special charms will be added here by JS -->
+            </div>
+        </div>
+
+        <!-- Rare Charms -->
+        <div class="charm-pool">
+            <h3>Rare Charms (+16 AED each)</h3>
+          <div class="size-note" style="text-align: center; font-style: italic; margin-bottom: 10px;">
         Note: The size of *dangly* charms is accurate in reference to the metal charm, not the bracelet.
-      </div>
-      <div class="category-tabs" id="rare-categories">
-        <button class="category-tab" data-category="newc3r">NEW Collection⭐!!</button>
-        <button class="category-tab" data-category="sanrio">Sanrio</button>
-        <button class="category-tab" data-category="hgs">Hot Girl Summer🌷💋☁️</button>
-        <button class="category-tab" data-category="butterflies">Butterflies ʚїɞ</button>
-        <button class="category-tab" data-category="sporty">Sporty🏎️💨</button>
-        <button class="category-tab" data-category="night">Whimsy🌙💤</button>
-        <button class="category-tab" data-category="rcute">Cute🍓🐥</button>
-        <button class="category-tab" data-category="careers">Careers💼</button>
-        <button class="category-tab" data-category="pets">Pets🐶🐾</button>
-        <button class="category-tab" data-category="gold">Gold</button>
-        <button class="category-tab" data-category="disney">Disney</button>
-        <button class="category-tab" data-category="love">Love/Friends/Family💗</button>
-        <button class="category-tab" data-category="dangly">Dangly (many new⭐)</button>
-        <button class="category-tab" data-category="random">Random</button>
-        <button class="category-tab" data-category="long">Long</button>
-        <button class="category-tab" data-category="graduation">Grad🎓✧˖°</button>
-        <button class="category-tab active" data-category="all">All</button>
-      </div>
-      <div class="charms-grid" id="rare-charms">
-        <!-- Rare charms will be added here by JS -->
-      </div>
+    </div>
+            <div class="category-tabs" id="rare-categories">
+                              <button class="category-tab" data-category="newc3r">NEW Collection⭐!!</button>
+
+                <button class="category-tab" data-category="sanrio">Sanrio</button>
+                <button class="category-tab" data-category="hgs">Hot Girl Summer🌷💋☁️</button>
+                <button class="category-tab" data-category="butterflies">Butterflies ʚїɞ</button>
+                <button class="category-tab" data-category="sporty">Sporty🏎️💨</button>
+                <button class="category-tab" data-category="night">Whimsy🌙💤</button>
+                <button class="category-tab" data-category="rcute">Cute🍓🐥</button>
+                <button class="category-tab" data-category="careers">Careers💼</button>
+                <button class="category-tab" data-category="pets">Pets🐶🐾</button>
+                <button class="category-tab" data-category="gold">Gold</button>
+                <button class="category-tab" data-category="disney">Disney</button>
+                <button class="category-tab" data-category="love">Love/Friends/Family💗</button>
+                <button class="category-tab" data-category="dangly">Dangly (many new⭐)</button>
+                              <button class="category-tab" data-category="random">Random</button>
+
+                <button class="category-tab" data-category="long">Long</button>
+
+                <button class="category-tab" data-category="graduation">Grad🎓✧˖°</button>
+              
+                <button class="category-tab active" data-category="all">All</button>
+            </div>
+            <div class="charms-grid" id="rare-charms">
+                <!-- Rare charms will be added here by JS -->
+            </div>
+        </div>
     </div>
   </div>
-
-  <!-- Custom Charms -->
-  <div class="charm-pool">
+<!-- Custom Charms -->
+<div class="charm-pool">
     <h3>Custom Charms (18 AED each)</h3>
     <div class="custom-charm-upload">
-      <input type="file" id="custom-charm-upload" accept="image/*" style="display: none;">
-      <button class="btn" onclick="document.getElementById('custom-charm-upload').click()">
-        <i class="fas fa-upload"></i> Upload Image
-      </button>
-      <div class="custom-charm-preview" id="custom-charm-preview">
-        <span>Preview</span>
-      </div>
-      <button class="btn" id="add-custom-charm">
-        <i class="fas fa-plus"></i> Add Custom Charm
-      </button>
+        <input type="file" id="custom-charm-upload" accept="image/*" style="display: none;">
+        <button class="btn" onclick="document.getElementById('custom-charm-upload').click()">
+            <i class="fas fa-upload"></i> Upload Image
+        </button>
+        <div class="custom-charm-preview" id="custom-charm-preview">
+            <span>Preview</span>
+        </div>
+        <button class="btn" id="add-custom-charm">
+            <i class="fas fa-plus"></i> Add Custom Charm
+        </button>
     </div>
-  </div>
-
+</div>
   <!-- Modal for charm removal confirmation -->
   <div class="modal" id="remove-charm-modal">
     <div class="modal-content">
@@ -1038,191 +951,80 @@
   </div>
 
   <!-- Order Form Modal -->
-  <div class="modal" id="order-modal">
-    <div class="order-modal-content">
-      <h2 style="font-family: 'Playfair Display', serif;">Place Your Order</h2>
+<!-- Order Form Modal -->
+<div class="modal" id="order-modal">
+  <div class="order-modal-content">
+    <h2>Place Your Order</h2>
 
-      <form id="order-form">
-        <div class="form-group">
-          <label for="full-name">Full Name*</label>
-          <input type="text" id="full-name" name="full-name" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="phone">Phone Number*</label>
-          <input type="tel" id="phone" name="phone" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="phone2">Second Phone Number (Optional)</label>
-          <input type="tel" id="phone2" name="phone2">
-        </div>
-
-        <div class="form-group">
-          <label for="city">City*</label>
-          <select id="city" name="city" required>
-            <option value="">Select City</option>
-            <option value="Abu Dhabi">Abu Dhabi</option>
-            <option value="Dubai">Dubai</option>
-            <option value="Sharjah">Sharjah</option>
-            <option value="Ajman">Ajman</option>
-            <option value="Umm Al Quwain">Umm Al Quwain</option>
-            <option value="Ras Al Khaimah">Ras Al Khaimah</option>
-            <option value="Fujairah">Fujairah</option>
-          </select>
-        </div>
-
-        <!-- Add the new address fields here -->
-        <div class="form-group">
-          <label for="area">Area*</label>
-          <input type="text" id="area" name="area" required>
-        </div>
-
-        <div class="form-group">
-          <label for="street-name">Street Name*</label>
-          <input type="text" id="street-name" name="street-name" required>
-        </div>
-
-        <div class="form-group">
-          <label for="building-name">Building Name</label>
-          <input type="text" id="building-name" name="building-name">
-        </div>
-
-        <div class="form-group">
-          <label for="apartment-no">Apartment No*</label>
-          <input type="text" id="apartment-no" name="apartment-no" required>
-        </div>
-
-        <div class="form-group">
-          <label for="floor-no">Floor No</label>
-          <input type="text" id="floor-no" name="floor-no">
-        </div>
-
-        <div class="form-group">
-          <label for="postal-code">Postal / Zip Code</label>
-          <input type="text" id="postal-code" name="postal-code">
-        </div>
-
-        <div class="form-group">
-          <label for="additional-address">Additional Address Details</label>
-          <textarea id="additional-address" name="additional-address" rows="2"></textarea>
-        </div>
-
-        <!-- Existing Cash on Delivery option -->
-        <div class="payment-option">
-          <input type="radio" id="pay-cash" name="payment" value="Cash" required checked>
-          <label for="pay-cash">Cash on Delivery</label>
-        </div>
-        
-        <!-- PayPal Option -->
-        <div class="payment-option">
-          <input type="radio" id="pay-paypal" name="payment" value="PayPal" required>
-          <label for="pay-paypal">Pay with Credit/Debit Card/PayPal</label>
-        </div>
-        
-        <!-- PayPal Button (hidden until selected) -->
-        <div id="paypal-button-container" style="display:none; margin-top:15px;"></div>
-        
-        <div id="payment-proof-container" style="display: none;">
-          <label for="payment-proof">Upload Payment Proof (required for Cliq)</label>
-          <input type="file" id="payment-proof" name="payment-proof" accept="image/*">
-        </div>
-        
-        <div class="order-summary">
-          <div id="order-subtotal">Subtotal: 0.00 AEDs</div>
-          <div id="order-delivery">Delivery Fee: 20 AEDs</div>
-          <div id="order-total-price">Total: 0.00 AEDs</div>
-        </div>
-        
-        <div class="order-buttons">
-          <button type="submit" class="btn confirm-order-btn">
-            <i class="fas fa-check-circle"></i> Confirm Order
-          </button>
-          <button type="button" class="btn cancel-btn" id="cancel-order">
-            <i class="fas fa-times-circle"></i> Cancel 
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Order Confirmation Modal -->
-  <div class="modal" id="order-confirmation">
-    <div class="order-modal-content">
-      <h2 style="font-family: 'Playfair Display', serif;">Order Confirmed!</h2>
-      <p>Thank you for your order. We'll contact you soon to confirm details.</p>
-      <p>Delivery starts with the start of July.</p>
-      <p>Order ID: <span id="order-id"></span></p>
-      <button class="btn" id="close-confirmation">Close</button>
-    </div>
-  </div>
-
-  <!-- Add Firebase and html2canvas scripts -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-  <script src="firebase-config.js"></script>
-  <script src="charms.js"></script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const welcomePopup = document.getElementById('welcome-popup');
-      const welcomeClose = document.getElementById('welcome-close');
-      const startDesigningBtn = document.getElementById('start-designing-btn');
+    <form id="order-form">
+      <div class="form-group">
+        <label for="full-name">Full Name*</label>
+        <input type="text" id="full-name" name="full-name" required>
+      </div>
       
-      // Check if 24 hours have passed since last view
-      const lastSeen = localStorage.getItem('popupLastSeen');
-      const now = new Date().getTime();
+      <div class="form-group">
+        <label for="phone">Phone Number*</label>
+        <input type="tel" id="phone" name="phone" required>
+      </div>
       
-      if (!lastSeen || now - lastSeen > 24 * 60 * 60 * 1000) {
-        setTimeout(() => {
-          welcomePopup.style.display = 'flex';
-          localStorage.setItem('popupLastSeen', now);
-        }, 1000);
-      }
-      
-      welcomeClose.addEventListener('click', () => {
-        welcomePopup.style.display = 'none';
-      });
+      <div class="form-group">
+        <label for="phone2">Second Phone Number (Optional)</label>
+        <input type="tel" id="phone2" name="phone2">
+      </div>
 
-      // Add this event listener for the "Let's Design!" button
-      if (startDesigningBtn) {
-        startDesigningBtn.addEventListener('click', () => {
-          welcomePopup.style.display = 'none';
-        });
-      }
-    });
-  </script>
-    
-  <script>
-    document.getElementById('translate-btn').addEventListener('click', function() {
-      // Wait for Google Translate to fully load
-      if (typeof google !== 'undefined' && google.translate) {
-        const dropdown = document.querySelector('.goog-te-menu-value');
-        if (dropdown) dropdown.click();
-      } else {
-        // Fallback: Show the hidden Google Translate element
-        const translateElement = document.getElementById('google_translate_element');
-        if (translateElement) {
-          translateElement.style.display = 'block';
-          setTimeout(() => {
-            const dropdown = document.querySelector('.goog-te-menu-value');
-            if (dropdown) dropdown.click();
-          }, 500);
-        }
-      }
-    });
-  </script>
-</body>
-</html>
+      <div class="form-group">
+        <label for="city">City*</label>
+        <select id="city" name="city" required>
+          <option value="">Select City</option>
+          <option value="Abu Dhabi">Abu Dhabi</option>
+          <option value="Dubai">Dubai</option>
+          <option value="Sharjah">Sharjah</option>
+          <option value="Ajman">Ajman</option>
+          <option value="Umm Al Quwain">Umm Al Quwain</option>
+          <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+          <option value="Fujairah">Fujairah</option>
+        </select>
+      </div>
 
+      <!-- Add the new address fields here -->
+      <div class="form-group">
+        <label for="area">Area*</label>
+        <input type="text" id="area" name="area" required>
+      </div>
+
+      <div class="form-group">
+        <label for="street-name">Street Name*</label>
+        <input type="text" id="street-name" name="street-name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="building-name">Building Name</label>
+        <input type="text" id="building-name" name="building-name">
+      </div>
+
+      <div class="form-group">
+        <label for="apartment-no">Apartment No*</label>
+        <input type="text" id="apartment-no" name="apartment-no" required>
+      </div>
+
+      <div class="form-group">
+        <label for="floor-no">Floor No</label>
+        <input type="text" id="floor-no" name="floor-no">
+      </div>
+
+      <div class="form-group">
+        <label for="postal-code">Postal / Zip Code</label>
+        <input type="text" id="postal-code" name="postal-code">
+      </div>
 
       <div class="form-group">
         <label for="additional-address">Additional Address Details</label>
         <textarea id="additional-address" name="additional-address" rows="2"></textarea>
       </div>
-
+      
+      <div class="payment-options">
+  <h3>Payment Method*</h3>
+  
   <!-- Existing Cash on Delivery option -->
   <div class="payment-option">
     <input type="radio" id="pay-cash" name="payment" value="Cash" required checked>
