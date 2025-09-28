@@ -3564,7 +3564,6 @@ document.addEventListener('DOMContentLoaded', () => {
         orderConfirmation = document.getElementById('order-confirmation');
         closeConfirmation = document.getElementById('close-confirmation');
         orderIdSpan = document.getElementById('order-id');
-      const disableCOD = true; // Set to true to hide COD option
         
         if (disableCOD) {
             const codOption = document.getElementById('pay-cash');
