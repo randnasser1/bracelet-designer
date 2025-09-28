@@ -1802,7 +1802,7 @@ function setupCartFunctionality() {
         addToCartBtn.disabled = true;
         addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
-        const designImage = await captureBraceletDesign();
+        const designImage =  captureBraceletDesign();
         const priceData = calculatePrice(false);
         
         const cartItem = {
