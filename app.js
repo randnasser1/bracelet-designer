@@ -1742,131 +1742,99 @@ function setupCartFunctionality() {
         cartElements.cartPreview.classList.remove('active');
     });
 
-   addToCartBtn.addEventListener('click', async () => {
-    try {
-        // First validate charm sets in current design
-        const currentCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'))
-            .map(img => ({ src: img.src, type: img.dataset.type }));
+    // KEEP ONLY THIS ONE addToCartBtn EVENT LISTENER - REMOVE THE DUPLICATE BELOW
+    addToCartBtn.addEventListener('click', async () => {
+        try {
+            // First validate charm sets in current design
+            const currentCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'))
+                .map(img => ({ src: img.src, type: img.dataset.type }));
+            
+            const invalidSets = validateCharmsForSets(currentCharms);
+            if (invalidSets.length > 0) {
+                const errorMessages = invalidSets.map(set => 
+                    `• ${set.name}: ${set.message}\n  (Problem: ${set.problem})`
+                ).join('\n\n');
+                
+                showCustomWarningModal(
+                    `Cannot Add to Cart!\n\nDesign has invalid charm sets:\n\n${errorMessages}\n\n` +
+                    'Please fix these issues before adding to cart.'
+                );
+                return;
+            }
+
+            // If validation passes, proceed with adding to cart
+            addToCartBtn.disabled = true;
+            addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+            // Capture design as data URL (no storage upload)
+            const designImage = await captureBraceletDesign();
+            const priceData = calculatePrice(false);
+            
+            const cartItem = {
+                id: Date.now().toString(),
+                product: currentProduct,
+                symbol: '🍓',
+                size: currentSize,
+                isFullGlam: isFullGlam,
+                materialType: materialType,
+                price: priceData.total,
+                originalPrice: priceData.subtotal,
+                designImage: designImage, // Store data URL directly
+                charms: currentCharms,
+                timestamp: new Date().toISOString()
+            };
+            
+            cart.push(cartItem);
+            updateCartDisplay();
+            
+            showToast('Design added to cart!');
+            cartPreview.classList.add('active');
+            
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            showToast('Could not add design to cart', 'error');
+        } finally {
+            addToCartBtn.disabled = false;
+            addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+        }
+    });
+
+    // REMOVE EVERYTHING FROM HERE DOWN TO THE DUPLICATE CATCH BLOCK
+
+    // 2. Update the checkout button event listener
+    placeOrderBtn.addEventListener('click', function() {
+        if (cart.length === 0) {
+            showToast('Your cart is empty!', 'error');
+            return;
+        }
         
-        const invalidSets = validateCharmsForSets(currentCharms);
+        // Validate before showing order modal
+        const invalidSets = validateCartForCheckout();
         if (invalidSets.length > 0) {
             const errorMessages = invalidSets.map(set => 
                 `• ${set.name}: ${set.message}\n  (Problem: ${set.problem})`
             ).join('\n\n');
             
             showCustomWarningModal(
-                `Cannot Add to Cart!\n\nDesign has invalid charm sets:\n\n${errorMessages}\n\n` +
-                'Please fix these issues before adding to cart.'
+                `Cannot Checkout!\n\nYour cart has invalid charm sets:\n\n${errorMessages}\n\n` +
+                'Please complete these sets or remove the charms.'
             );
             return;
         }
-
-        // If validation passes, proceed with adding to cart
-        addToCartBtn.disabled = true;
-        addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-
-        // Capture design as data URL (no storage upload)
-        const designImage = await captureBraceletDesign();
-        const priceData = calculatePrice(false);
         
-        const cartItem = {
-            id: Date.now().toString(),
-            product: currentProduct,
-            symbol: '🍓',
-            size: currentSize,
-            isFullGlam: isFullGlam,
-            materialType: materialType,
-            price: priceData.total,
-            originalPrice: priceData.subtotal,
-            designImage: designImage, // Store data URL directly
-            charms: currentCharms,
-            timestamp: new Date().toISOString()
-        };
+        // If validation passes, show order modal
+        orderModal.classList.add('active');
+        document.body.classList.add('modal-open');
         
-        cart.push(cartItem);
-        updateCartDisplay();
+        // Calculate order totals
+        const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+        const deliveryFee = 2.5;
+        const total = subtotal + deliveryFee;
         
-        showToast('Design added to cart!');
-        cartPreview.classList.add('active');
-        
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        showToast('Could not add design to cart', 'error');
-    } finally {
-        addToCartBtn.disabled = false;
-        addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
-    }
-});
-
-        // If validation passes, proceed with adding to cart
-        addToCartBtn.disabled = true;
-        addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-
-        const designImage =  captureBraceletDesign();
-        const priceData = calculatePrice(false);
-        
-        const cartItem = {
-            id: Date.now().toString(),
-            product: currentProduct,
-            symbol: '🍓',
-            size: currentSize,
-            isFullGlam: isFullGlam,
-            materialType: materialType,
-            price: priceData.total,
-            originalPrice: priceData.subtotal,
-            designImage: designImage,
-            charms: currentCharms,
-            timestamp: new Date().toISOString()
-        };
-        
-        cart.push(cartItem);
-        updateCartDisplay();
-        
-        showToast('Design added to cart!');
-        cartPreview.classList.add('active');
-        
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        showToast('Could not add design to cart', 'error');
-    } finally {
-        addToCartBtn.disabled = false;
-        addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
-    }
-});
-// 2. Update the checkout button event listener
-placeOrderBtn.addEventListener('click', function() {
-    if (cart.length === 0) {
-        showToast('Your cart is empty!', 'error');
-        return;
-    }
-    
-    // Validate before showing order modal
-    const invalidSets = validateCartForCheckout();
-    if (invalidSets.length > 0) {
-        const errorMessages = invalidSets.map(set => 
-            `• ${set.name}: ${set.message}\n  (Problem: ${set.problem})`
-        ).join('\n\n');
-        
-        showCustomWarningModal(
-            `Cannot Checkout!\n\nYour cart has invalid charm sets:\n\n${errorMessages}\n\n` +
-            'Please complete these sets or remove the charms.'
-        );
-        return;
-    }
-    
-    // If validation passes, show order modal
-    orderModal.classList.add('active');
-    document.body.classList.add('modal-open');
-    
-    // Calculate order totals
-    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-    const deliveryFee = 2.5;
-    const total = subtotal + deliveryFee;
-    
-    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
-    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
-    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
-});
+        document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
+        document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+        document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
+    });
 }
 function validateCharmsForSets(charms) {
     const invalidSets = [];
