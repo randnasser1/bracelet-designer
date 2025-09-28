@@ -1742,7 +1742,7 @@ function setupCartFunctionality() {
         cartElements.cartPreview.classList.remove('active');
     });
 
-    addToCartBtn.addEventListener('click', async () => {
+   addToCartBtn.addEventListener('click', async () => {
     try {
         // First validate charm sets in current design
         const currentCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'))
@@ -1760,6 +1760,43 @@ function setupCartFunctionality() {
             );
             return;
         }
+
+        // If validation passes, proceed with adding to cart
+        addToCartBtn.disabled = true;
+        addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+        // Capture design as data URL (no storage upload)
+        const designImage = await captureBraceletDesign();
+        const priceData = calculatePrice(false);
+        
+        const cartItem = {
+            id: Date.now().toString(),
+            product: currentProduct,
+            symbol: '🍓',
+            size: currentSize,
+            isFullGlam: isFullGlam,
+            materialType: materialType,
+            price: priceData.total,
+            originalPrice: priceData.subtotal,
+            designImage: designImage, // Store data URL directly
+            charms: currentCharms,
+            timestamp: new Date().toISOString()
+        };
+        
+        cart.push(cartItem);
+        updateCartDisplay();
+        
+        showToast('Design added to cart!');
+        cartPreview.classList.add('active');
+        
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        showToast('Could not add design to cart', 'error');
+    } finally {
+        addToCartBtn.disabled = false;
+        addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+    }
+});
 
         // If validation passes, proceed with adding to cart
         addToCartBtn.disabled = true;
@@ -1958,9 +1995,10 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
                 throw new Error('Please complete PayPal payment first');
             }
             
-            // Cliq validation
-            if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
-                throw new Error('Payment proof is required for Cliq payments');
+            // Cliq validation - remove file upload requirement
+            if (formData.get('payment') === 'Cliq') {
+                // You can add alternative validation here if needed
+                console.log('Cliq payment selected - no file upload required');
             }
         } else {
             formData = new FormData();
@@ -1978,7 +2016,7 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
 
         console.log('Order totals:', { subtotal, deliveryFee, totalJOD, totalUSD });
 
-        // Upload design images and create order data
+        // Create order data WITHOUT image uploads
         const orderData = await prepareOrderData(formData, totalJOD, totalUSD, isPayPalSuccess ? paypalData : null);
         
         // Submit to Firestore
@@ -2009,27 +2047,23 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
         }
     }
 }
-
 async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null) {
     const paymentMethod = formData.get('payment') || (paypalData ? 'PayPal' : 'Unknown');
     
-    // Upload design images for cart items
-    const itemsWithImages = await Promise.all(cart.map(async (item) => {
-        let imageUrl = null;
-        if (item.designImage) {
-            try {
-                imageUrl = await uploadImageToFirebase(item.designImage, 'designs/');
-            } catch (error) {
-                console.error('Failed to upload design image:', error);
-                // Continue without image rather than failing entire order
-            }
-        }
-        
+    // Store design images as data URLs directly in the database
+    const itemsWithDesigns = cart.map((item) => {
         return {
-            ...item,
-            imageUrl: imageUrl
+            product: item.product,
+            size: item.size,
+            price: item.price,
+            originalPrice: item.originalPrice,
+            designImage: item.designImage, // Store the data URL directly
+            isFullGlam: item.isFullGlam,
+            materialType: item.materialType,
+            charms: item.charms,
+            timestamp: new Date().toISOString()
         };
-    }));
+    });
 
     // Build order data
     const orderData = {
@@ -2049,7 +2083,7 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         exchangeRate: JOD_TO_USD_RATE,
         paymentStatus: paymentMethod === 'PayPal' ? 'paid' : 'pending',
         paymentDetails: paypalData,
-        items: itemsWithImages,
+        items: itemsWithDesigns,
         subtotal: cart.reduce((sum, item) => sum + item.price, 0),
         deliveryFee: 2.5,
         total: totalJOD,
@@ -2057,15 +2091,20 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         status: 'pending'
     };
 
-    // Handle payment proof for Cliq
+    // Handle payment proof for Cliq - store as data URL if file exists
     if (paymentMethod === 'Cliq') {
         const paymentProofFile = document.getElementById('payment-proof')?.files[0];
         if (paymentProofFile) {
             try {
-                const proofUrl = await uploadImageToFirebase(paymentProofFile, 'payment-proofs/');
-                orderData.paymentProofUrl = proofUrl;
+                // Convert file to data URL
+                const paymentProofDataUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(paymentProofFile);
+                });
+                orderData.paymentProof = paymentProofDataUrl;
             } catch (error) {
-                console.error('Failed to upload payment proof:', error);
+                console.error('Failed to process payment proof:', error);
             }
         }
     }
