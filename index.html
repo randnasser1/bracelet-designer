@@ -971,8 +971,7 @@
         <label for="phone2">Second Phone Number (Optional)</label>
         <input type="tel" id="phone2" name="phone2">
       </div>
-
-       <div class="form-group">
+  <div class="form-group">
           <label for="governorate">Governorate*</label>
           <select id="governorate" name="governorate" required>
               <option value="">Select Governorate</option>
@@ -990,42 +989,14 @@
               <option value="Ma'an">Ma'an</option>
           </select>
       </div>
+        
+        <div class="form-group">
+          <label for="address">Full Address Details الموقع بالتفصيل*</label>
+          <input type="text" id="address" name="address" required>
+        </div>
+        
+       
 
-      <!-- Add the new address fields here -->
-      <div class="form-group">
-        <label for="area">Area*</label>
-        <input type="text" id="area" name="area" required>
-      </div>
-
-      <div class="form-group">
-        <label for="street-name">Street Name*</label>
-        <input type="text" id="street-name" name="street-name" required>
-      </div>
-
-      <div class="form-group">
-        <label for="building-name">Building Name</label>
-        <input type="text" id="building-name" name="building-name">
-      </div>
-
-      <div class="form-group">
-        <label for="apartment-no">Apartment No*</label>
-        <input type="text" id="apartment-no" name="apartment-no" required>
-      </div>
-
-      <div class="form-group">
-        <label for="floor-no">Floor No</label>
-        <input type="text" id="floor-no" name="floor-no">
-      </div>
-
-      <div class="form-group">
-        <label for="postal-code">Postal / Zip Code</label>
-        <input type="text" id="postal-code" name="postal-code">
-      </div>
-
-      <div class="form-group">
-        <label for="additional-address">Additional Address Details</label>
-        <textarea id="additional-address" name="additional-address" rows="2"></textarea>
-      </div>
       
       <div class="payment-options">
   <h3>Payment Method*</h3>
@@ -1035,6 +1006,13 @@
     <input type="radio" id="pay-cash" name="payment" value="Cash" required checked>
     <label for="pay-cash">Cash on Delivery</label>
   </div>
+
+         <div class="payment-option">
+          <h3>Payment Method*</h3>
+          <div class="payment-option">
+            <input type="radio" id="pay-cliq" name="payment" value="Cliq" required>
+            <label for="pay-cliq">Pay with Cliq (00962788838118)</label>
+          </div>
   
   <!-- PayPal Option -->
   <div class="payment-option">
