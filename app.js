@@ -1709,7 +1709,6 @@ function updateIndividualSlots(preservedCharms = []) {
         jewelryPiece.appendChild(slotContainer);
     }
 }
-
 function setupCartFunctionality() {
     const cartElements = {
         cartButton: document.getElementById('cart-button'),
