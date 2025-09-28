@@ -555,7 +555,7 @@ async function uploadBraceletImage(imageFile) {
 // Helper function to upload images to Firebase Storage
 async function uploadImageToFirebase(imageData, folder = 'designs/') {
     try {
-        // Convert data URL to blob if needed
+        // Convert data URL to blob
         let blob;
         if (typeof imageData === 'string' && imageData.startsWith('data:')) {
             const response = await fetch(imageData);
@@ -564,25 +564,16 @@ async function uploadImageToFirebase(imageData, folder = 'designs/') {
             blob = imageData;
         } else {
             throw new Error('Invalid image data format');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         }
 
-        // Create storage reference
+        // Create unique filename
         const timestamp = Date.now();
-        const fileName = `${folder}${timestamp}_design.png`;
+        const randomString = Math.random().toString(36).substring(2, 15);
+        const fileName = `${folder}${timestamp}_${randomString}.png`;
+        
+        console.log('Uploading file:', fileName);
+        
+        // Get storage reference
         const storageRef = firebase.storage().ref(fileName);
         
         // Upload with metadata
@@ -594,23 +585,33 @@ async function uploadImageToFirebase(imageData, folder = 'designs/') {
             }
         });
 
-        // Return download URL when complete
+        // Wait for upload to complete
         return new Promise((resolve, reject) => {
             uploadTask.on('state_changed',
-                null, // Progress handler (optional)
-                (error) => reject(error),
+                (snapshot) => {
+                    // Progress monitoring
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload progress:', progress + '%');
+                },
+                (error) => {
+                    console.error('Upload error:', error);
+                    reject(new Error(`Upload failed: ${error.message}`));
+                },
                 async () => {
                     try {
+                        // Get download URL
                         const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                        console.log('File available at:', downloadURL);
                         resolve(downloadURL);
                     } catch (error) {
+                        console.error('Error getting download URL:', error);
                         reject(error);
                     }
                 }
             );
         });
     } catch (error) {
-        console.error('Upload error:', error);
+        console.error('Upload process error:', error);
         throw error;
     }
 }
@@ -1926,24 +1927,11 @@ document.querySelectorAll('input[name="payment"]').forEach(radio => {
         }
     });
 });
-async function handleFormSubmit(e) {
-    e.preventDefault();
-    const form = e.target;
+async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
+    if (e && e.preventDefault) e.preventDefault();
+    
+    const form = e.target || document.getElementById('order-form');
     const submitButton = form.querySelector('button[type="submit"]');
-
-    // Get payment method first
-    const paymentMethod = form.querySelector('input[name="payment"]:checked').value;
-
-    // Skip PayPal validation for COD orders (only if COD is enabled)
-    if (paymentMethod === 'Cash' && !disableCOD) {
-        await submitOrderForm(form, null);
-
-
-
-
-
-        return;
-    }
 
     // Prevent multiple submissions
     if (window.orderSubmissionInProgress) return;
@@ -1953,168 +1941,136 @@ async function handleFormSubmit(e) {
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
     try {
-        // 1. Validate form fields
-        const formData = new FormData(form);
-        const requiredFields = ['full-name', 'phone', 'governorate', 'address', 'payment'];
-        const missingFields = requiredFields.filter(field => !formData.get(field));
-        
-        if (missingFields.length > 0) {
-            throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
-        }
-        
-        if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
-            throw new Error('Payment proof is required for Cliq payments');
-        }
-         // PayPal-specific validation
-        if (paymentMethod === 'PayPal') {
-            const paypalTransactionId = formData.get('paypal_transaction_id');
-            if (!paypalTransactionId) {
-                throw new Error('PayPal payment not completed');
-            }
-        }
-        // 2. Validate charm sets across all cart items
-        const allCharms = cart.flatMap(item => item.charms.map(charm => charm.src));
-        const invalidSets = [];
-        
-        Object.values(CHARM_SETS).forEach(set => {
-            const foundCharms = set.charms.filter(charm => 
-                allCharms.some(placed => placed.includes(charm))
-            ).length;
+        let formData;
+        if (!isPayPalSuccess) {
+            formData = new FormData(form);
             
-            if (foundCharms > 0 && foundCharms < set.requiredCount) {
-                invalidSets.push({
-                    ...set,
-                    currentCount: foundCharms
-                });
+            // Validate form fields
+            const requiredFields = ['full-name', 'phone', 'governorate', 'address', 'payment'];
+            const missingFields = requiredFields.filter(field => !formData.get(field));
+            
+            if (missingFields.length > 0) {
+                throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
             }
-        });
-        
-        if (invalidSets.length > 0) {
-            const errorMessages = invalidSets.map(set => 
-                `${set.message}\n\nYou have: ${set.currentCount}/${set.requiredCount}`
-            ).join('\n\n');
-            throw new Error(`Please complete these charm sets:\n\n${errorMessages}`);
+            
+            // PayPal validation
+            if (formData.get('payment') === 'PayPal') {
+                throw new Error('Please complete PayPal payment first');
+            }
+            
+            // Cliq validation
+            if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
+                throw new Error('Payment proof is required for Cliq payments');
+            }
+        } else {
+            formData = new FormData();
+            // Add PayPal data to formData
+            Object.entries(paypalData).forEach(([key, value]) => {
+                formData.append(key, value);
+            });
         }
-        
-        // 3. Upload design images for each item
-        const cartWithImages = await Promise.all(cart.map(async (item) => {
-            if (item.designImage) {
-                try {
-                    // Convert data URL to blob
-                    const blob = await (await fetch(item.designImage)).blob();
-                    // Upload to Firebase Storage
-                    const downloadURL = await uploadImageToFirebase(blob, 'designs/');
-                    return {
-                        ...item,
-                        imageUrl: downloadURL
-                    };
-                } catch (error) {
-                    console.error('Error uploading design image:', error);
-                    return item; // Return item without image if upload fails
-                }
-            }
-            return item;
-        }));
 
-        // 4. Calculate order totals
+        // Calculate order totals
         const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
         const deliveryFee = 2.5;
-        const total = subtotal + deliveryFee;
+        const totalJOD = subtotal + deliveryFee;
+        const totalUSD = (totalJOD * JOD_TO_USD_RATE).toFixed(2);
+
+        console.log('Order totals:', { subtotal, deliveryFee, totalJOD, totalUSD });
+
+        // Upload design images and create order data
+        const orderData = await prepareOrderData(formData, totalJOD, totalUSD, isPayPalSuccess ? paypalData : null);
         
-        // 5. Create order data
-        const orderData = {
-            clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
-            customer: {
-                name: formData.get('full-name'),
-                phone: formData.get('phone'),
-                phone2: formData.get('phone2') || null,
-                governorate: formData.get('governorate'),
-                address: formData.get('address'),
-                notes: formData.get('notes') || null
-            },
-            paymentMethod: formData.get('payment'),
-                  currency: "JOD",
-                   amountJOD: totalJOD,
-                   amountUSD: totalUSD,  // Only for PayPal payments
-                   exchangeRate: JOD_TO_USD_RATE,  // Only for PayPal payments
-                           paymentStatus: formData.get('payment') === 'PayPal' ? 'paid' : 'pending',
-                           paymentDetails: formData.get('payment') === 'PayPal' ? {
-                               transactionId: formData.get('paypal_transaction_id'),
-                               amount: total,
-                currency: 'JOD'
-            } : null,
-              items: cartWithImages.map(item => ({
-                product: item.product,
-                size: item.size,
-                price: item.price,
-                imageUrl: item.imageUrl || null, // Use the uploaded URL
-                isFullGlam: item.isFullGlam,
-                materialType: item.materialType,
-                charms: item.charms,
-                timestamp: new Date().toISOString()
-            })),
-            subtotal: subtotal,
-            deliveryFee: deliveryFee,
-            total: total,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            status: 'pending'
-        };
-
-        // 6. Upload payment proof if Cliq payment
-        if (formData.get('payment') === 'Cliq') {
-            const paymentProofFile = document.getElementById('payment-proof').files[0];
-            if (!paymentProofFile) {
-                throw new Error('Please upload payment proof for Cliq payment');
-            }
-
-            // Simple client-side validation
-            if (paymentProofFile.size > 5 * 1024 * 1024) { // 5MB max
-                throw new Error('Payment proof must be smaller than 5MB');
-            }
-
-            const fileExt = paymentProofFile.name.split('.').pop().toLowerCase();
-            if (!['png', 'jpg', 'jpeg', 'pdf'].includes(fileExt)) {
-                throw new Error('Only PNG, JPG, or PDF files allowed');
-            }
-
-            // Upload with order reference
-            const fileName = `payment-proofs/${orderData.clientOrderId}_${Date.now()}.${fileExt}`;
-            const storageRef = storage.ref(fileName);
-            
-            await storageRef.put(paymentProofFile, {
-                contentType: paymentProofFile.type,
-                customMetadata: {
-                    orderId: orderData.clientOrderId,
-                    phone: formData.get('phone') || 'none'
-                }
-            });
-            
-            orderData.paymentProofUrl = await storageRef.getDownloadURL();
-        }
-        
-        // 7. Submit to Firestore
+        // Submit to Firestore
         const orderRef = await db.collection('orders').add(orderData);
         console.log('Order submitted with ID:', orderRef.id);
 
-        // 8. Clear cart and reset form
+        // Clear cart and reset form
         cart.length = 0;
         updateCartDisplay();
-        form.reset();
-        paymentProofContainer.style.display = 'none';
+        if (form.reset) form.reset();
+        if (paymentProofContainer) paymentProofContainer.style.display = 'none';
 
-        // 9. Show confirmation
+        // Show confirmation
         orderIdSpan.textContent = orderRef.id;
         orderModal.classList.remove('active');
         orderConfirmation.classList.add('active');
         
+        showToast('Order submitted successfully!', 'success');
+        
     } catch (error) {
         console.error('Order submission failed:', error);
-        alert(error.message || 'Order submission failed. Please check your connection and try again.');
+        showToast(error.message || 'Order submission failed. Please try again.', 'error');
     } finally {
         window.orderSubmissionInProgress = false;
-        submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Order';
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Order';
+        }
     }
+}
+
+async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null) {
+    const paymentMethod = formData.get('payment') || (paypalData ? 'PayPal' : 'Unknown');
+    
+    // Upload design images for cart items
+    const itemsWithImages = await Promise.all(cart.map(async (item) => {
+        let imageUrl = null;
+        if (item.designImage) {
+            try {
+                imageUrl = await uploadImageToFirebase(item.designImage, 'designs/');
+            } catch (error) {
+                console.error('Failed to upload design image:', error);
+                // Continue without image rather than failing entire order
+            }
+        }
+        
+        return {
+            ...item,
+            imageUrl: imageUrl
+        };
+    }));
+
+    // Build order data
+    const orderData = {
+        clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
+        customer: {
+            name: formData.get('full-name') || 'Not provided',
+            phone: formData.get('phone') || 'Not provided',
+            phone2: formData.get('phone2') || null,
+            governorate: formData.get('governorate') || 'Not provided',
+            address: formData.get('address') || 'Not provided',
+            notes: formData.get('notes') || null
+        },
+        paymentMethod: paymentMethod,
+        currency: "JOD",
+        amountJOD: totalJOD,
+        amountUSD: totalUSD,
+        exchangeRate: JOD_TO_USD_RATE,
+        paymentStatus: paymentMethod === 'PayPal' ? 'paid' : 'pending',
+        paymentDetails: paypalData,
+        items: itemsWithImages,
+        subtotal: cart.reduce((sum, item) => sum + item.price, 0),
+        deliveryFee: 2.5,
+        total: totalJOD,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        status: 'pending'
+    };
+
+    // Handle payment proof for Cliq
+    if (paymentMethod === 'Cliq') {
+        const paymentProofFile = document.getElementById('payment-proof')?.files[0];
+        if (paymentProofFile) {
+            try {
+                const proofUrl = await uploadImageToFirebase(paymentProofFile, 'payment-proofs/');
+                orderData.paymentProofUrl = proofUrl;
+            } catch (error) {
+                console.error('Failed to upload payment proof:', error);
+            }
+        }
+    }
+    
+    return orderData;
 }
 function setupOrderFunctionality() {
     // First get ALL required elements
@@ -2151,7 +2107,12 @@ function setupOrderFunctionality() {
     if (payCliqRadio) payCliqRadio.removeEventListener('change', handlePaymentChange);
 
     // Add event listeners only if elements exist
-    if (orderForm) orderForm.addEventListener('submit', handleFormSubmit);
+    // In your setupOrderFunctionality function, update the form submission:
+if (orderForm) {
+    orderForm.addEventListener('submit', function(e) {
+        handleFormSubmit(e);
+    });
+}
     if (placeOrderBtn) placeOrderBtn.addEventListener('click', handlePlaceOrderClick);
     if (cancelOrderBtn) cancelOrderBtn.addEventListener('click', handleCancelOrder);
     if (closeConfirmation) closeConfirmation.addEventListener('click', handleCloseConfirmation);
@@ -3234,69 +3195,78 @@ function setupCategoryTabs() {
         updateRareCharmsDisplay();
     }
 }
-const JOD_TO_USD_RATE = 1.41; 
+// Add this near your other constants
+const JOD_TO_USD_RATE = 1.41;
 
+// Update the PayPal button integration
 paypal.Buttons({
     style: {
-        layout: 'vertical',  // or 'horizontal'
-        // Disable funding options if needed (credit, card, etc.)
+        layout: 'vertical',
         disableFunding: 'card,credit',
-        // Remove billing address fields
         billingAddress: 'hidden',
-        // Remove shipping address (if applicable)
         shippingAddress: 'none'
     },
     createOrder: function(data, actions) {
         if (!document.getElementById('pay-paypal').checked) {
             return;
         }
+        
+        // Calculate totals properly
         const totalText = document.getElementById('order-total-price').textContent;
-        const totalJOD = parseFloat(totalText.replace('Total: ', '').replace(' JOD', ''));
+        const totalJOD = parseFloat(totalText.replace('Total: ', '').replace(' JDs', ''));
         
-        window.ordertotalJOD = totalJOD;
+        // Store for later use
+        window.currentOrderTotalJOD = totalJOD;
         
-        // Convert to USD only at payment time
-        const totalUSD = (totalJOD * JOD_TO_USD_RATE ).toFixed(2);
+        // Convert to USD
+        const totalUSD = (totalJOD * JOD_TO_USD_RATE).toFixed(2);
         
-          return actions.order.create({
+        console.log('Creating PayPal order:', { totalJOD, totalUSD });
+        
+        return actions.order.create({
             purchase_units: [{
                 amount: {
                     value: totalUSD,
                     currency_code: "USD"
                 }
             }],
-            // Ensure no shipping/billing address is collected
             application_context: {
                 shipping_preference: 'NO_SHIPPING',
-                user_action: 'PAY_NOW' // Skip review page
+                user_action: 'PAY_NOW'
             }
         });
     },
     onApprove: function(data, actions) {
         return actions.order.capture().then(function(details) {
-            const totalJOD = window.ordertotalJOD;
-            const totalUSD = (totalJOD * JOD_TO_USD_RATE ).toFixed(2);
+            // Use the stored total
+            const totalJOD = window.currentOrderTotalJOD;
+            const totalUSD = (totalJOD * JOD_TO_USD_RATE).toFixed(2);
             
             // Store transaction details
             const transactionDetails = {
                 paypal_transaction_id: details.id,
                 amount_jod: totalJOD,
                 amount_usd: totalUSD,
-                exchange_rate: JOD_TO_USD_RATE 
+                exchange_rate: JOD_TO_USD_RATE
             };
             
             // Add hidden fields to form
             const form = document.getElementById('order-form');
             for (const [key, value] of Object.entries(transactionDetails)) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
+                let input = form.querySelector(`[name="${key}"]`);
+                if (!input) {
+                    input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    form.appendChild(input);
+                }
                 input.value = value;
-                form.appendChild(input);
             }
             
-            // Submit form
-            form.submit();
+            console.log('PayPal transaction completed:', transactionDetails);
+            
+            // Submit the form programmatically
+            handleFormSubmit(new Event('submit'), true, transactionDetails);
         });
     },
     onError: function(err) {
@@ -3304,7 +3274,6 @@ paypal.Buttons({
         showToast('Payment failed: ' + err.message, 'error');
     }
 }).render('#paypal-button-container');
-
 async function submitOrderForm(form, paypalData) {
     const submitButton = form.querySelector('button[type="submit"]');
     
@@ -3336,82 +3305,7 @@ async function submitOrderForm(form, paypalData) {
     }
 }
 
-async function prepareOrderData(form, paypalData) {
-    const formData = new FormData(form);
-    const paymentMethod = formData.get('payment');
-    
-    // Calculate order totals
-    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-    const deliveryFee = 20;
-    const total = subtotal + deliveryFee;
-    
-    // Prepare order data with all address fields
-    const orderData = {
-        clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
-        customer: {
-            name: formData.get('full-name'),
-            phone: formData.get('phone'),
-            phone2: formData.get('phone2') || null,
-            city: formData.get('city'),
-            address: {
-                area: formData.get('area'),
-                streetName: formData.get('street-name'),
-                buildingName: formData.get('building-name') || null,
-                apartmentNo: formData.get('apartment-no'),
-                floorNo: formData.get('floor-no') || null,
-                postalCode: formData.get('postal-code') || null,
-                additionalDetails: formData.get('additional-address') || null
-            },
-            notes: formData.get('notes') || null
-        },
-        paymentMethod: paymentMethod,
-        paymentStatus: paymentMethod === 'PayPal' ? 'paid' : 'pending',
-        paymentDetails: paypalData || null,
-        items: await Promise.all(cart.map(async (item) => {
-            // Upload design image if it exists
-            let imageUrl = null;
-            if (item.designImage) {
-                try {
-                    const blob = await (await fetch(item.designImage)).blob();
-                    imageUrl = await uploadImageToFirebase(blob, 'designs/');
-                } catch (error) {
-                    console.error('Error uploading design image:', error);
-                }
-            }
-            
-            return {
-                product: item.product,
-                size: item.size,
-                price: item.price,
-                imageUrl: imageUrl,
-                isFullGlam: item.isFullGlam,
-                materialType: item.materialType,
-                charms: item.charms,
-                timestamp: new Date().toISOString()
-            };
-        })),
-        subtotal: subtotal,
-        deliveryFee: deliveryFee,
-        total: total,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        status: 'pending'
-    };
-    
-    // Handle payment proof for Cliq
-    if (paymentMethod === 'Cliq') {
-        const paymentProofFile = document.getElementById('payment-proof').files[0];
-        if (paymentProofFile) {
-            try {
-                const proofUrl = await uploadPaymentProof(paymentProofFile, orderData.clientOrderId);
-                orderData.paymentProofUrl = proofUrl;
-            } catch (error) {
-                console.error('Error uploading payment proof:', error);
-            }
-        }
-    }
-    
-    return orderData;
-}
+
 function showOrderConfirmation(orderData) {
     document.getElementById('confirmation-total').textContent = 
         `${orderData.total.toFixed(2)} JOD`;
