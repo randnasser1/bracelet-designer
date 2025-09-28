@@ -1,5 +1,3 @@
-
-
 let specialCharmsGrid;
 let rareCharmsGrid;
 let customCharmUpload;
@@ -27,77 +25,79 @@ let watchPoolContainer = null; // Add this with your other global variables
 const maxIndividualSlots = 10;
 const globalUsedCharms = new Map(); // Change from Set to Map to track quantities
 const charmQuantities = {}; // Tracks remaining quantities
-const disableCOD = false; // Set this to false to show COD option again
+
 // Constants
 const MAX_SLOT_SPACES = 16;
 const SIZE_CHARTS = {
-    bracelet: {
+     bracelet: {
         '15.2-16.2': { charms: 18, price: 0, display: '15.2cm - 16.2cm (18 charms)' },
-        '16.2-17.1': { charms: 19, price: 3, display: '16.2cm - 17.1cm (+3 AED, 19 charms)' },
-        '17.1-18.1': { charms: 20, price: 6, display: '17.1cm - 18.1cm (+6 AED, 20 charms)' },
-        '18.1-19.2': { charms: 21, price: 8, display: '18.1cm - 19.2cm (+8 AED, 21 charms)' },
-        '19.2-20': { charms: 22, price: 11, display: '19.2cm - 20cm (+11 AED, 22 charms)' },
-        '20-21': { charms: 23, price: 13, display: '20cm - 21cm (+13 AED, 23 charms)' },
-        '21-22': { charms: 24, price: 16, display: '21cm - 22cm (+16 AED, 24 charms)' }
+        '16.2-17.1': { charms: 19, price: 0.5, display: '16.2cm - 17.1cm (+0.5 JDs, 19 charms)' },
+        '17.1-18.1': { charms: 20, price: 1, display: '17.1cm - 18.1cm (+1 JD, 20 charms)' },
+        '18.1-19.2': { charms: 21, price: 1.5, display: '18.1cm - 19.2cm (+1.5 JDs, 21 charms)' },
+        '19.2-20': { charms: 22, price: 2, display: '19.2cm - 20cm (+2 JDs, 22 charms)' },
+        '20-21': { charms: 23, price: 2.5, display: '20cm - 21cm (+2.5 JDs, 23 charms)' },
+        '21-22': { charms: 24, price: 3, display: '21cm - 22cm (+3 JDs, 24 charms)' }
     },
+    // Watch sizes (same as bracelet but charm count reduced by 4)
     'watch': {
         '15.2-16.2': { charms: 14, price: 0, display: '15.2cm - 16.2cm (14 charms)' },
-        '16.2-17.1': { charms: 15, price: 3, display: '16.2cm - 17.1cm (+3 AED, 15 charms)' },
-        '17.1-18.1': { charms: 16, price: 6, display: '17.1cm - 18.1cm (+6 AED, 16 charms)' },
-        '18.1-19.2': { charms: 17, price: 8, display: '18.1cm - 19.2cm (+8 AED, 17 charms)' },
-        '19.2-20': { charms: 18, price: 11, display: '19.2cm - 20cm (+11 AED, 18 charms)' },
-        '20-21': { charms: 19, price: 13, display: '20cm - 21cm (+13 AED, 19 charms)' },
-        '21-22': { charms: 20, price: 16, display: '21cm - 22cm (+16 AED, 20 charms)' }
+        '16.2-17.1': { charms: 15, price: 0.5, display: '16.2cm - 17.1cm (+0.5 JDs, 15 charms)' },
+        '17.1-18.1': { charms: 16, price: 1, display: '17.1cm - 18.1cm (+1 JD, 16 charms)' },
+        '18.1-19.2': { charms: 17, price: 1.5, display: '18.1cm - 19.2cm (+1.5 JDs, 17 charms)' },
+        '19.2-20': { charms: 18, price: 2, display: '19.2cm - 20cm (+2 JDs, 18 charms)' },
+        '20-21': { charms: 19, price: 2.5, display: '20cm - 21cm (+2.5 JDs, 19 charms)' },
+        '21-22': { charms: 20, price: 3, display: '21cm - 22cm (+3 JDs, 20 charms)' }
     },
+    // Apple Watch sizes (same as bracelet but charm count reduced by 5)
     'apple-watch': {
         '15.2-16.2': { charms: 13, price: 0, display: '15.2cm - 16.2cm (13 charms)' },
-        '16.2-17.1': { charms: 14, price: 3, display: '16.2cm - 17.1cm (+3 AED, 14 charms)' },
-        '17.1-18.1': { charms: 15, price: 6, display: '17.1cm - 18.1cm (+6 AED, 15 charms)' },
-        '18.1-19.2': { charms: 16, price: 8, display: '18.1cm - 19.2cm (+8 AED, 16 charms)' },
-        '19.2-20': { charms: 17, price: 11, display: '19.2cm - 20cm (+11 AED, 17 charms)' },
-        '20-21': { charms: 18, price: 13, display: '20cm - 21cm (+13 AED, 18 charms)' },
-        '21-22': { charms: 19, price: 16, display: '21cm - 22cm (+16 AED, 19 charms)' }
+        '16.2-17.1': { charms: 14, price: 0.5, display: '16.2cm - 17.1cm (+0.5 JDs, 14 charms)' },
+        '17.1-18.1': { charms: 15, price: 1, display: '17.1cm - 18.1cm (+1 JD, 15 charms)' },
+        '18.1-19.2': { charms: 16, price: 1.5, display: '18.1cm - 19.2cm (+1.5 JDs, 16 charms)' },
+        '19.2-20': { charms: 17, price: 2, display: '19.2cm - 20cm (+2 JDs, 17 charms)' },
+        '20-21': { charms: 18, price: 2.5, display: '20cm - 21cm (+2.5 JDs, 18 charms)' },
+        '21-22': { charms: 19, price: 3, display: '21cm - 22cm (+3 JDs, 19 charms)' }
     },
-    'keychain': {
-        '5 charms': { charms: 5, price: 0, display: '5 charms' },
-        '6 charms': { charms: 6, price: 6, display: '6 charms' },
-        '7 charms': { charms: 7, price: 11, display: '7 charms' },
-    },
+   'keychain': {
+    '5 charms': { charms: 5, price: 0, display: '5 charms' },
+    '6 charms': { charms: 6, price: 1, display: '6 charms' },
+    '7 charms': { charms: 7, price: 2, display: '7 charms'},
+},
+    
     anklet: {
         '21-22': { charms: 23, price: 0, display: '21cm - 22cm (23 charms)' },
-        '22-23': { charms: 24, price: 3, display: '22cm - 23cm (+3 AED, 24 charms)' },
-        '23-24': { charms: 25, price: 6, display: '23cm - 24cm (+6 AED, 25 charms)' },
-        '24-25': { charms: 26, price: 8, display: '24cm - 25cm (+8 AED, 26 charms)' }
+        '22-23': { charms: 24, price: 0.5, display: '22cm - 23cm (+0.5 JDs, 24 charms)' },
+        '23-24': { charms: 25, price: 1, display: '23cm - 24cm (+1 JD, 25 charms)' },
+        '24-25': { charms: 26, price: 1.5, display: '24cm - 25cm (+1.5 JDs, 26 charms)' }
     },
     necklace: {
         '32-33': { charms: 34, price: 0, display: '32cm - 33cm (34 charms)' },
-        '33-34': { charms: 35, price: 3, display: '33cm - 34cm (+3 AED, 35 charms)' },
-        '34-35': { charms: 36, price: 6, display: '34cm - 35cm (+6 AED, 36 charms)' },
-        '35-36': { charms: 37, price: 8, display: '35cm - 36cm (+8 AED, 37 charms)' }
+        '33-34': { charms: 35, price: 0.5, display: '33cm - 34cm (+0.5 JDs, 35 charms)' },
+        '34-35': { charms: 36, price: 1, display: '34cm - 35cm (+1 JD, 36 charms)' },
+        '35-36': { charms: 37, price: 1.5, display: '35cm - 36cm (+1.5 JDs, 37 charms)' }
     },
     ring: {
         '7': { charms: 7, price: 0, display: '~7.0cm (7 charms)' },
-        '8': { charms: 8, price: 3, display: '~8.0cm (+3 AED, 8 charms)' },
-        '9': { charms: 9, price: 6, display: '~9.0cm (+6 AED, 9 charms)' },
-        '10': { charms: 10, price: 8, display: '~10.0cm (+8 AED, 10 charms)' },
-        '11': { charms: 11, price: 11, display: '~11.0cm (+11 AED, 11 charms)' }
+        '8': { charms: 8, price: 0.5, display: '~8.0cm (+0.5 JDs, 8 charms)' },
+        '9': { charms: 9, price: 1, display: '~9.0cm (+1 JD, 9 charms)' },
+        '10': { charms: 10, price: 1.5, display: '~10.0cm (+1.5 JDs, 10 charms)' },
+        '11': { charms: 11, price: 2, display: '~11.0cm (+2 JDs, 11 charms)' }
     },
-    individual: {
+    individual: { // Add this if you want individual charms to have sizes
         'default': { charms: 1, price: 0, display: 'Individual Charm' }
     }
 };
 
 const PRODUCTS = {
-    bracelet: { basePrice: 52, baseSlots: 18, includedSpecial: 1, fullGlam: 29 },
-    anklet: { basePrice: 78, baseSlots: 23, includedSpecial: 1, fullGlam: 42 },
-    necklace: { basePrice: 115, baseSlots: 34, includedSpecial: 1, fullGlam: 64 },
-    ring: { basePrice: 39, baseSlots: 7, includedSpecial: 1, fullGlam: 15 },
-    individual: { basePrice: 16, baseSlots: 1, includedSpecial: 0, fullGlam: 0 },
-    'watch': { basePrice: 104, baseSlots: 14, includedSpecial: 1, fullGlam: 35 },
-    'apple-watch': { basePrice: 94, baseSlots: 13, includedSpecial: 1, fullGlam: 32 },
-    'keychain': { basePrice: 32, baseSlots: 5, includedSpecial: 1, fullGlam: 13 }
+    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 1, fullGlam: 29 },
+    anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 1, fullGlam: 42 },
+    necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 1, fullGlam: 64 },
+    ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 },
+    individual: { basePrice: 3, baseSlots: 1, includedSpecial: 0, fullGlam: 0 },
+    'watch': { basePrice: 20, baseSlots: 14, includedSpecial: 1, fullGlam: 35 }, // Bracelet charms -4
+    'apple-watch': { basePrice: 18, baseSlots: 13, includedSpecial: 1, fullGlam: 32 }, // Bracelet charms -5
+    'keychain': { basePrice: 6, baseSlots: 5, includedSpecial: 1, fullGlam: 13 }
 };
-
 let currentWatchBase = 'basecharms/watch1.png'; // Default watch base
 
 
@@ -382,25 +382,25 @@ function showSetWarning(charmSet) {
 }
 function calculatePrice(includeDelivery = false) {
     // Handle individual charms separately
-   if (currentProduct === 'individual') {
-        const basePrice = 16; // Flat base price (only charged once)
+    if (currentProduct === 'individual') {
+        const basePrice = 3; // Base price per individual charm
         let charmCost = 0;
         
         const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
         placedCharms.forEach(charm => {
             if (charm.dataset.type === 'special') {
-                charmCost += 11; // Special charm cost
+                charmCost += 2;
             } else if (charm.dataset.type === 'rare') {
-                charmCost += 16; // Rare charm cost
+                charmCost += 3;
             } else if (charm.dataset.type === 'custom') {
-                charmCost += 18; // Custom charm cost
+                charmCost += 3.5;
             } else if (charm.classList.contains('long-charm')) {
-                charmCost += 31; // Long charm cost
+                charmCost += 6;
             }
         });
         
-        const subtotal = basePrice + charmCost; // Only base 16 AED + charms
-        const delivery = includeDelivery ? 20 : 0;
+        const subtotal = basePrice * individualSlotCount + charmCost;
+        const delivery = includeDelivery ? 2.5 : 0;
         const total = subtotal + delivery;
         
         return {
@@ -411,7 +411,19 @@ function calculatePrice(includeDelivery = false) {
         };
     }
 
-    // Rest of the function remains the same
+    // Verify valid product and size data
+    if (!PRODUCTS[currentProduct] || !SIZE_CHARTS[currentProduct] || !SIZE_CHARTS[currentProduct][currentSize]) {
+        console.error(`Missing price data for ${currentProduct} size ${currentSize}`);
+        return {
+            subtotal: 0,
+            discount: 0,
+            total: 0,
+            delivery: 0,
+            basePrice: 0,
+            charmCost: 0
+        };
+    }
+
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
     
@@ -421,11 +433,11 @@ function calculatePrice(includeDelivery = false) {
 
     // Apply material upgrades
     if (materialType === 'gold') {
-        totalPrice += 6;
-        originalPrice += 6;
+        totalPrice += 1;
+        originalPrice += 1;
     } else if (materialType === 'mix') {
-        totalPrice += 13;
-        originalPrice += 13;
+        totalPrice += 2.5;
+        originalPrice += 2.5;
     }
 
     // Count all placed charms and calculate costs
@@ -448,36 +460,36 @@ function calculatePrice(includeDelivery = false) {
         }
     });
 
-    // Apply charm costs
+    // Apply charm costs to both prices
     if (!isFullGlam) {
         const includedSpecials = product.includedSpecial;
         const paidSpecials = Math.max(0, specialCount - includedSpecials);
-        totalPrice += paidSpecials * 11; // 11 AED per special charm
-        originalPrice += paidSpecials * 11;
+        totalPrice += paidSpecials * 2;
+        originalPrice += paidSpecials * 2;
     }
 
     // Add costs for rare, custom, and long charms
-    totalPrice += rareCount * 16; // 16 AED per rare charm
-    originalPrice += rareCount * 16;
+    totalPrice += rareCount * 3;
+    originalPrice += rareCount * 3;
     
-    totalPrice += customCount * 18; // 18 AED per custom charm
-    originalPrice += customCount * 18;
+    totalPrice += customCount * 3.5;
+    originalPrice += customCount * 3.5;
     
-    totalPrice += longCharmCount * 31; // 31 AED per long charm
-    originalPrice += longCharmCount * 31;
+    totalPrice += longCharmCount * 6; // Long charms cost 6 JD each
+    originalPrice += longCharmCount * 6;
 
     // Check for discount eligibility
     const currentDate = new Date();
-    const discountEndDate = new Date('2025-09-28');
+    const discountEndDate = new Date('2025-07-25');
     let discountApplied = 0;
     
-    if (currentDate <= discountEndDate && originalPrice >= 75) {
+    if (currentDate <= discountEndDate && originalPrice >= 15) {
         discountApplied = Math.min(originalPrice * 0.1, 5);
         totalPrice = originalPrice - discountApplied;
     }
 
     if (includeDelivery) {
-        const deliveryFee = 20;
+        const deliveryFee = 2.5;
         return {
             subtotal: originalPrice,
             discount: discountApplied,
@@ -541,52 +553,39 @@ async function uploadBraceletImage(imageFile) {
   }
 }
 // Helper function to upload images to Firebase Storage
-async function uploadImageToFirebase(imageData, folder = 'designs/') {
-    try {
-        // Convert data URL to blob if needed
-        let blob;
-        if (typeof imageData === 'string' && imageData.startsWith('data:')) {
-            const response = await fetch(imageData);
-            blob = await response.blob();
-        } else if (imageData instanceof Blob) {
-            blob = imageData;
-        } else {
-            throw new Error('Invalid image data format');
+async function uploadImageToFirebase(imageFile, folder = 'designs/') {
+  try {
+    // 1. Create a unique filename
+    const timestamp = Date.now();
+    const fileName = `${folder}${timestamp}_${imageFile.name}`;
+    
+    // 2. Create storage reference
+    const storageRef = firebase.storage().ref();
+    const fileRef = storageRef.child(fileName);
+    
+    // 3. Start upload
+    const uploadTask = fileRef.put(imageFile);
+    
+    // 4. Return a promise that resolves with download URL
+    return new Promise((resolve, reject) => {
+      uploadTask.on('state_changed',
+        null, // Progress handler (optional)
+        (error) => reject(error),
+        async () => {
+          try {
+            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+            resolve(downloadURL);
+          } catch (error) {
+            reject(error);
+          }
         }
-
-        // Create storage reference
-        const timestamp = Date.now();
-        const fileName = `${folder}${timestamp}_design.png`;
-        const storageRef = firebase.storage().ref(fileName);
-        
-        // Upload with metadata
-        const uploadTask = storageRef.put(blob, {
-            contentType: 'image/png',
-            customMetadata: {
-                uploadedBy: 'customer',
-                uploadedAt: new Date().toISOString()
-            }
-        });
-
-        // Return download URL when complete
-        return new Promise((resolve, reject) => {
-            uploadTask.on('state_changed',
-                null, // Progress handler (optional)
-                (error) => reject(error),
-                async () => {
-                    try {
-                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-                        resolve(downloadURL);
-                    } catch (error) {
-                        reject(error);
-                    }
-                }
-            );
-        });
-    } catch (error) {
-        console.error('Upload error:', error);
-        throw error;
-    }
+      );
+    });
+    
+  } catch (error) {
+    console.error('Upload error:', error);
+    throw error;
+  }
 }
 function updateJewelryPiece() {
     const jewelryPiece = document.getElementById('jewelry-piece');
@@ -627,11 +626,11 @@ function getCharmSet(charmSrc) {
       previewName.textContent = charmName.charAt(0).toUpperCase() + charmName.slice(1);
       
       if (charmElement.dataset.type === 'special') {
-        previewType.textContent = 'Special Charm (+11 AED)';
+        previewType.textContent = 'Special Charm (+2 JDs)';
       } else if (charmElement.dataset.type === 'rare') {
-        previewType.textContent = 'Rare Charm (+16 AED)';
+        previewType.textContent = 'Rare Charm (+3 JDs)';
       } else {
-        previewType.textContent = 'Custom Charm (+18 AED)';
+        previewType.textContent = 'Custom Charm (+3.5 JDs)';
       }
       
       preview.classList.add('active');
@@ -656,8 +655,8 @@ function updateCartDisplay() {
     
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
-        cartSubtotal.textContent = 'Subtotal: 0.00 AED';
-        cartTotal.textContent = 'Total: 0.00 AED';
+        cartSubtotal.textContent = 'Subtotal: 0.00 JDs';
+        cartTotal.textContent = 'Total: 0.00 JDs';
         cartDiscountInfo.style.display = 'none';
         return;
     }
@@ -665,7 +664,7 @@ function updateCartDisplay() {
     let itemsHTML = '';
       const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
     const discountedSubtotal = cart.reduce((sum, item) => sum + item.price, 0);
-    const deliveryFee = 20;
+    const deliveryFee = 2.5;
     
     // Calculate additional cart-level discount if applicable
     const currentDate = new Date();
@@ -689,7 +688,7 @@ function updateCartDisplay() {
                     <div class="cart-item-details">
                         <div>${item.product} (${item.size})</div>
                         <div>${item.materialType}</div>
-                        <div>${item.price.toFixed(2)} AED</div>
+                        <div>${item.price.toFixed(2)} JDs</div>
                     </div>
                 </div>
                 <button class="remove-item" data-index="${index}">
@@ -700,29 +699,29 @@ function updateCartDisplay() {
     });
     
     cartItemsContainer.innerHTML = itemsHTML;
-    cartSubtotal.textContent = `Subtotal: ${discountedSubtotal.toFixed(2)} AED`;
-    document.getElementById('cart-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} AED`;
+    cartSubtotal.textContent = `Subtotal: ${discountedSubtotal.toFixed(2)} JDs`;
+    document.getElementById('cart-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
     
     if (additionalDiscount > 0) {
         cartDiscountInfo.style.display = 'block';
-        cartDiscountAmount.textContent = `Additional Discount: -${additionalDiscount.toFixed(2)} AED`;
+        cartDiscountAmount.textContent = `Additional Discount: -${additionalDiscount.toFixed(2)} JDs`;
         
         cartTotal.innerHTML = `
             <div>
                 <span style="text-decoration: line-through; color: #999; margin-right: 8px;">
-                    ${(discountedSubtotal + deliveryFee).toFixed(2)} AED
+                    ${(discountedSubtotal + deliveryFee).toFixed(2)} JDs
                 </span>
                 <span style="font-weight: bold; color: #d6336c;">
-                    ${total.toFixed(2)} AED
+                    ${total.toFixed(2)} JDs
                 </span>
             </div>
             <div style="color: #4CAF50; font-size: 0.9rem; margin-top: 4px;">
-                You saved ${(subtotal - discountedSubtotal + additionalDiscount).toFixed(2)} AED!
+                You saved ${(subtotal - discountedSubtotal + additionalDiscount).toFixed(2)} JDs!
             </div>
         `;
     } else {
         cartDiscountInfo.style.display = 'none';
-        cartTotal.textContent = `Total: ${(discountedSubtotal + deliveryFee).toFixed(2)} AED`;
+        cartTotal.textContent = `Total: ${(discountedSubtotal + deliveryFee).toFixed(2)} JDs`;
     }
 
     // Reattach event listeners
@@ -752,43 +751,46 @@ function updatePrice() {
     if (currentProduct === 'individual') {
         basePriceElement.innerHTML = `
             <span>Base Price:</span>
-            <span>16 AED</span>
+            <span>3.00 JDs</span>
         `;
         
-        const charmCost = priceData.total - 16;
+        const charmCost = priceData.total - 3;
         let charmText = '';
         
+        // Build detailed charm breakdown
         if (priceData.longCharmCount > 0) {
-            charmText += `${priceData.longCharmCount} long (${priceData.longCharmCount * 31} AED)`;
+            charmText += `${priceData.longCharmCount} long (${(priceData.longCharmCount * 6).toFixed(2)} JD)`;
         }
         if (priceData.specialCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.specialCount} special (${priceData.specialCount * 11} AED)`;
+            charmText += `${priceData.specialCount} special (${(priceData.specialCount * 2).toFixed(2)} JD)`;
         }
         if (priceData.rareCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.rareCount} rare (${priceData.rareCount * 16} AED)`;
+            charmText += `${priceData.rareCount} rare (${(priceData.rareCount * 3).toFixed(2)} JD)`;
         }
         if (priceData.customCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.customCount} custom (${priceData.customCount * 18} AED)`;
+            charmText += `${priceData.customCount} custom (${(priceData.customCount * 3.5).toFixed(2)} JD)`;
         }
         
         charmPriceElement.innerHTML = `
             <span>Charms:</span>
-            <span>${charmText || '0 AED'}</span>
+            <span>${charmText || '0.00 JD'}</span>
         `;
         
-        totalPriceElement.textContent = `Total: ${priceData.total} AED`;
+        totalPriceElement.textContent = `Total: ${priceData.total.toFixed(2)} JDs`;
         discountMessageElement.innerHTML = '';
     } else {
+        // For non-individual products
         if (isFullGlam) {
-            basePriceElement.innerHTML = `Full Glam Base: ${product.fullGlam} AED`;
+            basePriceElement.innerHTML = `Full Glam Base: ${product.fullGlam.toFixed(2)} JDs`;
         } else {
             const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
-            basePriceElement.innerHTML = `Base Price: ${basePrice} AED`;
+            basePriceElement.innerHTML = `Base Price: ${basePrice.toFixed(2)} JDs`;
         }
 
+        // Build detailed charm breakdown text
         let charmText = '';
         const freeSpecials = isFullGlam ? product.baseSlots : product.includedSpecial;
         const paidSpecials = Math.max(0, priceData.specialCount - freeSpecials);
@@ -798,39 +800,40 @@ function updatePrice() {
         }
         if (paidSpecials > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${paidSpecials} paid special (+${paidSpecials * 11} AED)`;
+            charmText += `${paidSpecials} paid special (+${(paidSpecials * 2).toFixed(2)} JD)`;
         }
         if (priceData.rareCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.rareCount} rare (+${priceData.rareCount * 16} AED)`;
+            charmText += `${priceData.rareCount} rare (+${(priceData.rareCount * 3).toFixed(2)} JD)`;
         }
         if (priceData.customCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.customCount} custom (+${priceData.customCount * 18} AED)`;
+            charmText += `${priceData.customCount} custom (+${(priceData.customCount * 3.5).toFixed(2)} JD)`;
         }
         if (priceData.longCharmCount > 0) {
             if (charmText) charmText += ', ';
-            charmText += `${priceData.longCharmCount} long (+${priceData.longCharmCount * 31} AED)`;
+            charmText += `${priceData.longCharmCount} long (+${(priceData.longCharmCount * 6).toFixed(2)} JD)`;
         }
 
         charmPriceElement.textContent = charmText || 'No charms added';
 
+        // Handle discount display
         if (priceData.discount > 0) {
             totalPriceElement.innerHTML = `
                 <div class="price-comparison">
-                    <span class="original-price">${priceData.subtotal} AED</span>
+                    <span class="original-price">${priceData.subtotal.toFixed(2)} JDs</span>
                     <span>→</span>
-                    <span class="discounted-price">${priceData.total} AED</span>
+                    <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
                 </div>
-                <div class="savings-notice">You saved ${priceData.discount} AED!</div>
+                <div class="savings-notice">You saved ${priceData.discount.toFixed(2)} JDs!</div>
             `;
             discountMessageElement.innerHTML = '<div class="discount-badge">10% OFF</div>';
         } else {
-            totalPriceElement.innerHTML = `Total: ${priceData.total} AED`;
-            if (priceData.subtotal < 78) {
+            totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
+            if (priceData.subtotal < 15) {
                 discountMessageElement.innerHTML = `
                     <div class="discount-promo">
-                        <i class="fas fa-tag"></i> Add ${78 - priceData.subtotal} AED more to get 10% OFF!
+                        <i class="fas fa-tag"></i> Add ${(15 - priceData.subtotal).toFixed(2)} JD more to get 10% OFF!
                     </div>
                 `;
             } else {
@@ -839,6 +842,7 @@ function updatePrice() {
         }
     }
 }
+
 function getCharmBreakdownText() {
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
     let specialCount = 0, rareCount = 0, customCount = 0;
@@ -855,9 +859,9 @@ function getCharmBreakdownText() {
     const paidSpecials = Math.max(0, specialCount - freeSpecials);
 
     let text = `Charms: ${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials`;
-    if (paidSpecials > 0) text += `, ${paidSpecials} paid (+${(paidSpecials * 11).toFixed(2)} JD)`;
-    if (rareCount > 0) text += `, ${rareCount} rare (+${(rareCount * 16).toFixed(2)} JD)`;
-    if (customCount > 0) text += `, ${customCount} custom (+${(customCount * 18).toFixed(2)} JD)`;
+    if (paidSpecials > 0) text += `, ${paidSpecials} paid (+${(paidSpecials * 2).toFixed(2)} JD)`;
+    if (rareCount > 0) text += `, ${rareCount} rare (+${(rareCount * 3).toFixed(2)} JD)`;
+    if (customCount > 0) text += `, ${customCount} custom (+${(customCount * 3.5).toFixed(2)} JD)`;
 
     return text;
 }
@@ -1791,12 +1795,12 @@ placeOrderBtn.addEventListener('click', function() {
     
     // Calculate order totals
     const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-    const deliveryFee = 20;
+    const deliveryFee = 2.5;
     const total = subtotal + deliveryFee;
     
-    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} AED`;
-    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} AED`;
-    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} AED`;
+    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
+    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
 });
 }
 function validateCharmsForSets(charms) {
@@ -1854,12 +1858,12 @@ function handlePlaceOrderClick() {
     
     // Calculate and display order summary
     const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-    const deliveryFee = 20;
+    const deliveryFee = 2.5;
     const total = subtotal + deliveryFee;
     
-    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} AED`;
-    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} AED`;
-    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} AED`;
+    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
+    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
 
     document.body.classList.add('modal-open');
     orderModal.classList.add('active');
@@ -1878,36 +1882,28 @@ function handleCloseConfirmation() {
     // Reset the designer after successful order
     initProduct('bracelet');
 }
-document.querySelectorAll('input[name="payment"]').forEach(radio => {
-    // Skip COD radio if disabled
-    if (disableCOD && radio.value === 'Cash') return;
-    
-    radio.addEventListener('change', function() {
-        if (this.value === 'PayPal') {
-            document.getElementById('paypal-button-container').style.display = 'block';
-            document.getElementById('payment-proof-container').style.display = 'none';
-        } else if (this.value === 'Cliq') {
-            document.getElementById('paypal-button-container').style.display = 'none';
-            document.getElementById('payment-proof-container').style.display = 'block';
-        } else if (this.value === 'Cash') {
-            document.getElementById('paypal-button-container').style.display = 'none';
-            document.getElementById('payment-proof-container').style.display = 'none';
-        }
-    });
-});
+
 async function handleFormSubmit(e) {
     e.preventDefault();
-    const form = e.target;
-    const submitButton = form.querySelector('button[type="submit"]');
     
-    // Get payment method first
-    const paymentMethod = form.querySelector('input[name="payment"]:checked').value;
-
-    // Skip PayPal validation for COD orders (only if COD is enabled)
-    if (paymentMethod === 'Cash' && !disableCOD) {
-        await submitOrderForm(form, null);
+    // Validate charm sets
+    const incompleteSets = validateAllSetsInCart();
+    if (incompleteSets.length > 0) {
+        const errorMessages = incompleteSets.map(set => 
+            `• ${set.name}: ${set.message}\n  (You have ${set.currentCount}/${set.requiredCount} charms)`
+        ).join('\n\n');
+        
+        showCustomWarningModal(
+            `Cannot Checkout!\n\nYou have incomplete charm sets:\n\n${errorMessages}\n\n` +
+            'Please complete these sets or remove the charms.'
+        );
         return;
     }
+        console.log('Form submission started');
+
+    const form = e.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+
     // Prevent multiple submissions
     if (window.orderSubmissionInProgress) return;
     window.orderSubmissionInProgress = true;
@@ -1918,7 +1914,7 @@ async function handleFormSubmit(e) {
     try {
         // 1. Validate form fields
         const formData = new FormData(form);
-        const requiredFields = ['full-name', 'phone', 'city', 'area', 'street-name', 'apartment-no', 'payment'];
+        const requiredFields = ['full-name', 'phone', 'governorate', 'address', 'payment'];
         const missingFields = requiredFields.filter(field => !formData.get(field));
         
         if (missingFields.length > 0) {
@@ -1928,14 +1924,7 @@ async function handleFormSubmit(e) {
         if (formData.get('payment') === 'Cliq' && !document.getElementById('payment-proof').files[0]) {
             throw new Error('Payment proof is required for Cliq payments');
         }
-
-        // PayPal-specific validation
-        if (paymentMethod === 'PayPal') {
-            const paypalTransactionId = formData.get('paypal_transaction_id');
-            if (!paypalTransactionId) {
-                throw new Error('PayPal payment not completed');
-            }
-        }
+        
         // 2. Validate charm sets across all cart items
         const allCharms = cart.flatMap(item => item.charms.map(charm => charm.src));
         const invalidSets = [];
@@ -1982,40 +1971,22 @@ async function handleFormSubmit(e) {
 
         // 4. Calculate order totals
         const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-        const deliveryFee = 20;
+        const deliveryFee = 2.5;
         const total = subtotal + deliveryFee;
         
-        // 5. Create order data with the new address fields
+        // 5. Create order data
         const orderData = {
             clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
             customer: {
                 name: formData.get('full-name'),
                 phone: formData.get('phone'),
                 phone2: formData.get('phone2') || null,
-                city: formData.get('city'),
-                address: {
-                    area: formData.get('area'),
-                    streetName: formData.get('street-name'),
-                    buildingName: formData.get('building-name') || null,
-                    apartmentNo: formData.get('apartment-no'),
-                    floorNo: formData.get('floor-no') || null,
-                    postalCode: formData.get('postal-code') || null,
-                    additionalDetails: formData.get('additional-address') || null
-                },
+                governorate: formData.get('governorate'),
+                address: formData.get('address'),
                 notes: formData.get('notes') || null
             },
             paymentMethod: formData.get('payment'),
-                currency: "AED",
-    amountAED: totalAED,
-    amountUSD: totalUSD,  // Only for PayPal payments
-    exchangeRate: AED_TO_USD_RATE,  // Only for PayPal payments
-            paymentStatus: formData.get('payment') === 'PayPal' ? 'paid' : 'pending',
-            paymentDetails: formData.get('payment') === 'PayPal' ? {
-                transactionId: formData.get('paypal_transaction_id'),
-                amount: total,
-                currency: 'AED'
-            } : null,
-              items: cartWithImages.map(item => ({
+            items: cartWithImages.map(item => ({
                 product: item.product,
                 size: item.size,
                 price: item.price,
@@ -3207,221 +3178,7 @@ function setupCategoryTabs() {
     }
 }
 
-// Add this conversion rate (update it periodically)
-const AED_TO_USD_RATE = 0.27; // Example rate, check current rate
-
-paypal.Buttons({
-    style: {
-        layout: 'vertical',  // or 'horizontal'
-        // Disable funding options if needed (credit, card, etc.)
-        disableFunding: 'card,credit',
-        // Remove billing address fields
-        billingAddress: 'hidden',
-        // Remove shipping address (if applicable)
-        shippingAddress: 'none'
-    },
-    createOrder: function(data, actions) {
-        if (!document.getElementById('pay-paypal').checked) {
-            return;
-        }
-        // Get total in AED from your display
-        const totalText = document.getElementById('order-total-price').textContent;
-        const totalAED = parseFloat(totalText.replace('Total: ', '').replace(' AED', ''));
-        
-        // Store the AED amount in a variable accessible to onApprove
-        window.orderTotalAED = totalAED;
-        
-        // Convert to USD only at payment time
-        const totalUSD = (totalAED * AED_TO_USD_RATE).toFixed(2);
-        
-          return actions.order.create({
-            purchase_units: [{
-                amount: {
-                    value: totalUSD,
-                    currency_code: "USD"
-                }
-            }],
-            // Ensure no shipping/billing address is collected
-            application_context: {
-                shipping_preference: 'NO_SHIPPING',
-                user_action: 'PAY_NOW' // Skip review page
-            }
-        });
-    },
-    onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
-            // Use the stored AED amount
-            const totalAED = window.orderTotalAED;
-            const totalUSD = (totalAED * AED_TO_USD_RATE).toFixed(2);
-            
-            // Store transaction details
-            const transactionDetails = {
-                paypal_transaction_id: details.id,
-                amount_aed: totalAED,
-                amount_usd: totalUSD,
-                exchange_rate: AED_TO_USD_RATE
-            };
-            
-            // Add hidden fields to form
-            const form = document.getElementById('order-form');
-            for (const [key, value] of Object.entries(transactionDetails)) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value;
-                form.appendChild(input);
-            }
-            
-            // Submit form
-            form.submit();
-        });
-    },
-    onError: function(err) {
-        console.error('PayPal error:', err);
-        showToast('Payment failed: ' + err.message, 'error');
-    }
-}).render('#paypal-button-container');
-
-async function submitOrderForm(form, paypalData) {
-    const submitButton = form.querySelector('button[type="submit"]');
-    
-    try {
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        
-        // Process the order data
-        const orderData = await prepareOrderData(form, paypalData);
-        
-        // Submit to Firestore
-        const orderRef = await db.collection('orders').add(orderData);
-        
-        // Clear cart and show confirmation
-        cart.length = 0;
-        updateCartDisplay();
-        form.reset();
-        
-        orderIdSpan.textContent = orderRef.id;
-        orderModal.classList.remove('active');
-        orderConfirmation.classList.add('active');
-        
-    } catch (error) {
-        console.error('Order submission failed:', error);
-        showToast(error.message || 'Order submission failed', 'error');
-    } finally {
-        submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Order';
-    }
-}
-
-async function prepareOrderData(form, paypalData) {
-    const formData = new FormData(form);
-    const paymentMethod = formData.get('payment');
-    
-    // Calculate order totals
-    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-    const deliveryFee = 20;
-    const total = subtotal + deliveryFee;
-    
-    // Prepare order data with all address fields
-    const orderData = {
-        clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
-        customer: {
-            name: formData.get('full-name'),
-            phone: formData.get('phone'),
-            phone2: formData.get('phone2') || null,
-            city: formData.get('city'),
-            address: {
-                area: formData.get('area'),
-                streetName: formData.get('street-name'),
-                buildingName: formData.get('building-name') || null,
-                apartmentNo: formData.get('apartment-no'),
-                floorNo: formData.get('floor-no') || null,
-                postalCode: formData.get('postal-code') || null,
-                additionalDetails: formData.get('additional-address') || null
-            },
-            notes: formData.get('notes') || null
-        },
-        paymentMethod: paymentMethod,
-        paymentStatus: paymentMethod === 'PayPal' ? 'paid' : 'pending',
-        paymentDetails: paypalData || null,
-        items: await Promise.all(cart.map(async (item) => {
-            // Upload design image if it exists
-            let imageUrl = null;
-            if (item.designImage) {
-                try {
-                    const blob = await (await fetch(item.designImage)).blob();
-                    imageUrl = await uploadImageToFirebase(blob, 'designs/');
-                } catch (error) {
-                    console.error('Error uploading design image:', error);
-                }
-            }
-            
-            return {
-                product: item.product,
-                size: item.size,
-                price: item.price,
-                imageUrl: imageUrl,
-                isFullGlam: item.isFullGlam,
-                materialType: item.materialType,
-                charms: item.charms,
-                timestamp: new Date().toISOString()
-            };
-        })),
-        subtotal: subtotal,
-        deliveryFee: deliveryFee,
-        total: total,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        status: 'pending'
-    };
-    
-    // Handle payment proof for Cliq
-    if (paymentMethod === 'Cliq') {
-        const paymentProofFile = document.getElementById('payment-proof').files[0];
-        if (paymentProofFile) {
-            try {
-                const proofUrl = await uploadPaymentProof(paymentProofFile, orderData.clientOrderId);
-                orderData.paymentProofUrl = proofUrl;
-            } catch (error) {
-                console.error('Error uploading payment proof:', error);
-            }
-        }
-    }
-    
-    return orderData;
-}
-function showOrderConfirmation(orderData) {
-    // Display AED amount to user
-    document.getElementById('confirmation-total').textContent = 
-        `${orderData.total.toFixed(2)} AED`;
-    
-    // For PayPal payments, show USD conversion
-    if (orderData.paymentMethod === 'PayPal') {
-        const usdAmount = (orderData.total * AED_TO_USD_RATE).toFixed(2);
-        document.getElementById('confirmation-usd').textContent = 
-            `(~${usdAmount} USD)`;
-        document.getElementById('confirmation-usd').style.display = 'inline';
-    } else {
-        document.getElementById('confirmation-usd').style.display = 'none';
-    }
-}
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.add('show');
-    }, 10);
-    
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => {
-            document.body.removeChild(toast);
-        }, 300);
-    }, 3000);
-}
-  function setupCustomCharmHandlers() {
+function setupCustomCharmHandlers() {
     // Get DOM elements
     const customCharmUpload = document.getElementById('custom-charm-upload');
     const customCharmPreview = document.getElementById('custom-charm-preview');
@@ -3542,21 +3299,7 @@ document.addEventListener('DOMContentLoaded', () => {
         orderConfirmation = document.getElementById('order-confirmation');
         closeConfirmation = document.getElementById('close-confirmation');
         orderIdSpan = document.getElementById('order-id');
-        const disableCOD = true; // Set to true to hide COD option
-        
-        if (disableCOD) {
-            const codOption = document.getElementById('pay-cash');
-            if (codOption) {
-                codOption.closest('.payment-option').style.display = 'none';
-                
-                // Check PayPal by default if COD is disabled
-                const paypalOption = document.getElementById('pay-paypal');
-                if (paypalOption) {
-                    paypalOption.checked = true;
-                    document.getElementById('paypal-button-container').style.display = 'block';
-                }
-            }
-        }
+
         // Set default product to bracelet
         currentProduct = 'bracelet';
         currentSize = '15.2-16.2';
