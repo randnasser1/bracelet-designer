@@ -385,7 +385,8 @@ function calculatePrice(includeDelivery = false) {
     if (currentProduct === 'individual') {
         const basePrice = 3; // Base price per individual charm
         let charmCost = 0;
-        
+
+     
         const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
         placedCharms.forEach(charm => {
             if (charm.dataset.type === 'special') {
@@ -410,7 +411,9 @@ function calculatePrice(includeDelivery = false) {
             delivery: delivery
         };
     }
-
+     if (materialType === 'gold') {
+        basePrice=6.6    
+    } 
     // Verify valid product and size data
     if (!PRODUCTS[currentProduct] || !SIZE_CHARTS[currentProduct] || !SIZE_CHARTS[currentProduct][currentSize]) {
         console.error(`Missing price data for ${currentProduct} size ${currentSize}`);
