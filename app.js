@@ -433,18 +433,19 @@ function calculatePrice(includeDelivery = false) {
     let totalPrice = originalPrice;
 
     // Apply material upgrades
-    if (materialType === 'gold'&& currentProduct !== 'bracelet') {
-        totalPrice += 1;
-        originalPrice += 1;
-    } 
-    if (materialType === 'gold' && currentProduct === 'bracelet') {
+     if (materialType === 'gold' && currentProduct === 'bracelet') {
         // Subtract 3.4 from both prices to get 6.6 JD (10 - 3.4 = 6.6)
         totalPrice -= 3.4;
         originalPrice -= 3.4;
+    } else if (materialType === 'gold') {
+        // For other gold products, add 1 JD
+        totalPrice += 1;
+        originalPrice += 1;
     } else if (materialType === 'mix') {
         totalPrice += 2.5;
         originalPrice += 2.5;
     }
+
 
     // Count all placed charms and calculate costs
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
