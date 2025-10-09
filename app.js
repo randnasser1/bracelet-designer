@@ -131,6 +131,21 @@ const WATCH_POOL = [
         name: 'White center Silver Square Watch',
         image: 'basecharms/watch5.png',
         soldOut: false
+    },{
+        id: 'pink-seashell-watch',
+        name: 'Pink center Gold Seashell Watch',
+        image: 'basecharms/pink-seashell-watch.png',
+        soldOut: false
+    },{
+        id: 'blue-seashell-watch',
+        name: 'Blue center Gold Seashell Watch',
+        image: 'basecharms/blue-seashell-watch.png',
+        soldOut: false
+    },{
+        id: 'pink-gold-watch',
+        name: 'Pink Center Gold Watch',
+        image: 'basecharms/pink-gold-watch.png',
+        soldOut: false
     },
 ];
 
