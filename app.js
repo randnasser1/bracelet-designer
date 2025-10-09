@@ -433,7 +433,7 @@ function calculatePrice(includeDelivery = false) {
     let totalPrice = originalPrice;
 
     // Apply material upgrades
-    if (materialType === 'gold') {
+    if (materialType === 'gold'&& currentProduct !== 'bracelet') {
         totalPrice += 1;
         originalPrice += 1;
     } 
