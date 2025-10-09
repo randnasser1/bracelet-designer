@@ -433,8 +433,8 @@ function calculatePrice(includeDelivery = false) {
 
     // Apply material upgrades
     if (materialType === 'gold') {
-        totalPrice += 1;
-        originalPrice += 1;
+        totalPrice -= 3.4;
+        originalPrice += 3.4;
     } else if (materialType === 'mix') {
         totalPrice += 2.5;
         originalPrice += 2.5;
