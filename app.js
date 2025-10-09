@@ -89,7 +89,7 @@ const SIZE_CHARTS = {
 };
 
 const PRODUCTS = {
-    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 0, fullGlam: 29 },
+    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 1, fullGlam: 29 },
     anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 1, fullGlam: 42 },
     necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 1, fullGlam: 64 },
     ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 },
@@ -465,15 +465,16 @@ function calculatePrice(includeDelivery = false) {
             customCount++;
         }
     });
-
+     
     // Apply charm costs to both prices
     if (!isFullGlam) {
-        const includedSpecials = product.includedSpecial;
+        // Gold normal bracelets get 0 included specials, others get their normal included specials
+        const includedSpecials = (materialType === 'gold' && currentProduct === 'bracelet') ? 0 : product.includedSpecial;
         const paidSpecials = Math.max(0, specialCount - includedSpecials);
         totalPrice += paidSpecials * 2;
         originalPrice += paidSpecials * 2;
     }
-
+     
     // Add costs for rare, custom, and long charms
     totalPrice += rareCount * 3;
     originalPrice += rareCount * 3;
