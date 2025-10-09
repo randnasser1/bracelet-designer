@@ -411,9 +411,7 @@ function calculatePrice(includeDelivery = false) {
             delivery: delivery
         };
     }
-     if (materialType === 'gold') {
-        basePrice=6.6    
-    } 
+     
     // Verify valid product and size data
     if (!PRODUCTS[currentProduct] || !SIZE_CHARTS[currentProduct] || !SIZE_CHARTS[currentProduct][currentSize]) {
         console.error(`Missing price data for ${currentProduct} size ${currentSize}`);
