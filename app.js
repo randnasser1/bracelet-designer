@@ -3546,6 +3546,14 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSpecialCharmsDisplay();
         updateRareCharmsDisplay();
         
+    } setTimeout(() => {
+            if (document.getElementById('base-price') && 
+                document.getElementById('charm-price') && 
+                document.getElementById('total-price')) {
+                updatePrice();
+            }
+        }, 100);
+
     } catch (error) {
         console.error('Initialization error:', error);
         alert('Failed to initialize application. Please refresh the page.');
