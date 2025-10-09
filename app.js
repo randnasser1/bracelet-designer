@@ -481,7 +481,7 @@ function calculatePrice(includeDelivery = false) {
 
     // Check for discount eligibility
     const currentDate = new Date();
-    const discountEndDate = new Date('2029-07-25');
+    const discountEndDate = new Date('2020-07-25');
     let discountApplied = 0;
     
     if (currentDate <= discountEndDate && originalPrice >= 15) {
