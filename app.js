@@ -1,4 +1,4 @@
-zlet specialCharmsGrid;
+let specialCharmsGrid;
 let rareCharmsGrid;
 let customCharmUpload;
 let customCharmPreview;
@@ -3453,7 +3453,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.firebaseInitialized = true;
         }
 
-        // Get DOM elements
+        // Get DOM elements with null checks
         jewelryPiece = document.getElementById('jewelry-piece');
         specialCharmsGrid = document.getElementById('special-charms');
         rareCharmsGrid = document.getElementById('rare-charms');
@@ -3470,6 +3470,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addToCartBtn = document.getElementById('add-to-cart-bottom');
         cartItems = document.getElementById('cart-items');
         placeOrderBtn = document.getElementById('order-btn');
+        
         // Order elements
         orderModal = document.getElementById('order-modal');
         orderForm = document.getElementById('order-form');
@@ -3478,7 +3479,21 @@ document.addEventListener('DOMContentLoaded', () => {
         orderConfirmation = document.getElementById('order-confirmation');
         closeConfirmation = document.getElementById('close-confirmation');
         orderIdSpan = document.getElementById('order-id');
+
+        // Check if essential elements exist
+        const essentialElements = [
+            'jewelry-piece', 'special-charms', 'rare-charms', 
+            'base-price', 'charm-price', 'total-price'
+        ];
         
+        const missingElements = essentialElements.filter(id => !document.getElementById(id));
+        
+        if (missingElements.length > 0) {
+            console.error('Missing essential elements:', missingElements);
+            // Don't proceed if essential elements are missing
+            return;
+        }
+
         if (disableCOD) {
             const codOption = document.getElementById('pay-cash');
             if (codOption) {
@@ -3492,6 +3507,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+        
         // Set default product to bracelet
         currentProduct = 'bracelet';
         currentSize = '15.2-16.2';
@@ -3539,24 +3555,23 @@ document.addEventListener('DOMContentLoaded', () => {
             window.orderFormInitialized = true;
         }
         
-        // Update price display
-        updatePrice();
-        
         // Initialize charm displays
         updateSpecialCharmsDisplay();
         updateRareCharmsDisplay();
         
-    } setTimeout(() => {
-            if (document.getElementById('base-price') && 
-                document.getElementById('charm-price') && 
-                document.getElementById('total-price')) {
-                updatePrice();
-            }
-        }, 100);
-
+        // Update price display - only after everything is initialized
+        updatePrice();
+        
+        console.log('Application initialized successfully');
+        
     } catch (error) {
         console.error('Initialization error:', error);
-        alert('Failed to initialize application. Please refresh the page.');
+        // Don't show alert for missing price elements, just log it
+        if (error.message.includes('innerHTML') || error.message.includes('null')) {
+            console.log('Some UI elements are not available yet, but application should still work');
+        } else {
+            alert('Failed to initialize application. Please refresh the page.');
+        }
     }
 });
 
