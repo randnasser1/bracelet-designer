@@ -784,6 +784,12 @@ function updatePrice() {
     const discountMessageElement = document.getElementById('discount-message');
     const product = PRODUCTS[currentProduct];
 
+    // Add null checks for all DOM elements
+    if (!basePriceElement || !charmPriceElement || !totalPriceElement || !discountMessageElement) {
+        console.error('Price display elements not found');
+        return;
+    }
+
     if (currentProduct === 'individual') {
         basePriceElement.innerHTML = `
             <span>Base Price:</span>
