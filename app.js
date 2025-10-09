@@ -777,111 +777,57 @@ function removeFromCart(index) {
     }
 }
 function updatePrice() {
-    const priceData = calculatePrice(false);
-    const basePriceElement = document.getElementById('base-price');
-    const charmPriceElement = document.getElementById('charm-price');
-    const totalPriceElement = document.getElementById('total-price');
-    const discountMessageElement = document.getElementById('discount-message');
-    const product = PRODUCTS[currentProduct];
-
-    // Add null checks for all DOM elements
-    if (!basePriceElement || !charmPriceElement || !totalPriceElement || !discountMessageElement) {
-        console.error('Price display elements not found');
-        return;
-    }
-
-    if (currentProduct === 'individual') {
-        basePriceElement.innerHTML = `
-            <span>Base Price:</span>
-            <span>3.00 JDs</span>
-        `;
+    try {
+        const priceData = calculatePrice(false);
         
-        const charmCost = priceData.total - 3;
-        let charmText = '';
-        
-        // Build detailed charm breakdown
-        if (priceData.longCharmCount > 0) {
-            charmText += `${priceData.longCharmCount} long (${(priceData.longCharmCount * 6).toFixed(2)} JD)`;
-        }
-        if (priceData.specialCount > 0) {
-            if (charmText) charmText += ', ';
-            charmText += `${priceData.specialCount} special (${(priceData.specialCount * 2).toFixed(2)} JD)`;
-        }
-        if (priceData.rareCount > 0) {
-            if (charmText) charmText += ', ';
-            charmText += `${priceData.rareCount} rare (${(priceData.rareCount * 3).toFixed(2)} JD)`;
-        }
-        if (priceData.customCount > 0) {
-            if (charmText) charmText += ', ';
-            charmText += `${priceData.customCount} custom (${(priceData.customCount * 3.5).toFixed(2)} JD)`;
+        // Safe element access with fallbacks
+        const basePriceElement = document.getElementById('base-price');
+        const charmPriceElement = document.getElementById('charm-price');
+        const totalPriceElement = document.getElementById('total-price');
+        // Remove discountMessageElement since it doesn't exist in your HTML
+
+        // Only update elements that exist
+        if (totalPriceElement) {
+            totalPriceElement.textContent = `Total: ${priceData.total.toFixed(2)} JDs`;
         }
         
-        charmPriceElement.innerHTML = `
-            <span>Charms:</span>
-            <span>${charmText || '0.00 JD'}</span>
-        `;
-        
-        totalPriceElement.textContent = `Total: ${priceData.total.toFixed(2)} JDs`;
-        discountMessageElement.innerHTML = '';
-    } else {
-        // For non-individual products
-        if (isFullGlam) {
-            basePriceElement.innerHTML = `Full Glam Base: ${product.fullGlam.toFixed(2)} JDs`;
-        } else {
-            const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
-            basePriceElement.innerHTML = `Base Price: ${basePrice.toFixed(2)} JDs`;
-        }
-
-        // Build detailed charm breakdown text
-        let charmText = '';
-        const freeSpecials = isFullGlam ? product.baseSlots : product.includedSpecial;
-        const paidSpecials = Math.max(0, priceData.specialCount - freeSpecials);
-
-        if (freeSpecials > 0) {
-            charmText += `${Math.min(priceData.specialCount, freeSpecials)}/${freeSpecials} free specials`;
-        }
-        if (paidSpecials > 0) {
-            if (charmText) charmText += ', ';
-            charmText += `${paidSpecials} paid special (+${(paidSpecials * 2).toFixed(2)} JD)`;
-        }
-        if (priceData.rareCount > 0) {
-            if (charmText) charmText += ', ';
-            charmText += `${priceData.rareCount} rare (+${(priceData.rareCount * 3).toFixed(2)} JD)`;
-        }
-        if (priceData.customCount > 0) {
-            if (charmText) charmText += ', ';
-            charmText += `${priceData.customCount} custom (+${(priceData.customCount * 3.5).toFixed(2)} JD)`;
-        }
-        if (priceData.longCharmCount > 0) {
-            if (charmText) charmText += ', ';
-            charmText += `${priceData.longCharmCount} long (+${(priceData.longCharmCount * 6).toFixed(2)} JD)`;
-        }
-
-        charmPriceElement.textContent = charmText || 'No charms added';
-
-        // Handle discount display
-        if (priceData.discount > 0) {
-            totalPriceElement.innerHTML = `
-                <div class="price-comparison">
-                    <span class="original-price">${priceData.subtotal.toFixed(2)} JDs</span>
-                    <span>→</span>
-                    <span class="discounted-price">${priceData.total.toFixed(2)} JDs</span>
-                </div>
-                <div class="savings-notice">You saved ${priceData.discount.toFixed(2)} JDs!</div>
-            `;
-            discountMessageElement.innerHTML = '<div class="discount-badge">10% OFF</div>';
-        } else {
-            totalPriceElement.innerHTML = `Total: ${priceData.total.toFixed(2)} JDs`;
-            if (priceData.subtotal < 15) {
-                discountMessageElement.innerHTML = `
-                    <div class="discount-promo">
-                        <i class="fas fa-tag"></i> Add ${(15 - priceData.subtotal).toFixed(2)} JD more to get 10% OFF!
-                    </div>
-                `;
+        if (basePriceElement) {
+            if (currentProduct === 'individual') {
+                basePriceElement.innerHTML = `<span>Base Price:</span><span>3.00 JDs</span>`;
             } else {
-                discountMessageElement.innerHTML = '';
+                const product = PRODUCTS[currentProduct];
+                if (isFullGlam) {
+                    basePriceElement.innerHTML = `Full Glam Base: ${product.fullGlam.toFixed(2)} JDs`;
+                } else {
+                    const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
+                    basePriceElement.innerHTML = `Base Price: ${basePrice.toFixed(2)} JDs`;
+                }
             }
         }
+
+        if (charmPriceElement) {
+            if (currentProduct === 'individual') {
+                const charmCost = priceData.total - 3;
+                charmPriceElement.innerHTML = `<span>Charms:</span><span>${charmCost.toFixed(2)} JDs</span>`;
+            } else {
+                // Simple charm display for non-individual products
+                charmPriceElement.innerHTML = `<span>Charms:</span><span>${priceData.charmCost.toFixed(2)} JDs</span>`;
+            }
+        }
+
+        // Log for debugging
+        console.log('Current price:', {
+            product: currentProduct,
+            material: materialType,
+            size: currentSize,
+            isFullGlam: isFullGlam,
+            total: priceData.total,
+            basePrice: priceData.basePrice,
+            charmCost: priceData.charmCost
+        });
+
+    } catch (error) {
+        console.log('Price update failed, but continuing:', error);
     }
 }
 
