@@ -1,4 +1,4 @@
-let specialCharmsGrid;
+zlet specialCharmsGrid;
 let rareCharmsGrid;
 let customCharmUpload;
 let customCharmPreview;
