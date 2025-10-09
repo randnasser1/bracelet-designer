@@ -89,7 +89,7 @@ const SIZE_CHARTS = {
 };
 
 const PRODUCTS = {
-    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 1, fullGlam: 29 },
+    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 0, fullGlam: 29 },
     anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 1, fullGlam: 42 },
     necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 1, fullGlam: 64 },
     ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 },
@@ -434,6 +434,11 @@ function calculatePrice(includeDelivery = false) {
 
     // Apply material upgrades
     if (materialType === 'gold') {
+        totalPrice += 1;
+        originalPrice += 1;
+    } 
+    if (materialType === 'gold' && currentProduct === 'bracelet') {
+        // Subtract 3.4 from both prices to get 6.6 JD (10 - 3.4 = 6.6)
         totalPrice -= 3.4;
         originalPrice -= 3.4;
     } else if (materialType === 'mix') {
