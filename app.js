@@ -3523,13 +3523,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update price display - only after everything is initialized
         updatePrice();
         
-        console.log('Application initialized successfully');
+         console.log('Application initialized successfully');
         
-    } setTimeout(() => {
+        setTimeout(() => {
             updatePrice();
         }, 500); // Give more time for DOM to be ready
-        
-        console.log('Application initialized successfully');
         
     } catch (error) {
         console.error('Initialization error:', error);
