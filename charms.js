@@ -549,11 +549,11 @@ const rareCharms = [
   { src: 'rares/disney/stitch.png', category: 'disney', quantity: 3 },
   // gold charms
   { src: 'rares/gold/gold.png', category: 'gold', quantity: 0 },
-  { src: 'rares/gold/gold17.png', category: 'gold', quantity: 1 },
+  { src: 'rares/gold/gold17.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold2.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold3.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold4.png', category: 'gold', quantity: 0 },
-  { src: 'rares/gold/gold5.png', category: 'gold', quantity: 1 },
+  { src: 'rares/gold/gold5.png', category: 'night', quantity: 1 },
   { src: 'rares/gold/gold6.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold7.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold8.png', category: 'gold', quantity: 1 },
@@ -562,14 +562,14 @@ const rareCharms = [
   { src: 'rares/gold/gold11.png', category: 'gold', quantity: 1 },
   { src: 'rares/gold/gold12.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold13.png', category: 'gold', quantity: 0 },
-  { src: 'rares/gold/gold14.png', category: 'gold', quantity: 1 },
+  { src: 'rares/gold/gold14.png', category: 'gold', quantity: 0 },
   { src: 'rares/gold/gold15.png', category: 'gold', quantity: 0 },
-  { src: 'rares/new-collection/24-gold.png', category: 'gold', quantity: 1 },
+  { src: 'rares/new-collection/24-gold.png', category: 'gold', quantity: 0 },
   { src: 'rares/new-collection/25-gold.png', category: 'gold', quantity: 0 },
   { src: 'rares/new-collection/26-gold.png', category: 'gold', quantity: 1 },
   { src: 'rares/new-collection/27-gold.png', category: 'gold', quantity: 1 },
   { src: 'rares/new-collection/28-gold.png', category: 'gold', quantity: 1 },
-  { src: 'rares/new-collection/29-gold.png', category: 'gold', quantity: 1 },
+  { src: 'rares/new-collection/29-gold.png', category: 'gold', quantity: 0 },
   // graduation charms
   { src: 'rares/graduation/grad.png', category: 'graduation', quantity: 1 },
   // hgs charms
@@ -972,7 +972,7 @@ const rareCharms = [
 
 
     //gold
-      { src: 'rares/newc2r/c225-gold.png', category: 'gold', quantity: 1 },
+      { src: 'rares/newc2r/c225-gold.png', category: 'gold', quantity: 0 },
 
  //starry night
     { src: 'rares/newc2r/c224.png', category: 'night', quantity: 1 },
