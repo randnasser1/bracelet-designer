@@ -3802,13 +3802,14 @@ function initializeRecommendedCharms() {
         }
 
         const charmItem = document.createElement('div');
-        charmItem.className = 'recommended-charm-item';
-        
-        const charmImg = document.createElement('img');
-        charmImg.src = charmName;
-        charmImg.alt = 'Recommended Charm';
-        charmImg.className = 'recommended-charm-image charm';
-        
+        const charmItem = document.createElement('div');
+         charmItem.className = 'recommended-charm-item';  // ✅ Matches CSS
+         
+         const charmImg = document.createElement('img');
+         charmImg.src = charmName;
+         charmImg.alt = 'Recommended Charm';
+         charmImg.className = 'recommended-charm-image';  // ✅ REMOVED extra 'charm' class
+             
         // SET DATA ATTRIBUTES PROPERLY
         charmImg.dataset.charm = charmName;
         charmImg.dataset.type = charmType;
