@@ -1063,9 +1063,19 @@ function handleCharmSelection(charmElement) {
         updateSelectedCharmPreview(charmElement);
     }
 }
+function debugSelectedCharm() {
+    console.log('=== DEBUG SELECTED CHARM ===');
+    console.log('selectedCharm:', selectedCharm);
+    if (selectedCharm) {
+        console.log('src:', selectedCharm.src);
+        console.log('dataset:', selectedCharm.dataset);
+        console.log('classList:', selectedCharm.classList);
+    }
+    console.log('============================');
+}
 function handleSlotClick(slot) {
     console.log('Slot clicked, selected charm:', selectedCharm);
-
+    debugSelectedCharm(); // Add this line
     // If there's a selected charm (including from recommended), try to place it
     if (selectedCharm) {
         const existingCharm = slot.querySelector('img:not([data-type="base"])');
@@ -2320,12 +2330,29 @@ function handleRegularCharmPlacement(slot, charmSrc, charmType) {
     slot.innerHTML = '';
     slot.appendChild(charmImg);
 }
-function placeSelectedCharm(slot) {
-    if (!selectedCharm) return;
 
     // Get charm details using the exact path from your data
+    function placeSelectedCharm(slot) {
+    if (!selectedCharm) {
+        console.error('No charm selected!');
+        return;
+    }
+
+    // Debug logging
+    console.log('Placing charm:', selectedCharm);
+    console.log('Charm data:', {
+        src: selectedCharm.src,
+        dataset: selectedCharm.dataset,
+        classList: selectedCharm.classList
+    });
+
+    // Get charm details - handle both regular and recommended charms
     const charmSrc = selectedCharm.dataset.charm || selectedCharm.src;
-    const charmType = selectedCharm.dataset.type;
+    const charmType = selectedCharm.dataset.type || 
+                     (selectedCharm.classList.contains('special') ? 'special' : 
+                      selectedCharm.classList.contains('rare') ? 'rare' : 'custom');
+    
+    console.log('Resolved charm data:', { charmSrc, charmType });
     const charmSet = getCharmSet(charmSrc);
     const isWatch = currentProduct === 'watch' || currentProduct === 'apple-watch';
     const baseSize = isWatch ? 40 : 84;
