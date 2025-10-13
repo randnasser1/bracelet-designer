@@ -1115,48 +1115,32 @@ function debugCharmSelection() {
 }
 
 function handleSlotClick(slot) {
-    console.log('=== SLOT CLICK START ===');
-    console.log('Slot clicked:', slot);
-    
-    // **USE window.selectedCharm FOR GLOBAL ACCESS**
-    let currentSelected = window.selectedCharm;
-    if (!currentSelected) {
-        currentSelected = document.querySelector('.charm.selected, .recommended-charm-image.selected');
-        console.log('🔍 Found selected in DOM:', currentSelected);
-    }
-    
-    console.log('selectedCharm at slot click:', currentSelected);
-    
-    if (currentSelected) {
-        console.log('✅ Selected charm found, proceeding with placement');
-        console.log('Selected charm src:', currentSelected.src);
-        
+    // If there's a selected charm, try to place it
+    if (selectedCharm) {
         const existingCharm = slot.querySelector('img:not([data-type="base"])');
         
+        // If there's already a charm in this slot, remove it first
         if (existingCharm) {
             removeCharmFromSlot(slot);
             
-            if (existingCharm.src === currentSelected.src) {
-                console.log('🔄 Same charm clicked, toggling off');
-                window.selectedCharm = null;
-                if (currentSelected) currentSelected.classList.remove('selected');
+            // If we're clicking the same charm type, just remove it (toggle behavior)
+            if (existingCharm.src === selectedCharm.src) {
+                selectedCharm = null;
                 hideSelectedCharmPreview();
                 return;
             }
         }
         
-        console.log('🚀 Calling placeSelectedCharm');
+        // Now place the new charm
         placeSelectedCharm(slot);
-        
-    } else {
-        console.log('❌ NO selected charm, checking for existing charm to remove');
+    } 
+    // If no charm selected but slot has a charm, remove it
+    else {
         const existingCharm = slot.querySelector('img:not([data-type="base"])');
         if (existingCharm) {
             removeCharmFromSlot(slot);
         }
     }
-    
-    console.log('=== SLOT CLICK END ===');
 }
 function updateWatchBase() {
     const baseImg = document.querySelector('.product-base-image');
