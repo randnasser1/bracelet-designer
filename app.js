@@ -1118,8 +1118,8 @@ function handleSlotClick(slot) {
     console.log('=== SLOT CLICK START ===');
     console.log('Slot clicked:', slot);
     
-    // FORCE CHECK - Look for selected charm in DOM if variable is null
-    let currentSelected = selectedCharm;
+    // **USE window.selectedCharm FOR GLOBAL ACCESS**
+    let currentSelected = window.selectedCharm;
     if (!currentSelected) {
         currentSelected = document.querySelector('.charm.selected, .recommended-charm-image.selected');
         console.log('🔍 Found selected in DOM:', currentSelected);
@@ -1138,7 +1138,7 @@ function handleSlotClick(slot) {
             
             if (existingCharm.src === currentSelected.src) {
                 console.log('🔄 Same charm clicked, toggling off');
-                selectedCharm = null;
+                window.selectedCharm = null;
                 if (currentSelected) currentSelected.classList.remove('selected');
                 hideSelectedCharmPreview();
                 return;
@@ -2398,11 +2398,13 @@ function ensureCharmDataAttributes(charmElement) {
 }
     // Get charm details using the exact path from your data
 function placeSelectedCharm(slot) {
-    if (!selectedCharm) {
+    // **USE window.selectedCharm**
+    if (!window.selectedCharm) {
         console.error('No charm selected!');
         return;
     }
 
+    const selectedCharm = window.selectedCharm; // Local reference
     // Debug logging
     console.log('Placing charm:', selectedCharm);
     console.log('Charm data:', {
@@ -2551,6 +2553,7 @@ function placeSelectedCharm(slot) {
             }
         });
     }
+    window.selectedCharm = null;
 
     // Clear selection
     selectedCharm.classList.remove('selected');
@@ -3782,19 +3785,17 @@ function initializeRecommendedCharms() {
     // Create charm elements
     recommendedCharmNames.forEach(charmName => {
         // Determine type from the file path
-        let charmType = 'rare'; // default to rare
+        let charmType = 'rare';
         let charmCategory = 'recommended';
         
         if (charmName.includes('special/')) {
             charmType = 'special';
-            // Extract category from path
             const pathParts = charmName.split('/');
             if (pathParts.length > 2) {
                 charmCategory = pathParts[1];
             }
         } else if (charmName.includes('rares/')) {
             charmType = 'rare';
-            // Extract category from path
             const pathParts = charmName.split('/');
             if (pathParts.length > 2) {
                 charmCategory = pathParts[1];
@@ -3802,27 +3803,27 @@ function initializeRecommendedCharms() {
         }
 
         const charmItem = document.createElement('div');
-         charmItem.className = 'recommended-charm-item';  // ✅ Matches CSS
-         
-         const charmImg = document.createElement('img');
-         charmImg.src = charmName;
-         charmImg.alt = 'Recommended Charm';
-         charmImg.className = 'recommended-charm-image';  // ✅ REMOVED extra 'charm' class
-             
-        // SET DATA ATTRIBUTES PROPERLY
+        charmItem.className = 'recommended-charm-item';
+        
+        const charmImg = document.createElement('img');
+        charmImg.src = charmName;
+        charmImg.alt = 'Recommended Charm';
+        charmImg.className = 'recommended-charm-image';
+        
+        // SET DATA ATTRIBUTES
         charmImg.dataset.charm = charmName;
         charmImg.dataset.type = charmType;
-        charmImg.dataset.quantity = 1;
+        charmImg.dataset.quantity = '1';
         charmImg.dataset.category = charmCategory;
         
-        // Add the correct class based on type
+        // Add type class
         if (charmType === 'special') {
             charmImg.classList.add('special');
         } else if (charmType === 'rare') {
             charmImg.classList.add('rare');
         }
 
-        // Handle long and dangly charms based on file name
+        // Handle long and dangly charms
         if (charmName.includes('long')) {
             charmImg.classList.add('long-charm');
         }
@@ -3832,43 +3833,36 @@ function initializeRecommendedCharms() {
 
         charmItem.appendChild(charmImg);
         
-        // FIXED CLICK HANDLER - Use the SAME logic as pool charms
+        // **FIXED CLICK HANDLER - SIMPLIFIED AND ROBUST**
         charmImg.addEventListener('click', function(e) {
             e.stopPropagation();
             e.preventDefault();
             
-            console.log('🎯 RECOMMENDED CHARM CLICKED');
+            console.log('🎯 RECOMMENDED CHARM CLICKED - FIXED VERSION');
             
-            // Use the EXACT same selection logic as handleCharmSelection
-            const charmSrc = this.dataset.charm || this.src;
-            const remainingQuantity = parseInt(this.dataset.quantity) || 1;
-            
-            // Don't allow selection if no quantity left
-            if (remainingQuantity <= 0) {
+            // Check if charm is available
+            const quantity = parseInt(this.dataset.quantity) || 1;
+            if (quantity <= 0) {
                 alert('This charm is out of stock!');
                 return;
             }
             
-            // Toggle selection - IDENTICAL to pool charm logic
-            if (this.classList.contains('selected')) {
-                console.log('🔽 Deselecting recommended charm');
-                this.classList.remove('selected');
-                selectedCharm = null;
-                hideSelectedCharmPreview();
-            } else {
-                console.log('🔼 Selecting new recommended charm');
-                // Remove selection from ALL charms (special, rare, recommended)
-                document.querySelectorAll('.charm, .recommended-charm-image').forEach(c => {
-                    c.classList.remove('selected');
-                });
-                
-                this.classList.add('selected');
-                selectedCharm = this;
-                console.log('✅ selectedCharm set to recommended charm:', selectedCharm);
-                updateSelectedCharmPreview(this);
-            }
+            // **DIRECT SELECTION - NO TOGGLE LOGIC**
+            // Remove selection from ALL charms first
+            document.querySelectorAll('.charm, .recommended-charm-image').forEach(c => {
+                c.classList.remove('selected');
+            });
             
-            // Pause the scrolling animation
+            // Select this charm
+            this.classList.add('selected');
+            
+            // **CRITICAL FIX: Set selectedCharm IMMEDIATELY and GLOBALLY**
+            window.selectedCharm = this;
+            console.log('✅ selectedCharm SET TO:', window.selectedCharm);
+            
+            updateSelectedCharmPreview(this);
+            
+            // Pause scrolling animation
             const scrollContainer = this.closest('.recommended-charms-scroll');
             if (scrollContainer) {
                 scrollContainer.style.animationPlayState = 'paused';
@@ -3876,6 +3870,12 @@ function initializeRecommendedCharms() {
                     scrollContainer.style.animationPlayState = 'running';
                 }, 2000);
             }
+            
+            // **DEBUG: Verify selection immediately**
+            setTimeout(() => {
+                console.log('🔄 VERIFICATION - selectedCharm:', window.selectedCharm);
+                console.log('Selected in DOM:', document.querySelector('.charm.selected, .recommended-charm-image.selected'));
+            }, 100);
         });
 
         recommendedScroll.appendChild(charmItem);
@@ -4067,39 +4067,7 @@ function testRecommendedCharmSelection() {
         debugSelectedCharm(firstCharm, 'TEST FUNCTION');
     }
 }
-function startSelectionMonitoring() {
-    if (selectionMonitor) clearInterval(selectionMonitor);
-    
-    selectionMonitor = setInterval(() => {
-        // Check if selectedCharm is null but there's a selected element in DOM
-        if (!selectedCharm) {
-            const selectedInDOM = document.querySelector('.charm.selected, .recommended-charm-image.selected');
-            if (selectedInDOM && selectedInDOM !== selectedCharm) {
-                console.log('🔄 RESTORING SELECTION FROM DOM');
-                selectedCharm = selectedInDOM;
-            }
-        }
-        
-        // Check if selectedCharm exists but isn't selected in DOM
-        if (selectedCharm && !selectedCharm.classList.contains('selected')) {
-            console.log('🔄 RESTORING SELECTION CLASS');
-            selectedCharm.classList.add('selected');
-        }
-    }, 500);
-}
-     // Add a test button to the page (remove this later)
-function addTestButton() {
-    const testBtn = document.createElement('button');
-    testBtn.textContent = ' Recommended Charms';
-    testBtn.style.cssText = 'position: fixed; top: 100px; right: 20px; z-index: 9999; padding: 10px; background: #d6336c; color: white; border: none; border-radius: 5px; cursor: pointer;';
-    testBtn.onclick = testRecommendedCharmSelection;
-    document.body.appendChild(testBtn);
-}
 
-// Call this when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(addTestButton, 2000);
-});
 
 // Make it available in console
 window.addEventListener('scroll', updateCartButtonPosition);
