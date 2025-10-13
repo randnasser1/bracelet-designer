@@ -1297,6 +1297,183 @@
         padding: 0 8px;
     }
 }
+/* Guided Tour Styles */
+.guided-tour {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.tour-popup {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: popIn 0.3s ease-out;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tour-popup h3 {
+  color: #d6336c;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.tour-popup p {
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+.tour-popup .highlight {
+  background: #fff0f5;
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  color: #d6336c;
+  font-weight: 600;
+  margin: 0 0.2rem;
+}
+
+.tour-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.tour-btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.tour-btn.primary {
+  background: #d6336c;
+  color: white;
+}
+
+.tour-btn.secondary {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.tour-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.tour-indicator {
+  position: absolute;
+  background: #ffeb3b;
+  border: 3px solid #d6336c;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  animation: pulse 2s infinite;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.tour-progress {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* Quick Tips */
+.quick-tip {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #d6336c;
+  color: white;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
+  z-index: 9998;
+  display: none;
+  max-width: 250px;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.quick-tip::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #d6336c;
+}
+
+/* Help Button */
+.help-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #d6336c;
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 9997;
+  box-shadow: 0 4px 12px rgba(214, 51, 108, 0.4);
+  transition: all 0.3s ease;
+}
+
+.help-button:hover {
+  transform: scale(1.1);
+  background: #ff85b3;
+}
   </style>
 </head>
 <body>
@@ -1513,14 +1690,12 @@
             <!-- Recommended charms will be populated here -->
         </div>
     </div>
-</div>
 
 
 </div>  <h3>Add your charms below ↓</h3>
   <!-- Add this before the jewelry piece container -->
     <div class="charm-name" id="preview-charm-name"></div>
     <div class="charm-type" id="preview-charm-type"></div>
-  </div>
 
 
 
@@ -1779,6 +1954,30 @@
       <button class="btn" id="close-confirmation">Close</button>
     </div>
   </div>
+
+  <!-- Guided Tour -->
+<div class="guided-tour" id="guided-tour">
+  <div class="tour-popup" id="tour-popup">
+    <h3 id="tour-title">Welcome to Your Jewelry Designer!</h3>
+    <p id="tour-message">Let me show you how to create your perfect piece...</p>
+    <div class="tour-buttons">
+      <button class="tour-btn secondary" id="skip-tour">Skip Tour</button>
+      <button class="tour-btn primary" id="next-tour">Next</button>
+    </div>
+    <div class="tour-progress" id="tour-progress">Step 1 of 6</div>
+  </div>
+</div>
+
+<!-- Tour Indicator -->
+<div class="tour-indicator" id="tour-indicator" style="display: none;">👇</div>
+
+<!-- Quick Tips -->
+<div class="quick-tip" id="quick-tip"></div>
+
+<!-- Help Button -->
+<div class="help-button" id="help-button" title="Get Help">
+  <i class="fas fa-question"></i>
+</div>
 </div>
   <!-- Add Firebase and html2canvas scripts -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -1837,5 +2036,7 @@ document.getElementById('translate-btn').addEventListener('click', function() {
   }
 });
 </script>
+<!-- Guided Tour -->
+
 </body>
 </html>
