@@ -1037,7 +1037,6 @@ function initSpecialProductWithBase(productType) {
   }
 }
 function handleCharmSelection(charmElement) {
-function handleCharmSelection(charmElement) {
     console.log('🎯 === CHARM SELECTION START ===');
     
     // DEBUG: Print what we received
@@ -4070,3 +4069,5 @@ document.addEventListener('DOMContentLoaded', function() {
 // Make it available in console
 window.addEventListener('scroll', updateCartButtonPosition);
 window.addEventListener('load', updateCartButtonPosition);
+
+
