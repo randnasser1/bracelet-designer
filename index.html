@@ -1175,6 +1175,140 @@
         display: none;
     }
 }
+
+    .order-form {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1rem auto;
+      max-width: 500px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #d6336c;
+    }
+    
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #f5a0c2;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      box-sizing: border-box;
+    }
+    
+    .payment-options {
+      margin: 1rem 0;
+    }
+    
+    .payment-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .payment-option input {
+      width: auto;
+      margin-right: 0.5rem;
+    }
+    
+    /* Order Summary Styles - Fixed Layout */
+    .order-summary {
+      background: #fff0f5;
+      border: 1px solid #f5a0c2;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .order-summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed #f5a0c2;
+    }
+    
+    .order-summary-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    
+    .order-total {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #d6336c;
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 2px solid #d6336c;
+    }
+    
+    .order-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .btn {
+      background: #ff85b3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+      flex: 1;
+      text-align: center;
+    }
+    
+    .btn:hover {
+      background: #ff5fa3;
+    }
+    
+    .confirm-order-btn {
+      background: #d6336c;
+    }
+    
+    .cancel-btn {
+      background: #e0e0e0;
+      color: #333;
+    }
+    
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .order-modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -1551,79 +1685,90 @@
     </div>
   </div>
 
-      <!-- Order Form Modal -->
-<div class="modal" id="order-modal">
-  <div class="order-modal-content">
-    <h2>Place Your Order</h2>
+ <!-- Order Form Modal -->
+  <div class="modal" id="order-modal">
+    <div class="order-modal-content">
+      <h2>Place Your Order</h2>
 
-    <form id="order-form">
-      <div class="form-group">
-        <label for="full-name">Full Name*</label>
-        <input type="text" id="full-name" name="full-name" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="phone">Phone Number*</label>
-        <input type="tel" id="phone" name="phone" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="phone2">Second Phone Number (Optional)</label>
-        <input type="tel" id="phone2" name="phone2">
-      </div>
-  <div class="form-group">
+      <form id="order-form">
+        <div class="form-group">
+          <label for="full-name">Full Name*</label>
+          <input type="text" id="full-name" name="full-name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone Number*</label>
+          <input type="tel" id="phone" name="phone" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone2">Second Phone Number (Optional)</label>
+          <input type="tel" id="phone2" name="phone2">
+        </div>
+        
+        <div class="form-group">
           <label for="governorate">Governorate*</label>
           <select id="governorate" name="governorate" required>
-              <option value="">Select Governorate</option>
-              <option value="Amman">Amman</option>
-              <option value="Irbid">Irbid</option>
-              <option value="Zarqa">Zarqa</option>
-              <option value="Balqa">Balqa</option>
-              <option value="Madaba">Madaba</option>
-              <option value="Jerash">Jerash</option>
-              <option value="Ajloun">Ajloun</option>
-              <option value="Aqaba">Aqaba</option>
-              <option value="Mafraq">Mafraq</option>
-              <option value="Tafilah">Tafilah</option>
-              <option value="Karak">Karak</option>
-              <option value="Ma'an">Ma'an</option>
+            <option value="">Select Governorate</option>
+            <option value="Amman">Amman</option>
+            <option value="Irbid">Irbid</option>
+            <option value="Zarqa">Zarqa</option>
+            <option value="Balqa">Balqa</option>
+            <option value="Madaba">Madaba</option>
+            <option value="Jerash">Jerash</option>
+            <option value="Ajloun">Ajloun</option>
+            <option value="Aqaba">Aqaba</option>
+            <option value="Mafraq">Mafraq</option>
+            <option value="Tafilah">Tafilah</option>
+            <option value="Karak">Karak</option>
+            <option value="Ma'an">Ma'an</option>
           </select>
-      </div>
+        </div>
         
         <div class="form-group">
           <label for="address">Full Address Details الموقع بالتفصيل*</label>
           <input type="text" id="address" name="address" required>
         </div>
-          
         
         <div class="payment-options">
-  <h3>Payment Method*</h3>
-  <div class="payment-option">
-    <input type="radio" id="pay-paypal" name="payment" value="PayPal" required>
-    <label for="pay-paypal">PayPal</label>
-  </div>
-  <div class="payment-option">
-    <input type="radio" id="pay-cliq" name="payment" value="Cliq" required>
-    <label for="pay-cliq">Pay with Cliq (00962788838118)</label>
-  </div>
-  <div class="payment-option">
-    <input type="radio" id="pay-cash" name="payment" value="Cash" required checked>
-    <label for="pay-cash">Cash on Delivery</label>
-  </div>
-</div>
+          <h3>Payment Method*</h3>
+          <div class="payment-option">
+            <input type="radio" id="pay-paypal" name="payment" value="PayPal" required>
+            <label for="pay-paypal">PayPal</label>
+          </div>
+          <div class="payment-option">
+            <input type="radio" id="pay-cliq" name="payment" value="Cliq" required>
+            <label for="pay-cliq">Pay with Cliq (00962788838118)</label>
+          </div>
+          <div class="payment-option">
+            <input type="radio" id="pay-cash" name="payment" value="Cash" required checked>
+            <label for="pay-cash">Cash on Delivery</label>
+          </div>
+        </div>
 
-<!-- Add the PayPal container here -->
-<div id="paypal-button-container" style="display: none; margin: 1rem 0;"></div>
+        <!-- Add the PayPal container here -->
+        <div id="paypal-button-container" style="display: none; margin: 1rem 0;"></div>
         
+        <div class="form-group">
           <label for="payment-proof">Upload Payment Proof (required for Cliq)</label>
           <input type="file" id="payment-proof" name="payment-proof" accept="image/*">
         </div>
-          <div class="order-summary">
-        <div id="order-subtotal">Subtotal: 0.00 JDs</div>
-        <div id="order-delivery">Delivery Fee: 2.50 JDs</div>
-        <div id="order-total-price">Total: 0.00 JDs</div>
-      </div>
-
+        
+        <!-- Fixed Order Summary Section -->
+        <div class="order-summary">
+          <div class="order-summary-item">
+            <span>Subtotal:</span>
+            <span id="order-subtotal">0.00 JDs</span>
+          </div>
+          <div class="order-summary-item">
+            <span>Delivery Fee:</span>
+            <span id="order-delivery">2.50 JDs</span>
+          </div>
+          <div class="order-total">
+            <span>Total:</span>
+            <span id="order-total-price">0.00 JDs</span>
+          </div>
+        </div>
         
         <div class="order-buttons">
           <button type="submit" class="btn confirm-order-btn">
@@ -1635,7 +1780,8 @@
         </div>
       </form>
     </div>
-</div>
+  </div>
+
 
   <!-- Order Confirmation Modal -->
   <div class="modal" id="order-confirmation">
