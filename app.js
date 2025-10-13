@@ -4068,6 +4068,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Make it available in console
-window.testRecommendedCharms = testRecommendedCharmSelection;
 window.addEventListener('scroll', updateCartButtonPosition);
 window.addEventListener('load', updateCartButtonPosition);
