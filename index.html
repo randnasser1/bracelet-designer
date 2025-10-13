@@ -634,152 +634,7 @@
   }
 }
 
-/* Recommended Charms Bar - Transparent Background */
-.recommended-charms-bar {
-    background: transparent !important;
-    padding: 8px 0;
-    margin-bottom: 15px;
-    border-radius: 0;
-    overflow: hidden;
-    position: relative;
-    box-shadow: none !important;
-}
 
-.recommended-charms-bar h3 {
-    text-align: center;
-    color: #d6336c;
-    margin: 0 0 8px 0;
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.recommended-scroll-container {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-}
-
-.recommended-charms-scroll {
-    display: flex;
-    gap: 4px; /* Minimal padding between charms */
-    padding: 0 10px;
-    animation: scrollRecommended 30s linear infinite;
-    width: max-content;
-}
-
-.recommended-charms-scroll:hover {
-    animation-play-state: paused;
-}
-
-.recommended-charm-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 84px; /* Fixed 84px width */
-    transition: all 0.3s ease;
-    cursor: pointer;
-    position: relative;
-    padding: 0; /* Remove padding */
-}
-
-.recommended-charm-item:hover {
-    transform: scale(1.05);
-}
-
-.recommended-charm-item:hover::after {
-    content: 'Click to Select';
-    position: absolute;
-    bottom: -25px;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.6rem;
-    white-space: nowrap;
-    z-index: 10;
-}
-
-.recommended-charm-image {
-    width: 84px !important;
-    height: 84px !important;
-    object-fit: contain;
-    border: 2px solid rgba(214, 51, 108, 0.3);
-    border-radius: 8px;
-    background: transparent !important;
-    cursor: pointer;
-    pointer-events: auto;
-    flex-shrink: 0; /* Prevent shrinking */
-}
-
-.recommended-charm-image.selected {
-    border: 3px solid #ffeb3b;
-    box-shadow: 0 0 10px #ffeb3b;
-}
-
-/* Ensure no background is applied */
-.recommended-charm-image[src*=".png"],
-.recommended-charm-image[src*=".jpg"],
-.recommended-charm-image[src*=".jpeg"] {
-    background: transparent !important;
-}
-
-@keyframes scrollRecommended {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
-}
-
-/* Remove gradient overlays since background is transparent */
-.recommended-scroll-container::before,
-.recommended-scroll-container::after {
-    display: none; /* Remove gradient overlays */
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-    .recommended-charms-bar {
-        margin-bottom: 10px;
-        padding: 6px 0;
-    }
-    
-    .recommended-charms-bar h3 {
-        font-size: 0.9rem;
-        margin-bottom: 6px;
-    }
-    
-    .recommended-charm-image {
-        width: 70px !important;
-        height: 70px !important;
-    }
-    
-    .recommended-charm-item {
-        min-width: 70px;
-    }
-    
-    .recommended-charms-scroll {
-        gap: 3px;
-        padding: 0 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    .recommended-charm-image {
-        width: 60px !important;
-        height: 60px !important;
-    }
-    
-    .recommended-charm-item {
-        min-width: 60px;
-    }
-    
-    .recommended-charms-scroll {
-        gap: 2px;
-        padding: 0 5px;
-    }
-}
 .homepage {
   text-align: center;
   padding: 2rem 1rem;
@@ -1309,6 +1164,139 @@
       max-height: 90vh;
       overflow-y: auto;
     }
+   /* Recommended Charms - Fixed Version */
+.recommended-charms-bar {
+    background: transparent !important;
+    padding: 8px 0;
+    margin-bottom: 15px;
+    border-radius: 0;
+    overflow: hidden;
+    position: relative;
+    box-shadow: none !important;
+}
+
+.recommended-charms-bar h3 {
+    text-align: center;
+    color: #d6336c;
+    margin: 0 0 8px 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.recommended-scroll-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    background: rgba(255, 240, 245, 0.7);
+    border-radius: 12px;
+    padding: 10px 0;
+}
+
+.recommended-charms-scroll {
+    display: flex;
+    gap: 8px;
+    padding: 0 15px;
+    animation: scrollRecommended 20s  linear infinite;
+    width: max-content;
+}
+
+/* REMOVE hover pause - it causes issues */
+/* .recommended-charms-scroll:hover {
+    animation-play-state: paused;
+} */
+
+.recommended-charm-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 84px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    padding: 5px;
+    border-radius: 8px;
+    background: white;
+    border: 2px solid transparent;
+    flex-shrink: 0;
+}
+
+.recommended-charm-item:hover {
+    transform: scale(1.05);
+    border-color: #d6336c;
+}
+
+.recommended-charm-item.selected {
+    border: 3px solid #ffeb3b !important;
+    box-shadow: 0 0 15px #ffeb3b !important;
+    background: #fffde7 !important;
+    transform: scale(1.05);
+    z-index: 100;
+}
+
+.recommended-charm-image {
+    width: 84px !important;
+    height: 84px !important;
+    object-fit: contain;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.recommended-charm-image.selected {
+    border: 2px solid #ffeb3b !important;
+}
+
+@keyframes scrollRecommended {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-33.33%); /* Only scroll 1/3 of the way for single set */
+    }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .recommended-charms-bar {
+        margin-bottom: 10px;
+        padding: 6px 0;
+    }
+    
+    .recommended-charms-bar h3 {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+    }
+    
+    .recommended-charm-image {
+        width: 70px !important;
+        height: 70px !important;
+    }
+    
+    .recommended-charm-item {
+        min-width: 70px;
+    }
+    
+    .recommended-charms-scroll {
+        gap: 6px;
+        padding: 0 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .recommended-charm-image {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    
+    .recommended-charm-item {
+        min-width: 60px;
+    }
+    
+    .recommended-charms-scroll {
+        gap: 4px;
+        padding: 0 8px;
+    }
+}
   </style>
 </head>
 <body>
@@ -1517,18 +1505,19 @@
     </div>
 </div>
   </div> <!-- Add the missing closing div and proper heading -->
+<!-- Recommended Charms - Simplified Version -->
 <div class="recommended-charms-bar" id="recommended-charms-bar">
     <h3>What's Trending🔥</h3>
     <div class="recommended-scroll-container">
         <div class="recommended-charms-scroll" id="recommended-charms-scroll">
-            <!-- Recommended charms populated by initializeRecommendedCharms() -->
+            <!-- Recommended charms will be populated here -->
         </div>
     </div>
+</div>
 
 
 </div>  <h3>Add your charms below ↓</h3>
   <!-- Add this before the jewelry piece container -->
-  <div class="selected-charm-preview" id="selected-charm-preview">
     <img id="preview-charm-image" src="" alt="Selected Charm">
     <div class="charm-name" id="preview-charm-name"></div>
     <div class="charm-type" id="preview-charm-type"></div>
