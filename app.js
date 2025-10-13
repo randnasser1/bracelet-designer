@@ -3732,43 +3732,59 @@ function initializeRecommendedCharms() {
         charmImg.alt = 'Recommended Charm';
         charmImg.className = 'recommended-charm-image charm';
         
-        // Store charm data
-        charmImg.dataset.charm = charmData.src;
-        charmImg.dataset.type = charmData.type;
+        // CRITICAL FIX: Store ALL charm data properly
+        charmImg.dataset.charm = charmData.src; // Exact path
+        charmImg.dataset.type = charmData.type; // 'special' or 'rare'
         charmImg.dataset.quantity = charmData.quantity || 1;
-
-        // Add type class
+        
+        // Store additional properties that placeSelectedCharm expects
         if (charmData.type === 'special') {
             charmImg.classList.add('special');
         } else if (charmData.type === 'rare') {
             charmImg.classList.add('rare');
         }
 
+        // Handle long and dangly charms
+        if (charmData.src.includes('long')) {
+            charmImg.classList.add('long-charm');
+        }
+        if (charmData.src.includes('dangly') || isLoveOrDolphinCharm(charmData.src)) {
+            charmImg.classList.add('dangly-charm');
+        }
+
         // Handle sold out state
         if (charmData.quantity <= 0) {
             charmImg.classList.add('sold-out');
             charmImg.style.opacity = '0.5';
+            charmImg.style.pointerEvents = 'none';
         }
 
         charmItem.appendChild(charmImg);
         
-        // Add click event
-        // In initializeRecommendedCharms function, update the click event:
-charmImg.addEventListener('click', function(e) {
-    e.stopPropagation();
-    handleCharmSelection(this);
-    
-    // NEW: Optional - pause the scrolling animation
-    const scrollContainer = this.closest('.recommended-charms-scroll');
-    if (scrollContainer) {
-        scrollContainer.style.animationPlayState = 'paused';
-        
-        // Resume after 2 seconds
-        setTimeout(() => {
-            scrollContainer.style.animationPlayState = 'running';
-        }, 2000);
-    }
-});
+        // Add click event - FIXED to properly handle selection
+        charmImg.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            // Check if charm is available
+            const quantity = parseInt(this.dataset.quantity) || 1;
+            if (quantity <= 0) {
+                alert('This charm is out of stock!');
+                return;
+            }
+            
+            handleCharmSelection(this);
+            
+            // Pause the scrolling animation
+            const scrollContainer = this.closest('.recommended-charms-scroll');
+            if (scrollContainer) {
+                scrollContainer.style.animationPlayState = 'paused';
+                
+                // Resume after 2 seconds
+                setTimeout(() => {
+                    scrollContainer.style.animationPlayState = 'running';
+                }, 2000);
+            }
+        });
 
         recommendedScroll.appendChild(charmItem);
     });
@@ -3777,7 +3793,7 @@ charmImg.addEventListener('click', function(e) {
     if (recommendedScroll.children.length > 0) {
         recommendedBar.style.display = 'block';
         
-        // Duplicate for seamless scroll (remove if you don't want infinite scroll)
+        // Duplicate for seamless scroll
         const duplicateContent = recommendedScroll.innerHTML;
         recommendedScroll.innerHTML += duplicateContent;
         
@@ -3786,8 +3802,6 @@ charmImg.addEventListener('click', function(e) {
         recommendedBar.style.display = 'none';
     }
 }
-// Also update your updateSelectedCharmPreview function to handle recommended charms:
-
 function setupCharmEventListeners() {
     // This will be called whenever charms are updated
     document.querySelectorAll('.charm').forEach(charm => {
