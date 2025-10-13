@@ -1037,9 +1037,15 @@ function initSpecialProductWithBase(productType) {
   }
 }
 function handleCharmSelection(charmElement) {
-    const charmSrc = charmElement.src;
+    console.log('=== CHARM SELECTION START ===');
+    console.log('Clicked element:', charmElement);
+    console.log('Current selectedCharm before:', selectedCharm);
+    
+    const charmSrc = charmElement.dataset.charm || charmElement.src;
     const charmType = charmElement.dataset.type;
     const remainingQuantity = parseInt(charmElement.dataset.quantity) || 1;
+    
+    console.log('Charm data:', { charmSrc, charmType, remainingQuantity });
     
     // Don't allow selection if no quantity left
     if (remainingQuantity <= 0) {
@@ -1049,10 +1055,12 @@ function handleCharmSelection(charmElement) {
     
     // Toggle selection
     if (charmElement.classList.contains('selected')) {
+        console.log('Deselecting charm');
         charmElement.classList.remove('selected');
         selectedCharm = null;
         hideSelectedCharmPreview();
     } else {
+        console.log('Selecting new charm');
         // Remove selection from ALL charms (special, rare, recommended)
         document.querySelectorAll('.charm, .recommended-charm-image').forEach(c => {
             c.classList.remove('selected');
@@ -1060,8 +1068,11 @@ function handleCharmSelection(charmElement) {
         
         charmElement.classList.add('selected');
         selectedCharm = charmElement;
+        console.log('selectedCharm after selection:', selectedCharm);
         updateSelectedCharmPreview(charmElement);
     }
+    
+    console.log('=== CHARM SELECTION END ===');
 }
 function debugSelectedCharm() {
     console.log('=== DEBUG SELECTED CHARM ===');
@@ -1074,10 +1085,13 @@ function debugSelectedCharm() {
     console.log('============================');
 }
 function handleSlotClick(slot) {
-    console.log('Slot clicked, selected charm:', selectedCharm);
-    debugSelectedCharm(); // Add this line
+    console.log('=== SLOT CLICK START ===');
+    console.log('Slot clicked:', slot);
+    console.log('selectedCharm at slot click:', selectedCharm);
+    
     // If there's a selected charm (including from recommended), try to place it
     if (selectedCharm) {
+        console.log('Selected charm found, proceeding with placement');
         const existingCharm = slot.querySelector('img:not([data-type="base"])');
         
         // If there's already a charm in this slot, remove it first
@@ -1088,25 +1102,33 @@ function handleSlotClick(slot) {
             if (existingCharm.src === selectedCharm.src) {
                 selectedCharm = null;
                 hideSelectedCharmPreview();
+                console.log('Same charm clicked, toggling off');
                 return;
             }
         }
         
         // Now place the new charm
+        console.log('Calling placeSelectedCharm');
         placeSelectedCharm(slot);
         
-        // NEW: Clear selection after placing
-        selectedCharm.classList.remove('selected');
+        // Clear selection after placing
+        console.log('Clearing selection after placement');
+        if (selectedCharm) {
+            selectedCharm.classList.remove('selected');
+        }
         selectedCharm = null;
         hideSelectedCharmPreview();
     } 
     // If no charm selected but slot has a charm, remove it
     else {
+        console.log('No selected charm, checking for existing charm to remove');
         const existingCharm = slot.querySelector('img:not([data-type="base"])');
         if (existingCharm) {
             removeCharmFromSlot(slot);
         }
     }
+    
+    console.log('=== SLOT CLICK END ===');
 }
 function updateWatchBase() {
     const baseImg = document.querySelector('.product-base-image');
@@ -3625,7 +3647,8 @@ updateStickyHeader();
 });
 document.addEventListener('DOMContentLoaded', function() {
     const jewelryPiece = document.getElementById('jewelry-piece');
-    
+
+     
     function adjustJewelryWidth() {
         const viewportWidth = window.innerWidth;
         jewelryPiece.style.maxWidth = Math.min(viewportWidth - 40, 800) + 'px';
@@ -3762,29 +3785,36 @@ function initializeRecommendedCharms() {
         charmItem.appendChild(charmImg);
         
         // Add click event - FIXED to properly handle selection
-        charmImg.addEventListener('click', function(e) {
-            e.stopPropagation();
-            
-            // Check if charm is available
-            const quantity = parseInt(this.dataset.quantity) || 1;
-            if (quantity <= 0) {
-                alert('This charm is out of stock!');
-                return;
-            }
-            
-            handleCharmSelection(this);
-            
-            // Pause the scrolling animation
-            const scrollContainer = this.closest('.recommended-charms-scroll');
-            if (scrollContainer) {
-                scrollContainer.style.animationPlayState = 'paused';
-                
-                // Resume after 2 seconds
-                setTimeout(() => {
-                    scrollContainer.style.animationPlayState = 'running';
-                }, 2000);
-            }
-        });
+       // In initializeRecommendedCharms function, replace the click event with this:
+charmImg.addEventListener('click', function(e) {
+    e.stopPropagation();
+    e.preventDefault(); // Add this to prevent any default behavior
+    
+    console.log('Recommended charm clicked:', this);
+    
+    // Check if charm is available
+    const quantity = parseInt(this.dataset.quantity) || 1;
+    if (quantity <= 0) {
+        alert('This charm is out of stock!');
+        return;
+    }
+    
+    // Use a small timeout to ensure the click is processed
+    setTimeout(() => {
+        handleCharmSelection(this);
+    }, 10);
+    
+    // Pause the scrolling animation
+    const scrollContainer = this.closest('.recommended-charms-scroll');
+    if (scrollContainer) {
+        scrollContainer.style.animationPlayState = 'paused';
+        
+        // Resume after 2 seconds
+        setTimeout(() => {
+            scrollContainer.style.animationPlayState = 'running';
+        }, 2000);
+    }
+});
 
         recommendedScroll.appendChild(charmItem);
     });
@@ -3809,6 +3839,21 @@ function setupCharmEventListeners() {
             e.stopPropagation();
             handleCharmSelection(this);
         });
+    });
+}
+
+function protectSelectedCharm() {
+    let _selectedCharm = selectedCharm;
+    
+    Object.defineProperty(window, 'selectedCharm', {
+        get: function() {
+            console.log('Getting selectedCharm:', _selectedCharm);
+            return _selectedCharm;
+        },
+        set: function(value) {
+            console.log('Setting selectedCharm from:', _selectedCharm, 'to:', value);
+            _selectedCharm = value;
+        }
     });
 }
 function setupScrollArrows() {
@@ -3866,6 +3911,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const productCards = document.querySelectorAll('#homepage .product-card');
     const productButtons = document.querySelectorAll('.product-btn');
      setupScrollArrows();
+         protectSelectedCharm();
+
 initializeRecommendedCharms();
     // Show designer page and select corresponding product when product card is clicked
     productCards.forEach(card => {
