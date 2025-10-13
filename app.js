@@ -3639,85 +3639,89 @@ function updateCartButtonPosition() {
     }
 }
 function initializeRecommendedCharms() {
+    const recommendedBar = document.getElementById('recommended-charms-bar');
     const recommendedScroll = document.getElementById('recommended-charms-scroll');
-    if (!recommendedScroll) {
-        console.error('Recommended charms scroll container not found');
+    
+    if (!recommendedBar || !recommendedScroll) {
+        console.error('Recommended charms elements not found');
         return;
     }
 
     const recommendedCharmNames = [
-        // Special charms
-        ,'rares/newc2r/c224.png',
-        ,'rares/sporty/sporty2.png'
-        ,'rares/sporty/sporty13.png'
-        ,'rares/love/c218.png'
-        ,'rares/gold/gold11.png'
-        ,'rares/love/c219.png'
-        ,'special/teddy/teddy2.png'
-        ,'rares/graduation/grad.png'
-        ,'special/new-collection/50.png'
-        ,'rares/gold/gold8.png'
-        ,'special/bows/pink.png'
-        ,'special/beach/x15.png'
-        ,'rares/new-collection/19-gold.png'
-        ,'special/cute specials/special.png'
-        ,'rares/disney/stitch.png'
-        ,'rares/hgs/20.png'
-        ,'special/red/94-gold.png'
-        ,'rares/newc3r/c31.png'
-        ,'rares/newc2r/c252.png'
-        ,'rares/newc3r/c37.png'
-        ,'rares/dangly/16s.png'
-        ,'rares/sanrio/metalkitty.png'
-        ,'rares/newc2r/c2145.png'
-        ,'rares/newc2r/c29-gold.png'
-        ,'rares/newc2r/c27.png'
-        ,'rares/newc2r/c229.png'
-        ,'rares/newc2r/c2115.png'
-        ,'rares/love/mrmrs2.png'
-        ,'rares/love/mrmrs1.png'
+        'rares/newc2r/c224.png',
+        'rares/sporty/sporty2.png',
+        'rares/sporty/sporty13.png',
+        'rares/love/c218.png',
+        'rares/gold/gold11.png',
+        'rares/love/c219.png',
+        'special/teddy/teddy2.png',
+        'rares/graduation/grad.png',
+        'special/new-collection/50.png',
+        'rares/gold/gold8.png',
+        'special/bows/pink.png',
+        'special/beach/x15.png',
+        'rares/new-collection/19-gold.png',
+        'special/cute specials/special.png',
+        'rares/disney/stitch.png',
+        'rares/hgs/20.png',
+        'special/red/94-gold.png',
+        'rares/newc3r/c31.png',
+        'rares/newc2r/c252.png',
+        'rares/newc3r/c37.png',
+        'rares/dangly/16s.png',
+        'rares/sanrio/metalkitty.png',
+        'rares/newc2r/c2145.png',
+        'rares/newc2r/c29-gold.png',
+        'rares/newc2r/c27.png',
+        'rares/newc2r/c229.png',
+        'rares/newc2r/c2115.png',
+        'rares/love/mrmrs2.png',
+        'rares/love/mrmrs1.png'
     ];
-    const recommendedCharms = recommendedCharmNames.map(charmName => {
-        // Look in special charms first
-        let charm = specialCharms.find(c => c.src.includes(charmName));
-        
-        // If not found in special, look in rare charms
-        if (!charm) {
-            charm = rareCharms.find(c => c.src.includes(charmName));
-        }
-        
-        return charm;
-    }).filter(charm => charm !== undefined); // Remove any undefined results
 
     // Clear existing content
     recommendedScroll.innerHTML = '';
 
-    // Create the scrolling content
-    recommendedCharms.forEach(charm => {
+    // Create charm elements
+    recommendedCharmNames.forEach(charmName => {
+        // Find charm in special or rare collections
+        let charmData = specialCharms.find(c => c.src.includes(charmName)) || 
+                       rareCharms.find(c => c.src.includes(charmName));
+        
+        if (!charmData) {
+            console.warn('Charm not found:', charmName);
+            return;
+        }
+
         const charmItem = document.createElement('div');
         charmItem.className = 'recommended-charm-item';
         
         const charmImg = document.createElement('img');
-        charmImg.src = charm.src;
+        charmImg.src = charmData.src;
         charmImg.alt = 'Recommended Charm';
-        charmImg.className = 'recommended-charm-image charm'; // ADD 'charm' class here
-        charmImg.loading = 'lazy';
+        charmImg.className = 'recommended-charm-image charm';
         
-        // Store charm data EXACTLY like the main pools
-        charmImg.dataset.charm = charm.src;
-        charmImg.dataset.type = charm.type;
-        charmImg.dataset.quantity = charm.quantity;
+        // Store charm data
+        charmImg.dataset.charm = charmData.src;
+        charmImg.dataset.type = charmData.type;
+        charmImg.dataset.quantity = charmData.quantity || 1;
 
-        // Add the same classes as main pool charms for consistency
-        if (charm.type === 'special') {
+        // Add type class
+        if (charmData.type === 'special') {
             charmImg.classList.add('special');
-        } else if (charm.type === 'rare') {
+        } else if (charmData.type === 'rare') {
             charmImg.classList.add('rare');
+        }
+
+        // Handle sold out state
+        if (charmData.quantity <= 0) {
+            charmImg.classList.add('sold-out');
+            charmImg.style.opacity = '0.5';
         }
 
         charmItem.appendChild(charmImg);
         
-        // Use the unified charm selection handler
+        // Add click event
         charmImg.addEventListener('click', function(e) {
             e.stopPropagation();
             handleCharmSelection(this);
@@ -3726,11 +3730,18 @@ function initializeRecommendedCharms() {
         recommendedScroll.appendChild(charmItem);
     });
 
-    // Duplicate content for seamless infinite scroll
-    const duplicateContent = recommendedScroll.innerHTML;
-    recommendedScroll.innerHTML += duplicateContent;
-    
-    console.log('Recommended charms initialized with', recommendedCharms.length, 'charms');
+    // Show the bar only if we have charms
+    if (recommendedScroll.children.length > 0) {
+        recommendedBar.style.display = 'block';
+        
+        // Duplicate for seamless scroll (remove if you don't want infinite scroll)
+        const duplicateContent = recommendedScroll.innerHTML;
+        recommendedScroll.innerHTML += duplicateContent;
+        
+        console.log('Recommended charms initialized with', recommendedScroll.children.length / 2, 'unique charms');
+    } else {
+        recommendedBar.style.display = 'none';
+    }
 }
 // Also update your updateSelectedCharmPreview function to handle recommended charms:
 
@@ -3797,8 +3808,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const backBtn = document.getElementById('back-to-home');
     const productCards = document.querySelectorAll('#homepage .product-card');
     const productButtons = document.querySelectorAll('.product-btn');
-        setupScrollArrows();
-
+     setupScrollArrows();
+initializeRecommendedCharms();
     // Show designer page and select corresponding product when product card is clicked
     productCards.forEach(card => {
         card.addEventListener('click', function() {
