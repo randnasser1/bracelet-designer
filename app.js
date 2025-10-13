@@ -1036,9 +1036,37 @@ function initSpecialProductWithBase(productType) {
     }, 100);
   }
 }
-// Unified slot click handler
+function handleCharmSelection(charmElement) {
+    const charmSrc = charmElement.src;
+    const charmType = charmElement.dataset.type;
+    const remainingQuantity = parseInt(charmElement.dataset.quantity) || 1;
+    
+    // Don't allow selection if no quantity left
+    if (remainingQuantity <= 0) {
+        alert('This charm is out of stock!');
+        return;
+    }
+    
+    // Toggle selection
+    if (charmElement.classList.contains('selected')) {
+        charmElement.classList.remove('selected');
+        selectedCharm = null;
+        hideSelectedCharmPreview();
+    } else {
+        // Remove selection from ALL charms (special, rare, recommended)
+        document.querySelectorAll('.charm, .recommended-charm-image').forEach(c => {
+            c.classList.remove('selected');
+        });
+        
+        charmElement.classList.add('selected');
+        selectedCharm = charmElement;
+        updateSelectedCharmPreview(charmElement);
+    }
+}
 function handleSlotClick(slot) {
-    // If there's a selected charm, try to place it
+        console.log('Slot clicked, selected charm:', selectedCharm);
+
+    // If there's a selected charm (including from recommended), try to place it
     if (selectedCharm) {
         const existingCharm = slot.querySelector('img:not([data-type="base"])');
         
@@ -1054,7 +1082,8 @@ function handleSlotClick(slot) {
             }
         }
         
-        // Now place the new charm
+        // Now place the new charm - this should work with recommended charms
+        // because they now have the same data structure
         placeSelectedCharm(slot);
     } 
     // If no charm selected but slot has a charm, remove it
