@@ -3783,55 +3783,59 @@ function initializeRecommendedCharms() {
 
     // Create charm elements
     recommendedCharmNames.forEach(charmName => {
-        // Find charm in special or rare collections and GET THE CORRECT TYPE
-        let charmData = specialCharms.find(c => c.src.includes(charmName)) || 
-                       rareCharms.find(c => c.src.includes(charmName));
+        // Determine type from the file path
+        let charmType = 'rare'; // default to rare
+        let charmCategory = 'recommended';
         
-        if (!charmData) {
-            console.warn('Charm not found:', charmName);
-            return;
+        if (charmName.includes('special/')) {
+            charmType = 'special';
+            // Extract category from path
+            const pathParts = charmName.split('/');
+            if (pathParts.length > 2) {
+                charmCategory = pathParts[1]; // e.g., 'teddy', 'bows', etc.
+            }
+        } else if (charmName.includes('rares/')) {
+            charmType = 'rare';
+            // Extract category from path
+            const pathParts = charmName.split('/');
+            if (pathParts.length > 2) {
+                charmCategory = pathParts[1]; // e.g., 'newc2r', 'sporty', etc.
+            }
         }
 
         const charmItem = document.createElement('div');
         charmItem.className = 'recommended-charm-item';
         
         const charmImg = document.createElement('img');
-        charmImg.src = charmData.src;
+        charmImg.src = charmName;
         charmImg.alt = 'Recommended Charm';
         charmImg.className = 'recommended-charm-image charm';
         
-        // FIX: Set the CORRECT data attributes
-        charmImg.dataset.charm = charmData.src; // Exact path
-        charmImg.dataset.type = charmData.type; // This should be 'special' or 'rare' - NOT undefined!
-        charmImg.dataset.quantity = charmData.quantity || 1;
-        charmImg.dataset.category = charmData.category || 'recommended';
+        // SET DATA ATTRIBUTES FROM THE SRC PATH
+        charmImg.dataset.charm = charmName;
+        charmImg.dataset.type = charmType; // This will be 'special' or 'rare'
+        charmImg.dataset.quantity = 1; // Default quantity
+        charmImg.dataset.category = charmCategory;
         
         console.log('Setting up recommended charm:', {
-            src: charmData.src,
-            type: charmData.type, // This should show 'special' or 'rare'
-            quantity: charmData.quantity
+            src: charmName,
+            type: charmType,
+            category: charmCategory
         });
         
-        // Add the same classes as pool charms
-        if (charmData.type === 'special') {
+        // Add the correct class based on type
+        if (charmType === 'special') {
             charmImg.classList.add('special');
-        } else if (charmData.type === 'rare') {
+        } else if (charmType === 'rare') {
             charmImg.classList.add('rare');
         }
 
-        // Handle long and dangly charms
-        if (charmData.src.includes('long')) {
+        // Handle long and dangly charms based on file name
+        if (charmName.includes('long')) {
             charmImg.classList.add('long-charm');
         }
-        if (charmData.src.includes('dangly') || isLoveOrDolphinCharm(charmData.src)) {
+        if (charmName.includes('dangly') || isLoveOrDolphinCharm(charmName)) {
             charmImg.classList.add('dangly-charm');
-        }
-
-        // Handle sold out state
-        if (charmData.quantity <= 0) {
-            charmImg.classList.add('sold-out');
-            charmImg.style.opacity = '0.5';
-            charmImg.style.pointerEvents = 'none';
         }
 
         charmItem.appendChild(charmImg);
@@ -3841,19 +3845,12 @@ function initializeRecommendedCharms() {
             e.stopPropagation();
             e.preventDefault();
             
-            console.log('🎯 Recommended charm CLICKED - FIXED VERSION');
+            console.log('🎯 Recommended charm CLICKED - FIXED');
             console.log('Charm data:', {
                 src: this.src,
-                type: this.dataset.type, // Should now be 'special' or 'rare'
+                type: this.dataset.type, // Should now be properly set
                 quantity: this.dataset.quantity
             });
-            
-            // Check if charm is available
-            const quantity = parseInt(this.dataset.quantity) || 1;
-            if (quantity <= 0) {
-                alert('This charm is out of stock!');
-                return;
-            }
             
             // Use the EXACT same selection handler as pool charms
             handleCharmSelection(this);
@@ -3886,6 +3883,7 @@ function initializeRecommendedCharms() {
         recommendedBar.style.display = 'none';
     }
 }
+
 
 function setupCharmEventListeners() {
     // This will be called whenever charms are updated
