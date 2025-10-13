@@ -27,6 +27,8 @@ const globalUsedCharms = new Map(); // Change from Set to Map to track quantitie
 const charmQuantities = {}; // Tracks remaining quantities
 const disableCOD = false; // Set this to false to show COD option again
 // Constants
+window.initProduct = initProduct;
+
 const MAX_SLOT_SPACES = 16;
 const SIZE_CHARTS = {
      bracelet: {
@@ -3607,6 +3609,214 @@ function updateCartButtonPosition() {
         cartButton.style.top = '90px';
     }
 }
+function initializeRecommendedCharms() {
+    const recommendedScroll = document.getElementById('recommended-charms-scroll');
+    if (!recommendedScroll) {
+        console.error('Recommended charms scroll container not found');
+        return;
+    }
 
+    const recommendedCharmNames = [
+        // Special charms
+        ,'rares/newc2r/c224.png',
+        ,'rares/sporty/sporty2.png'
+        ,'rares/sporty/sporty13.png'
+        ,'rares/love/c218.png'
+        ,'rares/gold/gold11.png'
+        ,'rares/love/c219.png'
+        ,'special/teddy/teddy2.png'
+        ,'rares/graduation/grad.png'
+        ,'special/new-collection/50.png'
+        ,'rares/gold/gold8.png'
+        ,'special/bows/pink.png'
+        ,'special/beach/x15.png'
+        ,'rares/new-collection/19-gold.png'
+        ,'special/cute specials/special.png'
+        ,'rares/disney/stitch.png'
+        ,'rares/hgs/20.png'
+        ,'special/red/94-gold.png'
+        ,'rares/newc3r/c31.png'
+        ,'rares/newc2r/c252.png'
+        ,'rares/newc3r/c37.png'
+        ,'rares/dangly/16s.png'
+        ,'rares/sanrio/metalkitty.png'
+        ,'rares/newc2r/c2145.png'
+        ,'rares/newc2r/c29-gold.png'
+        ,'rares/newc2r/c27.png'
+        ,'rares/newc2r/c229.png'
+        ,'rares/newc2r/c2115.png'
+        ,'rares/love/mrmrs2.png'
+        ,'rares/love/mrmrs1.png'
+    ];
+    const recommendedCharms = recommendedCharmNames.map(charmName => {
+        // Look in special charms first
+        let charm = specialCharms.find(c => c.src.includes(charmName));
+        
+        // If not found in special, look in rare charms
+        if (!charm) {
+            charm = rareCharms.find(c => c.src.includes(charmName));
+        }
+        
+        return charm;
+    }).filter(charm => charm !== undefined); // Remove any undefined results
+
+    // Clear existing content
+    recommendedScroll.innerHTML = '';
+
+    // Create the scrolling content
+    recommendedCharms.forEach(charm => {
+        const charmItem = document.createElement('div');
+        charmItem.className = 'recommended-charm-item';
+        
+        const charmImg = document.createElement('img');
+        charmImg.src = charm.src;
+        charmImg.alt = 'Recommended Charm';
+        charmImg.className = 'recommended-charm-image charm'; // ADD 'charm' class here
+        charmImg.loading = 'lazy';
+        
+        // Store charm data EXACTLY like the main pools
+        charmImg.dataset.charm = charm.src;
+        charmImg.dataset.type = charm.type;
+        charmImg.dataset.quantity = charm.quantity;
+
+        // Add the same classes as main pool charms for consistency
+        if (charm.type === 'special') {
+            charmImg.classList.add('special');
+        } else if (charm.type === 'rare') {
+            charmImg.classList.add('rare');
+        }
+
+        charmItem.appendChild(charmImg);
+        
+        // Use the unified charm selection handler
+        charmImg.addEventListener('click', function(e) {
+            e.stopPropagation();
+            handleCharmSelection(this);
+        });
+
+        recommendedScroll.appendChild(charmItem);
+    });
+
+    // Duplicate content for seamless infinite scroll
+    const duplicateContent = recommendedScroll.innerHTML;
+    recommendedScroll.innerHTML += duplicateContent;
+    
+    console.log('Recommended charms initialized with', recommendedCharms.length, 'charms');
+}
+// Also update your updateSelectedCharmPreview function to handle recommended charms:
+
+function setupCharmEventListeners() {
+    // This will be called whenever charms are updated
+    document.querySelectorAll('.charm').forEach(charm => {
+        charm.addEventListener('click', function(e) {
+            e.stopPropagation();
+            handleCharmSelection(this);
+        });
+    });
+}
+function setupScrollArrows() {
+    document.querySelectorAll('.category-tabs-container').forEach(container => {
+        const tabs = container.querySelector('.category-tabs');
+        const leftArrow = container.querySelector('.scroll-arrow.left');
+        const rightArrow = container.querySelector('.scroll-arrow.right');
+        
+        // Check if we need arrows (content is scrollable)
+        const checkArrows = () => {
+            if (tabs.scrollWidth > tabs.clientWidth) {
+                leftArrow.classList.remove('hidden');
+                rightArrow.classList.remove('hidden');
+                updateArrowVisibility();
+            } else {
+                leftArrow.classList.add('hidden');
+                rightArrow.classList.add('hidden');
+            }
+        };
+        
+        // Update arrow visibility based on scroll position
+        const updateArrowVisibility = () => {
+            const scrollLeft = tabs.scrollLeft;
+            const maxScroll = tabs.scrollWidth - tabs.clientWidth;
+            
+            leftArrow.classList.toggle('hidden', scrollLeft <= 10);
+            rightArrow.classList.toggle('hidden', scrollLeft >= maxScroll - 10);
+        };
+        
+        // Scroll functions
+        leftArrow.addEventListener('click', () => {
+            tabs.scrollBy({ left: -200, behavior: 'smooth' });
+        });
+        
+        rightArrow.addEventListener('click', () => {
+            tabs.scrollBy({ left: 200, behavior: 'smooth' });
+        });
+        
+        // Update arrows on scroll
+        tabs.addEventListener('scroll', updateArrowVisibility);
+        
+        // Check on load and resize
+        checkArrows();
+        window.addEventListener('resize', checkArrows);
+    });
+}
+
+// Call this in your DOMContentLoaded
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const homepage = document.getElementById('homepage');
+    const designerPage = document.getElementById('designer-page');
+    const backBtn = document.getElementById('back-to-home');
+    const productCards = document.querySelectorAll('#homepage .product-card');
+    const productButtons = document.querySelectorAll('.product-btn');
+        setupScrollArrows();
+
+    // Show designer page and select corresponding product when product card is clicked
+    productCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const productType = this.getAttribute('data-type');
+            
+            console.log('Product card clicked:', productType); // Debug log
+            
+            // Hide homepage and show designer
+            homepage.style.display = 'none';
+            designerPage.style.display = 'block';
+            
+            // Initialize the product directly using your existing function
+            if (typeof initProduct === 'function') {
+                initProduct(productType);
+            } else {
+                console.error('initProduct function not found');
+                // Fallback: manually trigger product initialization
+                currentProduct = productType;
+                initJewelryPiece();
+                updatePrice();
+            }
+            
+            // Update the product buttons to show active state
+            productButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-type') === productType) {
+                    btn.classList.add('active');
+                }
+            });
+        });
+    });
+    
+    // Back to homepage
+    if (backBtn) {
+        backBtn.addEventListener('click', function() {
+            designerPage.style.display = 'none';
+            homepage.style.display = 'block';
+        });
+    }
+    
+    // Also ensure the product buttons in designer page work
+    productButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productType = this.getAttribute('data-type');
+            initProduct(productType);
+        });
+    });
+});
 window.addEventListener('scroll', updateCartButtonPosition);
 window.addEventListener('load', updateCartButtonPosition);
