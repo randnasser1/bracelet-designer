@@ -3783,7 +3783,7 @@ function initializeRecommendedCharms() {
 
     // Create charm elements
     recommendedCharmNames.forEach(charmName => {
-        // Find charm in special or rare collections
+        // Find charm in special or rare collections and GET THE CORRECT TYPE
         let charmData = specialCharms.find(c => c.src.includes(charmName)) || 
                        rareCharms.find(c => c.src.includes(charmName));
         
@@ -3800,11 +3800,17 @@ function initializeRecommendedCharms() {
         charmImg.alt = 'Recommended Charm';
         charmImg.className = 'recommended-charm-image charm';
         
-        // CRITICAL FIX: Set ALL the same data attributes as pool charms
+        // FIX: Set the CORRECT data attributes
         charmImg.dataset.charm = charmData.src; // Exact path
-        charmImg.dataset.type = charmData.type; // 'special' or 'rare'
+        charmImg.dataset.type = charmData.type; // This should be 'special' or 'rare' - NOT undefined!
         charmImg.dataset.quantity = charmData.quantity || 1;
         charmImg.dataset.category = charmData.category || 'recommended';
+        
+        console.log('Setting up recommended charm:', {
+            src: charmData.src,
+            type: charmData.type, // This should show 'special' or 'rare'
+            quantity: charmData.quantity
+        });
         
         // Add the same classes as pool charms
         if (charmData.type === 'special') {
@@ -3830,40 +3836,39 @@ function initializeRecommendedCharms() {
 
         charmItem.appendChild(charmImg);
         
-        // Add click event - FIXED to use the same handler as pool charms
-        // In initializeRecommendedCharms function, replace the click event with this:
-charmImg.addEventListener('click', function(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    console.log('🔄 Recommended charm CLICKED');
-    
-    // DEBUG: Print the charm details immediately when clicked
-    debugSelectedCharm(this, 'Recommended Bar');
-    
-    // Check if charm is available
-    const quantity = parseInt(this.dataset.quantity) || 1;
-    if (quantity <= 0) {
-        alert('This charm is out of stock!');
-        return;
-    }
-    
-    console.log('✅ Calling handleCharmSelection...');
-    
-    // Use the EXACT same selection handler as pool charms
-    handleCharmSelection(this);
-    
-    // Pause the scrolling animation
-    const scrollContainer = this.closest('.recommended-charms-scroll');
-    if (scrollContainer) {
-        scrollContainer.style.animationPlayState = 'paused';
-        
-        // Resume after 2 seconds
-        setTimeout(() => {
-            scrollContainer.style.animationPlayState = 'running';
-        }, 2000);
-    }
-});
+        // Add click event
+        charmImg.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            console.log('🎯 Recommended charm CLICKED - FIXED VERSION');
+            console.log('Charm data:', {
+                src: this.src,
+                type: this.dataset.type, // Should now be 'special' or 'rare'
+                quantity: this.dataset.quantity
+            });
+            
+            // Check if charm is available
+            const quantity = parseInt(this.dataset.quantity) || 1;
+            if (quantity <= 0) {
+                alert('This charm is out of stock!');
+                return;
+            }
+            
+            // Use the EXACT same selection handler as pool charms
+            handleCharmSelection(this);
+            
+            // Pause the scrolling animation
+            const scrollContainer = this.closest('.recommended-charms-scroll');
+            if (scrollContainer) {
+                scrollContainer.style.animationPlayState = 'paused';
+                
+                // Resume after 2 seconds
+                setTimeout(() => {
+                    scrollContainer.style.animationPlayState = 'running';
+                }, 2000);
+            }
+        });
 
         recommendedScroll.appendChild(charmItem);
     });
@@ -3881,6 +3886,7 @@ charmImg.addEventListener('click', function(e) {
         recommendedBar.style.display = 'none';
     }
 }
+
 function setupCharmEventListeners() {
     // This will be called whenever charms are updated
     document.querySelectorAll('.charm').forEach(charm => {
