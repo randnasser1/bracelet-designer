@@ -1064,7 +1064,7 @@ function handleCharmSelection(charmElement) {
     }
 }
 function handleSlotClick(slot) {
-        console.log('Slot clicked, selected charm:', selectedCharm);
+    console.log('Slot clicked, selected charm:', selectedCharm);
 
     // If there's a selected charm (including from recommended), try to place it
     if (selectedCharm) {
@@ -1082,9 +1082,13 @@ function handleSlotClick(slot) {
             }
         }
         
-        // Now place the new charm - this should work with recommended charms
-        // because they now have the same data structure
+        // Now place the new charm
         placeSelectedCharm(slot);
+        
+        // NEW: Clear selection after placing
+        selectedCharm.classList.remove('selected');
+        selectedCharm = null;
+        hideSelectedCharmPreview();
     } 
     // If no charm selected but slot has a charm, remove it
     else {
@@ -3722,10 +3726,22 @@ function initializeRecommendedCharms() {
         charmItem.appendChild(charmImg);
         
         // Add click event
-        charmImg.addEventListener('click', function(e) {
-            e.stopPropagation();
-            handleCharmSelection(this);
-        });
+        // In initializeRecommendedCharms function, update the click event:
+charmImg.addEventListener('click', function(e) {
+    e.stopPropagation();
+    handleCharmSelection(this);
+    
+    // NEW: Optional - pause the scrolling animation
+    const scrollContainer = this.closest('.recommended-charms-scroll');
+    if (scrollContainer) {
+        scrollContainer.style.animationPlayState = 'paused';
+        
+        // Resume after 2 seconds
+        setTimeout(() => {
+            scrollContainer.style.animationPlayState = 'running';
+        }, 2000);
+    }
+});
 
         recommendedScroll.appendChild(charmItem);
     });
