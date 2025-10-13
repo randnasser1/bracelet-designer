@@ -1037,6 +1037,8 @@ function initSpecialProductWithBase(productType) {
   }
 }
 function handleCharmSelection(charmElement) {
+     ensureCharmDataAttributes(charmElement);
+
     console.log('=== CHARM SELECTION START ===');
     console.log('Clicked element:', charmElement);
     console.log('Current selectedCharm before:', selectedCharm);
@@ -1053,7 +1055,7 @@ function handleCharmSelection(charmElement) {
         return;
     }
     
-    // Toggle selection
+    // Toggle selection - handle both regular charms and recommended charms
     if (charmElement.classList.contains('selected')) {
         console.log('Deselecting charm');
         charmElement.classList.remove('selected');
@@ -2352,9 +2354,24 @@ function handleRegularCharmPlacement(slot, charmSrc, charmType) {
     slot.innerHTML = '';
     slot.appendChild(charmImg);
 }
-
+function ensureCharmDataAttributes(charmElement) {
+    // If it's a recommended charm without proper data attributes, set them
+    if (!charmElement.dataset.charm && charmElement.src) {
+        charmElement.dataset.charm = charmElement.src;
+    }
+    
+    if (!charmElement.dataset.type) {
+        if (charmElement.classList.contains('special')) {
+            charmElement.dataset.type = 'special';
+        } else if (charmElement.classList.contains('rare')) {
+            charmElement.dataset.type = 'rare';
+        } else {
+            charmElement.dataset.type = 'custom';
+        }
+    }
+}
     // Get charm details using the exact path from your data
-    function placeSelectedCharm(slot) {
+function placeSelectedCharm(slot) {
     if (!selectedCharm) {
         console.error('No charm selected!');
         return;
@@ -3786,9 +3803,10 @@ function initializeRecommendedCharms() {
         
         // Add click event - FIXED to properly handle selection
        // In initializeRecommendedCharms function, replace the click event with this:
+// In initializeRecommendedCharms function, replace the click event with this:
 charmImg.addEventListener('click', function(e) {
     e.stopPropagation();
-    e.preventDefault(); // Add this to prevent any default behavior
+    e.preventDefault();
     
     console.log('Recommended charm clicked:', this);
     
@@ -3799,10 +3817,8 @@ charmImg.addEventListener('click', function(e) {
         return;
     }
     
-    // Use a small timeout to ensure the click is processed
-    setTimeout(() => {
-        handleCharmSelection(this);
-    }, 10);
+    // Handle selection - same as pool charms
+    handleCharmSelection(this);
     
     // Pause the scrolling animation
     const scrollContainer = this.closest('.recommended-charms-scroll');
