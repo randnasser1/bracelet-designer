@@ -17,8 +17,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
   <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-<!-- In your HTML head or before the PayPal script -->
-<script src="https://www.paypal.com/sdk/js?client-id=AV6wdMHgwewWOkQ-K0IBdWO41OI1Y6WuLaoTJoXcF6zDX_tdRsUadUNuOUK_clN5cnqnDiKPEa8R072b&components=buttons,marks,funding-eligibility&enable-funding=applepay"></script>
+
   <script src="app.js" defer></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
@@ -441,21 +440,7 @@
       position: relative;
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
-    #country {
-  padding: 0.5rem;
-  border: 1px solid #f5a0c2;
-  border-radius: 8px;
-  font-family: 'Poppins', sans-serif;
-  width: 100%;
-}
-
-#location {
-  padding: 0.5rem;
-  border: 1px solid #f5a0c2;
-  border-radius: 8px;
-  font-family: 'Poppins', sans-serif;
-  width: 100%;
-}
+    
     .order-modal-content {
       background: white;
       padding: 2rem;
@@ -627,71 +612,556 @@
     width: 350px; /* Slightly larger on desktop */
   }
 }
+
+/* Recommended Charms Bar - Transparent Background */
+.recommended-charms-bar {
+    background: transparent !important;
+    padding: 8px 0;
+    margin-bottom: 15px;
+    border-radius: 0;
+    overflow: hidden;
+    position: relative;
+    box-shadow: none !important;
+}
+
+.recommended-charms-bar h3 {
+    text-align: center;
+    color: #d6336c;
+    margin: 0 0 8px 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.recommended-scroll-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.recommended-charms-scroll {
+    display: flex;
+    gap: 4px; /* Minimal padding between charms */
+    padding: 0 10px;
+    animation: scrollRecommended 30s linear infinite;
+    width: max-content;
+}
+
+.recommended-charms-scroll:hover {
+    animation-play-state: paused;
+}
+
+.recommended-charm-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 84px; /* Fixed 84px width */
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    padding: 0; /* Remove padding */
+}
+
+.recommended-charm-item:hover {
+    transform: scale(1.05);
+}
+
+.recommended-charm-item:hover::after {
+    content: 'Click to Select';
+    position: absolute;
+    bottom: -25px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.recommended-charm-image {
+    width: 84px !important;
+    height: 84px !important;
+    object-fit: contain;
+    border: 2px solid rgba(214, 51, 108, 0.3);
+    border-radius: 8px;
+    background: transparent !important;
+    cursor: pointer;
+    pointer-events: auto;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.recommended-charm-image.selected {
+    border: 3px solid #ffeb3b;
+    box-shadow: 0 0 10px #ffeb3b;
+}
+
+/* Ensure no background is applied */
+.recommended-charm-image[src*=".png"],
+.recommended-charm-image[src*=".jpg"],
+.recommended-charm-image[src*=".jpeg"] {
+    background: transparent !important;
+}
+
+@keyframes scrollRecommended {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* Remove gradient overlays since background is transparent */
+.recommended-scroll-container::before,
+.recommended-scroll-container::after {
+    display: none; /* Remove gradient overlays */
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .recommended-charms-bar {
+        margin-bottom: 10px;
+        padding: 6px 0;
+    }
+    
+    .recommended-charms-bar h3 {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+    }
+    
+    .recommended-charm-image {
+        width: 70px !important;
+        height: 70px !important;
+    }
+    
+    .recommended-charm-item {
+        min-width: 70px;
+    }
+    
+    .recommended-charms-scroll {
+        gap: 3px;
+        padding: 0 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .recommended-charm-image {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    
+    .recommended-charm-item {
+        min-width: 60px;
+    }
+    
+    .recommended-charms-scroll {
+        gap: 2px;
+        padding: 0 5px;
+    }
+}
+.homepage {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.product-selector-homepage {
+  margin-top: 2rem;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.product-card {
+  background: white;
+  border: none;
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(214, 51, 108, 0.2);
+}
+
+.product-card i {
+  font-size: 2rem;
+  color: #d6336c;
+  margin-bottom: 0.5rem;
+}
+
+.back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: #d6336c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  z-index: 1001;
+}
+/* Product Card Styles - Full Width Images */
+.product-card {
+  background: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Important for full-width images */
+  padding: 0; /* Remove padding to fill entire card */
+  margin: 0; /* Remove any margin */
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(214, 51, 108, 0.2);
+}
+
+.product-image-container {
+  width: 100%;
+  height: 120px; /* Fixed height for consistency */
+  overflow: hidden;
+  position: relative;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This makes the image fill the container */
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.product-text {
+  font-weight: 600;
+  color: #d6336c;
+  text-align: center;
+  font-size: 0.9rem;
+  padding: 0.8rem 0.5rem;
+  margin: 0;
+  background: white;
+  width: 100%;
+}
+
+/* Product Grid Adjustments */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Remove old icon styles */
+.product-card i {
+  display: none;
+}
+/* Compact Controls Layout */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.control-group {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 6px 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    min-height: 36px;
+}
+
+.control-group label {
+    font-weight: 600;
+    color: #d6336c;
+    white-space: nowrap;
+    margin: 0;
+}
+
+#size.btn {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    min-height: 28px;
+    border-radius: 6px;
+}
+
+.material-option {
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    font-size: 0.8rem;
+    min-height: 28px;
+}
+
+#full-glam-btn.btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    min-height: 36px;
+    border-radius: 8px;
+}
+
+/* Individual Controls */
+#individual-controls {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+
+.control-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: #d6336c;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+#slot-count {
+    font-weight: 600;
+    color: #d6336c;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* Compact Price Display */
+.price-display {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 15px;
+    border-radius: 10px;
+    margin: 10px auto;
+    max-width: 300px;
+    border: 1px solid #f5a0c2;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+}
+
+.price-row span:first-child {
+    font-weight: 600;
+    color: #d6336c;
+}
+
+.price-row span:last-child {
+    font-weight: 500;
+}
+
+#total-price {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #d6336c;
+    text-align: center;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #f5a0c2;
+}
+/* Horizontal Scrollable Category Tabs with Arrows */
+.category-tabs-container {
+    position: relative;
+    margin-bottom: 0.8rem;
+}
+
+.category-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding: 0.5rem 1.5rem; /* Add padding for arrows */
+    scrollbar-width: thin;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+.category-tabs::-webkit-scrollbar {
+    height: 4px;
+}
+
+.category-tabs::-webkit-scrollbar-track {
+    background: #fff0f5;
+    border-radius: 2px;
+}
+
+.category-tabs::-webkit-scrollbar-thumb {
+    background: #f5a0c2;
+    border-radius: 2px;
+}
+
+.category-tab {
+    background: #f5a0c2;
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    min-width: max-content;
+}
+
+.category-tab.active {
+    background: #d6336c;
+    font-weight: bold;
+}
+
+.category-tab:hover {
+    background: #e891b8;
+    transform: translateY(-1px);
+}
+
+/* Scroll Arrows */
+.scroll-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(214, 51, 108, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    z-index: 10;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.scroll-arrow:hover {
+    background: #d6336c;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.scroll-arrow.left {
+    left: 5px;
+}
+
+.scroll-arrow.right {
+    right: 5px;
+}
+
+.scroll-arrow.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Make charm pools slightly more compact */
+.charm-pool {
+    background: #fff0f5;
+    border: 1px solid #f5a0c2;
+    border-radius: 12px;
+    padding: 0.6rem;
+    margin-bottom: 0.8rem;
+}
+
+.charm-pool h3 {
+    color: #a61e4d;
+    margin-top: 0;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.charms-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+    .category-tabs {
+        gap: 0.3rem;
+        margin-bottom: 0.6rem;
+        padding: 0.4rem 1.2rem; /* Adjusted padding for mobile */
+    }
+    
+    .category-tab {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.65rem;
+        border-radius: 14px;
+    }
+    
+    .scroll-arrow {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+    }
+    
+    .charm-pool {
+        padding: 0.5rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .charm-pool h3 {
+        font-size: 0.85rem;
+        margin-bottom: 0.4rem;
+    }
+}
+
+/* Hide scrollbar on mobile when not scrolling */
+@media (max-width: 480px) {
+    .category-tabs {
+        scrollbar-width: none;
+    }
+    
+    .category-tabs::-webkit-scrollbar {
+        display: none;
+    }
+}
   </style>
 </head>
 <body>
-   <!-- Add this right after the body tag -->
-    <button id="cart-button" class="cart-button">
-    <i class="fas fa-shopping-cart"></i>
-    <span class="cart-count">0</span>
-  </button>
+  <!-- Add this right after the body tag -->
+  <div id="homepage" class="homepage">
+  <div class="header-container">
+   
 
-
-
-<div class="top-action-buttons">
- <button id="pricing-toggle" class="btn">
-  <i class="fas fa-tag"></i>
-  <span class="btn-text">Pricing</span>
-<button id="translate-btn" class="btn translate-btn">
-  <i class="fas fa-language"></i>
-  <span class="btn-text">العربية</span>
-</button>
-<div id="google_translate_element" style="display:none"></div>
-  <a href="https://wa.me/962788838118" class="btn whatsapp-btn" target="_blank">
-    <i class="fab fa-whatsapp"></i>
-    <span class="btn-text">WhatsApp</span>
-  </a>
-  <a href="https://instagram.com/italiacharms.jo" class="btn instagram-btn" target="_blank">
-    <i class="fab fa-instagram"></i>
-    <span class="btn-text">Instagram</span>
-  </a>
-</div>
-
-<div class="pricing-info">
-  <h3>Pricing Information</h3>
-  <h3 style="text-align: left;">Pricing Information</h3>
-
-  <div class="pricing-grid">
-    <div class="pricing-category">
-      <h4>Base Prices</h4>
-      <ul style="text-align: left;">
-        <li><strong>Bracelet:</strong> 10 JDs (18)</li>
-        <li><strong>Anklet:</strong> 15 JDs (23)</li>
-        <li><strong>Necklace:</strong> 22 JDs (34)</li>
-        <li><strong>Ring:</strong> 7.5 JDs (7)</li>
-      </ul>
-    </div>
-
-    <div class="pricing-category">
-      <h4>Upgrades</h4>
-      <ul style="text-align: left;">
-        <li><strong>Gold:</strong> +1 JD</li>
-        <li><strong>Mix:</strong> +2.5 JDs</li>
-        <li><strong>Special:</strong> +2 JDs</li>
-        <li><strong>Rare:</strong> +3 JDs</li>
-        <li><strong>Custom:</strong> +3.5 JDs</li>
-      </ul>
-    </div>
-
-</div>
-  <div class="contact-info">
-    <h4>Contact Us</h4>
-          <ul style="text-align: left;">
-
-    <p>WhatsApp: <a href="https://wa.me/962788838118">0788838118</a></p>
-    <p>Instagram: <a href="https://www.instagram.com/italiacharms.jo/">@italiacharm.jo</a></p>
-  </div>
-</div>
 
 
   <!-- Welcome Popup -->
@@ -722,7 +1192,122 @@
   <div id="google_translate_element"></div>
   <!-- Cart Button -->
 
+   <div class="product-selector-homepage">
+    <h2>Choose Your Product</h2>
+    <div class="product-grid">
+      <button class="product-card" data-type="bracelet">
+        <img src="products/bracelet.png" alt="Bracelet" class="product-image">
+        <div class="product-text">Bracelet</div>
+      </button>
+      
+      <button class="product-card" data-type="anklet">
+        <img src="products/anklet.png" alt="Anklet" class="product-image">
+        <div class="product-text">Anklet</div>
+      </button>
+      
+      <button class="product-card" data-type="necklace">
+        <img src="products/necklace.png" alt="Necklace" class="product-image">
+        <div class="product-text">Necklace</div>
+      </button>
+      
+      <button class="product-card" data-type="ring">
+        <img src="products/ring.png" alt="Ring" class="product-image">
+        <div class="product-text">Ring</div>
+      </button>
+      
+      <button class="product-card" data-type="individual">
+        <img src="products/individual.png" alt="Individual Charms" class="product-image">
+        <div class="product-text">Individual Charms</div>
+      </button>
+      
+      <button class="product-card" data-type="watch">
+        <img src="products/watch.png" alt="Watch" class="product-image">
+        <div class="product-text">Watch</div>
+      </button>
+      
+      <button class="product-card" data-type="apple-watch">
+        <img src="products/apple-watch.png" alt="Apple Watch" class="product-image">
+        <div class="product-text">Apple Watch</div>
+      </button>
+      
+      <button class="product-card" data-type="keychain">
+        <img src="products/keychain.png" alt="Keychain" class="product-image">
+        <div class="product-text">Keychain</div>
+      </button>
+    </div>
+  </div>
+  <div class="top-action-buttons">
+ <button id="pricing-toggle" class="btn">
+  <i class="fas fa-tag"></i>
+  <span class="btn-text">Pricing</span>
+<button id="translate-btn" class="btn translate-btn">
+  <i class="fas fa-language"></i>
+  <span class="btn-text">العربية</span>
+</button>
+<div id="google_translate_element" style="display:none"></div>
+  <a href="https://wa.me/962788838118" class="btn whatsapp-btn" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+    <span class="btn-text">WhatsApp</span>
+  </a>
+  <a href="https://instagram.com/italiacharms.jo" class="btn instagram-btn" target="_blank">
+    <i class="fab fa-instagram"></i>
+    <span class="btn-text">Instagram</span>
+  </a>
+</div>
+<div class="pricing-info">
+  <h3>Pricing Information</h3>
+  <h3 style="text-align: left;">Pricing Information</h3>
 
+  
+  <div class="pricing-grid">
+    <div class="pricing-category">
+      <h4>Base Prices</h4>
+            <ul style="text-align: left;">
+
+      <ul>
+        <li><strong>Bracelet:</strong> 10 JDs (18)</li>
+        <li><strong>Anklet:</strong> 15 JDs (23)</li>
+        <li><strong>Necklace:</strong> 22 JDs (34)</li>
+        <li><strong>Ring:</strong> 7.5 JDs (7)</li>
+      </ul>
+    </div>
+    
+    <div class="pricing-category">
+      <h4>Upgrades</h4>
+            <ul style="text-align: left;">
+
+      <ul>
+        <li><strong>Gold:</strong> +1 JD</li>
+        <li><strong>Mix:</strong> +2.5 JDs</li>
+        <li><strong>Special:</strong> +2 JDs</li>
+        <li><strong>Rare:</strong> +3 JDs</li>
+        <li><strong>Custom:</strong> +3.5 JDs</li>
+      </ul>
+    </div>
+    
+</div>
+  <div class="contact-info">
+    <h4>Contact Us</h4>
+          <ul style="text-align: left;">
+
+    <p>WhatsApp: <a href="https://wa.me/962788838118">0788838118</a></p>
+    <p>Instagram: <a href="https://www.instagram.com/italiacharms.jo/">@italiacharm.jo</a></p>
+  </div>
+</div>
+    </div>
+    </div>
+
+<div id="designer-page" class="designer-page" style="display: none;">
+
+   <!-- Add this right after the body tag -->
+    <button id="cart-button" class="cart-button">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="cart-count">0</span>
+  </button>
+
+
+
+  
   <!-- Cart Preview Panel -->
   <div id="cart-preview" class="cart-preview">
     <div class="cart-preview-header">
@@ -735,51 +1320,93 @@
       <div class="empty-cart">Your cart is empty</div>
     </div>
     
-    <div class="cart-footer">
+   <div class="cart-footer">
   <div id="cart-subtotal">Subtotal: 0.00 JDs</div>
-  
+  <div id="cart-discount-info" style="display: none;">
+    <span id="cart-discount-amount">10% Discount: -1.00 JDs</span>
+  </div>
   <div id="cart-delivery">Delivery Fee: 2.50 JDs</div>
   <div class="cart-total">Total: 0.00 JDs</div>
 </div>
       <button id="order-btn" class="btn order-btn">Place Order</button>
     </div>
-  </div>
+  
+ 
 
   <div class="main-content">
 
-<div class="product-selector">
-    <button class="product-btn active" data-type="bracelet">
-        <i class="fas fa-bracelet"></i> Bracelet
-    </button>
-    <button class="product-btn" data-type="anklet">
-        <i class="fas fa-anklet"></i> Anklet
-    </button>
-    <button class="product-btn" data-type="necklace">
-        <i class="fas fa-necklace"></i> Necklace
-    </button>
-    <button class="product-btn" data-type="ring">
-        <i class="fas fa-ring"></i> Ring
-    </button>
-    <button class="product-btn" data-type="individual">
-        <i class="fas fa-gem"></i> Individual Charms
-    </button>
-    <button class="product-btn" data-type="watch">
-        <i class="fas fa-clock"></i> Watch
-    </button>
-    <button class="product-btn" data-type="apple-watch">
-        <i class="fab fa-apple"></i> Apple Watch Strap
-    </button>
-    <button class="product-btn" data-type="keychain">
-        <i class="fas fa-key"></i> Keychain
-    </button>
+
+
+
+
+<!-- Add this at the top of designer-page -->
+<button id="back-to-home" class="back-btn">
+  <i class="fas fa-arrow-left"></i> Change Product
+</button>
+   
+
+<div class="price-display">
+    <div class="price-row" id="base-price">
+        <span>Base Price:</span>
+        <span>3.00 JDs</span>
+    </div>
+    <div class="price-row" id="charm-price">
+        <span>Charms:</span>
+        <span>0.00 JDs</span>
+    </div>
+    <div class="price-row" id="slot-price" style="display: none;">
+        <!-- Not used in this simplified version -->
+    </div>
+    <div id="total-price-container">
+        <div id="total-price">Total: 3.00 JDs</div>
+        <div id="discount-message"></div>
+    </div>
 </div>
-    
-    <div class="controls">
+  
+        <!-- Recommended Charms Bar -->
+<div class="recommended-charms-bar" id="recommended-charms-bar">
+    <div class="recommended-scroll-container">
+        <div class="recommended-charms-scroll" id="recommended-charms-scroll">
+            <!-- Recommended charms will be populated by JavaScript -->
+        </div>
+    </div>
+</div>
+
+</div>  <h3>Add your charms below ↓</h3>
+  <!-- Add this before the jewelry piece container -->
+  <div class="selected-charm-preview" id="selected-charm-preview">
+    <img id="preview-charm-image" src="" alt="Selected Charm">
+    <div class="charm-name" id="preview-charm-name"></div>
+    <div class="charm-type" id="preview-charm-type"></div>
+  </div>
+
+
+
+
+
+   <div class="bracelet-container">
+    <div id="jewelry-piece">
+      <!-- Slots will be added here -->
+    </div>
+  </div>
+  
+
+  <div class="action-buttons">
+      <button class="btn download-btn" id="download-btn">
+        <i class="fas fa-download"></i> Download Design
+      </button>
+      <button class="btn add-to-cart-btn" id="add-to-cart-bottom">
+        <i class="fas fa-cart-plus"></i> Add to Cart
+      </button>
+    </div>
+
+     <div class="controls">
     <!-- Size Selector (hidden for individual charms) -->
     <div class="control-group" id="size-controls">
         <label for="size">Size:</label>
         <select id="size" class="btn">
             <option value="15.2-16.2">15.2cm - 16.2cm (18 charms)</option>
+            <option value="16.2-17.1">16.2cm - 17.1cm (+0.5 JDs, 19 charms)</option>
             <!-- Other size options -->
         </select>
     </div>
@@ -801,60 +1428,51 @@
     <button id="increase-slots" class="control-btn plus-btn">+</button>
 </div>
     </div>
-</div>  <h3>Add your charms below ↓</h3>
-  <!-- Add this before the jewelry piece container -->
-  <div class="selected-charm-preview" id="selected-charm-preview">
-    <img id="preview-charm-image" src="" alt="Selected Charm">
-    <div class="charm-name" id="preview-charm-name"></div>
-    <div class="charm-type" id="preview-charm-type"></div>
-  </div>
 
-   <div class="bracelet-container">
-    <div id="jewelry-piece">
-      <!-- Slots will be added here -->
-    </div>
-  </div>
-  
-    </div>
-
-
-
-    
 
   
-
-<div class="price-display">
-    <div class="price-row" id="base-price">
-        <span>Base Price:</span>
-        <span>3.00 JDs</span>
-    </div>
-    <div class="price-row" id="charm-price">
-        <span>Charms:</span>
-        <span>0.00 JDs</span>
-    </div>
-    <div class="price-row" id="slot-price" style="display: none;">
-        <!-- Not used in this simplified version -->
-    </div>
-    <div id="total-price-container">
-        <div id="total-price">Total: 3.00 JDs</div>
-        
-    </div>
-</div>
-    <div class="action-buttons">
-      <button class="btn download-btn" id="download-btn">
-        <i class="fas fa-download"></i> Download Design
-      </button>
-      <button class="btn add-to-cart-btn" id="add-to-cart-bottom">
-        <i class="fas fa-cart-plus"></i> Add to Cart
-      </button>
-    </div>
 
     <div class="charm-pools">
             <!-- watch charms will be here -->
-        <!-- Special Charms -->
+        
+
+        <!-- Rare Charms -->
         <div class="charm-pool">
-            <h3>Special Charms (+2 JDs each)</h3>
-            <div class="category-tabs" id="special-categories">
+            <h3>Rare Charms (+3 JDs each)</h3>
+          <div class="category-tabs-container">
+        <button class="scroll-arrow left hidden">‹</button>
+        <div class="category-tabs" id="rare-categories">
+                              <button class="category-tab" data-category="newc2r">NEW Collection⭐!!</button>
+
+                <button class="category-tab" data-category="sanrio">Sanrio</button>
+                <button class="category-tab" data-category="hgs">Hot Girl Summer🌷💋☁️</button>
+                <button class="category-tab" data-category="butterflies">Butterflies ʚїɞ</button>
+                <button class="category-tab" data-category="sporty">Sporty🏎️💨</button>
+                <button class="category-tab" data-category="gold">Gold</button>
+                <button class="category-tab" data-category="disney">Disney</button>
+                <button class="category-tab" data-category="love">Love/Friends/Family💗</button>
+                <button class="category-tab" data-category="dangly">Dangly (many new⭐)</button>
+                              <button class="category-tab" data-category="random">Random</button>
+
+                <button class="category-tab" data-category="long">Long</button>
+
+                <button class="category-tab" data-category="graduation">Grad🎓✧˖°</button>
+                <button class="category-tab" data-category="long">Long</button>
+              
+                <button class="category-tab active" data-category="all">All</button>
+            </div>
+        <button class="scroll-arrow right hidden">›</button>
+    </div>
+            
+            <div class="charms-grid" id="rare-charms">
+                <!-- Rare charms will be added here by JS -->
+            </div>
+            <!-- Special Charms -->
+        <div class="charm-pool">
+            <h3>Special Charms (+2 JDs each after first 18 in Full Glam)</h3>
+            <div class="category-tabs-container">
+        <button class="scroll-arrow left hidden">‹</button>
+        <div class="category-tabs" id="special-categories">
                 <button class="category-tab" data-category="newc2s">NEW Collection⭐!!</button>
 
                 <button class="category-tab" data-category="teddy">Teddy Bears˚ʚ🧸ɞ˚</button>
@@ -873,48 +1491,16 @@
                 <button class="category-tab" data-category="mushrooms">Mushrooms🍄</button>
                 <button class="category-tab" data-category="simple">Simple & Cute</button>
                 <button class="category-tab active" data-category="all">All</button>
-            </div>
+           </div>
+        <button class="scroll-arrow right hidden">›</button>
+    </div>
 
             <div class="charms-grid" id="special-charms">
                 <!-- Special charms will be added here by JS -->
             </div>
         </div>
-
-        <!-- Rare Charms -->
-        <div class="charm-pool">
-            <h3>Rare Charms (+3 JDs each)</h3>
-          <div class="size-note" style="text-align: center; font-style: italic; margin-bottom: 10px;">
-        Note: The size of *dangly* charms is accurate in reference to the metal charm, not the bracelet.
-    </div>
-            <div class="category-tabs" id="rare-categories">
-                              <button class="category-tab" data-category="newc3r">NEW Collection⭐!!</button>
-
-                <button class="category-tab" data-category="sanrio">Sanrio</button>
-                <button class="category-tab" data-category="hgs">Hot Girl Summer🌷💋☁️</button>
-                <button class="category-tab" data-category="butterflies">Butterflies ʚїɞ</button>
-                <button class="category-tab" data-category="sporty">Sporty🏎️💨</button>
-                <button class="category-tab" data-category="night">Whimsy🌙💤</button>
-                <button class="category-tab" data-category="rcute">Cute🍓🐥</button>
-                <button class="category-tab" data-category="careers">Careers💼</button>
-                <button class="category-tab" data-category="pets">Pets🐶🐾</button>
-                <button class="category-tab" data-category="gold">Gold</button>
-                <button class="category-tab" data-category="disney">Disney</button>
-                <button class="category-tab" data-category="love">Love/Friends/Family💗</button>
-                <button class="category-tab" data-category="dangly">Dangly (many new⭐)</button>
-                              <button class="category-tab" data-category="random">Random</button>
-
-                <button class="category-tab" data-category="long">Long</button>
-
-                <button class="category-tab" data-category="graduation">Grad🎓✧˖°</button>
-              
-                <button class="category-tab active" data-category="all">All</button>
-            </div>
-            <div class="charms-grid" id="rare-charms">
-                <!-- Rare charms will be added here by JS -->
-            </div>
         </div>
     </div>
-  </div>
 <!-- Custom Charms -->
 <div class="charm-pool">
     <h3>Custom Charms (+3.5 JDs each)</h3>
@@ -943,27 +1529,28 @@
   </div>
 
   <!-- Order Form Modal -->
-<!-- Order Form Modal -->
-<div class="modal" id="order-modal">
-  <div class="order-modal-content">
-    <h2>Place Your Order</h2>
+  <div class="modal" id="order-modal">
+    <div class="order-modal-content">
+      <h2>Place Your Order</h2>
 
-    <form id="order-form">
-      <div class="form-group">
-        <label for="full-name">Full Name*</label>
-        <input type="text" id="full-name" name="full-name" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="phone">Phone Number*</label>
-        <input type="tel" id="phone" name="phone" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="phone2">Second Phone Number (Optional)</label>
-        <input type="tel" id="phone2" name="phone2">
-      </div>
-  <div class="form-group">
+      <form id="order-form">
+        <div class="form-group">
+          <label for="full-name">Full Name*</label>
+          <input type="text" id="full-name" name="full-name" required>
+          
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone Number*</label>
+          <input type="tel" id="phone" name="phone" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone2">Second Phone Number (Optional)</label>
+          <input type="tel" id="phone2" name="phone2">
+        </div>
+        
+        <div class="form-group">
           <label for="governorate">Governorate*</label>
           <select id="governorate" name="governorate" required>
               <option value="">Select Governorate</option>
@@ -987,56 +1574,39 @@
           <input type="text" id="address" name="address" required>
         </div>
         
-       
-
-<div class="payment-options">
-  <h3>Payment Method*</h3>
-
-  <!-- Cash on Delivery -->
-  <div class="payment-option">
-    <input type="radio" id="pay-cash" name="payment" value="Cash" required checked>
-    <label for="pay-cash">Cash on Delivery</label>
-  </div>
-
-  <!-- Cliq -->
-  <div class="payment-option">
-    <input type="radio" id="pay-cliq" name="payment" value="Cliq" required>
-    <label for="pay-cliq">Pay with Cliq (00962788838118)</label>
-  </div>
-
-  <!-- PayPal / Card -->
-  <div class="payment-option">
-    <input type="radio" id="pay-paypal" name="payment" value="PayPal" required>
-    <label for="pay-paypal">Pay with Credit/Debit Card/PayPal</label>
-  </div>
-
-  <!-- PayPal Button -->
-  <div id="paypal-button-container" style="display:none; margin-top:15px;"></div>
-</div>
-
-<!-- Payment Proof for Cliq -->
-<div id="payment-proof-container" style="display:none;">
-  <label for="payment-proof">Upload Payment Proof (required for Cliq)</label>
-  <input type="file" id="payment-proof" name="payment-proof" accept="image/*">
-</div>
-
-      
-      <div class="order-summary">
+        <div class="payment-options">
+          <h3>Payment Method*</h3>
+          <div class="payment-option">
+            <input type="radio" id="pay-cliq" name="payment" value="Cliq" required>
+            <label for="pay-cliq">Pay with Cliq (00962788838118)</label>
+          </div>
+          <div class="payment-option">
+            <input type="radio" id="pay-cash" name="payment" value="Cash" required checked>
+            <label for="pay-cash">Cash on Delivery</label>
+          </div>
+        </div>
+        
+        <div id="payment-proof-container" style="display: none;">
+          <label for="payment-proof">Upload Payment Proof (required for Cliq)</label>
+          <input type="file" id="payment-proof" name="payment-proof" accept="image/*">
+        </div>
+          <div class="order-summary">
         <div id="order-subtotal">Subtotal: 0.00 JDs</div>
         <div id="order-delivery">Delivery Fee: 2.50 JDs</div>
         <div id="order-total-price">Total: 0.00 JDs</div>
       </div>
-      
-      <div class="order-buttons">
-        <button type="submit" class="btn confirm-order-btn">
-          <i class="fas fa-check-circle"></i> Confirm Order
-        </button>
-        <button type="button" class="btn cancel-btn" id="cancel-order">
-          <i class="fas fa-times-circle"></i> Cancel 
-        </button>
-      </div>
-    </form>
-  </div>
+
+        
+        <div class="order-buttons">
+          <button type="submit" class="btn confirm-order-btn">
+            <i class="fas fa-check-circle"></i> Confirm Order
+          </button>
+          <button type="button" class="btn cancel-btn" id="cancel-order">
+            <i class="fas fa-times-circle"></i> Cancel 
+          </button>
+        </div>
+      </form>
+    </div>
 </div>
 
   <!-- Order Confirmation Modal -->
@@ -1044,8 +1614,12 @@
     <div class="order-modal-content">
       <h2>Order Confirmed!</h2>
       <p>Thank you for your order. We'll contact you soon to confirm details.</p>
+    <p>Delivery starts with the start of July.</p>
       <p>Order ID: <span id="order-id"></span></p>
       <button class="btn" id="close-confirmation">Close</button>
+    </div>
+  </div>
+</div>
     </div>
   </div>
 
