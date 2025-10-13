@@ -1037,17 +1037,21 @@ function initSpecialProductWithBase(productType) {
   }
 }
 function handleCharmSelection(charmElement) {
-     ensureCharmDataAttributes(charmElement);
-
     console.log('=== CHARM SELECTION START ===');
     console.log('Clicked element:', charmElement);
-    console.log('Current selectedCharm before:', selectedCharm);
+    console.log('Full element details:', {
+        tagName: charmElement.tagName,
+        src: charmElement.src,
+        dataset: charmElement.dataset,
+        classList: Array.from(charmElement.classList),
+        isRecommended: charmElement.classList.contains('recommended-charm-image')
+    });
     
     const charmSrc = charmElement.dataset.charm || charmElement.src;
     const charmType = charmElement.dataset.type;
     const remainingQuantity = parseInt(charmElement.dataset.quantity) || 1;
     
-    console.log('Charm data:', { charmSrc, charmType, remainingQuantity });
+    console.log('Resolved charm data:', { charmSrc, charmType, remainingQuantity });
     
     // Don't allow selection if no quantity left
     if (remainingQuantity <= 0) {
@@ -1055,7 +1059,7 @@ function handleCharmSelection(charmElement) {
         return;
     }
     
-    // Toggle selection - handle both regular charms and recommended charms
+    // Toggle selection
     if (charmElement.classList.contains('selected')) {
         console.log('Deselecting charm');
         charmElement.classList.remove('selected');
@@ -1086,6 +1090,30 @@ function debugSelectedCharm() {
     }
     console.log('============================');
 }
+// Add this debug function and call it when there are issues
+function debugCharmSelection() {
+    console.log('=== DEBUG CHARM SELECTION ===');
+    console.log('selectedCharm:', selectedCharm);
+    if (selectedCharm) {
+        console.log('selectedCharm details:', {
+            src: selectedCharm.src,
+            dataset: selectedCharm.dataset,
+            classList: Array.from(selectedCharm.classList)
+        });
+    }
+    
+    // Check all recommended charms
+    const recommendedCharms = document.querySelectorAll('.recommended-charm-image');
+    console.log('Total recommended charms:', recommendedCharms.length);
+    recommendedCharms.forEach((charm, index) => {
+        console.log(`Recommended charm ${index}:`, {
+            src: charm.src,
+            dataset: charm.dataset,
+            hasClickListener: !!charm.onclick
+        });
+    });
+}
+
 function handleSlotClick(slot) {
     console.log('=== SLOT CLICK START ===');
     console.log('Slot clicked:', slot);
@@ -3772,12 +3800,13 @@ function initializeRecommendedCharms() {
         charmImg.alt = 'Recommended Charm';
         charmImg.className = 'recommended-charm-image charm';
         
-        // CRITICAL FIX: Store ALL charm data properly
+        // CRITICAL FIX: Set ALL the same data attributes as pool charms
         charmImg.dataset.charm = charmData.src; // Exact path
         charmImg.dataset.type = charmData.type; // 'special' or 'rare'
         charmImg.dataset.quantity = charmData.quantity || 1;
+        charmImg.dataset.category = charmData.category || 'recommended';
         
-        // Store additional properties that placeSelectedCharm expects
+        // Add the same classes as pool charms
         if (charmData.type === 'special') {
             charmImg.classList.add('special');
         } else if (charmData.type === 'rare') {
@@ -3801,36 +3830,38 @@ function initializeRecommendedCharms() {
 
         charmItem.appendChild(charmImg);
         
-        // Add click event - FIXED to properly handle selection
-       // In initializeRecommendedCharms function, replace the click event with this:
-// In initializeRecommendedCharms function, replace the click event with this:
-charmImg.addEventListener('click', function(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    console.log('Recommended charm clicked:', this);
-    
-    // Check if charm is available
-    const quantity = parseInt(this.dataset.quantity) || 1;
-    if (quantity <= 0) {
-        alert('This charm is out of stock!');
-        return;
-    }
-    
-    // Handle selection - same as pool charms
-    handleCharmSelection(this);
-    
-    // Pause the scrolling animation
-    const scrollContainer = this.closest('.recommended-charms-scroll');
-    if (scrollContainer) {
-        scrollContainer.style.animationPlayState = 'paused';
-        
-        // Resume after 2 seconds
-        setTimeout(() => {
-            scrollContainer.style.animationPlayState = 'running';
-        }, 2000);
-    }
-});
+        // Add click event - FIXED to use the same handler as pool charms
+        charmImg.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            console.log('Recommended charm clicked - full data:', {
+                src: this.src,
+                dataset: this.dataset,
+                classList: this.classList
+            });
+            
+            // Check if charm is available
+            const quantity = parseInt(this.dataset.quantity) || 1;
+            if (quantity <= 0) {
+                alert('This charm is out of stock!');
+                return;
+            }
+            
+            // Use the EXACT same selection handler as pool charms
+            handleCharmSelection(this);
+            
+            // Pause the scrolling animation
+            const scrollContainer = this.closest('.recommended-charms-scroll');
+            if (scrollContainer) {
+                scrollContainer.style.animationPlayState = 'paused';
+                
+                // Resume after 2 seconds
+                setTimeout(() => {
+                    scrollContainer.style.animationPlayState = 'running';
+                }, 2000);
+            }
+        });
 
         recommendedScroll.appendChild(charmItem);
     });
