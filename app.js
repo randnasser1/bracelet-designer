@@ -2382,28 +2382,11 @@ function ensureCharmDataAttributes(charmElement) {
 }
     // Get charm details using the exact path from your data
 function placeSelectedCharm(slot) {
-    // **USE window.selectedCharm**
-    if (!window.selectedCharm) {
-        console.error('No charm selected!');
-        return;
-    }
+    if (!selectedCharm) return;
 
-    const selectedCharm = window.selectedCharm; // Local reference
-    // Debug logging
-    console.log('Placing charm:', selectedCharm);
-    console.log('Charm data:', {
-        src: selectedCharm.src,
-        dataset: selectedCharm.dataset,
-        classList: selectedCharm.classList
-    });
-
-    // Get charm details - handle both regular and recommended charms
+    // Get charm details using the exact path from your data
     const charmSrc = selectedCharm.dataset.charm || selectedCharm.src;
-    const charmType = selectedCharm.dataset.type || 
-                     (selectedCharm.classList.contains('special') ? 'special' : 
-                      selectedCharm.classList.contains('rare') ? 'rare' : 'custom');
-    
-    console.log('Resolved charm data:', { charmSrc, charmType });
+    const charmType = selectedCharm.dataset.type;
     const charmSet = getCharmSet(charmSrc);
     const isWatch = currentProduct === 'watch' || currentProduct === 'apple-watch';
     const baseSize = isWatch ? 40 : 84;
@@ -2537,7 +2520,6 @@ function placeSelectedCharm(slot) {
             }
         });
     }
-    window.selectedCharm = null;
 
     // Clear selection
     selectedCharm.classList.remove('selected');
