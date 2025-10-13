@@ -4148,7 +4148,255 @@ setTimeout(() => {
         });
     });
 });
+// Guided Tour System
+class GuidedTour {
+  constructor() {
+    this.currentStep = 0;
+    this.steps = [
+      {
+        title: "Choose Your Size",
+        message: "Start by selecting your <span class='highlight'>bracelet size</span> here. Different sizes hold different numbers of charms!",
+        element: "#size-controls",
+        position: "bottom"
+      },
+      {
+        title: "Pick Your Material",
+        message: "Choose between <span class='highlight'>Silver</span>, <span class='highlight'>Gold</span>, or <span class='highlight'>Mix</span> materials for your jewelry base.",
+        element: ".control-group:has(.material-option)",
+        position: "bottom"
+      },
+      {
+        title: "Design Area",
+        message: "This is where your jewelry comes to life! <span class='highlight'>Click the + signs</span> to add charms to your design.",
+        element: "#jewelry-piece",
+        position: "top"
+      },
+      {
+        title: "Explore Rare Charms",
+        message: "Scroll through our <span class='highlight'>Rare Charms collection</span> (+3 JDs each) - use the arrows to see more categories!",
+        element: "#rare-charms",
+        position: "top"
+      },
+      {
+        title: "Special Charms",
+        message: "Discover our <span class='highlight'>Special Charms</span> (+2 JDs each) - perfect for making your piece unique!",
+        element: "#special-charms",
+        position: "top"
+      },
+      {
+        title: "Custom Charms",
+        message: "Want something personal? Upload your own images as <span class='highlight'>Custom Charms</span> (+3.5 JDs each)!",
+        element: ".custom-charm-upload",
+        position: "top"
+      },
+      {
+        title: "Ready to Create!",
+        message: "That's it! You're ready to design your perfect jewelry piece. Click <span class='highlight'>Help</span> anytime if you need guidance.",
+        element: null,
+        position: "center"
+      }
+    ];
+    
+    this.init();
+  }
 
+  init() {
+    // Check if user has seen tour before
+    const hasSeenTour = localStorage.getItem('jewelryTourCompleted');
+    
+    if (!hasSeenTour) {
+      setTimeout(() => this.startTour(), 2000);
+    }
+
+    // Help button event listener
+    document.getElementById('help-button').addEventListener('click', () => {
+      this.showQuickTip("Need help? Click anywhere to start the guided tour!");
+      document.addEventListener('click', this.startTourOnClick.bind(this), { once: true });
+    });
+
+    // Tour button event listeners
+    document.getElementById('skip-tour').addEventListener('click', () => this.endTour());
+    document.getElementById('next-tour').addEventListener('click', () => this.nextStep());
+  }
+
+  startTourOnClick() {
+    this.startTour();
+  }
+
+  startTour() {
+    this.currentStep = 0;
+    document.getElementById('guided-tour').style.display = 'flex';
+    this.showStep();
+  }
+
+  showStep() {
+    const step = this.steps[this.currentStep];
+    const popup = document.getElementById('tour-popup');
+    const indicator = document.getElementById('tour-indicator');
+    
+    document.getElementById('tour-title').innerHTML = step.title;
+    document.getElementById('tour-message').innerHTML = step.message;
+    document.getElementById('tour-progress').textContent = `Step ${this.currentStep + 1} of ${this.steps.length}`;
+    
+    // Update button text for last step
+    if (this.currentStep === this.steps.length - 1) {
+      document.getElementById('next-tour').textContent = 'Finish';
+    } else {
+      document.getElementById('next-tour').textContent = 'Next';
+    }
+    
+    // Position indicator if element exists
+    if (step.element && document.querySelector(step.element)) {
+      const element = document.querySelector(step.element);
+      const rect = element.getBoundingClientRect();
+      
+      indicator.style.display = 'flex';
+      
+      if (step.position === 'bottom') {
+        indicator.style.top = (rect.bottom + 10) + 'px';
+        indicator.style.left = (rect.left + rect.width / 2 - 25) + 'px';
+      } else {
+        indicator.style.top = (rect.top - 60) + 'px';
+        indicator.style.left = (rect.left + rect.width / 2 - 25) + 'px';
+      }
+      
+      // Scroll element into view
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      indicator.style.display = 'none';
+    }
+  }
+
+  nextStep() {
+    this.currentStep++;
+    
+    if (this.currentStep >= this.steps.length) {
+      this.endTour();
+    } else {
+      this.showStep();
+    }
+  }
+
+  endTour() {
+    document.getElementById('guided-tour').style.display = 'none';
+    document.getElementById('tour-indicator').style.display = 'none';
+    localStorage.setItem('jewelryTourCompleted', 'true');
+    
+    // Show completion tip
+    this.showQuickTip("Great! Start designing by clicking the + signs to add charms! 🎨");
+  }
+
+  showQuickTip(message) {
+    const tip = document.getElementById('quick-tip');
+    tip.textContent = message;
+    tip.style.display = 'block';
+    
+    setTimeout(() => {
+      tip.style.display = 'none';
+    }, 5000);
+  }
+}
+
+// Contextual Tips
+class ContextualTips {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    // Show tip when user hovers over size selector
+    const sizeControls = document.getElementById('size-controls');
+    if (sizeControls) {
+      sizeControls.addEventListener('mouseenter', () => {
+        this.showTipNearElement(sizeControls, "Choose your size - larger sizes hold more charms!");
+      });
+    }
+
+    // Show tip when user first sees charm pools
+    let charmPoolsSeen = false;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !charmPoolsSeen) {
+          charmPoolsSeen = true;
+          setTimeout(() => {
+            this.showTipNearElement(entry.target, "Scroll through categories to discover all our charms! ➡️");
+          }, 1000);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    const charmPools = document.querySelector('.charm-pools');
+    if (charmPools) {
+      observer.observe(charmPools);
+    }
+
+    // Show tip for custom charms
+    const customUpload = document.querySelector('.custom-charm-upload');
+    if (customUpload) {
+      customUpload.addEventListener('mouseenter', () => {
+        this.showTipNearElement(customUpload, "Make it personal! Upload your own images as custom charms.");
+      });
+    }
+  }
+
+  showTipNearElement(element, message) {
+    const rect = element.getBoundingClientRect();
+    const tip = document.getElementById('quick-tip');
+    
+    tip.textContent = message;
+    tip.style.bottom = (window.innerHeight - rect.top + 10) + 'px';
+    tip.style.right = (window.innerWidth - rect.right) + 'px';
+    tip.style.display = 'block';
+    
+    setTimeout(() => {
+      tip.style.display = 'none';
+    }, 4000);
+  }
+}
+
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  // Start guided tour
+  new GuidedTour();
+  
+  // Start contextual tips
+  new ContextualTips();
+  
+  // Show welcome tip after a delay
+  setTimeout(() => {
+    const quickTip = document.getElementById('quick-tip');
+    if (quickTip) {
+      quickTip.textContent = "💡 Pro tip: Scroll horizontally in charm categories to see more options!";
+      quickTip.style.display = 'block';
+      setTimeout(() => {
+        quickTip.style.display = 'none';
+      }, 6000);
+    }
+  }, 8000);
+});
+
+// Add scroll detection for charm categories
+document.addEventListener('DOMContentLoaded', () => {
+  const charmCategories = document.querySelectorAll('.category-tabs');
+  
+  charmCategories.forEach(category => {
+    let hasScrolled = false;
+    
+    category.addEventListener('scroll', () => {
+      if (!hasScrolled && category.scrollLeft > 50) {
+        hasScrolled = true;
+        const quickTip = document.getElementById('quick-tip');
+        if (quickTip) {
+          quickTip.textContent = "✨ Great! Keep scrolling to discover more charm categories!";
+          quickTip.style.display = 'block';
+          setTimeout(() => {
+            quickTip.style.display = 'none';
+          }, 4000);
+        }
+      }
+    });
+  });
+});
 
 // Make it available in console
 window.addEventListener('scroll', updateCartButtonPosition);
