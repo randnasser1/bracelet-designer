@@ -3802,7 +3802,6 @@ function initializeRecommendedCharms() {
         }
 
         const charmItem = document.createElement('div');
-        const charmItem = document.createElement('div');
          charmItem.className = 'recommended-charm-item';  // ✅ Matches CSS
          
          const charmImg = document.createElement('img');
