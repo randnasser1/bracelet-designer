@@ -3975,7 +3975,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const productButtons = document.querySelectorAll('.product-btn');
      setupScrollArrows();
          protectSelectedCharm();
-startSelectionMonitoring();
 
 initializeRecommendedCharms();
     // Show designer page and select corresponding product when product card is clicked
