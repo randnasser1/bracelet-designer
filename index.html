@@ -1297,7 +1297,8 @@
         padding: 0 8px;
     }
 }
-/* Guided Tour Styles */
+<!-- Add this to the head section -->
+/* Guided Tour Styles - Fixed & Responsive */
 .guided-tour {
   position: fixed;
   top: 0;
@@ -1413,6 +1414,29 @@
   color: #666;
 }
 
+/* Mobile responsive tour */
+@media (max-width: 768px) {
+  .tour-popup {
+    padding: 1rem;
+    max-width: 90%;
+  }
+  
+  .tour-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .tour-btn {
+    width: 100%;
+  }
+  
+  .tour-indicator {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+}
+
 /* Quick Tips */
 .quick-tip {
   position: fixed;
@@ -1474,6 +1498,24 @@
   transform: scale(1.1);
   background: #ff85b3;
 }
+
+/* Mobile responsive help elements */
+@media (max-width: 480px) {
+  .quick-tip {
+    bottom: 70px;
+    right: 10px;
+    max-width: 200px;
+    font-size: 0.9rem;
+  }
+  
+  .help-button {
+    bottom: 15px;
+    left: 15px;
+    width: 45px;
+    height: 45px;
+  }
+}
+</style>
   </style>
 </head>
 <body>
@@ -1954,8 +1996,8 @@
       <button class="btn" id="close-confirmation">Close</button>
     </div>
   </div>
-
-  <!-- Guided Tour -->
+<!-- Add this to the body section, inside the designer-page div -->
+<!-- Guided Tour -->
 <div class="guided-tour" id="guided-tour">
   <div class="tour-popup" id="tour-popup">
     <h3 id="tour-title">Welcome to Your Jewelry Designer!</h3>
@@ -2040,3 +2082,4 @@ document.getElementById('translate-btn').addEventListener('click', function() {
 
 </body>
 </html>
+
