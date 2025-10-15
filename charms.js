@@ -586,7 +586,7 @@ const rareCharms = [
   { src: 'rares/hgs/24.png', category: 'hgs', quantity: 0 },
   { src: 'rares/hgs/26.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/hgs5.png', category: 'hgs', quantity: 1 },
-  { src: 'rares/hgs/hgs6.png', category: 'hgs', quantity: 0 },
+  { src: 'rares/hgs/hgs6.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/hgs7.png', category: 'hgs', quantity: 0 },
   { src: 'rares/hgs/129.png', category: 'hgs', quantity: 1 },
   { src: 'rares/hgs/130.png', category: 'hgs', quantity: 0 },
@@ -614,6 +614,7 @@ const rareCharms = [
   { src: 'rares/newc2r/c2101.png', category: 'hgs', quantity: 1 },
   { src: 'rares/newc2r/c2102.png', category: 'hgs', quantity: 1 },
      { src: 'rares/newc2r/c21.png', category: 'hgs', quantity: 1 },
+  { src: 'rares/sporty/sporty9.png', category: 'hgs', quantity: 1 },
 
 
   // long charms
@@ -679,7 +680,7 @@ const rareCharms = [
   { src: 'rares/sporty/sporty7.png', category: 'sporty', quantity: 2 },
   { src: 'rares/sporty/sporty8.png', category: 'sporty', quantity: 0 },
   { src: 'rares/sporty/30.png', category: 'sporty', quantity: 1 },
-  { src: 'rares/sporty/sporty9.png', category: 'sporty', quantity: 0 },
+  { src: 'rares/sporty/sporty9.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty10.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty11.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty12.png', category: 'sporty', quantity: 0 },
