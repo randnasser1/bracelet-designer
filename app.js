@@ -3811,6 +3811,7 @@ function initializeRecommendedCharms() {
         'special/new-collection/50.png',
      'rares/sporty/sporty9.png',
         'rares/hgs/hgs6.png',
+         'rares/newc2r/c222.png',
 
         'rares/gold/gold8.png',
         'special/bows/pink.png',
