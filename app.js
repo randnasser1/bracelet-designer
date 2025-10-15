@@ -3809,6 +3809,9 @@ function initializeRecommendedCharms() {
         'special/teddy/teddy2.png',
         'rares/graduation/grad.png',
         'special/new-collection/50.png',
+     'rares/sporty/sporty9.png',
+        'rares/hgs/hgs6.png',
+
         'rares/gold/gold8.png',
         'special/bows/pink.png',
         'special/beach/x15.png',
