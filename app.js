@@ -401,11 +401,11 @@ function showSetWarning(charmSet) {
 function calculatePrice(includeDelivery = false) {
     // Handle individual charms separately
     if (currentProduct === 'individual') {
-        const basePrice = 3; // Base price per individual charm
+        const basePrice = 3; // Fixed base price of 3 JDs for individual charms
+        
         let charmCost = 0;
-
-     
         const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
+        
         placedCharms.forEach(charm => {
             if (charm.dataset.type === 'special') {
                 charmCost += 2;
@@ -418,7 +418,7 @@ function calculatePrice(includeDelivery = false) {
             }
         });
         
-        const subtotal = basePrice * individualSlotCount + charmCost;
+        const subtotal = basePrice + charmCost; // Only add basePrice once, not multiplied by slot count
         const delivery = includeDelivery ? 2.5 : 0;
         const total = subtotal + delivery;
         
