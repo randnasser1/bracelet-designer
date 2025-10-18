@@ -2488,21 +2488,49 @@ function handlePaymentChange(e) {
 
 function handlePlaceOrderClick() {
     if (cart.length === 0) {
-        alert('Your cart is empty!');
+        showToast('Your cart is empty!', 'error');
         return;
     }
     
-    // Calculate and display order summary
-    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+    // 🎯 CHECK MINIMUM ORDER AMOUNT
+    const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
+    const MINIMUM_ORDER = 15.00;
+    
+    if (subtotal < MINIMUM_ORDER) {
+        const amountNeeded = (MINIMUM_ORDER - subtotal).toFixed(2);
+        showCustomWarningModal(
+            `Minimum Order Required!\n\nYour order is ${subtotal.toFixed(2)} JOD.\n` +
+            `You need to add ${amountNeeded} JOD more to reach the minimum order of 15 JOD.\n\n` +
+            `💡 Add more charms or upgrade to Full Glam to qualify!`
+        );
+        return;
+    }
+    
+    // Validate charm sets before checkout
+    const invalidSets = validateCartForCheckout();
+    if (invalidSets.length > 0) {
+        const errorMessages = invalidSets.map(set => 
+            `• ${set.name}: ${set.message}\n  (Problem: ${set.problem})`
+        ).join('\n\n');
+        
+        showCustomWarningModal(
+            `Cannot Checkout!\n\nYour cart has invalid charm sets:\n\n${errorMessages}\n\n` +
+            'Please complete these sets or remove the charms.'
+        );
+        return;
+    }
+    
+    // If validation passes, show order modal
+    orderModal.classList.add('active');
+    document.body.classList.add('modal-open');
+    
+    // Calculate order totals
     const deliveryFee = 2.5;
     const total = subtotal + deliveryFee;
     
     document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
     document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
     document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
-
-    document.body.classList.add('modal-open');
-    orderModal.classList.add('active');
 }
 
 function handleCancelOrder() {
