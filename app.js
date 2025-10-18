@@ -5134,3 +5134,44 @@ function setupCollapsibleOrders() {
         }
     });
 }
+function updateShippingProgress() {
+    const progressFill = document.getElementById('progress-fill');
+    const amountNeeded = document.getElementById('amount-needed');
+    const progressPercent = document.querySelector('.progress-percent');
+    
+    if (!progressFill) return;
+    
+    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+    const freeShippingThreshold = 15; // Free shipping at 15 JOD
+    const amountNeededValue = Math.max(0, freeShippingThreshold - subtotal);
+    const progress = Math.min(100, (subtotal / freeShippingThreshold) * 100);
+    
+    if (amountNeeded) {
+        amountNeeded.textContent = amountNeededValue.toFixed(2);
+    }
+    
+    if (progressFill) {
+        progressFill.style.width = `${progress}%`;
+    }
+    
+    if (progressPercent) {
+        progressPercent.textContent = `${Math.round(progress)}%`;
+    }
+    
+    // Show/hide based on progress
+    const shippingProgress = document.getElementById('shipping-progress');
+    if (shippingProgress) {
+        if (subtotal >= freeShippingThreshold) {
+            shippingProgress.innerHTML = `
+                <div style="text-align: center; color: #4CAF50; font-weight: bold;">
+                    🎉 Congratulations! You qualify for FREE shipping!
+                </div>
+            `;
+        } else if (subtotal > 0) {
+            shippingProgress.style.display = 'block';
+        } else {
+            shippingProgress.style.display = 'none';
+        }
+    }
+}
+
