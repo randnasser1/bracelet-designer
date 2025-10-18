@@ -5059,3 +5059,16 @@ function showMinimumAmountMessage() {
         }
     }
 }
+function checkFirstOrderDiscount() {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return false;
+    
+    const hasOrderedBefore = localStorage.getItem(`hasOrdered_${currentUser.uid}`);
+    
+    if (!hasOrderedBefore) {
+        showToast("🎊 Welcome! Use code WELCOME10 for 10% off your first order!", 'success');
+        return true;
+    }
+    
+    return false;
+}
