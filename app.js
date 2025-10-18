@@ -400,24 +400,11 @@ async function loadUserOrderHistory(userId) {
 }
 
 function displayOrderHistory(orders) {
-    // Create or update order history UI
-    let orderHistorySection = document.getElementById('order-history-section');
-    
-    if (!orderHistorySection) {
-        orderHistorySection = document.createElement('div');
-        orderHistorySection.id = 'order-history-section';
-        orderHistorySection.className = 'order-history';
-        
-        // Insert after the user profile
-        const userProfile = document.getElementById('user-profile');
-        userProfile.parentNode.insertBefore(orderHistorySection, userProfile.nextSibling);
-    }
-    
+    const ordersContent = document.getElementById('orders-content');
+    if (!ordersContent) return;
+
     if (orders.length === 0) {
-        orderHistorySection.innerHTML = `
-            <div class="order-history-header">
-                <h3>My Orders</h3>
-            </div>
+        ordersContent.innerHTML = `
             <div class="empty-orders">
                 <p>No orders yet</p>
                 <p>Start designing your perfect jewelry piece!</p>
@@ -425,7 +412,7 @@ function displayOrderHistory(orders) {
         `;
         return;
     }
-    
+
     const ordersHTML = orders.map(order => `
         <div class="order-item" data-order-id="${order.id}">
             <div class="order-header">
@@ -439,29 +426,33 @@ function displayOrderHistory(orders) {
                 </div>
             </div>
             <div class="order-items-preview">
-                ${order.items.map(item => `
+                ${order.items.slice(0, 2).map(item => `
                     <div class="order-item-preview">
                         <span>${item.product} (${item.size})</span>
                         <span>${item.price} JOD</span>
                     </div>
                 `).join('')}
+                ${order.items.length > 2 ? 
+                    `<div class="order-item-preview" style="color: #666; font-style: italic;">
+                        +${order.items.length - 2} more items...
+                    </div>` : ''}
             </div>
-            <button class="btn view-order-btn" onclick="viewOrderDetails('${order.id}')">
+            <button class="view-order-btn" onclick="viewOrderDetails('${order.id}')">
                 View Details
             </button>
         </div>
     `).join('');
-    
-    orderHistorySection.innerHTML = `
-        <div class="order-history-header">
-            <h3>My Orders (${orders.length})</h3>
-        </div>
-        <div class="orders-list">
-            ${ordersHTML}
-        </div>
-    `;
+
+    ordersContent.innerHTML = ordersHTML;
 }
 
+// Remove the old standalone order history section
+function removeStandaloneOrderHistory() {
+    const oldOrderHistory = document.getElementById('order-history-section');
+    if (oldOrderHistory) {
+        oldOrderHistory.remove();
+    }
+}
 function hideOrderHistory() {
     const orderHistorySection = document.getElementById('order-history-section');
     if (orderHistorySection) {
@@ -582,21 +573,38 @@ function updateAuthUI(user) {
     
     if (user) {
         authButton.style.display = 'none';
-        userProfile.style.display = 'flex';
+        userProfile.style.display = 'block';
         userName.textContent = `Hello, ${user.displayName || user.email}`;
-        console.log('User logged in:', user.email);
         
-        // Load user's order history
-        loadUserOrderHistory(user.uid);
+        // Remove any old standalone order history
+        removeStandaloneOrderHistory();
+        
+        // Setup collapsible orders
+        setTimeout(() => {
+            setupCollapsibleOrders();
+        }, 100);
+        
     } else {
         authButton.style.display = 'block';
         userProfile.style.display = 'none';
-        console.log('User logged out');
-        
-        // Hide order history
-        hideOrderHistory();
     }
 }
+function expandOrdersForNewOrder() {
+    const collapsibleOrders = document.getElementById('collapsible-orders');
+    const collapseBtn = document.getElementById('collapse-orders');
+    
+    if (collapsibleOrders && !collapsibleOrders.classList.contains('expanded')) {
+        collapsibleOrders.classList.add('expanded');
+        if (collapseBtn) collapseBtn.classList.remove('collapsed');
+        
+        // Load orders if needed
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+            loadUserOrderHistory(currentUser.uid);
+        }
+    }
+}
+
 
 function getAuthErrorMessage(error) {
     console.log('Auth error code:', error.code);
@@ -2544,7 +2552,9 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
         orderIdSpan.textContent = orderRef.id;
         orderModal.classList.remove('active');
         orderConfirmation.classList.add('active');
-        
+         if (auth.currentUser) {
+            setTimeout(expandOrdersForNewOrder, 1000);
+        }
         showToast('Order submitted successfully!', 'success');
         
     } catch (error) {
@@ -5071,4 +5081,56 @@ function checkFirstOrderDiscount() {
     }
     
     return false;
+}
+function setupCollapsibleOrders() {
+    const profileHeader = document.getElementById('profile-header');
+    const collapseBtn = document.getElementById('collapse-orders');
+    const collapsibleOrders = document.getElementById('collapsible-orders');
+    const ordersContent = document.getElementById('orders-content');
+
+    if (!profileHeader || !collapseBtn) return;
+
+    let isExpanded = false;
+
+    // Toggle orders when clicking profile header
+    profileHeader.addEventListener('click', (e) => {
+        // Don't trigger if clicking logout button
+        if (e.target.closest('.logout-btn')) return;
+        
+        toggleOrders();
+    });
+
+    // Toggle orders when clicking collapse button
+    collapseBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent profile header click
+        toggleOrders();
+    });
+
+    function toggleOrders() {
+        isExpanded = !isExpanded;
+        
+        if (isExpanded) {
+            collapsibleOrders.classList.add('expanded');
+            collapseBtn.classList.remove('collapsed');
+            
+            // Load orders if not already loaded
+            if (ordersContent.children.length === 0) {
+                loadUserOrderHistory(auth.currentUser.uid);
+            }
+        } else {
+            collapsibleOrders.classList.remove('expanded');
+            collapseBtn.classList.add('collapsed');
+        }
+    }
+
+    // Close orders when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!collapsibleOrders.contains(e.target) && !profileHeader.contains(e.target)) {
+            if (isExpanded) {
+                collapsibleOrders.classList.remove('expanded');
+                collapseBtn.classList.add('collapsed');
+                isExpanded = false;
+            }
+        }
+    });
 }
