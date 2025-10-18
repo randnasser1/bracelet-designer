@@ -254,7 +254,7 @@ function createBaseSlot() {
 }
 // Modify your captureBraceletDesign function to use this:
 async function captureBraceletDesign() {
-    const jewelryPiece = document.getElementById('jewelry-piece');
+    let jewelryPiece = document.getElementById('jewelry-piece');
     if (!jewelryPiece) {
         throw new Error('Jewelry piece container not found');
     }
@@ -642,7 +642,7 @@ async function uploadImageToFirebase(imageData, folder = 'designs/') {
     }
 }
 function updateJewelryPiece() {
-    const jewelryPiece = document.getElementById('jewelry-piece');
+    let jewelryPiece = document.getElementById('jewelry-piece');
     jewelryPiece.innerHTML = '';
     
     const slots = SIZE_CHARTS[currentProduct][currentSize].charms;
@@ -932,14 +932,14 @@ function initWatchPool() {
         specialCharmsPool.parentNode.insertBefore(watchPoolContainer, specialCharmsPool);
     } else {
         // Fallback to inserting after jewelry piece
-        const jewelryPiece = document.getElementById('jewelry-piece');
+        let jewelryPiece = document.getElementById('jewelry-piece');
         if (jewelryPiece) {
             jewelryPiece.parentNode.insertBefore(watchPoolContainer, jewelryPiece.nextSibling);
         }
     }
 }
 function centerScrollOnLoad() {
-  const jewelryPiece = document.getElementById('jewelry-piece');
+  let jewelryPiece = document.getElementById('jewelry-piece');
   if (jewelryPiece) {
     // Calculate center position after a small delay to allow rendering
     setTimeout(() => {
@@ -952,7 +952,7 @@ function centerScrollOnLoad() {
 document.addEventListener('DOMContentLoaded', centerScrollOnLoad);
 
 function initSpecialProductWithBase(productType) {
-  const jewelryPiece = document.getElementById('jewelry-piece');
+  let jewelryPiece = document.getElementById('jewelry-piece');
   jewelryPiece.innerHTML = '';
   jewelryPiece.className = `${productType}-container`;
   
@@ -1167,7 +1167,7 @@ function updateWatchBase() {
     }
 }
 function initStandardJewelry(productType) {
-    const jewelryPiece = document.getElementById('jewelry-piece');
+    let jewelryPiece = document.getElementById('jewelry-piece');
     
     // Normal jewelry piece styling
     jewelryPiece.className = '';
@@ -1195,7 +1195,7 @@ function initStandardJewelry(productType) {
 }
 
 function centerJewelryPiece() {
-  const jewelryPiece = document.getElementById('jewelry-piece');
+  let jewelryPiece = document.getElementById('jewelry-piece');
   if (!jewelryPiece) return;
   
   // Don't center if it's a keychain (we want left-aligned)
@@ -1350,7 +1350,7 @@ function updateScrollIndicators() {
   const container = document.querySelector('.bracelet-container');
   if (!container) return;
   
-  const jewelryPiece = document.getElementById('jewelry-piece');
+  let jewelryPiece = document.getElementById('jewelry-piece');
   const scrollLeft = jewelryPiece.scrollLeft;
   const maxScroll = jewelryPiece.scrollWidth - jewelryPiece.clientWidth;
   
@@ -1653,7 +1653,7 @@ if (sizeSelect) {
 // Update the updateIndividualSlots function:
 
 function updateIndividualSlots(preservedCharms = []) {
-    const jewelryPiece = document.getElementById('jewelry-piece');
+    let jewelryPiece = document.getElementById('jewelry-piece');
     jewelryPiece.innerHTML = '';
     jewelryPiece.className = 'individual-container';
     
@@ -2205,7 +2205,7 @@ if (orderForm) {
     window.orderFunctionalityInitialized = true;
 }
 function initJewelryPiece() {
-  const jewelryPiece = document.getElementById('jewelry-piece');
+  let jewelryPiece = document.getElementById('jewelry-piece');
   jewelryPiece.innerHTML = '';
   
   // Remove any extra classes that might affect sizing
@@ -3717,7 +3717,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('DOMContentLoaded', function() {
     const braceletContainer = document.querySelector('.bracelet-container');
-    const jewelryPiece = document.getElementById('jewelry-piece');
+    let jewelryPiece = document.getElementById('jewelry-piece');
     
     function updateStickyHeader() {
     const braceletContainer = document.querySelector('.bracelet-container');
@@ -3741,7 +3741,7 @@ window.addEventListener('resize', updateStickyHeader);
 updateStickyHeader();
 });
 document.addEventListener('DOMContentLoaded', function() {
-    const jewelryPiece = document.getElementById('jewelry-piece');
+    let jewelryPiece = document.getElementById('jewelry-piece');
 
      
     function adjustJewelryWidth() {
@@ -3755,7 +3755,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 function handleMobileViewport() {
     const isMobile = window.innerWidth <= 480;
-    const jewelryPiece = document.getElementById('jewelry-piece');
+    let jewelryPiece = document.getElementById('jewelry-piece');
     
     if (isMobile) {
         // Enable horizontal scrolling on mobile
