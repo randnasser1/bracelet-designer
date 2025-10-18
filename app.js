@@ -599,36 +599,104 @@ function updateAuthUI(user) {
 }
 
 function getAuthErrorMessage(error) {
+    console.log('Auth error code:', error.code);
+    
     switch (error.code) {
         case 'auth/email-already-in-use':
-            return 'Email already in use';
+            return 'This email is already registered. Please login instead.';
         case 'auth/invalid-email':
-            return 'Invalid email address';
+            return 'Please enter a valid email address.';
         case 'auth/weak-password':
-            return 'Password should be at least 6 characters';
+            return 'Password should be at least 6 characters long.';
         case 'auth/user-not-found':
-            return 'User not found';
+            return 'No account found with this email. Please check your email or create a new account.';
         case 'auth/wrong-password':
-            return 'Incorrect password';
+            return 'Incorrect password. Please try again.';
+        case 'auth/operation-not-allowed':
+            return 'Email/password accounts are not enabled. Please contact support.';
+        case 'auth/network-request-failed':
+            return 'Network error. Please check your internet connection.';
+        case 'auth/too-many-requests':
+            return 'Too many failed attempts. Please try again later.';
         default:
-            return error.message;
+            return error.message || 'Authentication failed. Please try again.';
     }
 }
-
 // Require auth for checkout
+// Update the checkout button handler
 function setupAuthProtectedCheckout() {
     const placeOrderBtn = document.getElementById('order-btn');
     
     if (placeOrderBtn) {
         placeOrderBtn.addEventListener('click', function(e) {
-            if (!auth.currentUser) {
+            const currentUser = auth.currentUser;
+            
+            if (!currentUser) {
                 e.preventDefault();
-                showToast('Please login to place an order', 'error');
-                document.getElementById('auth-modal').classList.add('active');
+                showAccountCreationPrompt();
                 return false;
             }
         });
     }
+}
+
+// Show account creation prompt
+function showAccountCreationPrompt() {
+    const modalHTML = `
+        <div class="modal active" id="account-prompt-modal">
+            <div class="order-modal-content">
+                <h2>Create an Account?</h2>
+                <p>Would you like to create an account to save your order history and track your purchases?</p>
+                <div class="prompt-options">
+                    <button class="btn confirm-order-btn" id="create-account-yes">
+                        <i class="fas fa-user-plus"></i> Yes, Create Account
+                    </button>
+                    <button class="btn cancel-btn" id="continue-guest">
+                        <i class="fas fa-shopping-bag"></i> Continue as Guest
+                    </button>
+                    <button class="btn" id="already-have-account">
+                        <i class="fas fa-sign-in-alt"></i> I Already Have an Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Add event listeners
+    document.getElementById('create-account-yes').addEventListener('click', () => {
+        document.getElementById('account-prompt-modal').remove();
+        document.getElementById('auth-modal').classList.add('active');
+        document.querySelector('.auth-tab[data-tab="signup"]').click();
+    });
+    
+    document.getElementById('continue-guest').addEventListener('click', () => {
+        document.getElementById('account-prompt-modal').remove();
+        // Proceed with guest checkout
+        proceedWithGuestCheckout();
+    });
+    
+    document.getElementById('already-have-account').addEventListener('click', () => {
+        document.getElementById('account-prompt-modal').remove();
+        document.getElementById('auth-modal').classList.add('active');
+        document.querySelector('.auth-tab[data-tab="login"]').click();
+    });
+}
+
+function proceedWithGuestCheckout() {
+    // Show the order modal for guest checkout
+    orderModal.classList.add('active');
+    document.body.classList.add('modal-open');
+    
+    // Calculate and display order summary
+    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+    const deliveryFee = 2.5;
+    const total = subtotal + deliveryFee;
+    
+    document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
+    document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
 }
 function createBaseSlot() {
     const slot = document.createElement('div');
