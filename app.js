@@ -360,21 +360,32 @@ async function logoutUser() {
 // Order History Functions
 async function loadUserOrderHistory(userId) {
     try {
-        console.log('Loading order history for user:', userId);
-        
         const ordersRef = db.collection('orders');
-        const query = ordersRef.where('userId', '==', userId).orderBy('timestamp', 'desc');
-        const snapshot = await query.get();
+        // Get orders where userId matches OR userEmail matches (for guest orders)
+        const userOrdersQuery = ordersRef.where('userId', '==', userId);
+        const guestOrdersQuery = ordersRef.where('userEmail', '==', auth.currentUser.email);
+        
+        const [userSnapshot, guestSnapshot] = await Promise.all([
+            userOrdersQuery.get(),
+            guestOrdersQuery.get()
+        ]);
         
         const orders = [];
-        snapshot.forEach(doc => {
-            orders.push({
-                id: doc.id,
-                ...doc.data()
-            });
+        
+        userSnapshot.forEach(doc => {
+            orders.push({ id: doc.id, ...doc.data() });
         });
         
-        console.log('Found orders:', orders.length);
+        guestSnapshot.forEach(doc => {
+            // Avoid duplicates
+            if (!orders.find(order => order.id === doc.id)) {
+                orders.push({ id: doc.id, ...doc.data() });
+            }
+        });
+        
+        // Sort by timestamp
+        orders.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+        
         displayOrderHistory(orders);
         
     } catch (error) {
