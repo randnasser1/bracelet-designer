@@ -3376,3 +3376,29 @@ width: 100px !important;
     margin-top: 0.5rem;
     text-align: center;
 }
+/* User Profile Buttons */
+.orders-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.logout-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
