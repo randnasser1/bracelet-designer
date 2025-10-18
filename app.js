@@ -1,7 +1,13 @@
+// Wait for Firebase to be ready
 function waitForFirebase() {
     return new Promise((resolve) => {
+        if (window.firebaseReady && window.auth && window.db) {
+            resolve();
+            return;
+        }
+        
         const checkFirebase = () => {
-            if (window.firebaseReady && typeof firebase !== 'undefined') {
+            if (window.firebaseReady && window.auth && window.db) {
                 resolve();
             } else {
                 setTimeout(checkFirebase, 100);
@@ -11,7 +17,7 @@ function waitForFirebase() {
     });
 }
 
-// Global variables
+// Global variables - declare at the top
 let jewelryPiece;
 let specialCharmsGrid;
 let rareCharmsGrid;
