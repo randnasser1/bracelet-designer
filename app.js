@@ -236,6 +236,383 @@ let currentDesign = {
     imageData: null
 };
 window.orderFunctionalityInitialized = false;
+// Authentication functions
+function initAuth() {
+    const authButton = document.getElementById('auth-button');
+    const authModal = document.getElementById('auth-modal');
+    const closeAuth = document.getElementById('close-auth');
+    const authTabs = document.querySelectorAll('.auth-tab');
+    const authForms = document.querySelectorAll('.auth-form');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const userProfile = document.getElementById('user-profile');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userName = document.getElementById('user-name');
+
+    // Auth button click
+    authButton.addEventListener('click', () => {
+        authModal.classList.add('active');
+    });
+
+    // Close auth modal
+    closeAuth.addEventListener('click', () => {
+        authModal.classList.remove('active');
+    });
+
+    // Switch between login/signup tabs
+    authTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.dataset.tab;
+            
+            authTabs.forEach(t => t.classList.remove('active'));
+            authForms.forEach(f => f.classList.remove('active'));
+            
+            tab.classList.add('active');
+            document.getElementById(`${targetTab}-form`).classList.add('active');
+        });
+    });
+
+    // Login form submission
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        
+        try {
+            const user = await loginUser(email, password);
+            authModal.classList.remove('active');
+            loginForm.reset();
+            showToast('Login successful!', 'success');
+        } catch (error) {
+            showToast(error.message, 'error');
+        }
+    });
+
+    // Signup form submission
+    signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        
+        try {
+            const user = await signUpUser(email, password, name);
+            authModal.classList.remove('active');
+            signupForm.reset();
+            showToast('Account created successfully!', 'success');
+        } catch (error) {
+            showToast(error.message, 'error');
+        }
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+        logoutUser();
+    });
+
+    // Auth state listener
+    auth.onAuthStateChanged((user) => {
+        updateAuthUI(user);
+    });
+}
+
+// Auth functions
+async function signUpUser(email, password, displayName) {
+    try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        
+        // Create user profile in Firestore
+        await db.collection('users').doc(user.uid).set({
+            email: email,
+            displayName: displayName,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Update profile
+        await user.updateProfile({
+            displayName: displayName
+        });
+        
+        return user;
+    } catch (error) {
+        throw new Error(getAuthErrorMessage(error));
+    }
+}
+
+async function loginUser(email, password) {
+    try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        return userCredential.user;
+    } catch (error) {
+        throw new Error(getAuthErrorMessage(error));
+    }
+}
+
+async function logoutUser() {
+    try {
+        await auth.signOut();
+        showToast('Logged out successfully', 'success');
+    } catch (error) {
+        showToast('Error logging out', 'error');
+    }
+}
+// Order History Functions
+async function loadUserOrderHistory(userId) {
+    try {
+        console.log('Loading order history for user:', userId);
+        
+        const ordersRef = db.collection('orders');
+        const query = ordersRef.where('userId', '==', userId).orderBy('timestamp', 'desc');
+        const snapshot = await query.get();
+        
+        const orders = [];
+        snapshot.forEach(doc => {
+            orders.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+        
+        console.log('Found orders:', orders.length);
+        displayOrderHistory(orders);
+        
+    } catch (error) {
+        console.error('Error loading order history:', error);
+    }
+}
+
+function displayOrderHistory(orders) {
+    // Create or update order history UI
+    let orderHistorySection = document.getElementById('order-history-section');
+    
+    if (!orderHistorySection) {
+        orderHistorySection = document.createElement('div');
+        orderHistorySection.id = 'order-history-section';
+        orderHistorySection.className = 'order-history';
+        
+        // Insert after the user profile
+        const userProfile = document.getElementById('user-profile');
+        userProfile.parentNode.insertBefore(orderHistorySection, userProfile.nextSibling);
+    }
+    
+    if (orders.length === 0) {
+        orderHistorySection.innerHTML = `
+            <div class="order-history-header">
+                <h3>My Orders</h3>
+            </div>
+            <div class="empty-orders">
+                <p>No orders yet</p>
+                <p>Start designing your perfect jewelry piece!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const ordersHTML = orders.map(order => `
+        <div class="order-item" data-order-id="${order.id}">
+            <div class="order-header">
+                <div class="order-info">
+                    <strong>Order #${order.clientOrderId}</strong>
+                    <span class="order-date">${formatOrderDate(order.timestamp)}</span>
+                </div>
+                <div class="order-status">
+                    <span class="status-badge ${order.status}">${order.status}</span>
+                    <span class="order-total">${order.total} JOD</span>
+                </div>
+            </div>
+            <div class="order-items-preview">
+                ${order.items.map(item => `
+                    <div class="order-item-preview">
+                        <span>${item.product} (${item.size})</span>
+                        <span>${item.price} JOD</span>
+                    </div>
+                `).join('')}
+            </div>
+            <button class="btn view-order-btn" onclick="viewOrderDetails('${order.id}')">
+                View Details
+            </button>
+        </div>
+    `).join('');
+    
+    orderHistorySection.innerHTML = `
+        <div class="order-history-header">
+            <h3>My Orders (${orders.length})</h3>
+        </div>
+        <div class="orders-list">
+            ${ordersHTML}
+        </div>
+    `;
+}
+
+function hideOrderHistory() {
+    const orderHistorySection = document.getElementById('order-history-section');
+    if (orderHistorySection) {
+        orderHistorySection.style.display = 'none';
+    }
+}
+
+function formatOrderDate(timestamp) {
+    if (!timestamp) return 'Date unknown';
+    
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+async function viewOrderDetails(orderId) {
+    try {
+        const orderDoc = await db.collection('orders').doc(orderId).get();
+        if (orderDoc.exists) {
+            const order = orderDoc.data();
+            showOrderDetailsModal(order);
+        }
+    } catch (error) {
+        console.error('Error loading order details:', error);
+        showToast('Error loading order details', 'error');
+    }
+}
+
+function showOrderDetailsModal(order) {
+    // Create modal for order details
+    const modalHTML = `
+        <div class="modal active" id="order-details-modal">
+            <div class="order-modal-content">
+                <h2>Order Details - #${order.clientOrderId}</h2>
+                
+                <div class="order-details-section">
+                    <h3>Order Information</h3>
+                    <div class="detail-row">
+                        <span>Order Date:</span>
+                        <span>${formatOrderDate(order.timestamp)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Status:</span>
+                        <span class="status-badge ${order.status}">${order.status}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Total:</span>
+                        <span>${order.total} JOD</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Payment Method:</span>
+                        <span>${order.paymentMethod}</span>
+                    </div>
+                </div>
+
+                <div class="order-details-section">
+                    <h3>Items</h3>
+                    ${order.items.map((item, index) => `
+                        <div class="order-item-detail">
+                            <div class="item-header">
+                                <strong>${item.product} (${item.size})</strong>
+                                <span>${item.price} JOD</span>
+                            </div>
+                            <div class="item-details">
+                                <span>Material: ${item.materialType}</span>
+                                <span>Full Glam: ${item.isFullGlam ? 'Yes' : 'No'}</span>
+                                <span>Charms: ${item.charms.length}</span>
+                            </div>
+                            ${item.designImage ? `
+                                <div class="item-design">
+                                    <img src="${item.designImage}" alt="Design" style="max-width: 200px; border-radius: 8px;">
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="order-details-section">
+                    <h3>Delivery Information</h3>
+                    <div class="detail-row">
+                        <span>Name:</span>
+                        <span>${order.customer.name}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Phone:</span>
+                        <span>${order.customer.phone}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Address:</span>
+                        <span>${order.customer.address}, ${order.customer.governorate}</span>
+                    </div>
+                </div>
+
+                <button class="btn cancel-btn" onclick="closeOrderDetails()">
+                    Close
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function closeOrderDetails() {
+    const modal = document.getElementById('order-details-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+function updateAuthUI(user) {
+    const authButton = document.getElementById('auth-button');
+    const userProfile = document.getElementById('user-profile');
+    const userName = document.getElementById('user-name');
+    
+    if (user) {
+        authButton.style.display = 'none';
+        userProfile.style.display = 'flex';
+        userName.textContent = `Hello, ${user.displayName || user.email}`;
+        console.log('User logged in:', user.email);
+        
+        // Load user's order history
+        loadUserOrderHistory(user.uid);
+    } else {
+        authButton.style.display = 'block';
+        userProfile.style.display = 'none';
+        console.log('User logged out');
+        
+        // Hide order history
+        hideOrderHistory();
+    }
+}
+
+function getAuthErrorMessage(error) {
+    switch (error.code) {
+        case 'auth/email-already-in-use':
+            return 'Email already in use';
+        case 'auth/invalid-email':
+            return 'Invalid email address';
+        case 'auth/weak-password':
+            return 'Password should be at least 6 characters';
+        case 'auth/user-not-found':
+            return 'User not found';
+        case 'auth/wrong-password':
+            return 'Incorrect password';
+        default:
+            return error.message;
+    }
+}
+
+// Require auth for checkout
+function setupAuthProtectedCheckout() {
+    const placeOrderBtn = document.getElementById('order-btn');
+    
+    if (placeOrderBtn) {
+        placeOrderBtn.addEventListener('click', function(e) {
+            if (!auth.currentUser) {
+                e.preventDefault();
+                showToast('Please login to place an order', 'error');
+                document.getElementById('auth-modal').classList.add('active');
+                return false;
+            }
+        });
+    }
+}
 function createBaseSlot() {
     const slot = document.createElement('div');
     slot.className = 'slot';
@@ -2043,17 +2420,6 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
             if (missingFields.length > 0) {
                 throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
             }
-            
-            // PayPal validation
-            if (formData.get('payment') === 'PayPal') {
-                throw new Error('Please complete PayPal payment first');
-            }
-            
-            // Cliq validation - remove file upload requirement
-            if (formData.get('payment') === 'Cliq') {
-                // You can add alternative validation here if needed
-                console.log('Cliq payment selected - no file upload required');
-            }
         } else {
             formData = new FormData();
             // Add PayPal data to formData
@@ -2068,14 +2434,15 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
         const totalJOD = subtotal + deliveryFee;
         const totalUSD = (totalJOD * JOD_TO_USD_RATE).toFixed(2);
 
-        console.log('Order totals:', { subtotal, deliveryFee, totalJOD, totalUSD });
-
-        // Create order data WITHOUT image uploads
+        // Create order data
         const orderData = await prepareOrderData(formData, totalJOD, totalUSD, isPayPalSuccess ? paypalData : null);
         
         // Submit to Firestore
         const orderRef = await db.collection('orders').add(orderData);
         console.log('Order submitted with ID:', orderRef.id);
+
+        // Send email notifications
+        await sendOrderNotifications(orderRef.id, orderData);
 
         // Clear cart and reset form
         cart.length = 0;
@@ -2101,17 +2468,39 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
         }
     }
 }
+
+// Email notification function
+async function sendOrderNotifications(orderId, orderData) {
+    try {
+        // Get the cloud function
+        const sendOrderEmails = firebase.functions().httpsCallable('sendOrderEmails');
+        
+        // Call the function
+        const result = await sendOrderEmails({
+            orderId: orderId,
+            orderData: orderData,
+            customerEmail: orderData.customer.email,
+            customerName: orderData.customer.name
+        });
+        
+        console.log('Email notifications sent:', result.data);
+    } catch (error) {
+        console.error('Failed to send email notifications:', error);
+        // Don't throw error - order should still be saved even if emails fail
+    }
+}
 async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null) {
     const paymentMethod = formData.get('payment') || (paypalData ? 'PayPal' : 'Unknown');
+    const currentUser = auth.currentUser;
     
-    // Store design images as data URLs directly in the database
+    // Store design images as data URLs
     const itemsWithDesigns = cart.map((item) => {
         return {
             product: item.product,
             size: item.size,
             price: item.price,
             originalPrice: item.originalPrice,
-            designImage: item.designImage, // Store the data URL directly
+            designImage: item.designImage,
             isFullGlam: item.isFullGlam,
             materialType: item.materialType,
             charms: item.charms,
@@ -2119,7 +2508,7 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         };
     });
 
-    // Build order data
+    // Build order data with user info
     const orderData = {
         clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
         customer: {
@@ -2128,8 +2517,13 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
             phone2: formData.get('phone2') || null,
             governorate: formData.get('governorate') || 'Not provided',
             address: formData.get('address') || 'Not provided',
-            notes: formData.get('notes') || null
+            notes: formData.get('notes') || null,
+            email: formData.get('customer-email') || (currentUser ? currentUser.email : null)
         },
+        // Enhanced user linking
+        userId: currentUser ? currentUser.uid : null,
+        userEmail: currentUser ? currentUser.email : null,
+        userName: currentUser ? currentUser.displayName : formData.get('full-name'),
         paymentMethod: paymentMethod,
         currency: "JOD",
         amountJOD: totalJOD,
@@ -2142,15 +2536,16 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         deliveryFee: 2.5,
         total: totalJOD,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        status: 'pending'
+        status: 'pending',
+        // Add for easy querying
+        userOrderIndex: currentUser ? `${currentUser.uid}_${Date.now()}` : null
     };
 
-    // Handle payment proof for Cliq - store as data URL if file exists
+    // Handle payment proof for Cliq
     if (paymentMethod === 'Cliq') {
         const paymentProofFile = document.getElementById('payment-proof')?.files[0];
         if (paymentProofFile) {
             try {
-                // Convert file to data URL
                 const paymentProofDataUrl = await new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.onload = (e) => resolve(e.target.result);
@@ -3607,7 +4002,8 @@ document.addEventListener('DOMContentLoaded', () => {
             setupOrderFunctionality();
             window.firebaseInitialized = true;
         }
-
+        initAuth();
+        setupAuthProtectedCheckout();
         // Get DOM elements with null checks
         jewelryPiece = document.getElementById('jewelry-piece');
         specialCharmsGrid = document.getElementById('special-charms');
@@ -4394,4 +4790,3 @@ function showTourStep(stepIndex) {
 // Make it available in console
 window.addEventListener('scroll', updateCartButtonPosition);
 window.addEventListener('load', updateCartButtonPosition);
-
