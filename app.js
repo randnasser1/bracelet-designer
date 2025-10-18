@@ -1214,7 +1214,9 @@ function updateCartDisplay() {
     const cartSubtotal = document.getElementById('cart-subtotal');
     const cartDiscountInfo = document.getElementById('cart-discount-info');
     const cartDiscountAmount = document.getElementById('cart-discount-amount');
+    const cartDelivery = document.getElementById('cart-delivery');
     const cartTotal = document.querySelector('.cart-total');
+    const placeOrderBtn = document.getElementById('order-btn');
     
     cartCount.textContent = cart.length;
     
@@ -1223,28 +1225,34 @@ function updateCartDisplay() {
         cartSubtotal.textContent = 'Subtotal: 0.00 JDs';
         cartTotal.textContent = 'Total: 0.00 JDs';
         cartDiscountInfo.style.display = 'none';
+        cartDelivery.textContent = 'Delivery Fee: 2.50 JDs';
         return;
     }
     
     let itemsHTML = '';
-      const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
+    const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
     const discountedSubtotal = cart.reduce((sum, item) => sum + item.price, 0);
     const deliveryFee = 2.5;
     
-    // Calculate additional cart-level discount if applicable
-    const currentDate = new Date();
-    const discountEndDate = new Date('2024-07-25');
+    // 🎯 CHECK MINIMUM ORDER FOR DISCOUNT
+    const MINIMUM_ORDER = 15.00;
+    const qualifiesForDiscount = subtotal >= MINIMUM_ORDER;
     let additionalDiscount = 0;
     
-    if (currentDate <= discountEndDate && subtotal >= 15) {
-        const potentialDiscount = subtotal * 0.1;
-        const alreadyDiscounted = subtotal - discountedSubtotal;
-        additionalDiscount = Math.min(potentialDiscount - alreadyDiscounted, 5 - alreadyDiscounted);
+    if (qualifiesForDiscount) {
+        const currentDate = new Date();
+        const discountEndDate = new Date('2025-10-31');
+        
+        if (currentDate <= discountEndDate) {
+            const potentialDiscount = subtotal * 0.1;
+            const alreadyDiscounted = subtotal - discountedSubtotal;
+            additionalDiscount = Math.min(potentialDiscount - alreadyDiscounted, 5 - alreadyDiscounted);
+        }
     }
     
     const total = discountedSubtotal - additionalDiscount + deliveryFee;
 
-    // Display items with their discounted prices
+    // Display cart items
     cart.forEach((item, index) => {
         itemsHTML += `
             <div class="cart-item">
@@ -1265,11 +1273,12 @@ function updateCartDisplay() {
     
     cartItemsContainer.innerHTML = itemsHTML;
     cartSubtotal.textContent = `Subtotal: ${discountedSubtotal.toFixed(2)} JDs`;
-    document.getElementById('cart-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    cartDelivery.textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
     
+    // 🎯 SHOW DISCOUNT INFORMATION
     if (additionalDiscount > 0) {
         cartDiscountInfo.style.display = 'block';
-        cartDiscountAmount.textContent = `Additional Discount: -${additionalDiscount.toFixed(2)} JDs`;
+        cartDiscountAmount.textContent = `Seasonal Discount: -${additionalDiscount.toFixed(2)} JDs`;
         
         cartTotal.innerHTML = `
             <div>
@@ -1281,11 +1290,18 @@ function updateCartDisplay() {
                 </span>
             </div>
             <div style="color: #4CAF50; font-size: 0.9rem; margin-top: 4px;">
-                You saved ${(subtotal - discountedSubtotal + additionalDiscount).toFixed(2)} JDs!
+                🎉 You saved ${additionalDiscount.toFixed(2)} JDs!
             </div>
         `;
+    } else if (qualifiesForDiscount) {
+        cartDiscountInfo.style.display = 'block';
+        cartDiscountAmount.textContent = '✅ Qualifies for discounts!';
+        cartTotal.textContent = `Total: ${(discountedSubtotal + deliveryFee).toFixed(2)} JDs`;
     } else {
-        cartDiscountInfo.style.display = 'none';
+        cartDiscountInfo.style.display = 'block';
+        const amountNeeded = (MINIMUM_ORDER - subtotal).toFixed(2);
+        cartDiscountAmount.innerHTML = `📢 Add ${amountNeeded} JOD more for 10% off!`;
+        cartDiscountAmount.style.color = '#ff6b6b';
         cartTotal.textContent = `Total: ${(discountedSubtotal + deliveryFee).toFixed(2)} JDs`;
     }
 
@@ -1296,9 +1312,6 @@ function updateCartDisplay() {
             removeFromCart(index);
         });
     });
-    updateShippingProgress();
-    updateOfferBanner(); // Update banner based on new cart total
-    startCountdownTimer(); // Restart timer check with new amount
 }
 function removeFromCart(index) {
     if (index >= 0 && index < cart.length) {
@@ -1312,13 +1325,12 @@ function updatePrice() {
     try {
         const priceData = calculatePrice(false);
         
-        // Safe element access with fallbacks
         const basePriceElement = document.getElementById('base-price');
         const charmPriceElement = document.getElementById('charm-price');
         const totalPriceElement = document.getElementById('total-price');
-        // Remove discountMessageElement since it doesn't exist in your HTML
+        const discountMessages = document.getElementById('discount-messages');
 
-        // Only update elements that exist
+        // Update basic price display
         if (totalPriceElement) {
             totalPriceElement.textContent = `Total: ${priceData.total.toFixed(2)} JDs`;
         }
@@ -1329,10 +1341,10 @@ function updatePrice() {
             } else {
                 const product = PRODUCTS[currentProduct];
                 if (isFullGlam) {
-                    basePriceElement.innerHTML = `Full Glam Base: ${product.fullGlam.toFixed(2)} JDs`;
+                    basePriceElement.innerHTML = `<span>Full Glam Base:</span><span>${product.fullGlam.toFixed(2)} JDs</span>`;
                 } else {
                     const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
-                    basePriceElement.innerHTML = `Base Price: ${basePrice.toFixed(2)} JDs`;
+                    basePriceElement.innerHTML = `<span>Base Price:</span><span>${basePrice.toFixed(2)} JDs</span>`;
                 }
             }
         }
@@ -1342,27 +1354,44 @@ function updatePrice() {
                 const charmCost = priceData.total - 3;
                 charmPriceElement.innerHTML = `<span>Charms:</span><span>${charmCost.toFixed(2)} JDs</span>`;
             } else {
-                // Simple charm display for non-individual products
                 charmPriceElement.innerHTML = `<span>Charms:</span><span>${priceData.charmCost.toFixed(2)} JDs</span>`;
             }
         }
 
-        // Log for debugging
-        console.log('Current price:', {
-            product: currentProduct,
-            material: materialType,
-            size: currentSize,
-            isFullGlam: isFullGlam,
-            total: priceData.total,
-            basePrice: priceData.basePrice,
-            charmCost: priceData.charmCost
-        });
+        // 🎯 UPDATE DISCOUNT MESSAGES BASED ON MINIMUM ORDER
+        if (discountMessages) {
+            discountMessages.innerHTML = '';
+            
+            if (priceData.subtotal > 0) {
+                if (priceData.qualifiesForDiscount) {
+                    if (priceData.discount > 0) {
+                        discountMessages.innerHTML = `
+                            <div class="discount-message success">
+                                ✅ You qualify for discounts! ${priceData.discount.toFixed(2)} JDs OFF applied!
+                            </div>
+                        `;
+                    } else {
+                        discountMessages.innerHTML = `
+                            <div class="discount-message info">
+                                💡 Your order qualifies for discounts! Complete checkout to apply.
+                            </div>
+                        `;
+                    }
+                } else {
+                    const amountNeeded = (priceData.minimumForDiscount - priceData.subtotal).toFixed(2);
+                    discountMessages.innerHTML = `
+                        <div class="discount-message warning">
+                            📢 Add ${amountNeeded} JOD more to qualify for 10% discount (min. 15 JOD)!
+                        </div>
+                    `;
+                }
+            }
+        }
 
     } catch (error) {
-        console.log('Price update failed, but continuing:', error);
+        console.log('Price update failed:', error);
     }
 }
-
 function getCharmBreakdownText() {
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
     let specialCount = 0, rareCount = 0, customCount = 0;
