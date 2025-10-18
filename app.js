@@ -985,8 +985,10 @@ function calculatePrice(includeDelivery = false) {
     const currentDate = new Date();
     const discountEndDate = new Date('2025-10-31');
     let discountApplied = 0;
+    updateOfferBanner();
     
-    if (currentDate <= discountEndDate && originalPrice >= 15) {
+    // Check for first order discount
+    if (checkFirstOrderDiscount()) {
         discountApplied = Math.min(originalPrice * 0.1, 5);
         totalPrice = originalPrice - discountApplied;
     }
@@ -1273,6 +1275,9 @@ function updateCartDisplay() {
             removeFromCart(index);
         });
     });
+    updateShippingProgress();
+    updateOfferBanner(); // Update banner based on new cart total
+    startCountdownTimer(); // Restart timer check with new amount
 }
 function removeFromCart(index) {
     if (index >= 0 && index < cart.length) {
@@ -4876,3 +4881,181 @@ function showTourStep(stepIndex) {
 // Make it available in console
 window.addEventListener('scroll', updateCartButtonPosition);
 window.addEventListener('load', updateCartButtonPosition);
+// Check if user qualifies for countdown discount AND order qualifies
+function userQualifiesForCountdownDiscount() {
+    const currentUser = auth.currentUser;
+    
+    // Check if order qualifies (subtotal over 15 JOD)
+    const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
+    if (subtotal < 15) {
+        return false;
+    }
+    
+    // User-specific key
+    const userKey = currentUser ? `offerCountdown_${currentUser.uid}` : 'offerCountdown_guest';
+    
+    // Check if already used countdown discount
+    if (localStorage.getItem(`${userKey}_used`)) {
+        return false;
+    }
+    
+    // For logged-in users: only new users (no previous orders)
+    if (currentUser) {
+        const hasOrderedBefore = localStorage.getItem(`hasOrdered_${currentUser.uid}`);
+        return !hasOrderedBefore; // Only new users qualify
+    }
+    
+    // For guests: always qualify (they're always "new")
+    return true;
+}// Update the offer banner based on user type and order amount
+function updateOfferBanner() {
+    const offerBanner = document.getElementById('offer-banner');
+    const offerText = document.querySelector('.offer-text');
+    if (!offerText || !offerBanner) return;
+    
+    const currentUser = auth.currentUser;
+    const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
+    
+    // Hide banner if order doesn't qualify
+    if (subtotal < 15) {
+        offerBanner.style.display = 'none';
+        return;
+    }
+    
+    // Show appropriate message
+    if (currentUser) {
+        offerText.innerHTML = `Welcome! Complete your first order over 15 JOD in <span id="countdown-timer">10:00</span> to get 10% OFF!`;
+    } else {
+        offerText.innerHTML = `New customer? Complete your order over 15 JOD in <span id="countdown-timer">10:00</span> to get 10% OFF!`;
+    }
+    
+    offerBanner.style.display = 'block';
+}// Enhanced Countdown Timer that checks order amount
+function startCountdownTimer() {
+    const timerElement = document.getElementById('countdown-timer');
+    const offerBanner = document.getElementById('offer-banner');
+    const closeButton = document.getElementById('close-offer');
+    
+    if (!timerElement) return;
+
+    // Check if user AND order qualify for the countdown discount
+    const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
+    if (!userQualifiesForCountdownDiscount() || subtotal < 15) {
+        if (offerBanner) offerBanner.style.display = 'none';
+        return;
+    }
+
+    let timeLeft = 600; // 10 minutes in seconds
+    
+    // Load saved time from localStorage with user-specific key
+    const userKey = auth.currentUser ? `offerCountdown_${auth.currentUser.uid}` : 'offerCountdown_guest';
+    const savedTime = localStorage.getItem(userKey);
+    
+    if (savedTime) {
+        const elapsed = Math.floor((Date.now() - parseInt(savedTime)) / 1000);
+        timeLeft = Math.max(0, 600 - elapsed);
+        
+        // If time expired, remove qualification
+        if (timeLeft <= 0) {
+            localStorage.removeItem(userKey);
+            localStorage.removeItem(`${userKey}_qualified`);
+            if (offerBanner) offerBanner.style.display = 'none';
+            return;
+        }
+    } else {
+        // Start new countdown and mark as qualified
+        localStorage.setItem(userKey, Date.now().toString());
+        localStorage.setItem(`${userKey}_qualified`, 'true');
+    }
+    
+    const countdown = setInterval(() => {
+        // Re-check if order still qualifies (in case items were removed)
+        const currentSubtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
+        if (currentSubtotal < 15) {
+            clearInterval(countdown);
+            if (offerBanner) offerBanner.style.display = 'none';
+            return;
+        }
+        
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        
+        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            if (offerBanner) offerBanner.style.display = 'none';
+            localStorage.removeItem(userKey);
+            localStorage.removeItem(`${userKey}_qualified`);
+        } else {
+            timeLeft--;
+        }
+    }, 1000);
+    
+    // Close button
+    if (closeButton) {
+        closeButton.addEventListener('click', () => {
+            if (offerBanner) offerBanner.style.display = 'none';
+        });
+    }
+}// Comprehensive discount eligibility check with order amount requirement
+function checkAllDiscountEligibility() {
+    const currentUser = auth.currentUser;
+    const now = new Date();
+    const discountEndDate = new Date('2024-07-25'); // Your existing date
+    const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
+    
+    let eligibleDiscounts = [];
+    
+    // 1. Date-based discount (your existing logic) - requires 15 JOD
+    if (now <= discountEndDate && subtotal >= 15) {
+        eligibleDiscounts.push({
+            type: 'seasonal',
+            message: '🎊 Seasonal Sale: 10% off orders above 15 JOD!',
+            maxAmount: 5,
+            requiresAmount: 15
+        });
+    }
+    
+    // 2. Countdown discount for new users/guests - requires 15 JOD
+    if (userQualifiesForCountdownDiscount() && subtotal >= 15) {
+        eligibleDiscounts.push({
+            type: 'countdown',
+            message: '⏰ Limited Time: 10% off your first order over 15 JOD!',
+            maxAmount: 5,
+            requiresAmount: 15
+        });
+    }
+    
+    // 3. First order discount (if not already covered by countdown) - requires 15 JOD
+    if (currentUser && !localStorage.getItem(`hasOrdered_${currentUser.uid}`) && subtotal >= 15) {
+        eligibleDiscounts.push({
+            type: 'welcome',
+            message: '🎉 Welcome! Enjoy 10% off your first order over 15 JOD!',
+            maxAmount: 5,
+            requiresAmount: 15
+        });
+    }
+    
+    return eligibleDiscounts;
+}// Show message when order is below minimum for discount
+function showMinimumAmountMessage() {
+    const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
+    const discountMessages = document.getElementById('discount-messages');
+    
+    if (subtotal > 0 && subtotal < 15) {
+        const amountNeeded = (15 - subtotal).toFixed(2);
+        if (discountMessages) {
+            discountMessages.innerHTML = `
+                <div class="discount-message info">
+                    💡 Add ${amountNeeded} JOD more to qualify for discounts!
+                </div>
+            `;
+        }
+    } else if (subtotal >= 15) {
+        // Clear the message when qualified
+        if (discountMessages) {
+            discountMessages.innerHTML = '';
+        }
+    }
+}
