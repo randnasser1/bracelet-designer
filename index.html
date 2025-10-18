@@ -2332,23 +2332,36 @@ document.getElementById('translate-btn').addEventListener('click', function() {
 
 <!-- Add this near your user profile -->
 <!-- Update your existing user profile section -->
+<!-- User Profile with Collapsible Orders -->
 <div class="user-profile" id="user-profile" style="display: none;">
-    <span id="user-name">Welcome!</span>
-    
-    <!-- Loyalty Points -->
-    <div class="loyalty-points" id="loyalty-points">
-        <div class="points-display">
-            <span class="points-icon">⭐</span>
-            <span id="points-count">0</span>
+    <div class="profile-header" id="profile-header">
+        <span id="user-name">Welcome!</span>
+        
+        <!-- Loyalty Points -->
+        <div class="loyalty-points" id="loyalty-points">
+            <div class="points-display">
+                <span class="points-icon">⭐</span>
+                <span id="points-count">0</span>
+            </div>
         </div>
+        
+        <button id="logout-btn" class="btn logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
     </div>
     
-    <button id="orders-btn" class="btn orders-btn">
-        <i class="fas fa-history"></i> My Orders
-    </button>
-    <button id="logout-btn" class="btn logout-btn">
-        <i class="fas fa-sign-out-alt"></i> Logout
-    </button>
+    <!-- Collapsible Orders Section -->
+    <div class="collapsible-orders" id="collapsible-orders">
+        <div class="orders-header">
+            <h4><i class="fas fa-history"></i> My Orders</h4>
+            <button class="collapse-btn" id="collapse-orders">
+                <i class="fas fa-chevron-up"></i>
+            </button>
+        </div>
+        <div class="orders-content" id="orders-content">
+            <!-- Order history will be loaded here -->
+        </div>
+    </div>
 </div>
 <!-- Auth Button (shown when not logged in) -->
 <button id="auth-button" class="btn auth-btn">
