@@ -1696,7 +1696,14 @@
   <!-- Add this right after the body tag -->
   <div id="homepage" class="homepage">
   <div class="header-container">
-   
+   <!-- Limited Time Offer Banner -->
+<div class="offer-banner" id="offer-banner" style="display: none;">
+    <div class="offer-content">
+        <span class="offer-icon">🎁</span>
+        <span class="offer-text">Complete your order in <span id="countdown-timer">10:00</span> to get 10% OFF!</span>
+        <button class="offer-close" id="close-offer">×</button>
+    </div>
+</div>
   <div class="promotion-banner">
   <h3 style="color: white;">✨ LIMITED TIME OFFER ✨</h3>
   <h3 style="color: white; font-size: 2em;">10% OFF</h3>
@@ -1884,7 +1891,16 @@
   <i class="fas fa-arrow-left"></i> Change Product
 </button>
    
-
+<!-- Free Shipping Progress -->
+<div class="shipping-progress" id="shipping-progress" style="display: none;">
+    <div class="progress-text">
+        <span>Add <span id="amount-needed">5.00</span> JOD for FREE shipping!</span>
+        <span class="progress-percent">0%</span>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+</div>
 <div class="price-display">
     <div class="price-row" id="base-price">
         <span>Base Price:</span>
@@ -1894,6 +1910,10 @@
         <span>Charms:</span>
         <span>0.00 JDs</span>
     </div>
+  <!-- Discount Messages -->
+<div class="discount-messages" id="discount-messages">
+    <!-- Dynamic discount messages will appear here -->
+</div>
     <div class="price-row" id="slot-price" style="display: none;">
         <!-- Not used in this simplified version -->
     </div>
@@ -2311,8 +2331,18 @@ document.getElementById('translate-btn').addEventListener('click', function() {
 
 
 <!-- Add this near your user profile -->
+<!-- Update your existing user profile section -->
 <div class="user-profile" id="user-profile" style="display: none;">
     <span id="user-name">Welcome!</span>
+    
+    <!-- Loyalty Points -->
+    <div class="loyalty-points" id="loyalty-points">
+        <div class="points-display">
+            <span class="points-icon">⭐</span>
+            <span id="points-count">0</span>
+        </div>
+    </div>
+    
     <button id="orders-btn" class="btn orders-btn">
         <i class="fas fa-history"></i> My Orders
     </button>
