@@ -2309,12 +2309,17 @@ document.getElementById('translate-btn').addEventListener('click', function() {
     </div>
 </div>
 
-<!-- User Profile (shown when logged in) -->
+
+<!-- Add this near your user profile -->
 <div class="user-profile" id="user-profile" style="display: none;">
     <span id="user-name">Welcome!</span>
-    <button id="logout-btn" class="btn">Logout</button>
+    <button id="orders-btn" class="btn orders-btn">
+        <i class="fas fa-history"></i> My Orders
+    </button>
+    <button id="logout-btn" class="btn logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
 </div>
-
 <!-- Auth Button (shown when not logged in) -->
 <button id="auth-button" class="btn auth-btn">
     <i class="fas fa-user"></i> Login
