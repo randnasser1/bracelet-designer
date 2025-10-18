@@ -1,3 +1,5 @@
+let jewelryPiece;
+
 let specialCharmsGrid;
 let rareCharmsGrid;
 let customCharmUpload;
