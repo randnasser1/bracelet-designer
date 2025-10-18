@@ -1,5 +1,18 @@
-let jewelryPiece;
+function waitForFirebase() {
+    return new Promise((resolve) => {
+        const checkFirebase = () => {
+            if (window.firebaseReady && typeof firebase !== 'undefined') {
+                resolve();
+            } else {
+                setTimeout(checkFirebase, 100);
+            }
+        };
+        checkFirebase();
+    });
+}
 
+// Global variables
+let jewelryPiece;
 let specialCharmsGrid;
 let rareCharmsGrid;
 let customCharmUpload;
