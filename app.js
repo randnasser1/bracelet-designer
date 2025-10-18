@@ -453,8 +453,8 @@ function calculatePrice(includeDelivery = false) {
     // Apply material upgrades
      if (materialType === 'gold' && currentProduct === 'bracelet') {
         // Subtract 3.4 from both prices to get 6.6 JD (10 - 3.4 = 6.6)
-        totalPrice -= 3.4;
-        originalPrice -= 3.4;
+        totalPrice += 1;
+        originalPrice -= 1;
     } else if (materialType === 'gold') {
         // For other gold products, add 1 JD
         totalPrice += 1;
@@ -488,7 +488,7 @@ function calculatePrice(includeDelivery = false) {
     // Apply charm costs to both prices
     if (!isFullGlam) {
         // Gold normal bracelets get 0 included specials, others get their normal included specials
-        const includedSpecials = (materialType === 'gold' && currentProduct === 'bracelet') ? 0 : product.includedSpecial;
+        const includedSpecials = 1;
         const paidSpecials = Math.max(0, specialCount - includedSpecials);
         totalPrice += paidSpecials * 2;
         originalPrice += paidSpecials * 2;
