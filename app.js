@@ -990,17 +990,30 @@ function calculatePrice(includeDelivery = false) {
     originalPrice += longCharmCount * 6;
 
     // Check for discount eligibility
-    const currentDate = new Date();
-    const discountEndDate = new Date('2025-10-31');
-    let discountApplied = 0;
     updateOfferBanner();
     
-    // Check for first order discount
-    if (checkFirstOrderDiscount()) {
-        discountApplied = Math.min(originalPrice * 0.1, 5);
-        totalPrice = originalPrice - discountApplied;
+     let discountApplied = 0;
+    let qualifiesForDiscount = false;
+    const MINIMUM_FOR_DISCOUNT = 15.00;
+    
+    if (originalPrice >= MINIMUM_FOR_DISCOUNT) {
+        qualifiesForDiscount = true;
+        
+        // Check for first order discount
+        if (checkFirstOrderDiscount()) {
+            discountApplied = Math.min(originalPrice * 0.1, 5);
+            totalPrice = originalPrice - discountApplied;
+        }
+        
+        // Check for seasonal discount
+        const currentDate = new Date();
+        const discountEndDate = new Date('2025-10-31');
+        if (currentDate <= discountEndDate) {
+            const seasonalDiscount = Math.min(originalPrice * 0.1, 5);
+            discountApplied = Math.max(discountApplied, seasonalDiscount);
+            totalPrice = originalPrice - discountApplied;
+        }
     }
-
     if (includeDelivery) {
         const deliveryFee = 2.5;
         return {
