@@ -2089,7 +2089,10 @@
           <label for="phone2">Second Phone Number (Optional)</label>
           <input type="tel" id="phone2" name="phone2">
         </div>
-        
+            <div class="form-group">
+        <label for="customer-email">Email (for order confirmation)</label>
+        <input type="email" id="customer-email" name="customer-email" placeholder="your-email@gmail.com">
+    </div>
         <div class="form-group">
           <label for="governorate">Governorate*</label>
           <select id="governorate" name="governorate" required>
@@ -2256,7 +2259,65 @@ document.getElementById('translate-btn').addEventListener('click', function() {
 });
 </script>
 <!-- Guided Tour -->
+<!-- Auth Modal -->
+<div class="modal" id="auth-modal">
+    <div class="order-modal-content">
+        <h2>Welcome to Italia Charms</h2>
+        
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Login</button>
+            <button class="auth-tab" data-tab="signup">Sign Up</button>
+        </div>
+        
+        <!-- Login Form -->
+        <form id="login-form" class="auth-form active">
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" required placeholder="your-email@gmail.com">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" required placeholder="Your password">
+            </div>
+            <button type="submit" class="btn confirm-order-btn">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
+        
+        <!-- Sign Up Form -->
+        <form id="signup-form" class="auth-form">
+            <div class="form-group">
+                <label for="signup-name">Full Name</label>
+                <input type="text" id="signup-name" required placeholder="Your full name">
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" required placeholder="your-email@gmail.com">
+            </div>
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" required placeholder="Create a password">
+            </div>
+            <button type="submit" class="btn confirm-order-btn">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            <button class="btn cancel-btn" id="close-auth">Close</button>
+        </div>
+    </div>
+</div>
 
+<!-- User Profile (shown when logged in) -->
+<div class="user-profile" id="user-profile" style="display: none;">
+    <span id="user-name">Welcome!</span>
+    <button id="logout-btn" class="btn">Logout</button>
+</div>
+
+<!-- Auth Button (shown when not logged in) -->
+<button id="auth-button" class="btn auth-btn">
+    <i class="fas fa-user"></i> Login
+</button>
 </body>
 </html>
-
