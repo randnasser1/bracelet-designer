@@ -2522,7 +2522,8 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         },
         // Enhanced user linking
         userId: currentUser ? currentUser.uid : null,
-        userEmail: currentUser ? currentUser.email : null,
+    userEmail: currentUser ? currentUser.email : formData.get('customer-email'),
+    isGuestOrder: currentUser ? false : true,
         userName: currentUser ? currentUser.displayName : formData.get('full-name'),
         paymentMethod: paymentMethod,
         currency: "JOD",
