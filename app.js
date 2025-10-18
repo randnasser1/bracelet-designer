@@ -903,15 +903,15 @@ function calculatePrice(includeDelivery = false) {
             }
         });
         
-        const subtotal = basePrice + charmCost; // Only add basePrice once, not multiplied by slot count
+        const subtotal = basePrice + charmCost;
         const delivery = includeDelivery ? 2.5 : 0;
         const total = subtotal + delivery;
         
         return {
-            subtotal: subtotal,
+            subtotal: parseFloat(subtotal.toFixed(2)),
             discount: 0,
-            total: total,
-            delivery: delivery
+            total: parseFloat(total.toFixed(2)),
+            delivery: parseFloat(delivery.toFixed(2))
         };
     }
      
@@ -936,19 +936,16 @@ function calculatePrice(includeDelivery = false) {
     let totalPrice = originalPrice;
 
     // Apply material upgrades
-     if (materialType === 'gold' && currentProduct === 'bracelet') {
-        // Subtract 3.4 from both prices to get 6.6 JD (10 - 3.4 = 6.6)
+    if (materialType === 'gold' && currentProduct === 'bracelet') {
         totalPrice += 1;
         originalPrice -= 1;
     } else if (materialType === 'gold') {
-        // For other gold products, add 1 JD
         totalPrice += 1;
         originalPrice += 1;
     } else if (materialType === 'mix') {
         totalPrice += 2.5;
         originalPrice += 2.5;
     }
-
 
     // Count all placed charms and calculate costs
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
@@ -972,7 +969,6 @@ function calculatePrice(includeDelivery = false) {
      
     // Apply charm costs to both prices
     if (!isFullGlam) {
-        // Gold normal bracelets get 0 included specials, others get their normal included specials
         const includedSpecials = 1;
         const paidSpecials = Math.max(0, specialCount - includedSpecials);
         totalPrice += paidSpecials * 2;
@@ -986,19 +982,15 @@ function calculatePrice(includeDelivery = false) {
     totalPrice += customCount * 3.5;
     originalPrice += customCount * 3.5;
     
-    totalPrice += longCharmCount * 6; // Long charms cost 6 JD each
+    totalPrice += longCharmCount * 6;
     originalPrice += longCharmCount * 6;
 
     // Check for discount eligibility
-    updateOfferBanner();
-    
-     let discountApplied = 0;
-    let qualifiesForDiscount = false;
+    let discountApplied = 0;
     const MINIMUM_FOR_DISCOUNT = 15.00;
+    let qualifiesForDiscount = originalPrice >= MINIMUM_FOR_DISCOUNT;
     
-    if (originalPrice >= MINIMUM_FOR_DISCOUNT) {
-        qualifiesForDiscount = true;
-        
+    if (qualifiesForDiscount) {
         // Check for first order discount
         if (checkFirstOrderDiscount()) {
             discountApplied = Math.min(originalPrice * 0.1, 5);
@@ -1014,6 +1006,12 @@ function calculatePrice(includeDelivery = false) {
             totalPrice = originalPrice - discountApplied;
         }
     }
+
+    // Ensure all values are valid numbers
+    originalPrice = parseFloat(originalPrice.toFixed(2));
+    totalPrice = parseFloat(totalPrice.toFixed(2));
+    discountApplied = parseFloat(discountApplied.toFixed(2));
+
     if (includeDelivery) {
         const deliveryFee = 2.5;
         return {
@@ -1026,7 +1024,9 @@ function calculatePrice(includeDelivery = false) {
             longCharmCount: longCharmCount,
             specialCount: specialCount,
             rareCount: rareCount,
-            customCount: customCount
+            customCount: customCount,
+            qualifiesForDiscount: qualifiesForDiscount,
+            minimumForDiscount: MINIMUM_FOR_DISCOUNT
         };
     }
     
@@ -1040,8 +1040,16 @@ function calculatePrice(includeDelivery = false) {
         longCharmCount: longCharmCount,
         specialCount: specialCount,
         rareCount: rareCount,
-        customCount: customCount
+        customCount: customCount,
+        qualifiesForDiscount: qualifiesForDiscount,
+        minimumForDiscount: MINIMUM_FOR_DISCOUNT
     };
+}
+function safeDisplayPrice(price) {
+    if (isNaN(price) || price === null || price === undefined) {
+        return '0.00';
+    }
+    return parseFloat(price).toFixed(2);
 }
 async function uploadBraceletImage(imageFile) {
   try {
@@ -1342,10 +1350,9 @@ function updatePrice() {
         const totalPriceElement = document.getElementById('total-price');
         const discountMessages = document.getElementById('discount-messages');
 
-        // Update basic price display
+        // Update basic price display with safe values
         if (totalPriceElement) {
             if (priceData.discount > 0) {
-                // 🎉 SHOW BEAUTIFUL DISCOUNT PRICING
                 const originalTotal = priceData.subtotal;
                 const discountedTotal = priceData.total;
                 
@@ -1353,19 +1360,19 @@ function updatePrice() {
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span style="text-decoration: line-through; color: #999; font-size: 0.9rem;">
-                                ${originalTotal.toFixed(2)} JDs
+                                ${safeDisplayPrice(originalTotal)} JDs
                             </span>
                             <span style="font-weight: bold; color: #d6336c; font-size: 1.1rem;">
-                                ${discountedTotal.toFixed(2)} JDs
+                                ${safeDisplayPrice(discountedTotal)} JDs
                             </span>
                         </div>
                         <div style="background: #4CAF50; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">
-                            🎉 You save ${priceData.discount.toFixed(2)} JDs!
+                            🎉 You save ${safeDisplayPrice(priceData.discount)} JDs!
                         </div>
                     </div>
                 `;
             } else {
-                totalPriceElement.textContent = `Total: ${priceData.total.toFixed(2)} JDs`;
+                totalPriceElement.textContent = `Total: ${safeDisplayPrice(priceData.total)} JDs`;
             }
         }
         
@@ -1375,10 +1382,10 @@ function updatePrice() {
             } else {
                 const product = PRODUCTS[currentProduct];
                 if (isFullGlam) {
-                    basePriceElement.innerHTML = `<span>Full Glam Base:</span><span>${product.fullGlam.toFixed(2)} JDs</span>`;
+                    basePriceElement.innerHTML = `<span>Full Glam Base:</span><span>${safeDisplayPrice(product.fullGlam)} JDs</span>`;
                 } else {
                     const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
-                    basePriceElement.innerHTML = `<span>Base Price:</span><span>${basePrice.toFixed(2)} JDs</span>`;
+                    basePriceElement.innerHTML = `<span>Base Price:</span><span>${safeDisplayPrice(basePrice)} JDs</span>`;
                 }
             }
         }
@@ -1386,13 +1393,13 @@ function updatePrice() {
         if (charmPriceElement) {
             if (currentProduct === 'individual') {
                 const charmCost = priceData.total - 3;
-                charmPriceElement.innerHTML = `<span>Charms:</span><span>${charmCost.toFixed(2)} JDs</span>`;
+                charmPriceElement.innerHTML = `<span>Charms:</span><span>${safeDisplayPrice(charmCost)} JDs</span>`;
             } else {
-                charmPriceElement.innerHTML = `<span>Charms:</span><span>${priceData.charmCost.toFixed(2)} JDs</span>`;
+                charmPriceElement.innerHTML = `<span>Charms:</span><span>${safeDisplayPrice(priceData.charmCost)} JDs</span>`;
             }
         }
 
-        // 🎯 BEAUTIFUL DISCOUNT MESSAGES
+        // Rest of your discount messages code remains the same...
         if (discountMessages) {
             discountMessages.innerHTML = '';
             
@@ -1405,11 +1412,11 @@ function updatePrice() {
                                 <div class="discount-content">
                                     <div class="discount-title">Discount Applied!</div>
                                     <div class="discount-details">
-                                        <span class="original-price">${priceData.subtotal.toFixed(2)} JOD</span>
+                                        <span class="original-price">${safeDisplayPrice(priceData.subtotal)} JOD</span>
                                         <span class="discount-arrow">→</span>
-                                        <span class="final-price">${priceData.total.toFixed(2)} JOD</span>
+                                        <span class="final-price">${safeDisplayPrice(priceData.total)} JOD</span>
                                     </div>
-                                    <div class="discount-savings">You save ${priceData.discount.toFixed(2)} JOD! (10% OFF)</div>
+                                    <div class="discount-savings">You save ${safeDisplayPrice(priceData.discount)} JOD! (10% OFF)</div>
                                 </div>
                             </div>
                         `;
@@ -1431,7 +1438,7 @@ function updatePrice() {
                             <div class="discount-icon">📢</div>
                             <div class="discount-content">
                                 <div class="discount-title">Almost There!</div>
-                                <div class="discount-details">Add <span class="amount-needed">${amountNeeded} JOD</span> more to get 10% OFF</div>
+                                <div class="discount-details">Add <span class="amount-needed">${safeDisplayPrice(amountNeeded)} JOD</span> more to get 10% OFF</div>
                                 <div class="discount-minimum">Minimum order: 15.00 JOD</div>
                             </div>
                         </div>
@@ -1442,6 +1449,11 @@ function updatePrice() {
 
     } catch (error) {
         console.log('Price update failed:', error);
+        // Fallback to safe values
+        const totalPriceElement = document.getElementById('total-price');
+        if (totalPriceElement) {
+            totalPriceElement.textContent = 'Total: 0.00 JDs';
+        }
     }
 }
 function getCharmBreakdownText() {
@@ -4813,6 +4825,17 @@ setTimeout(() => {
             const productType = this.getAttribute('data-type');
             initProduct(productType);
         });
+    });
+    setTimeout(() => {
+        updatePrice();
+    }, 500);
+    
+    // Add error handling for price updates
+    window.addEventListener('error', function(e) {
+        if (e.message.includes('price') || e.message.includes('NaN')) {
+            console.log('Price calculation error detected, resetting...');
+            updatePrice();
+        }
     });
 });
 // Add this JavaScript to handle the guided tour
