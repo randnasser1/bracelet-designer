@@ -3971,3 +3971,203 @@ width: 100px !important;
 .frequently-bought {
     animation: slideDown 0.5s ease-out;
 }
+/* Collapsible Orders Styles */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.profile-header:hover {
+    background: rgba(214, 51, 108, 0.05);
+    border-radius: 10px;
+    padding: 0.5rem;
+}
+
+.collapsible-orders {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.3s ease;
+    opacity: 0;
+    margin-top: 0;
+}
+
+.collapsible-orders.expanded {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 1rem;
+}
+
+.orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-top: 1px solid #f0f0f0;
+    cursor: pointer;
+}
+
+.orders-header h4 {
+    color: #d6336c;
+    margin: 0;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.collapse-btn {
+    background: none;
+    border: none;
+    color: #d6336c;
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.collapse-btn:hover {
+    background: rgba(214, 51, 108, 0.1);
+    transform: scale(1.1);
+}
+
+.collapse-btn .fa-chevron-up {
+    transition: transform 0.3s ease;
+}
+
+.collapse-btn.collapsed .fa-chevron-up {
+    transform: rotate(180deg);
+}
+
+.orders-content {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+}
+
+/* Order items inside collapsible */
+.orders-content .order-item {
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+    background: #fafafa;
+    transition: all 0.3s ease;
+}
+
+.orders-content .order-item:hover {
+    border-color: #d6336c;
+    transform: translateY(-1px);
+}
+
+.orders-content .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 0.5rem;
+    padding: 0;
+    cursor: default;
+}
+
+.orders-content .order-header:hover {
+    background: none;
+    padding: 0;
+}
+
+.orders-content .order-info strong {
+    color: #d6336c;
+    display: block;
+    font-size: 0.85rem;
+}
+
+.orders-content .order-date {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.orders-content .order-status {
+    text-align: right;
+}
+
+.orders-content .status-badge {
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+.orders-content .order-total {
+    font-weight: bold;
+    color: #d6336c;
+    font-size: 0.85rem;
+}
+
+.orders-content .order-items-preview {
+    margin: 0.3rem 0;
+}
+
+.orders-content .order-item-preview {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    padding: 0.1rem 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.orders-content .order-item-preview:last-child {
+    border-bottom: none;
+}
+
+.orders-content .view-order-btn {
+    width: 100%;
+    padding: 0.4rem;
+    font-size: 0.75rem;
+    margin-top: 0.3rem;
+    background: #d6336c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.orders-content .view-order-btn:hover {
+    background: #c2255c;
+}
+
+/* Empty orders state */
+.orders-content .empty-orders {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #666;
+    font-style: italic;
+}
+
+.orders-content .empty-orders p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+}
+
+/* Smooth scrolling */
+.orders-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.orders-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.orders-content::-webkit-scrollbar-thumb {
+    background: #d6336c;
+    border-radius: 10px;
+}
+
+.orders-content::-webkit-scrollbar-thumb:hover {
+    background: #c2255c;
+}
