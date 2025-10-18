@@ -1,18 +1,26 @@
-
+// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyD_iOEwu71dL4Lmfl7Km8lSlYFzSuubbzY",
     authDomain: "italian-charms.firebaseapp.com",
     projectId: "italian-charms",
-  storageBucket: "italian-charms.firebasestorage.app" ,// ← MUST match your CORS-configured bucket
+    storageBucket: "italian-charms.firebasestorage.app",
     messagingSenderId: "156559643870",
     appId: "1:156559643870:web:a14807a2a6d1761b71de4f"
-}; 
+};
 
-// Wait for Firebase to load
-function initializeFirebase() {
-    if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
+// Wait for window to load completely
+window.addEventListener('load', function() {
+    console.log('Window loaded, checking Firebase...');
+    
+    if (typeof firebase === 'undefined') {
+        console.error('❌ Firebase scripts failed to load!');
+        return;
+    }
+    
+    try {
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        console.log('Firebase initialized successfully');
+        console.log('✅ Firebase initialized successfully');
         
         // Initialize services
         window.auth = firebase.auth();
@@ -20,20 +28,12 @@ function initializeFirebase() {
         window.storage = firebase.storage();
         window.functions = firebase.functions();
         
-        console.log('Firebase services initialized');
-    } else if (firebase.apps.length > 0) {
-        console.log('Firebase already initialized');
-    } else {
-        console.log('Firebase not loaded yet');
+        console.log('✅ All Firebase services ready');
+        
+        // Signal that Firebase is ready
+        window.firebaseReady = true;
+        
+    } catch (error) {
+        console.error('❌ Firebase initialization failed:', error);
     }
-}
-
-// Initialize when Firebase is ready
-if (typeof firebase !== 'undefined') {
-    initializeFirebase();
-} else {
-    // Retry after a short delay
-    setTimeout(initializeFirebase, 1000);
-}
-
-
+});
