@@ -1216,7 +1216,6 @@ function updateCartDisplay() {
     const cartDiscountAmount = document.getElementById('cart-discount-amount');
     const cartDelivery = document.getElementById('cart-delivery');
     const cartTotal = document.querySelector('.cart-total');
-    const placeOrderBtn = document.getElementById('order-btn');
     
     cartCount.textContent = cart.length;
     
@@ -1250,7 +1249,8 @@ function updateCartDisplay() {
         }
     }
     
-    const total = discountedSubtotal - additionalDiscount + deliveryFee;
+    const totalBeforeDiscount = discountedSubtotal + deliveryFee;
+    const finalTotal = totalBeforeDiscount - additionalDiscount;
 
     // Display cart items
     cart.forEach((item, index) => {
@@ -1275,34 +1275,46 @@ function updateCartDisplay() {
     cartSubtotal.textContent = `Subtotal: ${discountedSubtotal.toFixed(2)} JDs`;
     cartDelivery.textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
     
-    // 🎯 SHOW DISCOUNT INFORMATION
+    // 🎯 BEAUTIFUL CART DISCOUNT DISPLAY
     if (additionalDiscount > 0) {
         cartDiscountInfo.style.display = 'block';
-        cartDiscountAmount.textContent = `Seasonal Discount: -${additionalDiscount.toFixed(2)} JDs`;
+        cartDiscountAmount.innerHTML = `
+            <div class="cart-discount-applied">
+                <span class="discount-badge">🎉 10% OFF</span>
+                <span class="discount-amount">-${additionalDiscount.toFixed(2)} JDs</span>
+            </div>
+        `;
         
         cartTotal.innerHTML = `
-            <div>
-                <span style="text-decoration: line-through; color: #999; margin-right: 8px;">
-                    ${(discountedSubtotal + deliveryFee).toFixed(2)} JDs
-                </span>
-                <span style="font-weight: bold; color: #d6336c;">
-                    ${total.toFixed(2)} JDs
-                </span>
-            </div>
-            <div style="color: #4CAF50; font-size: 0.9rem; margin-top: 4px;">
-                🎉 You saved ${additionalDiscount.toFixed(2)} JDs!
+            <div class="cart-total-with-discount">
+                <div class="price-comparison">
+                    <span class="original-price">${totalBeforeDiscount.toFixed(2)} JDs</span>
+                    <span class="final-price">${finalTotal.toFixed(2)} JDs</span>
+                </div>
+                <div class="savings-message">
+                    You saved ${additionalDiscount.toFixed(2)} JDs!
+                </div>
             </div>
         `;
     } else if (qualifiesForDiscount) {
         cartDiscountInfo.style.display = 'block';
-        cartDiscountAmount.textContent = '✅ Qualifies for discounts!';
-        cartTotal.textContent = `Total: ${(discountedSubtotal + deliveryFee).toFixed(2)} JDs`;
+        cartDiscountAmount.innerHTML = `
+            <div class="cart-discount-eligible">
+                <span class="discount-badge">⭐ ELIGIBLE</span>
+                <span>10% discount will be applied at checkout</span>
+            </div>
+        `;
+        cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
     } else {
         cartDiscountInfo.style.display = 'block';
         const amountNeeded = (MINIMUM_ORDER - subtotal).toFixed(2);
-        cartDiscountAmount.innerHTML = `📢 Add ${amountNeeded} JOD more for 10% off!`;
-        cartDiscountAmount.style.color = '#ff6b6b';
-        cartTotal.textContent = `Total: ${(discountedSubtotal + deliveryFee).toFixed(2)} JDs`;
+        cartDiscountAmount.innerHTML = `
+            <div class="cart-discount-not-eligible">
+                <span class="discount-badge">📢 ALMOST THERE</span>
+                <span>Add ${amountNeeded} JOD for 10% OFF</span>
+            </div>
+        `;
+        cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
     }
 
     // Reattach event listeners
@@ -1332,7 +1344,29 @@ function updatePrice() {
 
         // Update basic price display
         if (totalPriceElement) {
-            totalPriceElement.textContent = `Total: ${priceData.total.toFixed(2)} JDs`;
+            if (priceData.discount > 0) {
+                // 🎉 SHOW BEAUTIFUL DISCOUNT PRICING
+                const originalTotal = priceData.subtotal;
+                const discountedTotal = priceData.total;
+                
+                totalPriceElement.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="text-decoration: line-through; color: #999; font-size: 0.9rem;">
+                                ${originalTotal.toFixed(2)} JDs
+                            </span>
+                            <span style="font-weight: bold; color: #d6336c; font-size: 1.1rem;">
+                                ${discountedTotal.toFixed(2)} JDs
+                            </span>
+                        </div>
+                        <div style="background: #4CAF50; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">
+                            🎉 You save ${priceData.discount.toFixed(2)} JDs!
+                        </div>
+                    </div>
+                `;
+            } else {
+                totalPriceElement.textContent = `Total: ${priceData.total.toFixed(2)} JDs`;
+            }
         }
         
         if (basePriceElement) {
@@ -1358,7 +1392,7 @@ function updatePrice() {
             }
         }
 
-        // 🎯 UPDATE DISCOUNT MESSAGES BASED ON MINIMUM ORDER
+        // 🎯 BEAUTIFUL DISCOUNT MESSAGES
         if (discountMessages) {
             discountMessages.innerHTML = '';
             
@@ -1366,22 +1400,40 @@ function updatePrice() {
                 if (priceData.qualifiesForDiscount) {
                     if (priceData.discount > 0) {
                         discountMessages.innerHTML = `
-                            <div class="discount-message success">
-                                ✅ You qualify for discounts! ${priceData.discount.toFixed(2)} JDs OFF applied!
+                            <div class="discount-banner success">
+                                <div class="discount-icon">🎊</div>
+                                <div class="discount-content">
+                                    <div class="discount-title">Discount Applied!</div>
+                                    <div class="discount-details">
+                                        <span class="original-price">${priceData.subtotal.toFixed(2)} JOD</span>
+                                        <span class="discount-arrow">→</span>
+                                        <span class="final-price">${priceData.total.toFixed(2)} JOD</span>
+                                    </div>
+                                    <div class="discount-savings">You save ${priceData.discount.toFixed(2)} JOD! (10% OFF)</div>
+                                </div>
                             </div>
                         `;
                     } else {
                         discountMessages.innerHTML = `
-                            <div class="discount-message info">
-                                💡 Your order qualifies for discounts! Complete checkout to apply.
+                            <div class="discount-banner eligible">
+                                <div class="discount-icon">⭐</div>
+                                <div class="discount-content">
+                                    <div class="discount-title">You Qualify for 10% OFF!</div>
+                                    <div class="discount-details">Complete your order to apply the discount</div>
+                                </div>
                             </div>
                         `;
                     }
                 } else {
                     const amountNeeded = (priceData.minimumForDiscount - priceData.subtotal).toFixed(2);
                     discountMessages.innerHTML = `
-                        <div class="discount-message warning">
-                            📢 Add ${amountNeeded} JOD more to qualify for 10% discount (min. 15 JOD)!
+                        <div class="discount-banner not-eligible">
+                            <div class="discount-icon">📢</div>
+                            <div class="discount-content">
+                                <div class="discount-title">Almost There!</div>
+                                <div class="discount-details">Add <span class="amount-needed">${amountNeeded} JOD</span> more to get 10% OFF</div>
+                                <div class="discount-minimum">Minimum order: 15.00 JOD</div>
+                            </div>
                         </div>
                     `;
                 }
@@ -2492,21 +2544,22 @@ function handlePlaceOrderClick() {
         return;
     }
     
-    // 🎯 CHECK MINIMUM ORDER AMOUNT
+    // Check minimum order amount
     const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
     const MINIMUM_ORDER = 15.00;
     
     if (subtotal < MINIMUM_ORDER) {
         const amountNeeded = (MINIMUM_ORDER - subtotal).toFixed(2);
         showCustomWarningModal(
-            `Minimum Order Required!\n\nYour order is ${subtotal.toFixed(2)} JOD.\n` +
-            `You need to add ${amountNeeded} JOD more to reach the minimum order of 15 JOD.\n\n` +
-            `💡 Add more charms or upgrade to Full Glam to qualify!`
+            `🎯 Minimum Order Required!\n\n💳 Your current order: ${subtotal.toFixed(2)} JOD\n` +
+            `💰 You need: ${amountNeeded} JOD more\n` +
+            `🎁 Minimum for 10% discount: 15.00 JOD\n\n` +
+            `💡 Add more charms or upgrade to Full Glam!`
         );
         return;
     }
     
-    // Validate charm sets before checkout
+    // Validate charm sets
     const invalidSets = validateCartForCheckout();
     if (invalidSets.length > 0) {
         const errorMessages = invalidSets.map(set => 
@@ -2524,13 +2577,41 @@ function handlePlaceOrderClick() {
     orderModal.classList.add('active');
     document.body.classList.add('modal-open');
     
-    // Calculate order totals
+    // Calculate order totals with beautiful discount display
     const deliveryFee = 2.5;
-    const total = subtotal + deliveryFee;
+    const totalBeforeDiscount = subtotal + deliveryFee;
     
+    // Calculate discount
+    let discount = 0;
+    if (subtotal >= MINIMUM_ORDER) {
+        discount = Math.min(subtotal * 0.1, 5);
+    }
+    
+    const finalTotal = totalBeforeDiscount - discount;
+    
+    // Update order summary with beautiful discount display
     document.getElementById('order-subtotal').textContent = `Subtotal: ${subtotal.toFixed(2)} JDs`;
     document.getElementById('order-delivery').textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
-    document.getElementById('order-total-price').textContent = `Total: ${total.toFixed(2)} JDs`;
+    
+    if (discount > 0) {
+        document.getElementById('order-total-price').innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="text-decoration: line-through; color: #999;">
+                        ${totalBeforeDiscount.toFixed(2)} JDs
+                    </span>
+                    <span style="font-weight: bold; color: #d6336c; font-size: 1.2rem;">
+                        ${finalTotal.toFixed(2)} JDs
+                    </span>
+                </div>
+                <div style="color: #4CAF50; font-size: 0.9rem; font-weight: bold;">
+                    🎉 10% Discount Applied! (-${discount.toFixed(2)} JDs)
+                </div>
+            </div>
+        `;
+    } else {
+        document.getElementById('order-total-price').textContent = `Total: ${finalTotal.toFixed(2)} JDs`;
+    }
 }
 
 function handleCancelOrder() {
