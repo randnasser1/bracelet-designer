@@ -3401,4 +3401,21 @@ width: 100px !important;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}/* Info Message Style */
+.discount-message.info {
+    background: #e2e3e5;
+    border: 1px solid #d6d8db;
+    color: #383d41;
+}
+
+/* Minimum amount warning */
+.minimum-amount-warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin: 5px 0;
+    font-size: 0.85rem;
+    text-align: center;
 }
