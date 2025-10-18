@@ -31,8 +31,8 @@ exports.sendOrderEmails = functions.https.onCall(async (data, context) => {
     try {
         // Email to admin (YOU)
         const adminEmail = {
-            from: 'Italia Charms <your-email@gmail.com>',
-            to: 'your-email@gmail.com', // CHANGE THIS TO YOUR ACTUAL EMAIL
+            from: 'Italia Charms italiacharmshop@gmail.com',
+            to: 'italiacharmshop@gmail.com', // CHANGE THIS TO YOUR ACTUAL EMAIL
             subject: `🎉 New Order Received - Order #${orderId}`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -84,7 +84,7 @@ exports.sendOrderEmails = functions.https.onCall(async (data, context) => {
         // Email to customer (only if they provided email)
         if (customerEmail) {
             const customerEmailHtml = {
-                from: 'Italia Charms <your-email@gmail.com>',
+                from: 'Italia Charms italiacharmshop@gmail.com',
                 to: customerEmail,
                 subject: `🎀 Your Italia Charms Order Confirmation - #${orderId}`,
                 html: `
