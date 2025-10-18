@@ -8,21 +8,30 @@ const firebaseConfig = {
     appId: "1:156559643870:web:a14807a2a6d1761b71de4f"
 }; 
 
-
-// Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+// Wait for Firebase to load
+function initializeFirebase() {
+    if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
+        firebase.initializeApp(firebaseConfig);
+        console.log('Firebase initialized successfully');
+        
+        // Initialize services
+        window.auth = firebase.auth();
+        window.db = firebase.firestore();
+        window.storage = firebase.storage();
+        window.functions = firebase.functions();
+        
+        console.log('Firebase services initialized');
+    } else if (firebase.apps.length > 0) {
+        console.log('Firebase already initialized');
+    } else {
+        console.log('Firebase not loaded yet');
+    }
 }
 
-// Initialize services - FIXED: Use firebase.auth() not auth directly
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
-
-// Make them globally available
-window.firebase = firebase;
-window.auth = auth;
-window.db = db;
-window.storage = storage;
-
-console.log('Firebase initialized successfully');
+// Initialize when Firebase is ready
+if (typeof firebase !== 'undefined') {
+    initializeFirebase();
+} else {
+    // Retry after a short delay
+    setTimeout(initializeFirebase, 1000);
+}
