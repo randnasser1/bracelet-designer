@@ -1690,6 +1690,51 @@
     background: #d6336c;
     transform: translateY(-50%) scale(1.1);
 }
+    .category-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.6rem;
+    overflow-x: auto;
+    padding: 0.8rem 1.5rem;
+    scrollbar-width: thin;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    justify-content: flex-start; /* Add this line */
+    scroll-padding-left: 0; /* Add this line */
+    scroll-snap-type: x mandatory; /* Optional: for better snapping */
+}
+
+.category-tab {
+    background: #f5a0c2;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    min-width: max-content;
+    font-weight: 600;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+    scroll-snap-align: start; /* Optional: for better snapping */
+}
+
+/* Ensure the container doesn't center content */
+.category-tabs-container {
+    position: relative;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+}
+
+/* Make sure the first tab is always visible at start */
+.category-tabs:first-child {
+    margin-left: 0;
+}
 </style>
 </head>
 <body>
