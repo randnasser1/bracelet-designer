@@ -688,11 +688,11 @@ const rareCharms = [
   { src: 'rares/sanrio/metalkitty.png', category: 'sanrio', quantity: 9 },
   { src: 'rares/sanrio/83-gold.png', category: 'sanrio', quantity: 9 },
   // sporty charms
-  { src: 'rares/sporty/sporty.png', category: 'sporty', quantity: 1 },
+  { src: 'rares/sporty/sporty.png', category: 'sporty', quantity: 0 },
   { src: 'rares/sporty/18-gold.png', category: 'sporty', quantity: 0 },
   { src: 'rares/sporty/sporty2.png', category: 'sporty', quantity: 0 },
   { src: 'rares/sporty/sporty3.png', category: 'sporty', quantity: 4 },
-  { src: 'rares/sporty/sporty4.png', category: 'sporty', quantity: 2 },
+  { src: 'rares/sporty/sporty4.png', category: 'sporty', quantity: 0},
   { src: 'rares/sporty/sporty5.png', category: 'sporty', quantity: 0 },
   { src: 'rares/sporty/sporty6.png', category: 'sporty', quantity: 0 },
   { src: 'rares/sporty/sporty7.png', category: 'sporty', quantity: 2 },
@@ -702,11 +702,11 @@ const rareCharms = [
   { src: 'rares/sporty/sporty10.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty11.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/sporty12.png', category: 'sporty', quantity: 0 },
-  { src: 'rares/sporty/sporty13.png', category: 'sporty', quantity: 1 },
+  { src: 'rares/sporty/sporty13.png', category: 'sporty', quantity: 0 },
   { src: 'rares/sporty/sporty14.png', category: 'sporty', quantity: 0 },
   { src: 'rares/sporty/sporty15.png', category: 'sporty', quantity: 1 },
   { src: 'rares/sporty/29.png', category: 'sporty', quantity: 1 },
-  { src: 'rares/sporty/31.png', category: 'sporty', quantity: 1 },
+  { src: 'rares/sporty/31.png', category: 'sporty', quantity: 0 },
   { src: 'rares/new-collection/8x.png', category: 'sporty', quantity: 1 },
 
   // dangly charms
