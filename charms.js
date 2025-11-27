@@ -297,10 +297,7 @@ const specialCharms = [
   { src: 'special/teddy/128-gold.png', category: 'teddy', quantity: 9 },
   { src: 'special/teddy/teddy5.png', category: 'teddy', quantity: 9 },
   { src: 'special/teddy/teddy6.png', category: 'teddy', quantity: 11 },
-];
-
-const rareCharms = [
-  // girly charms
+   // girly charms
   { src: 'special/new-collection/11.png', category: 'girly', quantity: 1 },
   { src: 'special/new-collection/33.png', category: 'girly', quantity: 1 },
   { src: 'special/new-collection/29-gold.png', category: 'girly', quantity: 1 },
@@ -501,6 +498,10 @@ const rareCharms = [
   { src: 'special/newc2s/c295-gold.png', category: 'newc2s', quantity: 4 },
   { src: 'special/newc2s/c298.png', category: 'newc2s', quantity: 1 },
   { src: 'special/newc2s/c299.png', category: 'newc2s', quantity: 1 },
+];
+
+const rareCharms = [
+ 
   // newc4s charms
   { src: 'special/newc4s/c430.png', category: 'newc4s', quantity: 1 },
   { src: 'special/newc4s/c431.png', category: 'newc4s', quantity: 1 },
