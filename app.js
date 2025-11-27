@@ -1288,7 +1288,7 @@ function updateCartDisplay() {
         cartDiscountInfo.style.display = 'block';
         cartDiscountAmount.innerHTML = `
             <div class="cart-discount-applied">
-                <span class="discount-badge">🎉 10% OFF</span>
+                <span class="discount-badge">🎉 20% OFF</span>
                 <span class="discount-amount">-${additionalDiscount.toFixed(2)} JDs</span>
             </div>
         `;
@@ -1309,7 +1309,7 @@ function updateCartDisplay() {
         cartDiscountAmount.innerHTML = `
             <div class="cart-discount-eligible">
                 <span class="discount-badge">⭐ ELIGIBLE</span>
-                <span>10% discount will be applied at checkout</span>
+                <span>20% discount will be applied at checkout</span>
             </div>
         `;
         cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
@@ -1319,7 +1319,7 @@ function updateCartDisplay() {
         cartDiscountAmount.innerHTML = `
             <div class="cart-discount-not-eligible">
                 <span class="discount-badge">📢 ALMOST THERE</span>
-                <span>Add ${amountNeeded} JOD for 10% OFF</span>
+                <span>Add ${amountNeeded} JOD for 20% OFF</span>
             </div>
         `;
         cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
@@ -1416,7 +1416,7 @@ function updatePrice() {
                                         <span class="discount-arrow">→</span>
                                         <span class="final-price">${safeDisplayPrice(priceData.total)} JOD</span>
                                     </div>
-                                    <div class="discount-savings">You save ${safeDisplayPrice(priceData.discount)} JOD! (10% OFF)</div>
+                                    <div class="discount-savings">You save ${safeDisplayPrice(priceData.discount)} JOD! (20% OFF)</div>
                                 </div>
                             </div>
                         `;
@@ -1425,7 +1425,7 @@ function updatePrice() {
                             <div class="discount-banner eligible">
                                 <div class="discount-icon">⭐</div>
                                 <div class="discount-content">
-                                    <div class="discount-title">You Qualify for 10% OFF!</div>
+                                    <div class="discount-title">You Qualify for 20% OFF!</div>
                                     <div class="discount-details">Complete your order to apply the discount</div>
                                 </div>
                             </div>
@@ -1438,7 +1438,7 @@ function updatePrice() {
                             <div class="discount-icon">📢</div>
                             <div class="discount-content">
                                 <div class="discount-title">Almost There!</div>
-                                <div class="discount-details">Add <span class="amount-needed">${safeDisplayPrice(amountNeeded)} JOD</span> more to get 10% OFF</div>
+                                <div class="discount-details">Add <span class="amount-needed">${safeDisplayPrice(amountNeeded)} JOD</span> more to get 20% OFF</div>
                                 <div class="discount-minimum">Minimum order: 15.00 JOD</div>
                             </div>
                         </div>
@@ -2565,7 +2565,7 @@ function handlePlaceOrderClick() {
         showCustomWarningModal(
             `🎯 Minimum Order Required!\n\n💳 Your current order: ${subtotal.toFixed(2)} JOD\n` +
             `💰 You need: ${amountNeeded} JOD more\n` +
-            `🎁 Minimum for 10% discount: 15.00 JOD\n\n` +
+            `🎁 Minimum for 20% discount: 15.00 JOD\n\n` +
             `💡 Add more charms or upgrade to Full Glam!`
         );
         return;
@@ -2617,7 +2617,7 @@ function handlePlaceOrderClick() {
                     </span>
                 </div>
                 <div style="color: #4CAF50; font-size: 0.9rem; font-weight: bold;">
-                    🎉 10% Discount Applied! (-${discount.toFixed(2)} JDs)
+                    🎉 20% Discount Applied! (-${discount.toFixed(2)} JDs)
                 </div>
             </div>
         `;
@@ -5106,9 +5106,9 @@ function updateOfferBanner() {
     
     // Show appropriate message
     if (currentUser) {
-        offerText.innerHTML = `Welcome! Complete your first order over 15 JOD in <span id="countdown-timer">10:00</span> to get 10% OFF!`;
+        offerText.innerHTML = `Welcome! Complete your first order over 15 JOD in <span id="countdown-timer">10:00</span> to get 20% OFF!`;
     } else {
-        offerText.innerHTML = `New customer? Complete your order over 15 JOD in <span id="countdown-timer">10:00</span> to get 10% OFF!`;
+        offerText.innerHTML = `New customer? Complete your order over 15 JOD in <span id="countdown-timer">10:00</span> to get 20% OFF!`;
     }
     
     offerBanner.style.display = 'block';
@@ -5193,7 +5193,7 @@ function checkAllDiscountEligibility() {
     if (now <= discountEndDate && subtotal >= 15) {
         eligibleDiscounts.push({
             type: 'seasonal',
-            message: '🎊 Seasonal Sale: 10% off orders above 15 JOD!',
+            message: '🎊 Seasonal Sale: 20% off orders above 15 JOD!',
             maxAmount: 5,
             requiresAmount: 15
         });
@@ -5203,7 +5203,7 @@ function checkAllDiscountEligibility() {
     if (userQualifiesForCountdownDiscount() && subtotal >= 15) {
         eligibleDiscounts.push({
             type: 'countdown',
-            message: '⏰ Limited Time: 10% off your first order over 15 JOD!',
+            message: '⏰ Limited Time: 20% off your first order over 15 JOD!',
             maxAmount: 5,
             requiresAmount: 15
         });
@@ -5213,7 +5213,7 @@ function checkAllDiscountEligibility() {
     if (currentUser && !localStorage.getItem(`hasOrdered_${currentUser.uid}`) && subtotal >= 15) {
         eligibleDiscounts.push({
             type: 'welcome',
-            message: '🎉 Welcome! Enjoy 10% off your first order over 15 JOD!',
+            message: '🎉 Welcome! Enjoy 20% off your first order over 15 JOD!',
             maxAmount: 5,
             requiresAmount: 15
         });
@@ -5248,7 +5248,7 @@ function checkFirstOrderDiscount() {
     const hasOrderedBefore = localStorage.getItem(`hasOrdered_${currentUser.uid}`);
     
     if (!hasOrderedBefore) {
-        showToast("🎊 Welcome! Use code WELCOME10 for 10% off your first order!", 'success');
+        showToast("🎊 Welcome! Use code WELCOME10 for 20% off your first order!", 'success');
         return true;
     }
     
