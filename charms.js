@@ -1006,9 +1006,3 @@ const rareCharms = [
   { src: 'rares/newc4r/c49.png', category: 'newc4r', quantity: 1 },
 ];
 
-// Make data available
-window.charmData = {
-  specialCharms,
-  rareCharms,
-  allCharms: [...specialCharms, ...rareCharms]
-};
