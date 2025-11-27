@@ -4477,14 +4477,12 @@ function initializeRecommendedCharms() {
     const recommendedCharmNames = [
         'rares/newc2r/c224.png',
         'rares/sporty/sporty2.png',
-        'rares/sporty/sporty13.png',
         'rares/love/c218.png',
         'rares/gold/gold11.png',
         'rares/love/c219.png',
         'special/teddy/teddy2.png',
         'rares/graduation/grad.png',
         'special/new-collection/50.png',
-     'rares/sporty/sporty9.png',
         'rares/hgs/hgs6.png',
          'rares/newc2r/c222.png',
 
