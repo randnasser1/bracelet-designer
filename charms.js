@@ -447,11 +447,6 @@ const specialCharms = [
   { src: 'special/newc2s/c295-gold.png', category: 'newc2s', quantity: 4 },
   { src: 'special/newc2s/c298.png', category: 'newc2s', quantity: 1 },
   { src: 'special/newc2s/c299.png', category: 'newc2s', quantity: 1 },
-];
-
-const rareCharms = [
- 
-  // newc4s charms
   { src: 'special/newc4s/c430.png', category: 'newc4s', quantity: 1 },
   { src: 'special/newc4s/c431.png', category: 'newc4s', quantity: 1 },
   { src: 'special/newc4s/c432.png', category: 'newc4s', quantity: 1 },
@@ -471,6 +466,11 @@ const rareCharms = [
   { src: 'special/newc4s/c446.png', category: 'newc4s', quantity: 1 },
   { src: 'special/newc4s/c447.png', category: 'newc4s', quantity: 1 },
   // butterflies charms
+];
+
+const rareCharms = [
+ 
+  //
   { src: 'rares/new-collection/10.png', category: 'butterflies', quantity: 1 },
   { src: 'rares/new-collection/11-gold.png', category: 'butterflies', quantity: 1 },
   { src: 'rares/new-collection/12.png', category: 'butterflies', quantity: 6 },
