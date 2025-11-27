@@ -993,7 +993,7 @@ function calculatePrice(includeDelivery = false) {
     if (qualifiesForDiscount) {
         // Check for first order discount
         if (checkFirstOrderDiscount()) {
-            discountApplied = Math.min(originalPrice * 0.1, 5);
+            discountApplied = Math.min(originalPrice * 0.3, 5);
             totalPrice = originalPrice - discountApplied;
         }
         
@@ -1001,7 +1001,7 @@ function calculatePrice(includeDelivery = false) {
         const currentDate = new Date();
         const discountEndDate = new Date('2025-11-30');
         if (currentDate <= discountEndDate) {
-            const seasonalDiscount = Math.min(originalPrice * 0.1, 5);
+            const seasonalDiscount = Math.min(originalPrice * 0.3, 5);
             discountApplied = Math.max(discountApplied, seasonalDiscount);
             totalPrice = originalPrice - discountApplied;
         }
@@ -1251,7 +1251,7 @@ function updateCartDisplay() {
         const discountEndDate = new Date('2025-10-31');
         
         if (currentDate <= discountEndDate) {
-            const potentialDiscount = subtotal * 0.1;
+            const potentialDiscount = subtotal * 0.3;
             const alreadyDiscounted = subtotal - discountedSubtotal;
             additionalDiscount = Math.min(potentialDiscount - alreadyDiscounted, 5 - alreadyDiscounted);
         }
@@ -2596,7 +2596,7 @@ function handlePlaceOrderClick() {
     // Calculate discount
     let discount = 0;
     if (subtotal >= MINIMUM_ORDER) {
-        discount = Math.min(subtotal * 0.1, 5);
+        discount = Math.min(subtotal * 0.3, 5);
     }
     
     const finalTotal = totalBeforeDiscount - discount;
