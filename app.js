@@ -1342,24 +1342,30 @@ function updateCartDisplay() {
     const discountedSubtotal = cart.reduce((sum, item) => sum + item.price, 0);
     const deliveryFee = 2.5;
     
-    // 🎯 CHECK MINIMUM ORDER FOR DISCOUNT
-    const MINIMUM_ORDER = 15.00;
-    const qualifiesForDiscount = subtotal >= MINIMUM_ORDER;
-    let additionalDiscount = 0;
+    // 🎯 CHECK WHEEL REWARDS INSTEAD OF OLD DISCOUNT
+    let wheelDiscount = 0;
+    let wheelDiscountPercent = 0;
+    let wheelDiscountMinAmount = 0;
     
-    if (qualifiesForDiscount) {
-        const currentDate = new Date();
-        const discountEndDate = new Date('2025-10-31');
+    // Check for active wheel discounts
+    if (hasSpunToday && activeWheelRewards.discounts.length > 0) {
+        const discount = activeWheelRewards.discounts[0];
+        wheelDiscountPercent = discount.percent;
+        wheelDiscountMinAmount = discount.minAmount;
         
-        if (currentDate <= discountEndDate) {
-            const potentialDiscount = subtotal * 0.1;
-            const alreadyDiscounted = subtotal - discountedSubtotal;
-            additionalDiscount = Math.min(potentialDiscount - alreadyDiscounted, 5 - alreadyDiscounted);
+        if (subtotal >= wheelDiscountMinAmount) {
+            wheelDiscount = Math.min(subtotal * (wheelDiscountPercent / 100), 5);
         }
     }
     
-    const totalBeforeDiscount = discountedSubtotal + deliveryFee;
-    const finalTotal = totalBeforeDiscount - additionalDiscount;
+    // Check for free delivery
+    let finalDeliveryFee = deliveryFee;
+    if (hasSpunToday && activeWheelRewards.freeDelivery.active && subtotal >= activeWheelRewards.freeDelivery.minAmount) {
+        finalDeliveryFee = 0;
+    }
+    
+    const totalBeforeDiscount = discountedSubtotal + finalDeliveryFee;
+    const finalTotal = totalBeforeDiscount - wheelDiscount;
 
     // Display cart items
     cart.forEach((item, index) => {
@@ -1382,15 +1388,15 @@ function updateCartDisplay() {
     
     cartItemsContainer.innerHTML = itemsHTML;
     cartSubtotal.textContent = `Subtotal: ${discountedSubtotal.toFixed(2)} JDs`;
-    cartDelivery.textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    cartDelivery.textContent = `Delivery Fee: ${finalDeliveryFee.toFixed(2)} JDs`;
     
-    // 🎯 BEAUTIFUL CART DISCOUNT DISPLAY
-    if (additionalDiscount > 0) {
+    // 🎯 WHEEL REWARDS DISPLAY IN CART
+    if (wheelDiscount > 0) {
         cartDiscountInfo.style.display = 'block';
         cartDiscountAmount.innerHTML = `
             <div class="cart-discount-applied">
-                <span class="discount-badge">🎉 10% OFF</span>
-                <span class="discount-amount">-${additionalDiscount.toFixed(2)} JDs</span>
+                <span class="discount-badge">🎉 ${wheelDiscountPercent}% OFF (Wheel)</span>
+                <span class="discount-amount">-${wheelDiscount.toFixed(2)} JDs</span>
             </div>
         `;
         
@@ -1401,28 +1407,52 @@ function updateCartDisplay() {
                     <span class="final-price">${finalTotal.toFixed(2)} JDs</span>
                 </div>
                 <div class="savings-message">
-                    You saved ${additionalDiscount.toFixed(2)} JDs!
+                    Wheel Reward: Saved ${wheelDiscount.toFixed(2)} JDs!
                 </div>
             </div>
         `;
-    } else if (qualifiesForDiscount) {
+    } 
+    else if (hasSpunToday && activeWheelRewards.discounts.length > 0) {
+        // Has wheel discount but doesn't qualify yet
+        const discount = activeWheelRewards.discounts[0];
+        const amountNeeded = (discount.minAmount - subtotal).toFixed(2);
+        
         cartDiscountInfo.style.display = 'block';
         cartDiscountAmount.innerHTML = `
-            <div class="cart-discount-eligible">
-                <span class="discount-badge">⭐ ELIGIBLE</span>
-                <span>10% discount will be applied at checkout</span>
+            <div class="cart-discount-not-eligible">
+                <span class="discount-badge">🎡 ${discount.percent}% OFF Available</span>
+                <span>Add ${amountNeeded} JOD to apply wheel discount</span>
             </div>
         `;
         cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
-    } else {
+    }
+    else if (finalDeliveryFee === 0) {
+        // Free delivery applied
         cartDiscountInfo.style.display = 'block';
-        const amountNeeded = (MINIMUM_ORDER - subtotal).toFixed(2);
         cartDiscountAmount.innerHTML = `
-            <div class="cart-discount-not-eligible">
-                <span class="discount-badge">📢 ALMOST THERE</span>
-                <span>Add ${amountNeeded} JOD for 10% OFF</span>
+            <div class="cart-discount-applied">
+                <span class="discount-badge">🚚 FREE Delivery (Wheel)</span>
+                <span class="discount-amount">-2.50 JDs</span>
             </div>
         `;
+        cartTotal.textContent = `Total: ${finalTotal.toFixed(2)} JDs`;
+    }
+    else if (hasSpunToday && activeWheelRewards.freeDelivery.active) {
+        // Has free delivery but doesn't qualify yet
+        const amountNeeded = (activeWheelRewards.freeDelivery.minAmount - subtotal).toFixed(2);
+        
+        cartDiscountInfo.style.display = 'block';
+        cartDiscountAmount.innerHTML = `
+            <div class="cart-discount-not-eligible">
+                <span class="discount-badge">🚚 FREE Delivery Available</span>
+                <span>Add ${amountNeeded} JOD for free delivery</span>
+            </div>
+        `;
+        cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
+    }
+    else {
+        // No wheel rewards or not qualified
+        cartDiscountInfo.style.display = 'none';
         cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
     }
 
