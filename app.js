@@ -5942,9 +5942,6 @@ let hasSpunToday = false;
 let isSpinning = false;
 let wheelChart = null;
 
-// ADD THIS AT THE TOP OF YOUR SPIN WHEEL CODE FOR TESTING
-hasSpunToday = false;
-localStorage.removeItem('lastSpinDate');
 
 let activeWheelRewards = {
     freeCharm: { active: false, count: 0, minAmount: 10 },
@@ -5975,7 +5972,6 @@ function setupSpinWheelEventListeners() {
         closeNotification.addEventListener('click', hideRewardNotification);
     }
 }
-// Show spin wheel modal
 function showSpinWheel() {
     const spinModal = document.getElementById('spin-wheel-modal');
     if (!spinModal) {
@@ -5983,27 +5979,105 @@ function showSpinWheel() {
         return;
     }
     
-    // Don't show if already spun today (unless they won "spin again")
-    if (hasSpunToday && !activeWheelRewards.discounts.length && !activeWheelRewards.freeCharm.active && !activeWheelRewards.freeDelivery.active) {
-        console.log('Already spun today with no active rewards');
+    const spinStats = getSpinStatistics();
+    
+    // Don't show if no spins remaining
+    if (spinStats.spinsRemaining <= 0 && !hasSpunToday) {
+        showSpinLimitReached();
         return;
     }
     
     spinModal.classList.add('active');
     
-    // Update button text based on whether it's free or costs points
+    // Update button text based on spins remaining
     const spinButton = document.getElementById('spin-button');
     if (spinButton) {
-        const costText = spinButton.querySelector('.spin-cost-text');
-        if (costText) {
-            costText.textContent = hasSpunToday ? '(10 points)' : '(FREE)';
+        if (spinStats.spinsRemaining > 0) {
+            spinButton.disabled = false;
+            spinButton.innerHTML = `
+                <span class="spin-text">SPIN NOW!</span>
+                <span class="spin-cost-text">(FREE)</span>
+            `;
+        } else {
+            spinButton.disabled = true;
+            spinButton.innerHTML = `
+                <span class="spin-text">DAILY SPIN USED</span>
+                <span class="spin-cost-text">(Come back tomorrow)</span>
+            `;
         }
     }
     
-    console.log('🎡 Showing spin wheel');
+    // Update spin counter display
+    updateSpinCounterDisplay(spinStats);
+    
+    console.log('🎡 Showing spin wheel - Spins remaining:', spinStats.spinsRemaining);
+}
+// Add spin counter to the modal
+function updateSpinCounterDisplay(spinStats) {
+    let spinCounter = document.getElementById('spin-counter');
+    
+    if (!spinCounter) {
+        spinCounter = document.createElement('div');
+        spinCounter.id = 'spin-counter';
+        spinCounter.className = 'spin-counter';
+        
+        const wheelControls = document.querySelector('.wheel-controls');
+        if (wheelControls) {
+            wheelControls.insertBefore(spinCounter, wheelControls.querySelector('.spin-info'));
+        }
+    }
+    
+    spinCounter.innerHTML = `
+        <div class="spin-counter-content">
+            <div class="spins-remaining">
+                <span class="counter-icon">🎡</span>
+                <span class="counter-text">Spins Today: ${spinStats.spinsToday}/1</span>
+            </div>
+            ${spinStats.spinsRemaining <= 0 ? `
+                <div class="next-spin-info">
+                    Next free spin in: <span id="next-spin-timer">24:00:00</span>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    // Start countdown to next spin if needed
+    if (spinStats.spinsRemaining <= 0) {
+        startNextSpinCountdown();
+    }
 }
 
-
+// Countdown to next free spin
+function startNextSpinCountdown() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const countdownElement = document.getElementById('next-spin-timer');
+    if (!countdownElement) return;
+    
+    const countdown = setInterval(() => {
+        const now = new Date().getTime();
+        const timeLeft = tomorrow.getTime() - now;
+        
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            countdownElement.textContent = '00:00:00';
+            // Refresh the page or reset spins
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+            return;
+        }
+        
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+        
+        countdownElement.textContent = 
+            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+}
 // Select reward based on probabilities
 function selectReward() {
     const random = Math.random() * 100;
@@ -6081,9 +6155,7 @@ function activateFreeDeliveryReward() {
 
 function activateSpinAgainReward() {
     // Give user another free spin
-    hasSpunToday = false;
-    localStorage.removeItem('lastSpinDate');
-    
+   
     // DON'T close the spin wheel modal - keep it open
     const spinModal = document.getElementById('spin-wheel-modal');
     if (spinModal) {
@@ -6514,21 +6586,107 @@ function spinWheel() {
         
     }, 4000);
 }
-function initSpinWheel() {
-    console.log('🎡 Initializing clean spin wheel...');
+// Check if user is eligible for daily spin
+function checkDailySpinEligibility() {
+    const today = new Date().toDateString();
+    const lastSpinDate = localStorage.getItem('lastSpinDate');
+    const userSpinData = getUserSpinData();
     
-    // FOR TESTING - UNLIMITED SPINS
+    // Check if already spun today
+    if (lastSpinDate === today) {
+        hasSpunToday = true;
+        console.log('✅ User already spun today');
+        return true; // Still return true to show wheel if they have active rewards
+    }
+    
+    // Check spin limit
+    if (userSpinData.dailySpins >= 1) {
+        console.log('❌ Daily spin limit reached');
+        showSpinLimitReached();
+        return false;
+    }
+    
     hasSpunToday = false;
-    localStorage.removeItem('lastSpinDate');
+    return true;
+}
+
+// Get user's spin data with persistence
+function getUserSpinData() {
+    const userKey = auth.currentUser ? `spinData_${auth.currentUser.uid}` : 'spinData_guest';
+    const savedData = localStorage.getItem(userKey);
+    
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            const today = new Date().toDateString();
+            
+            // Reset daily spins if it's a new day
+            if (data.lastSpinDate !== today) {
+                data.dailySpins = 0;
+                data.lastSpinDate = today;
+            }
+            
+            return data;
+        } catch (e) {
+            console.error('Error parsing spin data:', e);
+        }
+    }
+    
+    // Default data
+    return {
+        dailySpins: 0,
+        totalSpins: 0,
+        lastSpinDate: new Date().toDateString(),
+        spinHistory: []
+    };
+}
+
+// Save user's spin data
+function saveUserSpinData() {
+    const userKey = auth.currentUser ? `spinData_${auth.currentUser.uid}` : 'spinData_guest';
+    const spinData = getUserSpinData();
+    
+    // Update spin data
+    spinData.dailySpins += 1;
+    spinData.totalSpins += 1;
+    spinData.lastSpinDate = new Date().toDateString();
+    
+    localStorage.setItem(userKey, JSON.stringify(spinData));
+    localStorage.setItem('lastSpinDate', spinData.lastSpinDate);
+}
+
+// Show spin limit reached message
+function showSpinLimitReached() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const timeUntilReset = tomorrow.getTime() - new Date().getTime();
+    const hoursUntilReset = Math.ceil(timeUntilReset / (1000 * 60 * 60));
+    
+    showToast(`🎡 Come back in ${hoursUntilReset} hours for your next free spin!`, 'info');
+}
+function initSpinWheel() {
+    console.log('🎡 Initializing PRODUCTION spin wheel...');
     
     loadUserData();
-    createWheel();
-    setupSpinWheelEventListeners();
     
-    // Show spin wheel after delay
-    setTimeout(() => {
-        showSpinWheel();
-    }, 3000);
+    // Check if user can spin today
+    const canSpin = checkDailySpinEligibility();
+    
+    if (canSpin) {
+        createWheel();
+        setupSpinWheelEventListeners();
+        
+        // Auto-show wheel if they haven't spun today
+        if (!hasSpunToday) {
+            setTimeout(() => {
+                showSpinWheel();
+            }, 3000);
+        }
+    } else {
+        console.log('❌ User cannot spin today');
+    }
 }
 // Global variables for expiration
 let rewardExpirationTime = null;
@@ -6631,6 +6789,7 @@ function activateReward(reward) {
     saveUserData();
                                                                                                         
 }
+// Update the expiration popup to show 24 hours
 function showExpirationPopup(reward) {
     const popupHTML = `
         <div class="modal active" id="reward-expiration-popup" style="z-index: 10002;">
@@ -6642,8 +6801,8 @@ function showExpirationPopup(reward) {
                     
                     <div class="expiration-timer">
                         <h4>⏰ Limited Time Offer!</h4>
-                        <div class="timer" id="expiration-timer">30:00</div>
-                        <div class="timer-warning">You have 30 minutes to design your jewelry to claim your reward</div>
+                        <div class="timer" id="expiration-timer">24:00:00</div>
+                        <div class="timer-warning">You have 24 hours to use your reward</div>
                     </div>
                     
                     ${reward.minAmount > 0 ? `
@@ -6676,7 +6835,7 @@ function showExpirationPopup(reward) {
     // Add new popup
     document.body.insertAdjacentHTML('beforeend', popupHTML);
     
-    // 🎉 ADD CONFETTI TO POPUP TOO!
+    // Add confetti
     triggerConfetti();
 }
 
@@ -6966,7 +7125,11 @@ function processReward(reward) {
         return; // Stop here, don't process further
     }
 
-    // For all other rewards, close the spin modal
+    // For all other rewards, mark as spun for the day
+    hasSpunToday = true;
+    saveUserSpinData(); // Save that they've used their daily spin
+    
+    // Close the spin modal
     const spinModal = document.getElementById('spin-wheel-modal');
     if (spinModal) {
         spinModal.classList.remove('active');
@@ -6983,7 +7146,6 @@ function processReward(reward) {
     // Note: We keep free charms since they can stack
     
     // Mark that user has spun today
-    hasSpunToday = true;
     localStorage.setItem('lastSpinDate', new Date().toDateString());
 
     // Store the won reward with its minimum amount
@@ -6992,10 +7154,13 @@ function processReward(reward) {
         minAmount: reward.id === 'free-charm' ? 10 : reward.minAmount
     };
 
-    // Set expiration time (30 minutes from now)
-    rewardExpirationTime = new Date().getTime() + (30 * 60 * 1000);
+    // Set expiration time (24 hours for rewards)
+    rewardExpirationTime = new Date().getTime() + (45 * 60 * 1000);
     localStorage.setItem('rewardExpirationTime', rewardExpirationTime);
     localStorage.setItem('currentWonReward', JSON.stringify(currentWonReward));
+
+    // Add to spin history
+    addToSpinHistory(reward);
 
     // Activate the reward (this will only activate the new one)
     activateRewardWithMinimum(reward, currentWonReward.minAmount);
@@ -7009,21 +7174,53 @@ function processReward(reward) {
     // Show the reward notification popup
     showRewardNotification(reward);
     
-    // Show expiration popup
+    // Show expiration popup (24 hours now)
     showExpirationPopup(currentWonReward);
 
     // Start both timers
     startExpirationTimer();
     startGlobalCountdownTimer();
 
-    console.log('✅ New reward activated, old rewards cleared');
+    console.log('✅ New reward activated, daily spin used');
     console.log('📊 Current active rewards:', {
         discounts: activeWheelRewards.discounts,
         freeDelivery: activeWheelRewards.freeDelivery,
         freeCharm: activeWheelRewards.freeCharm
     });
 }
+// Track spin history
+function addToSpinHistory(reward) {
+    const userKey = auth.currentUser ? `spinData_${auth.currentUser.uid}` : 'spinData_guest';
+    const spinData = getUserSpinData();
+    
+    if (!spinData.spinHistory) {
+        spinData.spinHistory = [];
+    }
+    
+    spinData.spinHistory.push({
+        reward: reward.name,
+        date: new Date().toISOString(),
+        type: reward.id
+    });
+    
+    // Keep only last 50 spins
+    if (spinData.spinHistory.length > 50) {
+        spinData.spinHistory = spinData.spinHistory.slice(-50);
+    }
+    
+    localStorage.setItem(userKey, JSON.stringify(spinData));
+}
 
+// Get spin statistics
+function getSpinStatistics() {
+    const spinData = getUserSpinData();
+    return {
+        totalSpins: spinData.totalSpins || 0,
+        spinsToday: spinData.dailySpins || 0,
+        spinsRemaining: Math.max(0, 1 - (spinData.dailySpins || 0)),
+        lastSpin: spinData.lastSpinDate
+    };
+}
 // New function to activate rewards with minimum amounts
 // New function to activate rewards with minimum amounts
 function activateRewardWithMinimum(reward, minAmount) {
