@@ -2074,47 +2074,242 @@ function hideSpinWheelCompletely() {
     
     console.log('🗑️ Removed spin wheel elements completely');
 }
+// Function to update spacing dynamically
+function updateScrollSpacing() {
+    const braceletContainer = document.querySelector('.bracelet-container');
+    const countdownDisplay = document.getElementById('spin-countdown-display');
+    
+    if (!braceletContainer || !countdownDisplay) return;
+    
+    const scrollY = window.scrollY;
+    const isSticky = braceletContainer.classList.contains('sticky-active');
+    
+    if (isSticky) {
+        // When sticky, add extra top margin to body to prevent overlap
+        document.body.style.paddingTop = '60px'; // Adjust based on your header height
+        countdownDisplay.style.marginBottom = '10px'; // Space between countdown and sticky bracelet
+    } else {
+        // Reset when not sticky
+        document.body.style.paddingTop = '0';
+        countdownDisplay.style.marginBottom = '15px';
+    }
+}
+
+// Update the existing sticky header function
+function updateStickyHeader() {
+    const braceletContainer = document.querySelector('.bracelet-container');
+    if (!braceletContainer) return;
+    
+    const scrollY = window.scrollY;
+    if (scrollY > 100) {
+        braceletContainer.classList.add('sticky-active');
+        braceletContainer.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+    } else {
+        braceletContainer.classList.remove('sticky-active');
+        braceletContainer.style.boxShadow = 'none';
+    }
+    
+    // Update spacing when scroll state changes
+    updateScrollSpacing();
+}
+
+// Enhanced scroll event listener
+window.addEventListener('scroll', function() {
+    updateStickyHeader();
+    updateScrollSpacing();
+});
+
+window.addEventListener('resize', function() {
+    updateStickyHeader();
+    updateScrollSpacing();
+});
+
+// Initial setup
+document.addEventListener('DOMContentLoaded', function() {
+    updateStickyHeader();
+    updateScrollSpacing();
+});
+function showSpinCountdown(timeLeft) {
+    hideGlobalCountdown();
+    hideSpinCountdown();
+    
+    // Only show if there's no active reward countdown
+    if (rewardExpirationTime && new Date().getTime() < rewardExpirationTime) {
+        console.log('🎁 Active reward in progress, skipping spin countdown');
+        return;
+    }
+    
+    const countdownDisplay = document.createElement('div');
+    countdownDisplay.id = 'spin-countdown-display';
+    countdownDisplay.className = 'countdown-display spin-countdown';
+    countdownDisplay.innerHTML = `
+        <div class="countdown-active">
+            <div class="countdown-icon">⏰</div>
+            <div class="countdown-text">
+                <div class="countdown-title">Next Free Spin In:</div>
+                <div class="countdown-timer">${formatTimeRemaining(timeLeft)}</div>
+                <div class="countdown-subtitle">Spin daily for amazing rewards</div>
+            </div>
+            <button class="countdown-action-btn" onclick="showSpinWheel()">
+                Remind Me
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(countdownDisplay);
+    updateSpinCountdownTimer(timeLeft);
+}
+function updateCountdownTimer(timeLeft) {
+    const countdownDisplay = document.getElementById('spin-countdown-display');
+    if (!countdownDisplay) return;
+    
+    const countdown = setInterval(() => {
+        timeLeft -= 1000;
+        
+        // Check if reward became active
+        if (rewardExpirationTime && new Date().getTime() < rewardExpirationTime) {
+            clearInterval(countdown);
+            hideSpinCountdown();
+            return;
+        }
+        
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            // Replace with wheel invitation
+            replaceCountdownWithWheel(countdownDisplay);
+            return;
+        }
+        
+        // Update the timer display
+        const timerElement = countdownDisplay.querySelector('.countdown-timer');
+        if (timerElement) {
+            timerElement.textContent = formatTimeRemaining(timeLeft);
+        }
+    }, 1000);
+}
+
+
+function replaceCountdownWithWheel(countdownElement) {
+    // Replace countdown with spin wheel invitation
+    countdownElement.innerHTML = `
+        <div class="countdown-ready">
+            <div class="countdown-icon">🎡</div>
+            <div class="countdown-text">
+                <div class="countdown-title">Free Spin Available!</div>
+            </div>
+            <button class="spin-now-btn" onclick="showSpinWheel()">
+                SPIN NOW!
+            </button>
+        </div>
+    `;
+    
+    // Change to success color
+    countdownElement.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
+    
+    console.log('🎡 Countdown replaced with spin wheel invitation');
+    
+    // Auto-show spin wheel after 3 seconds
+    setTimeout(() => {
+        showSpinWheel();
+    }, 3000);
+}
+
+function formatTimeRemaining(milliseconds) {
+    const hours = Math.floor(milliseconds / (1000 * 60 * 60));
+    const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000);
+    
+    if (hours > 0) {
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    } else {
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+}
+
+function manageCountdowns() {
+    // Check for active reward first
+    if (rewardExpirationTime && new Date().getTime() < rewardExpirationTime) {
+        const timeLeft = rewardExpirationTime - new Date().getTime();
+        showGlobalCountdown(timeLeft);
+        return;
+    }
+    
+    // Check for spin eligibility
+    const now = new Date();
+    const lastSpinTime = localStorage.getItem('lastSpinTime');
+    
+    if (lastSpinTime) {
+        const timeSinceLastSpin = now.getTime() - parseInt(lastSpinTime);
+        const twentyFourHours = 24 * 60 * 60 * 1000;
+        
+        if (timeSinceLastSpin < twentyFourHours) {
+            const timeLeft = twentyFourHours - timeSinceLastSpin;
+            showSpinCountdown(timeLeft);
+        } else {
+            // Spin available - don't show countdown
+            hideSpinCountdown();
+        }
+    } else {
+        // No spin recorded - spin available
+        hideSpinCountdown();
+    }
+}
+
+// Initialize countdowns when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Check countdowns after a short delay
+    setTimeout(() => {
+        manageCountdowns();
+    }, 1000);
+    
+    // Check countdowns every minute
+    setInterval(manageCountdowns, 60000);
+});
+
+
 function checkDailySpinEligibility() {
     const now = new Date();
-    const today = now.toDateString();
     const lastSpinDate = localStorage.getItem('lastSpinDate');
-    const lastSpinTime = localStorage.getItem('lastSpinTime'); // Add timestamp
+    const lastSpinTime = localStorage.getItem('lastSpinTime');
     
-    console.log('🔍 Checking spin eligibility:', {
-        today: today,
-        lastSpinDate: lastSpinDate,
-        lastSpinTime: lastSpinTime,
-        currentTime: now.getTime()
-    });
+    // Don't show spin countdown if there's an active reward
+    if (rewardExpirationTime && now.getTime() < rewardExpirationTime) {
+        console.log('🎁 Active reward in progress, hiding spin countdown');
+        hideSpinCountdown();
+        return false;
+    }
     
-    // If user has spun today, check if 24 hours have passed
-    if (lastSpinDate === today && lastSpinTime) {
+    // If user has spun before
+    if (lastSpinDate && lastSpinTime) {
         const timeSinceLastSpin = now.getTime() - parseInt(lastSpinTime);
-        const twentyFourHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        const twentyFourHours = 24 * 60 * 60 * 1000;
         
-        console.log('⏰ Time since last spin:', {
-            hours: timeSinceLastSpin / (60 * 60 * 1000),
-            required: 24
-        });
-        
-        // If less than 24 hours have passed, user cannot spin
+        // If less than 24 hours have passed, show countdown
         if (timeSinceLastSpin < twentyFourHours) {
             hasSpunToday = true;
-            console.log('❌ User spun recently - must wait 24 hours');
+            const timeLeft = twentyFourHours - timeSinceLastSpin;
             
-            // Hide spin elements
-            hideSpinElements();
+            // Show countdown UI
+            showSpinCountdown(timeLeft);
+            console.log('⏰ Next spin available in:', formatTimeRemaining(timeLeft));
+            
             return false;
+        } else {
+            // 24 hours have passed - reset and allow spin
+            console.log('✅ 24 hours passed - spin available again');
+            localStorage.removeItem('lastSpinDate');
+            localStorage.removeItem('lastSpinTime');
+            hasSpunToday = false;
+            hideSpinCountdown();
+            return true;
         }
     }
     
-    // If no spin record OR 24 hours have passed, user can spin
+    // No spin record found - can spin
     hasSpunToday = false;
-    console.log('✅ User is eligible to spin');
+    hideSpinCountdown();
     return true;
 }
-
-// Call this after initializing jewelry piece and after any updates
 document.addEventListener('DOMContentLoaded', function() {
   centerJewelryPiece();
   
@@ -4879,12 +5074,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Application loaded with minor issues');
     }
 });
-
-document.addEventListener('DOMContentLoaded', function() {
-    const braceletContainer = document.querySelector('.bracelet-container');
-    let jewelryPiece = document.getElementById('jewelry-piece');
-    
-    function updateStickyHeader() {
+function updateStickyHeader() {
     const braceletContainer = document.querySelector('.bracelet-container');
     if (!braceletContainer) return;
     
@@ -4897,6 +5087,18 @@ document.addEventListener('DOMContentLoaded', function() {
         braceletContainer.style.boxShadow = 'none';
     }
 }
+
+// Run on scroll and resize
+window.addEventListener('scroll', updateStickyHeader);
+window.addEventListener('resize', updateStickyHeader);
+
+// Initial check
+updateStickyHeader();
+document.addEventListener('DOMContentLoaded', function() {
+    const braceletContainer = document.querySelector('.bracelet-container');
+    let jewelryPiece = document.getElementById('jewelry-piece');
+    
+    
 
 // Run on scroll and resize
 window.addEventListener('scroll', updateStickyHeader);
@@ -6201,7 +6403,96 @@ function setupSpinWheelEventListeners() {
         closeNotification.addEventListener('click', hideRewardNotification);
     }
 }
+function replaceGlobalCountdownWithExpired(countdownElement) {
+    countdownElement.innerHTML = `
+        <div class="countdown-expired">
+            <div class="countdown-icon">⏰</div>
+            <div class="countdown-text">
+                <div class="countdown-title">Reward Expired</div>
+                <div class="countdown-subtitle">Spin the wheel for new rewards</div>
+            </div>
+            <button class="countdown-action-btn" onclick="hideGlobalCountdown()">
+                Dismiss
+            </button>
+        </div>
+    `;
+    
+    countdownElement.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
+    
+    setTimeout(() => {
+        hideGlobalCountdown();
+    }, 5000);
+}
+function replaceSpinCountdownWithReady(countdownElement) {
+    countdownElement.innerHTML = `
+        <div class="countdown-ready">
+            <div class="countdown-icon">🎡</div>
+            <div class="countdown-text">
+                <div class="countdown-title">Free Spin Available!</div>
+                <div class="countdown-subtitle">Spin now for amazing rewards</div>
+            </div>
+            <button class="countdown-action-btn spin-now-btn" onclick="showSpinWheel()">
+                SPIN NOW!
+            </button>
+        </div>
+    `;
+    
+    countdownElement.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
+    
+    console.log('🎡 Spin countdown completed - spin available');
+    
+    // Auto-show spin wheel after 3 seconds
+    setTimeout(() => {
+        showSpinWheel();
+    }, 3000);
+}
+function hideGlobalCountdown() {
+    const countdownDisplay = document.getElementById('global-countdown-display');
+    if (countdownDisplay) {
+        countdownDisplay.remove();
+    }
+    if (globalCountdownTimer) {
+        clearInterval(globalCountdownTimer);
+        globalCountdownTimer = null;
+    }
+}
 
+function hideSpinCountdown() {
+    const countdownDisplay = document.getElementById('spin-countdown-display');
+    if (countdownDisplay) {
+        countdownDisplay.remove();
+    }
+    if (spinCountdownTimer) {
+        clearInterval(spinCountdownTimer);
+        spinCountdownTimer = null;
+    }
+}
+function updateSpinCountdownTimer(timeLeft) {
+    const countdownDisplay = document.getElementById('spin-countdown-display');
+    if (!countdownDisplay) return;
+    
+    spinCountdownTimer = setInterval(() => {
+        timeLeft -= 1000;
+        
+        // Check if reward became active
+        if (rewardExpirationTime && new Date().getTime() < rewardExpirationTime) {
+            clearInterval(spinCountdownTimer);
+            hideSpinCountdown();
+            return;
+        }
+        
+        if (timeLeft <= 0) {
+            clearInterval(spinCountdownTimer);
+            replaceSpinCountdownWithReady(countdownDisplay);
+            return;
+        }
+        
+        const timerElement = countdownDisplay.querySelector('.countdown-timer');
+        if (timerElement) {
+            timerElement.textContent = formatTimeRemaining(timeLeft);
+        }
+    }, 1000);
+}
 function updateSpinCounterDisplay(spinStats) {
     let spinCounter = document.getElementById('spin-counter');
     
@@ -6348,32 +6639,87 @@ function activateFreeDeliveryReward() {
 }
 
 function showSpinWheel() {
-    // FIRST, check if we should even show anything
+    const spinModal = document.getElementById('spin-wheel-modal');
+    if (!spinModal) return;
+    
     const canSpin = checkDailySpinEligibility();
     
-    if (!canSpin) {
-        console.log('❌ Blocking spin wheel - user already spun today');
-        return; // Don't show anything
+    if (canSpin) {
+        // User can spin - show wheel
+        spinModal.classList.add('active');
+        console.log('🎡 Spin wheel opened');
+    } else {
+        // User cannot spin yet - check if we should show countdown
+        const lastSpinTime = parseInt(localStorage.getItem('lastSpinTime'));
+        if (lastSpinTime) {
+            const timeSinceLastSpin = new Date().getTime() - lastSpinTime;
+            const twentyFourHours = 24 * 60 * 60 * 1000;
+            const timeLeft = twentyFourHours - timeSinceLastSpin;
+            
+            if (timeLeft > 0) {
+                // Show countdown in the same place
+                showSpinCountdown(timeLeft);
+                console.log('⏰ Showing countdown instead of wheel');
+            }
+        }
+    }
+}
+
+function showSpinCountdownModal() {
+    const lastSpinTime = parseInt(localStorage.getItem('lastSpinTime'));
+    const timeSinceLastSpin = new Date().getTime() - lastSpinTime;
+    const twentyFourHours = 24 * 60 * 60 * 1000;
+    const timeLeft = twentyFourHours - timeSinceLastSpin;
+    
+    // Create or show countdown modal
+    let countdownModal = document.getElementById('spin-countdown-modal');
+    
+    if (!countdownModal) {
+        countdownModal = document.createElement('div');
+        countdownModal.id = 'spin-countdown-modal';
+        countdownModal.className = 'modal active';
+        countdownModal.innerHTML = `
+            <div class="order-modal-content">
+                <h2>⏰ Come Back Soon!</h2>
+                <div class="countdown-modal-content">
+                    <div class="countdown-icon-large">🎡</div>
+                    <p>Your next free spin will be available in:</p>
+                    <div class="modal-countdown-timer">${formatTimeRemaining(timeLeft)}</div>
+                    <p class="countdown-note">Spin the wheel every 24 hours to win amazing rewards!</p>
+                    <button class="btn cancel-btn" onclick="document.getElementById('spin-countdown-modal').remove()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(countdownModal);
     }
     
-    const spinModal = document.getElementById('spin-wheel-modal');
-    if (!spinModal) {
-        console.error('Spin wheel modal not found!');
-        return;
-    }
-    
-    // Only proceed if user can spin
-    spinModal.classList.add('active');
-    console.log('🎡 Spin wheel opened - user has spins remaining');
+    // Update the modal timer
+    const timerElement = countdownModal.querySelector('.modal-countdown-timer');
+    const updateModalTimer = setInterval(() => {
+        timeLeft -= 1000;
+        
+        if (timeLeft <= 0) {
+            clearInterval(updateModalTimer);
+            timerElement.textContent = '00:00:00';
+            timerElement.innerHTML = '<span style="color: #4CAF50;">🎉 Ready to spin!</span>';
+            countdownModal.querySelector('p').textContent = 'Your free spin is now available!';
+            return;
+        }
+        
+        timerElement.textContent = formatTimeRemaining(timeLeft);
+    }, 1000);
 }
 
 
 document.addEventListener('DOMContentLoaded', function() {
+        checkDailySpinEligibility();
+
     // Initialize spin wheel state
     updateSpinIndicator();
     
     // Also check on page load and hide if needed
-    checkDailySpinEligibility();
 });
 
 // Also update when user data changes
@@ -7062,6 +7408,7 @@ let rewardExpirationTime = null;
 let expirationTimer = null;
 let currentWonReward = null;
 let globalCountdownTimer = null; // ← ADD THIS LINE
+let spinCountdownTimer = null;
 
 const WHEEL_REWARDS = [
     { 
@@ -7243,8 +7590,9 @@ function startExpirationTimer() {
     }, 1000);
 }
 
-// Handle reward expiration
 function rewardExpired() {
+    console.log('⏰ Reward expired, showing spin countdown');
+    
     // Remove the reward from active rewards
     if (currentWonReward) {
         removeReward(currentWonReward);
@@ -7253,6 +7601,9 @@ function rewardExpired() {
     // Clear storage
     localStorage.removeItem('rewardExpirationTime');
     localStorage.removeItem('currentWonReward');
+    
+    // Remove global countdown banner
+    removeGlobalCountdownBanner();
     
     // Show expiration message
     const popup = document.getElementById('reward-expiration-popup');
@@ -7272,10 +7623,15 @@ function rewardExpired() {
             </div>
         `;
         
-        // Auto-close after 5 seconds
+        // Auto-close after 3 seconds and show spin countdown
         setTimeout(() => {
             closeExpirationPopup();
-        }, 5000);
+            // Calculate time until next spin and show countdown
+            checkDailySpinEligibility();
+        }, 3000);
+    } else {
+        // If no popup, just check and show spin countdown
+        checkDailySpinEligibility();
     }
     
     // Update price display
@@ -7381,42 +7737,60 @@ function startDesigning() {
     showToast(`🎉 Your reward is active! Add ${currentWonReward?.minAmount || 15} JOD to your design to claim it.`, 'success');
 }
 
-// Show global countdown banner
-function showGlobalCountdownBanner() {
-    // Remove existing banner
-    const existingBanner = document.querySelector('.global-countdown-banner');
-    if (existingBanner) {
-        existingBanner.remove();
-    }
+function showGlobalCountdown(timeLeft) {
+    hideGlobalCountdown();
+    hideSpinCountdown();
     
-    // Create new banner
-    const bannerHTML = `
-        <div class="global-countdown-banner" id="global-countdown-banner">
-            <div class="banner-content">
-                <span class="banner-icon">⏰</span>
-                <span class="banner-text">Limited Time Reward!</span>
-                <span class="banner-timer" id="global-timer">30:00</span>
+    const countdownDisplay = document.createElement('div');
+    countdownDisplay.id = 'global-countdown-display';
+    countdownDisplay.className = 'countdown-display global-countdown';
+    countdownDisplay.innerHTML = `
+        <div class="countdown-active">
+            <div class="countdown-icon">🎉</div>
+            <div class="countdown-text">
+                <div class="countdown-title">Limited Time Reward!</div>
+                <div class="countdown-timer">${formatTimeRemaining(timeLeft)}</div>
+                <div class="countdown-subtitle">Complete your order to claim</div>
             </div>
+            <button class="countdown-action-btn" onclick="startDesigning()">
+                Design Now
+            </button>
         </div>
     `;
     
-    document.body.insertAdjacentHTML('afterbegin', bannerHTML);
-    
-    // Show the banner
-    const banner = document.getElementById('global-countdown-banner');
-    if (banner) {
-        banner.style.display = 'block';
-    }
+    document.body.appendChild(countdownDisplay);
+    updateGlobalCountdownTimer(timeLeft);
 }
-
+function updateGlobalCountdownTimer(timeLeft) {
+    const countdownDisplay = document.getElementById('global-countdown-display');
+    if (!countdownDisplay) return;
+    
+    globalCountdownTimer = setInterval(() => {
+        timeLeft -= 1000;
+        
+        if (timeLeft <= 0) {
+            clearInterval(globalCountdownTimer);
+            replaceGlobalCountdownWithExpired(countdownDisplay);
+            return;
+        }
+        
+        const timerElement = countdownDisplay.querySelector('.countdown-timer');
+        if (timerElement) {
+            timerElement.textContent = formatTimeRemaining(timeLeft);
+        }
+    }, 1000);
+}
 // Start global countdown timer
 function startGlobalCountdownTimer() {
     if (globalCountdownTimer) {
         clearInterval(globalCountdownTimer);
     }
     
-    // Show the global banner
+    // Show the global banner at BOTTOM
     showGlobalCountdownBanner();
+    
+    // Hide spin countdown when reward is active
+    hideSpinCountdown();
     
     globalCountdownTimer = setInterval(() => {
         const now = new Date().getTime();
@@ -7430,16 +7804,10 @@ function startGlobalCountdownTimer() {
             return;
         }
         
-        // Update both timers
+        // Update timer
         const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
         const timerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        
-        // Update popup timer
-        const popupTimer = document.getElementById('expiration-timer');
-        if (popupTimer) {
-            popupTimer.textContent = timerText;
-        }
         
         // Update global banner timer
         const globalTimer = document.getElementById('global-timer');
@@ -7449,11 +7817,8 @@ function startGlobalCountdownTimer() {
         
         // Add urgent styling when less than 5 minutes
         const banner = document.getElementById('global-countdown-banner');
-        const popupTimerContainer = document.querySelector('.expiration-timer');
-        
         if (timeLeft < 5 * 60 * 1000) {
-            if (banner) banner.classList.add('urgent');
-            if (popupTimerContainer) popupTimerContainer.classList.add('urgent');
+            banner.classList.add('urgent');
         }
         
     }, 1000);
