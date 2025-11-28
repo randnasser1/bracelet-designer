@@ -884,71 +884,90 @@ function showSetWarning(charmSet) {
     }
 }
 function calculatePrice(includeDelivery = false) {
+    console.log('🔄 Calculating price for:', currentProduct);
+    
     // Handle individual charms separately
     if (currentProduct === 'individual') {
-        const basePrice = 3; // Fixed base price of 3 JDs for individual charms
-        
-        let charmCost = 0;
-        const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
-        
-        placedCharms.forEach(charm => {
-            if (charm.dataset.type === 'special') {
-                charmCost += 2;
-            } else if (charm.dataset.type === 'rare') {
-                charmCost += 3;
-            } else if (charm.dataset.type === 'custom') {
-                charmCost += 3.5;
-            } else if (charm.classList.contains('long-charm')) {
-                charmCost += 6;
-            }
-        });
-        
-        const subtotal = basePrice + charmCost;
-        const delivery = includeDelivery ? 2.5 : 0;
-        const total = subtotal + delivery;
-        
-        return {
-            subtotal: parseFloat(subtotal.toFixed(2)),
-            discount: 0,
-            total: parseFloat(total.toFixed(2)),
-            delivery: parseFloat(delivery.toFixed(2))
-        };
+        return calculateIndividualPrice(includeDelivery);
     }
      
-    // Verify valid product and size data
-    if (!PRODUCTS[currentProduct] || !SIZE_CHARTS[currentProduct] || !SIZE_CHARTS[currentProduct][currentSize]) {
-        console.error(`Missing price data for ${currentProduct} size ${currentSize}`);
-        return {
-            subtotal: 0,
-            discount: 0,
-            total: 0,
-            delivery: 0,
-            basePrice: 0,
-            charmCost: 0
-        };
-    }
-
+    // Get product data
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
     
+    if (!product || !sizeData) {
+        console.error('Missing product data:', { currentProduct, currentSize });
+        return getDefaultPriceData(includeDelivery);
+    }
+
     // Calculate base price
-    let originalPrice = isFullGlam ? product.fullGlam : (product.basePrice + sizeData.price);
-    let totalPrice = originalPrice;
+    let basePrice = product.basePrice;
+    let sizeUpgradePrice = isFullGlam ? 0 : sizeData.price;
 
     // Apply material upgrades
-    if (materialType === 'gold' && currentProduct === 'bracelet') {
-        totalPrice += 1;
-        originalPrice -= 1;
-    } else if (materialType === 'gold') {
-        totalPrice += 1;
-        originalPrice += 1;
+    let materialUpgrade = 0;
+    if (materialType === 'gold') {
+        materialUpgrade = 1;
     } else if (materialType === 'mix') {
-        totalPrice += 2.5;
-        originalPrice += 2.5;
+        materialUpgrade = 2.5;
     }
+
+    // Calculate original price
+    let originalPrice = basePrice + sizeUpgradePrice + materialUpgrade;
 
     // Count all placed charms and calculate costs
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
+    let charmCost = calculateCharmCost(placedCharms);
+
+    // Total before discounts
+    let subtotal = originalPrice + charmCost;
+
+    // Apply discounts (ONLY wheel discounts)
+    let discountApplied = 0;
+    let wheelDiscount = 0;
+
+    // ONLY apply wheel discounts if user has actually won them
+    const MINIMUM_FOR_WHEEL_REWARDS = 15.00;
+    const qualifiesForWheelRewards = subtotal >= MINIMUM_FOR_WHEEL_REWARDS;
+    
+    if (hasSpunToday && activeWheelRewards.discounts.length > 0 && qualifiesForWheelRewards) {
+        wheelDiscount = calculateWheelDiscount(subtotal);
+        discountApplied = wheelDiscount;
+        
+        console.log('💰 Applying wheel discount:', {
+            subtotal: subtotal,
+            wheelDiscount: wheelDiscount,
+            finalDiscount: discountApplied
+        });
+    }
+
+    // Final price after discounts - FIXED: Actually subtract the discount
+    let totalPrice = subtotal - discountApplied;
+    
+    // Calculate delivery
+    let deliveryFee = includeDelivery ? calculateDeliveryFee(subtotal) : 0;
+
+    // Ensure all values are valid numbers
+    const result = {
+        subtotal: parseFloat(subtotal.toFixed(2)),
+        discount: parseFloat(discountApplied.toFixed(2)),
+        total: parseFloat((includeDelivery ? totalPrice + deliveryFee : totalPrice).toFixed(2)),
+        delivery: parseFloat(deliveryFee.toFixed(2)),
+        basePrice: parseFloat(originalPrice.toFixed(2)),
+        charmCost: parseFloat(charmCost.toFixed(2)),
+        qualifiesForDiscount: false,
+        minimumForDiscount: 15,
+        wheelDiscount: parseFloat(wheelDiscount.toFixed(2)),
+        qualifiesForWheelRewards: qualifiesForWheelRewards,
+        minimumForWheelRewards: MINIMUM_FOR_WHEEL_REWARDS
+    };
+
+    console.log('Final price calculation:', result);
+    return result;
+}
+
+// Calculate charm costs separately
+function calculateCharmCost(placedCharms) {
     let specialCount = 0;
     let rareCount = 0;
     let customCount = 0;
@@ -966,85 +985,167 @@ function calculatePrice(includeDelivery = false) {
             customCount++;
         }
     });
-     
-    // Apply charm costs to both prices
-    if (!isFullGlam) {
-        const includedSpecials = 1;
-        const paidSpecials = Math.max(0, specialCount - includedSpecials);
-        totalPrice += paidSpecials * 2;
-        originalPrice += paidSpecials * 2;
+
+    let charmCost = 0;
+    
+    // Apply free special charms only if user won them from wheel
+    let freeSpecials = 0;
+    if (activeWheelRewards.freeCharm.active && activeWheelRewards.freeCharm.count > 0) {
+        // Check if order qualifies for free charm (10 JD minimum)
+        const subtotal = calculateSubtotal(); // Calculate current subtotal
+        if (subtotal >= 10) { // CHANGED: 10 JD minimum for free charm
+            freeSpecials = Math.min(specialCount, activeWheelRewards.freeCharm.count);
+            console.log('🎁 Applying free special charms:', freeSpecials, 'out of', specialCount);
+        }
     }
+    
+    const paidSpecials = Math.max(0, specialCount - freeSpecials);
+    charmCost += paidSpecials * 2;
      
     // Add costs for rare, custom, and long charms
-    totalPrice += rareCount * 3;
-    originalPrice += rareCount * 3;
-    
-    totalPrice += customCount * 3.5;
-    originalPrice += customCount * 3.5;
-    
-    totalPrice += longCharmCount * 6;
-    originalPrice += longCharmCount * 6;
+    charmCost += rareCount * 3;
+    charmCost += customCount * 3.5;
+    charmCost += longCharmCount * 6;
 
-    // Check for discount eligibility
-    let discountApplied = 0;
-    const MINIMUM_FOR_DISCOUNT = 15.00;
-    let qualifiesForDiscount = originalPrice >= MINIMUM_FOR_DISCOUNT;
+    return charmCost;
+}
+
+// Helper function to calculate current subtotal
+function calculateSubtotal() {
+    if (currentProduct === 'individual') {
+        return 3; // Base price for individual charms
+    }
     
-    if (qualifiesForDiscount) {
-        // Check for first order discount
-        if (checkFirstOrderDiscount()) {
-            discountApplied = Math.min(originalPrice * 0.2, 5);
-            totalPrice = originalPrice - discountApplied;
-        }
-        
-        // Check for seasonal discount
-        const currentDate = new Date();
-        const discountEndDate = new Date('2025-11-30');
-        if (currentDate <= discountEndDate) {
-            const seasonalDiscount = Math.min(originalPrice * 0.2, 5);
-            discountApplied = Math.max(discountApplied, seasonalDiscount);
-            totalPrice = originalPrice - discountApplied;
-        }
+    const product = PRODUCTS[currentProduct];
+    const sizeData = SIZE_CHARTS[currentProduct][currentSize];
+    
+    if (!product || !sizeData) return 0;
+
+    // Calculate base price
+    let basePrice = product.basePrice;
+    let sizeUpgradePrice = isFullGlam ? 0 : sizeData.price;
+
+    // Apply material upgrades
+    let materialUpgrade = 0;
+    if (materialType === 'gold') {
+        materialUpgrade = 1;
+    } else if (materialType === 'mix') {
+        materialUpgrade = 2.5;
     }
 
-    // Ensure all values are valid numbers
-    originalPrice = parseFloat(originalPrice.toFixed(2));
-    totalPrice = parseFloat(totalPrice.toFixed(2));
-    discountApplied = parseFloat(discountApplied.toFixed(2));
+    // Calculate original price
+    let originalPrice = basePrice + sizeUpgradePrice + materialUpgrade;
 
-    if (includeDelivery) {
-        const deliveryFee = 2.5;
-        return {
-            subtotal: originalPrice,
-            discount: discountApplied,
-            total: totalPrice + deliveryFee,
-            delivery: deliveryFee,
-            basePrice: isFullGlam ? product.fullGlam : product.basePrice + sizeData.price,
-            charmCost: totalPrice - (isFullGlam ? product.fullGlam : product.basePrice + sizeData.price),
-            longCharmCount: longCharmCount,
-            specialCount: specialCount,
-            rareCount: rareCount,
-            customCount: customCount,
-            qualifiesForDiscount: qualifiesForDiscount,
-            minimumForDiscount: MINIMUM_FOR_DISCOUNT
-        };
-    }
+    return originalPrice;
+}
+
+// Individual price calculation
+function calculateIndividualPrice(includeDelivery = false) {
+    const basePrice = 3;
+    
+    let charmCost = 0;
+    const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
+    
+    placedCharms.forEach(charm => {
+        if (charm.dataset.type === 'special') {
+            charmCost += 2;
+        } else if (charm.dataset.type === 'rare') {
+            charmCost += 3;
+        } else if (charm.dataset.type === 'custom') {
+            charmCost += 3.5;
+        } else if (charm.classList.contains('long-charm')) {
+            charmCost += 6;
+        }
+    });
+    
+    const subtotal = basePrice + charmCost;
+    const delivery = includeDelivery ? calculateDeliveryFee(subtotal) : 0;
+    const total = subtotal + delivery;
     
     return {
-        subtotal: originalPrice,
-        discount: discountApplied,
-        total: totalPrice,
-        delivery: 0,
-        basePrice: isFullGlam ? product.fullGlam : product.basePrice + sizeData.price,
-        charmCost: totalPrice - (isFullGlam ? product.fullGlam : product.basePrice + sizeData.price),
-        longCharmCount: longCharmCount,
-        specialCount: specialCount,
-        rareCount: rareCount,
-        customCount: customCount,
-        qualifiesForDiscount: qualifiesForDiscount,
-        minimumForDiscount: MINIMUM_FOR_DISCOUNT
+        subtotal: parseFloat(subtotal.toFixed(2)),
+        discount: 0, // No discounts for individual charms
+        total: parseFloat(total.toFixed(2)),
+        delivery: parseFloat(delivery.toFixed(2)),
+        basePrice: basePrice,
+        charmCost: parseFloat(charmCost.toFixed(2)),
+        longCharmCount: 0,
+        specialCount: 0,
+        rareCount: 0,
+        customCount: 0,
+        qualifiesForDiscount: false,
+        minimumForDiscount: 15,
+        wheelDiscount: 0
     };
 }
+
+// Default price data for errors
+function getDefaultPriceData(includeDelivery = false) {
+    const delivery = includeDelivery ? 2.5 : 0;
+    return {
+        subtotal: 0,
+        discount: 0,
+        total: delivery,
+        delivery: delivery,
+        basePrice: 0,
+        charmCost: 0,
+        longCharmCount: 0,
+        specialCount: 0,
+        rareCount: 0,
+        customCount: 0,
+        qualifiesForDiscount: false,
+        minimumForDiscount: 15,
+        wheelDiscount: 0
+    };
+}
+function calculateWheelDiscount(subtotal) {
+    let bestDiscount = 0;
+    
+    // Only consider the LATEST discount (there should only be one now)
+    if (activeWheelRewards.discounts.length > 0) {
+        // Get the most recent discount (should be only one)
+        const discount = activeWheelRewards.discounts[0];
+        
+        // Only apply if order meets minimum amount
+        if (subtotal >= discount.minAmount) {
+            // Calculate discount amount
+            const discountAmount = subtotal * (discount.percent / 100);
+            
+            // Apply maximum cap if needed (for 10% and 15% discounts)
+            let finalDiscount = discountAmount;
+            if (discount.percent === 10 || discount.percent === 15) {
+                finalDiscount = Math.min(discountAmount, 5); // Max 5 JD for higher discounts
+            }
+            
+            bestDiscount = finalDiscount;
+            
+            console.log('✅ Applying discount:', {
+                percent: discount.percent,
+                minAmount: discount.minAmount,
+                subtotal: subtotal,
+                discountAmount: discountAmount,
+                finalDiscount: finalDiscount
+            });
+        } else {
+            console.log('❌ Discount not applied - below minimum:', {
+                percent: discount.percent,
+                minAmount: discount.minAmount,
+                subtotal: subtotal,
+                needed: discount.minAmount - subtotal
+            });
+        }
+    }
+    
+    return bestDiscount;
+}
+// NEW: Calculate delivery fee with wheel free delivery
+function calculateDeliveryFee(subtotal) {
+    if (activeWheelRewards.freeDelivery.active && subtotal >= activeWheelRewards.freeDelivery.minAmount) {
+        return 0;
+    }
+    return 2.5; // Standard delivery fee
+}
+
 function safeDisplayPrice(price) {
     if (isNaN(price) || price === null || price === undefined) {
         return '0.00';
@@ -1216,123 +1317,7 @@ function updateSelectedCharmPreview(charmElement) {
     // Resume scrolling when charm is deselected
     resumeRecommendedScroll();
 }
-function updateCartDisplay() {
-    const cartItemsContainer = document.getElementById('cart-items');
-    const cartCount = document.querySelector('.cart-count');
-    const cartSubtotal = document.getElementById('cart-subtotal');
-    const cartDiscountInfo = document.getElementById('cart-discount-info');
-    const cartDiscountAmount = document.getElementById('cart-discount-amount');
-    const cartDelivery = document.getElementById('cart-delivery');
-    const cartTotal = document.querySelector('.cart-total');
-    
-    cartCount.textContent = cart.length;
-    
-    if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
-        cartSubtotal.textContent = 'Subtotal: 0.00 JDs';
-        cartTotal.textContent = 'Total: 0.00 JDs';
-        cartDiscountInfo.style.display = 'none';
-        cartDelivery.textContent = 'Delivery Fee: 2.50 JDs';
-        return;
-    }
-    
-    let itemsHTML = '';
-    const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
-    const discountedSubtotal = cart.reduce((sum, item) => sum + item.price, 0);
-    const deliveryFee = 2.5;
-    
-    // 🎯 CHECK MINIMUM ORDER FOR DISCOUNT
-    const MINIMUM_ORDER = 15.00;
-    const qualifiesForDiscount = subtotal >= MINIMUM_ORDER;
-    let additionalDiscount = 0;
-    
-    if (qualifiesForDiscount) {
-        const currentDate = new Date();
-        const discountEndDate = new Date('2025-10-31');
-        
-        if (currentDate <= discountEndDate) {
-            const potentialDiscount = subtotal * 0.2;
-            const alreadyDiscounted = subtotal - discountedSubtotal;
-            additionalDiscount = Math.min(potentialDiscount - alreadyDiscounted, 5 - alreadyDiscounted);
-        }
-    }
-    
-    const totalBeforeDiscount = discountedSubtotal + deliveryFee;
-    const finalTotal = totalBeforeDiscount - additionalDiscount;
 
-    // Display cart items
-    cart.forEach((item, index) => {
-        itemsHTML += `
-            <div class="cart-item">
-                <div class="cart-item-info">
-                    <div class="cart-item-symbol">${item.symbol}</div>
-                    <div class="cart-item-details">
-                        <div>${item.product} (${item.size})</div>
-                        <div>${item.materialType}</div>
-                        <div>${item.price.toFixed(2)} JDs</div>
-                    </div>
-                </div>
-                <button class="remove-item" data-index="${index}">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        `;
-    });
-    
-    cartItemsContainer.innerHTML = itemsHTML;
-    cartSubtotal.textContent = `Subtotal: ${discountedSubtotal.toFixed(2)} JDs`;
-    cartDelivery.textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
-    
-    // 🎯 BEAUTIFUL CART DISCOUNT DISPLAY
-    if (additionalDiscount > 0) {
-        cartDiscountInfo.style.display = 'block';
-        cartDiscountAmount.innerHTML = `
-            <div class="cart-discount-applied">
-                <span class="discount-badge">🎉 20% OFF</span>
-                <span class="discount-amount">-${additionalDiscount.toFixed(2)} JDs</span>
-            </div>
-        `;
-        
-        cartTotal.innerHTML = `
-            <div class="cart-total-with-discount">
-                <div class="price-comparison">
-                    <span class="original-price">${totalBeforeDiscount.toFixed(2)} JDs</span>
-                    <span class="final-price">${finalTotal.toFixed(2)} JDs</span>
-                </div>
-                <div class="savings-message">
-                    You saved ${additionalDiscount.toFixed(2)} JDs!
-                </div>
-            </div>
-        `;
-    } else if (qualifiesForDiscount) {
-        cartDiscountInfo.style.display = 'block';
-        cartDiscountAmount.innerHTML = `
-            <div class="cart-discount-eligible">
-                <span class="discount-badge">⭐ ELIGIBLE</span>
-                <span>20% discount will be applied at checkout</span>
-            </div>
-        `;
-        cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
-    } else {
-        cartDiscountInfo.style.display = 'block';
-        const amountNeeded = (MINIMUM_ORDER - subtotal).toFixed(2);
-        cartDiscountAmount.innerHTML = `
-            <div class="cart-discount-not-eligible">
-                <span class="discount-badge">📢 ALMOST THERE</span>
-                <span>Add ${amountNeeded} JOD for 20% OFF</span>
-            </div>
-        `;
-        cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
-    }
-
-    // Reattach event listeners
-    document.querySelectorAll('.remove-item').forEach(button => {
-        button.addEventListener('click', function() {
-            const index = parseInt(this.dataset.index);
-            removeFromCart(index);
-        });
-    });
-}
 function removeFromCart(index) {
     if (index >= 0 && index < cart.length) {
         cart.splice(index, 1);
@@ -1399,62 +1384,147 @@ function updatePrice() {
             }
         }
 
-        // Rest of your discount messages code remains the same...
-        if (discountMessages) {
-            discountMessages.innerHTML = '';
-            
-            if (priceData.subtotal > 0) {
-                if (priceData.qualifiesForDiscount) {
-                    if (priceData.discount > 0) {
-                        discountMessages.innerHTML = `
-                            <div class="discount-banner success">
-                                <div class="discount-icon">🎊</div>
-                                <div class="discount-content">
-                                    <div class="discount-title">Discount Applied!</div>
-                                    <div class="discount-details">
-                                        <span class="original-price">${safeDisplayPrice(priceData.subtotal)} JOD</span>
-                                        <span class="discount-arrow">→</span>
-                                        <span class="final-price">${safeDisplayPrice(priceData.total)} JOD</span>
-                                    </div>
-                                    <div class="discount-savings">You save ${safeDisplayPrice(priceData.discount)} JOD! (20% OFF)</div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        discountMessages.innerHTML = `
-                            <div class="discount-banner eligible">
-                                <div class="discount-icon">⭐</div>
-                                <div class="discount-content">
-                                    <div class="discount-title">You Qualify for 20% OFF!</div>
-                                    <div class="discount-details">Complete your order to apply the discount</div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                } else {
-                    const amountNeeded = (priceData.minimumForDiscount - priceData.subtotal).toFixed(2);
-                    discountMessages.innerHTML = `
-                        <div class="discount-banner not-eligible">
-                            <div class="discount-icon">📢</div>
-                            <div class="discount-content">
-                                <div class="discount-title">Almost There!</div>
-                                <div class="discount-details">Add <span class="amount-needed">${safeDisplayPrice(amountNeeded)} JOD</span> more to get 20% OFF</div>
-                                <div class="discount-minimum">Minimum order: 15.00 JOD</div>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-        }
+        // Update discount display with wheel rewards
+        updateDiscountDisplayWithWheelRewards(priceData);
 
     } catch (error) {
         console.log('Price update failed:', error);
-        // Fallback to safe values
+        // FalRlback to safe values
         const totalPriceElement = document.getElementById('total-price');
         if (totalPriceElement) {
             totalPriceElement.textContent = 'Total: 0.00 JDs';
         }
     }
+}
+function updateDiscountDisplayWithWheelRewards(priceData) {
+    const discountMessages = document.getElementById('discount-messages');
+    if (!discountMessages) return;
+    
+    // Clear previous messages
+    discountMessages.innerHTML = '';
+    
+    const subtotal = priceData.subtotal;
+    let messagesHTML = '';
+
+    console.log('📊 Displaying active rewards:', {
+        hasSpunToday: hasSpunToday,
+        discounts: activeWheelRewards.discounts.length,
+        freeCharm: activeWheelRewards.freeCharm.active,
+        freeDelivery: activeWheelRewards.freeDelivery.active
+    });
+
+    // ONLY show wheel rewards if user has spun the wheel today AND won rewards
+    if (hasSpunToday) {
+        // Check free charm status - UPDATED to 10 JD minimum
+        if (activeWheelRewards.freeCharm.active && activeWheelRewards.freeCharm.count > 0) {
+            const minAmount = 10; // CHANGED: 10 JOD minimum for free charm
+            const qualifies = subtotal >= minAmount;
+            const amountNeeded = (minAmount - subtotal).toFixed(2);
+            
+            if (qualifies) {
+                messagesHTML += `
+                    <div class="discount-banner eligible">
+                        <div class="discount-icon">🎁</div>
+                        <div class="discount-content">
+                            <div class="discount-title">Free Special Charm APPLIED!</div>
+                            <div class="discount-details">You have ${activeWheelRewards.freeCharm.count} free special charm(s)</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messagesHTML += `
+                    <div class="discount-banner not-eligible">
+                        <div class="discount-icon">🎁</div>
+                        <div class="discount-content">
+                            <div class="discount-title">Free Special Charm Available!</div>
+                            <div class="discount-details">Add <span class="amount-needed">${safeDisplayPrice(amountNeeded)} JOD</span> more to get FREE Special Charm</div>
+                            <div class="discount-minimum">Minimum order: ${minAmount}.00 JOD</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Check discounts - show only if there are any
+        if (activeWheelRewards.discounts.length > 0) {
+            const discount = activeWheelRewards.discounts[0];
+            
+            // Use the actual minimum amount from the discount object
+            const minAmount = discount.minAmount || (discount.percent === 5 ? 12 : 15);
+            const qualifies = subtotal >= minAmount;
+            const amountNeeded = (minAmount - subtotal).toFixed(2);
+            
+            let icon;
+            switch(discount.percent) {
+                case 15:
+                    icon = '💰';
+                    break;
+                case 10:
+                    icon = '💎';
+                    break;
+                case 5:
+                    icon = '✨';
+                    break;
+                default:
+                    icon = '💎';
+            }
+            
+            if (qualifies) {
+                messagesHTML += `
+                    <div class="discount-banner eligible">
+                        <div class="discount-icon">${icon}</div>
+                        <div class="discount-content">
+                            <div class="discount-title">${discount.percent}% OFF APPLIED!</div>
+                            <div class="discount-details">You're saving ${priceData.wheelDiscount.toFixed(2)} JOD</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messagesHTML += `
+                    <div class="discount-banner not-eligible">
+                        <div class="discount-icon">${icon}</div>
+                        <div class="discount-content">
+                            <div class="discount-title">${discount.percent}% OFF Available!</div>
+                            <div class="discount-details">Add <span class="amount-needed">${safeDisplayPrice(amountNeeded)} JOD</span> more to get ${discount.percent}% OFF</div>
+                            <div class="discount-minimum">Minimum order: ${minAmount}.00 JOD</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Check free delivery (only show if won)
+        if (activeWheelRewards.freeDelivery.active) {
+            const minAmount = activeWheelRewards.freeDelivery.minAmount || 25;
+            const qualifies = subtotal >= minAmount;
+            const amountNeeded = (minAmount - subtotal).toFixed(2);
+            
+            if (qualifies) {
+                messagesHTML += `
+                    <div class="discount-banner eligible">
+                        <div class="discount-icon">🚚</div>
+                        <div class="discount-content">
+                            <div class="discount-title">FREE Delivery APPLIED!</div>
+                            <div class="discount-details">You saved 2.50 JOD on delivery</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messagesHTML += `
+                    <div class="discount-banner not-eligible">
+                        <div class="discount-icon">🚚</div>
+                        <div class="discount-content">
+                            <div class="discount-title">FREE Delivery Available!</div>
+                            <div class="discount-details">Add <span class="amount-needed">${safeDisplayPrice(amountNeeded)} JOD</span> more to get FREE Delivery</div>
+                            <div class="discount-minimum">Minimum order: ${minAmount}.00 JOD</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    discountMessages.innerHTML = messagesHTML;
 }
 function getCharmBreakdownText() {
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
@@ -1467,11 +1537,16 @@ function getCharmBreakdownText() {
         else if (type === 'custom') customCount++;
     });
 
-    const product = PRODUCTS[currentProduct];
-    const freeSpecials = isFullGlam ? product.baseSlots : product.includedSpecial;
+    // Check for free special charms from wheel
+    let freeSpecials = 0;
+    if (activeWheelRewards.freeCharm.active && activeWheelRewards.freeCharm.count > 0) {
+        freeSpecials = activeWheelRewards.freeCharm.count;
+    }
+    
     const paidSpecials = Math.max(0, specialCount - freeSpecials);
 
-    let text = `Charms: ${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials`;
+    let text = `Charms: ${specialCount} special`;
+    if (freeSpecials > 0) text += ` (${Math.min(specialCount, freeSpecials)} free from wheel)`;
     if (paidSpecials > 0) text += `, ${paidSpecials} paid (+${(paidSpecials * 2).toFixed(2)} JD)`;
     if (rareCount > 0) text += `, ${rareCount} rare (+${(rareCount * 3).toFixed(2)} JD)`;
     if (customCount > 0) text += `, ${customCount} custom (+${(customCount * 3.5).toFixed(2)} JD)`;
@@ -1819,22 +1894,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initProduct(product) {
-    // Store existing charms before clearing (only for individual mode)
-    let existingCharms = [];
-    if (currentProduct === 'individual') {
-        existingCharms = Array.from(jewelryPiece.querySelectorAll('.slot'))
-            .map(slot => {
-                const charm = slot.querySelector('img:not([data-type="base"])');
-                return charm ? {
-                    src: charm.src,
-                    type: charm.dataset.type,
-                    isLong: slot.classList.contains('long-slot'),
-                    isDangly: slot.classList.contains('has-dangly')
-                } : null;
-            })
-            .filter(Boolean);
-    }
-
+    console.log('🔄 Initializing product:', product);
+    
     // Set the current product
     currentProduct = product;
     
@@ -1845,7 +1906,7 @@ function initProduct(product) {
         currentSize = '15.2-16.2';
     } else if (product !== 'individual') {
         // For other products, use their first available size
-        const sizes = Object.keys(SIZE_CHARTS[product]);
+        const sizes = Object.keys(SIZE_CHARTS[product] || {});
         if (sizes.length > 0) {
             currentSize = sizes[0];
         }
@@ -1854,15 +1915,13 @@ function initProduct(product) {
     // Update UI elements
     const individualControls = document.getElementById('individual-controls');
     const sizeControls = document.getElementById('size-controls');
-    const materialSelector = document.querySelector('.material-selector');
-    const fullGlamBtn = document.getElementById('full-glam-btn');
-    const addCharmsLabel = document.querySelector('.add-charms-label');
-
+    
     // Reset design state
-    jewelryPiece.innerHTML = '';
+    if (jewelryPiece) {
+        jewelryPiece.innerHTML = '';
+    }
     selectedCharm = null;
     hideSelectedCharmPreview();
-    usedCharms.clear();
 
     // Update size dropdown
     updateSizeOptions(product);
@@ -1871,65 +1930,29 @@ function initProduct(product) {
     if (product === 'watch' || product === 'apple-watch' || product === 'keychain') {
         if (individualControls) individualControls.style.display = 'none';
         if (sizeControls) sizeControls.style.display = 'block';
-        if (materialSelector) materialSelector.style.display = 'none';
-        if (fullGlamBtn) fullGlamBtn.style.display = 'none';
-        
         initSpecialProductWithBase(product);
     } 
     else if (product === 'individual') {
-        // Show individual controls
         if (individualControls) individualControls.style.display = 'flex';
-        
-        // Hide irrelevant elements
         if (sizeControls) sizeControls.style.display = 'none';
-        if (materialSelector) materialSelector.style.display = 'none';
-        if (fullGlamBtn) fullGlamBtn.style.display = 'none';
-        if (addCharmsLabel) addCharmsLabel.style.display = 'none';
-        
-        // Initialize individual slots with preserved charms
-        updateIndividualSlots(existingCharms);
+        updateIndividualSlots();
     } 
     else {
         if (individualControls) individualControls.style.display = 'none';
         if (sizeControls) sizeControls.style.display = 'block';
-        if (materialSelector) materialSelector.style.display = 'flex';
-        if (fullGlamBtn) fullGlamBtn.style.display = 'block';
-        if (addCharmsLabel) addCharmsLabel.style.display = 'block';
-        
         initJewelryPiece();
         isFullGlam = false;
+        const fullGlamBtn = document.getElementById('full-glam-btn');
         if (fullGlamBtn) fullGlamBtn.classList.remove('active');
     }
-    if (product === 'watch') {
-        initWatchPool(); // Initialize watch pool for watch products
-        if (individualControls) individualControls.style.display = 'none';
-        if (sizeControls) sizeControls.style.display = 'block';
-        if (materialSelector) materialSelector.style.display = 'none';
-        if (fullGlamBtn) fullGlamBtn.style.display = 'none';
-        
-        initSpecialProductWithBase(product);
-    }else {
-        // Hide watch pool for other products
-        if (watchPoolContainer) watchPoolContainer.style.display = 'none';
-        // ... rest of initialization ...
-    }
+
     // Update material display
     updateBaseCharms();
     
-    // Update product button active state
-    document.querySelectorAll('.product-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.type === product) {
-            btn.classList.add('active');
-        }
-    });
-
-    // Update price display
+    // Update price display with correct base price
     updatePrice();
     
-    setTimeout(() => {
-        centerJewelryPiece();
-    }, 100);
+    console.log('✅ Product initialized:', { currentProduct, currentSize, basePrice: PRODUCTS[product]?.basePrice });
 }
 function isLoveOrDolphinCharm(src) {
     const loveDolphinCharmPaths = [
@@ -2565,7 +2588,7 @@ function handlePlaceOrderClick() {
         showCustomWarningModal(
             `🎯 Minimum Order Required!\n\n💳 Your current order: ${subtotal.toFixed(2)} JOD\n` +
             `💰 You need: ${amountNeeded} JOD more\n` +
-            `🎁 Minimum for 20% discount: 15.00 JOD\n\n` +
+            `🎁 Minimum for 10% discount: 15.00 JOD\n\n` +
             `💡 Add more charms or upgrade to Full Glam!`
         );
         return;
@@ -2596,7 +2619,7 @@ function handlePlaceOrderClick() {
     // Calculate discount
     let discount = 0;
     if (subtotal >= MINIMUM_ORDER) {
-        discount = Math.min(subtotal * 0.2, 5);
+        discount = Math.min(subtotal * 0.1, 5);
     }
     
     const finalTotal = totalBeforeDiscount - discount;
@@ -2617,7 +2640,7 @@ function handlePlaceOrderClick() {
                     </span>
                 </div>
                 <div style="color: #4CAF50; font-size: 0.9rem; font-weight: bold;">
-                    🎉 20% Discount Applied! (-${discount.toFixed(2)} JDs)
+                    🎉 10% Discount Applied! (-${discount.toFixed(2)} JDs)
                 </div>
             </div>
         `;
@@ -2705,6 +2728,16 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
         // Send email notifications
         await sendOrderNotifications(orderRef.id, orderData);
 
+        // ========== INTEGRATION POINT ==========
+        // Call the integrated success handler with wheel rewards
+        onOrderSuccess({
+            ...orderData,
+            clientOrderId: orderRef.id,
+            timestamp: new Date().toISOString(),
+            firestoreId: orderRef.id
+        });
+        // ========== END INTEGRATION ==========
+
         // Clear cart and reset form
         cart.length = 0;
         updateCartDisplay();
@@ -2715,10 +2748,9 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
         orderIdSpan.textContent = orderRef.id;
         orderModal.classList.remove('active');
         orderConfirmation.classList.add('active');
-         if (auth.currentUser) {
+        if (auth.currentUser) {
             setTimeout(expandOrdersForNewOrder, 1000);
         }
-        showToast('Order submitted successfully!', 'success');
         
     } catch (error) {
         console.error('Order submission failed:', error);
@@ -2732,25 +2764,225 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
     }
 }
 
-// Email notification function
+// Enhanced email notification with reward details
 async function sendOrderNotifications(orderId, orderData) {
     try {
         // Get the cloud function
         const sendOrderEmails = firebase.functions().httpsCallable('sendOrderEmails');
         
-        // Call the function
+        // Prepare reward details for email
+        const rewardDetails = orderData.wheelRewards.appliedRewards
+            .filter(r => r.applied)
+            .map(r => `${r.name}: ${r.savings.toFixed(2)} JOD savings`)
+            .join(', ');
+        
+        // Call the function with enhanced data
         const result = await sendOrderEmails({
             orderId: orderId,
             orderData: orderData,
             customerEmail: orderData.customer.email,
-            customerName: orderData.customer.name
+            customerName: orderData.customer.name,
+            rewardDetails: rewardDetails,
+            totalSavings: orderData.wheelRewards.appliedRewards
+                .filter(r => r.applied)
+                .reduce((sum, r) => sum + r.savings, 0)
         });
         
-        console.log('Email notifications sent:', result.data);
+        console.log('📧 Email notifications sent with reward details:', result.data);
     } catch (error) {
         console.error('Failed to send email notifications:', error);
-        // Don't throw error - order should still be saved even if emails fail
     }
+}
+// Helper function to determine which rewards were applied to this order
+function getAppliedRewardsForOrder(totalJOD) {
+    const appliedRewards = [];
+    const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
+    
+    // Check free charm application
+    if (activeWheelRewards.freeCharm.active && activeWheelRewards.freeCharm.count > 0) {
+        const minAmount = activeWheelRewards.freeCharm.minAmount || 10;
+        if (subtotal >= minAmount) {
+            appliedRewards.push({
+                type: 'free-charm',
+                name: 'Free Special Charm',
+                count: activeWheelRewards.freeCharm.count,
+                minAmount: minAmount,
+                applied: true,
+                savings: calculateFreeCharmSavings()
+            });
+        } else {
+            appliedRewards.push({
+                type: 'free-charm',
+                name: 'Free Special Charm',
+                count: activeWheelRewards.freeCharm.count,
+                minAmount: minAmount,
+                applied: false,
+                reason: `Order below minimum (${minAmount} JOD required)`
+            });
+        }
+    }
+    
+    // Check discount application
+    if (activeWheelRewards.discounts.length > 0) {
+        const discount = activeWheelRewards.discounts[0];
+        const minAmount = discount.minAmount;
+        
+        if (subtotal >= minAmount) {
+            const discountAmount = Math.min(subtotal * (discount.percent / 100), 5);
+            appliedRewards.push({
+                type: 'discount',
+                name: `${discount.percent}% OFF`,
+                percent: discount.percent,
+                minAmount: minAmount,
+                applied: true,
+                savings: discountAmount,
+                originalSubtotal: subtotal,
+                discountedSubtotal: subtotal - discountAmount
+            });
+        } else {
+            appliedRewards.push({
+                type: 'discount',
+                name: `${discount.percent}% OFF`,
+                percent: discount.percent,
+                minAmount: minAmount,
+                applied: false,
+                reason: `Order below minimum (${minAmount} JOD required)`
+            });
+        }
+    }
+    
+    // Check free delivery application
+    if (activeWheelRewards.freeDelivery.active) {
+        const minAmount = activeWheelRewards.freeDelivery.minAmount || 25;
+        
+        if (subtotal >= minAmount) {
+            appliedRewards.push({
+                type: 'free-delivery',
+                name: 'FREE Delivery',
+                minAmount: minAmount,
+                applied: true,
+                savings: 2.5
+            });
+        } else {
+            appliedRewards.push({
+                type: 'free-delivery',
+                name: 'FREE Delivery',
+                minAmount: minAmount,
+                applied: false,
+                reason: `Order below minimum (${minAmount} JOD required)`
+            });
+        }
+    }
+    
+    return appliedRewards;
+}
+// Enhanced order success handler
+function onOrderSuccess(orderData) {
+    console.log('✅ Order completed successfully with rewards:', orderData.wheelRewards);
+    
+    // Add points for completing order
+    addPointsAfterOrder(orderData.amountJOD);
+    
+    // Track reward usage in analytics
+    trackRewardUsage(orderData);
+    
+    // Consume used rewards
+    consumeUsedRewards(orderData.wheelRewards.appliedRewards);
+    
+    // Show success message with reward summary
+    showOrderSuccessWithRewards(orderData);
+}
+
+// Track reward usage for analytics
+function trackRewardUsage(orderData) {
+    const rewards = orderData.wheelRewards.appliedRewards;
+    
+    rewards.forEach(reward => {
+        if (reward.applied) {
+            console.log(`🎯 Reward used: ${reward.name} - Savings: ${reward.savings} JOD`);
+            
+            // You can send this to analytics services like Google Analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'reward_used', {
+                    'reward_type': reward.type,
+                    'reward_name': reward.name,
+                    'savings_amount': reward.savings,
+                    'order_value': orderData.amountJOD
+                });
+            }
+        }
+    });
+}
+
+// Consume rewards that were used in the order
+function consumeUsedRewards(appliedRewards) {
+    appliedRewards.forEach(reward => {
+        if (reward.applied) {
+            switch (reward.type) {
+                case 'free-charm':
+                    // Reduce free charm count
+                    if (activeWheelRewards.freeCharm.count > 0) {
+                        activeWheelRewards.freeCharm.count--;
+                        if (activeWheelRewards.freeCharm.count <= 0) {
+                            activeWheelRewards.freeCharm.active = false;
+                        }
+                        console.log(`🎁 Consumed 1 free charm. Remaining: ${activeWheelRewards.freeCharm.count}`);
+                    }
+                    break;
+                    
+                case 'discount':
+                    // Discounts are one-time use, clear them
+                    activeWheelRewards.discounts = [];
+                    console.log('💰 Discount consumed and cleared');
+                    break;
+                    
+                case 'free-delivery':
+                    // Free delivery is one-time use
+                    activeWheelRewards.freeDelivery.active = false;
+                    console.log('🚚 Free delivery consumed');
+                    break;
+            }
+        }
+    });
+    
+    // Save updated rewards
+    saveUserData();
+}
+
+// Show enhanced order success message
+function showOrderSuccessWithRewards(orderData) {
+    const rewards = orderData.wheelRewards.appliedRewards;
+    const appliedRewards = rewards.filter(r => r.applied);
+    
+    if (appliedRewards.length > 0) {
+        let savingsMessage = '🎉 Order Complete! \n\n';
+        let totalSavings = 0;
+        
+        appliedRewards.forEach(reward => {
+            savingsMessage += `✅ ${reward.name}: Saved ${reward.savings.toFixed(2)} JOD\n`;
+            totalSavings += reward.savings;
+        });
+        
+        savingsMessage += `\n💰 Total Savings: ${totalSavings.toFixed(2)} JOD`;
+        
+        showToast(savingsMessage, 'success');
+    } else {
+        showToast('✅ Order completed successfully!', 'success');
+    }
+}
+// Calculate savings from free charms
+function calculateFreeCharmSavings() {
+    const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
+    let specialCount = 0;
+    
+    placedCharms.forEach(charm => {
+        if (charm.dataset.type === 'special') {
+            specialCount++;
+        }
+    });
+    
+    const freeSpecials = Math.min(specialCount, activeWheelRewards.freeCharm.count);
+    return freeSpecials * 2; // Each special charm costs 2 JDs
 }
 async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null) {
     const paymentMethod = formData.get('payment') || (paypalData ? 'PayPal' : 'Unknown');
@@ -2771,6 +3003,31 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         };
     });
 
+    // Build wheel rewards data for the order
+    const wheelRewardsData = {
+        // Current active rewards at time of order
+        activeRewards: {
+            freeCharm: activeWheelRewards.freeCharm,
+            discounts: activeWheelRewards.discounts,
+            freeDelivery: activeWheelRewards.freeDelivery
+        },
+        // Applied rewards in this order
+        appliedRewards: getAppliedRewardsForOrder(totalJOD),
+        // Wheel spin history
+        spinInfo: {
+            hasSpunToday: hasSpunToday,
+            userPoints: userPoints,
+            lastSpinDate: localStorage.getItem('lastSpinDate')
+        },
+        // Won reward details
+        wonReward: currentWonReward ? {
+            id: currentWonReward.id,
+            name: currentWonReward.name,
+            minAmount: currentWonReward.minAmount,
+            wonAt: new Date().toISOString()
+        } : null
+    };
+
     // Build order data with user info
     const orderData = {
         clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
@@ -2785,8 +3042,8 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         },
         // Enhanced user linking
         userId: currentUser ? currentUser.uid : null,
-    userEmail: currentUser ? currentUser.email : formData.get('customer-email'),
-    isGuestOrder: currentUser ? false : true,
+        userEmail: currentUser ? currentUser.email : formData.get('customer-email'),
+        isGuestOrder: currentUser ? false : true,
         userName: currentUser ? currentUser.displayName : formData.get('full-name'),
         paymentMethod: paymentMethod,
         currency: "JOD",
@@ -2799,6 +3056,10 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         subtotal: cart.reduce((sum, item) => sum + item.price, 0),
         deliveryFee: 2.5,
         total: totalJOD,
+        
+        // WHEEL REWARDS DATA - ADDED HERE
+        wheelRewards: wheelRewardsData,
+        
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         status: 'pending',
         // Add for easy querying
@@ -4472,8 +4733,7 @@ function initializeRecommendedCharms() {
         console.error('❌ Recommended charms elements not found');
         return;
     }
-
-    // Your actual recommended charms
+ // Your actual recommended charms
     const recommendedCharmNames = [
         'rares/newc2r/c224.png',
         'rares/sporty/sporty2.png',
@@ -4593,56 +4853,6 @@ function resumeRecommendedScroll() {
     }
 }
 
-function handleRecommendedCharmClick(charmItem, charmImg) {
-    console.log('🎯 Recommended charm clicked');
-    
-    // Stop scrolling when charm is selected
-    stopRecommendedScroll();
-    
-    // If clicking the same charm that's already selected, deselect it
-    if (charmItem.classList.contains('selected')) {
-        console.log('🔽 Deselecting charm');
-        charmItem.classList.remove('selected');
-        charmImg.classList.remove('selected');
-        selectedCharm = null;
-        hideSelectedCharmPreview();
-        resumeRecommendedScroll(); // Resume scrolling when deselected
-        return;
-    }
-    
-    // Remove selection from all recommended charms
-    document.querySelectorAll('.recommended-charm-item').forEach(item => {
-        item.classList.remove('selected');
-    });
-    
-    // Remove selection from all regular charms
-    document.querySelectorAll('.charms-grid .charm').forEach(charm => {
-        charm.classList.remove('selected');
-    });
-    
-    // Select this charm
-    charmItem.classList.add('selected');
-    charmImg.classList.add('selected');
-    
-    // Set as the global selected charm
-    selectedCharm = charmImg;
-    
-    // Ensure data attributes are properly set
-    ensureCharmDataAttributes(selectedCharm);
-    
-    // Update preview
-    updateSelectedCharmPreview(charmImg);
-    
-    console.log('✅ Charm selected and locked:', selectedCharm);
-    console.log('✅ Charm data:', selectedCharm.dataset);
-    
-    // Resume scrolling after 5 seconds if still selected
-    setTimeout(() => {
-        if (selectedCharm === charmImg) {
-            resumeRecommendedScroll();
-        }
-    }, 5000);
-}
 
 function handleRecommendedCharmClick(charmItem, charmImg) {
     console.log('🎯 Recommended charm clicked:', charmImg.dataset.name);
@@ -5109,9 +5319,9 @@ function updateOfferBanner() {
     
     // Show appropriate message
     if (currentUser) {
-        offerText.innerHTML = `Welcome! Complete your first order over 15 JOD in <span id="countdown-timer">10:00</span> to get 20% OFF!`;
+        offerText.innerHTML = `Welcome! Complete your first order over 15 JOD in <span id="countdown-timer">10:00</span> to get 10% OFF!`;
     } else {
-        offerText.innerHTML = `New customer? Complete your order over 15 JOD in <span id="countdown-timer">10:00</span> to get 20% OFF!`;
+        offerText.innerHTML = `New customer? Complete your order over 15 JOD in <span id="countdown-timer">10:00</span> to get 10% OFF!`;
     }
     
     offerBanner.style.display = 'block';
@@ -5196,7 +5406,7 @@ function checkAllDiscountEligibility() {
     if (now <= discountEndDate && subtotal >= 15) {
         eligibleDiscounts.push({
             type: 'seasonal',
-            message: '🎊 Seasonal Sale: 20% off orders above 15 JOD!',
+            message: '🎊 Seasonal Sale: 10% off orders above 15 JOD!',
             maxAmount: 5,
             requiresAmount: 15
         });
@@ -5206,7 +5416,7 @@ function checkAllDiscountEligibility() {
     if (userQualifiesForCountdownDiscount() && subtotal >= 15) {
         eligibleDiscounts.push({
             type: 'countdown',
-            message: '⏰ Limited Time: 20% off your first order over 15 JOD!',
+            message: '⏰ Limited Time: 10% off your first order over 15 JOD!',
             maxAmount: 5,
             requiresAmount: 15
         });
@@ -5216,7 +5426,7 @@ function checkAllDiscountEligibility() {
     if (currentUser && !localStorage.getItem(`hasOrdered_${currentUser.uid}`) && subtotal >= 15) {
         eligibleDiscounts.push({
             type: 'welcome',
-            message: '🎉 Welcome! Enjoy 20% off your first order over 15 JOD!',
+            message: '🎉 Welcome! Enjoy 10% off your first order over 15 JOD!',
             maxAmount: 5,
             requiresAmount: 15
         });
@@ -5244,19 +5454,7 @@ function showMinimumAmountMessage() {
         }
     }
 }
-function checkFirstOrderDiscount() {
-    const currentUser = auth.currentUser;
-    if (!currentUser) return false;
-    
-    const hasOrderedBefore = localStorage.getItem(`hasOrdered_${currentUser.uid}`);
-    
-    if (!hasOrderedBefore) {
-        showToast("🎊 Welcome! Use code WELCOME10 for 20% off your first order!", 'success');
-        return true;
-    }
-    
-    return false;
-}
+
 function setupCollapsibleOrders() {
     const profileHeader = document.getElementById('profile-header');
     const collapseBtn = document.getElementById('collapse-orders');
@@ -5350,3 +5548,1599 @@ function updateShippingProgress() {
     }
 }
 
+// NEW: Load user data from localStorage
+function loadUserData() {
+    const savedPoints = localStorage.getItem('userPoints');
+    const savedRewards = localStorage.getItem('activeWheelRewards');
+    const lastSpinDate = localStorage.getItem('lastSpinDate');
+    
+    userPoints = savedPoints ? parseInt(savedPoints) : 0;
+    hasSpunToday = lastSpinDate === new Date().toDateString();
+    
+    if (savedRewards) {
+        try {
+            activeWheelRewards = JSON.parse(savedRewards);
+        } catch (e) {
+            console.error('Error loading wheel rewards:', e);
+            activeWheelRewards = {
+                freeCharm: { active: false, count: 0, minAmount: 10 },
+                discounts: [],
+                freeDelivery: { active: false, minAmount: 25 }
+            };
+        }
+    }
+    
+    updatePointsDisplay();
+}
+
+// NEW: Save user data to localStorage
+function saveUserData() {
+    localStorage.setItem('userPoints', userPoints.toString());
+    localStorage.setItem('activeWheelRewards', JSON.stringify(activeWheelRewards));
+}
+
+// NEW: Update points display
+function updatePointsDisplay() {
+    const pointsDisplay = document.getElementById('user-points');
+    if (pointsDisplay) {
+        pointsDisplay.textContent = userPoints;
+    }
+}
+
+// NEW: Add points after order completion
+function addPointsAfterOrder(orderTotal) {
+    const pointsEarned = 5; // 5 points per order as specified
+    userPoints += pointsEarned;
+    saveUserData();
+    updatePointsDisplay();
+    
+    showToast(`🎉 You earned ${pointsEarned} points! Total: ${userPoints} points`, 'success');
+}
+
+// NEW: Apply wheel rewards when order is placed
+function applyWheelRewardsToOrder(orderData) {
+    const subtotal = orderData.subtotal || orderData.total - (orderData.delivery || 0);
+    const appliedRewards = [];
+    
+    // Apply free charm if qualified
+    if (activeWheelRewards.freeCharm.active && activeWheelRewards.freeCharm.count > 0 && subtotal >= activeWheelRewards.freeCharm.minAmount) {
+        appliedRewards.push('free-charm');
+        // Consume one free charm
+        activeWheelRewards.freeCharm.count--;
+        if (activeWheelRewards.freeCharm.count <= 0) {
+            activeWheelRewards.freeCharm.active = false;
+        }
+    }
+    
+    // Note: Discounts and free delivery are already applied in calculatePrice
+    
+    // Save updated rewards
+    saveUserData();
+    
+    return appliedRewards;
+}
+
+function getWheelRewardsCartHTML() {
+    let html = '<div class="cart-wheel-rewards">';
+    
+    if (activeWheelRewards.freeCharm.active) {
+        html += `<div class="cart-reward-item">🎁 ${activeWheelRewards.freeCharm.count} Free Special Charm(s) available</div>`;
+    }
+    
+    activeWheelRewards.discounts.forEach(discount => {
+        html += `<div class="cart-reward-item">💰 ${discount.percent}% OFF on orders above ${discount.minAmount} JOD</div>`;
+    });
+    
+    if (activeWheelRewards.freeDelivery) {
+        html += `<div class="cart-reward-item">🚚 FREE Delivery on orders above 25 JOD</div>`;
+    }
+    
+    html += '</div>';
+    return html;
+}
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    function initializeProductText() {
+        const productCards = document.querySelectorAll('.product-card');
+        const productNames = {
+            'bracelet': 'Bracelet',
+            'watch': 'Watch',
+            'individual': 'Single charms-No bracelet',
+            'anklet': 'Anklet',
+            'ring': 'Ring',
+            'apple-watch': 'Apple Watch',
+            'keychain': 'Key chain'
+        };
+
+        productCards.forEach(card => {
+            const productType = card.dataset.type;
+            let productText = card.querySelector('.product-text');
+            
+            // Create text element if it doesn't exist
+            if (!productText) {
+                productText = document.createElement('div');
+                productText.className = 'product-text';
+                card.appendChild(productText);
+            }
+            
+            // Set the appropriate text
+            if (productNames[productType]) {
+                productText.textContent = productNames[productType];
+            }
+        });
+    }
+
+    // Initialize product text first
+    initializeProductText();
+    // Initialize all product slideshows
+    const slideshows = document.querySelectorAll('.product-slideshow');
+    
+    slideshows.forEach(slideshow => {
+        const slides = slideshow.querySelectorAll('.product-slide');
+        const indicators = slideshow.querySelectorAll('.slideshow-indicator');
+        const prevBtn = slideshow.querySelector('.slideshow-nav.prev');
+        const nextBtn = slideshow.querySelector('.slideshow-nav.next');
+        
+        let currentSlide = 0;
+        let slideInterval;
+        
+        // Function to show a specific slide
+        function showSlide(index) {
+            // Remove active class from all slides and indicators
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(indicator => indicator.classList.remove('active'));
+            
+            // Add active class to current slide and indicator
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            if (indicators[currentSlide]) {
+                indicators[currentSlide].classList.add('active');
+            }
+        }
+        
+        // Function to go to next slide
+        function nextSlide() {
+            let nextIndex = (currentSlide + 1) % slides.length;
+            showSlide(nextIndex);
+        }
+        
+        // Function to go to previous slide
+        function prevSlide() {
+            let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prevIndex);
+        }
+        
+        // Start automatic slideshow
+        function startSlideshow() {
+            if (slides.length > 1) {
+                slideInterval = setInterval(nextSlide, 2000); // Change slide every 2 seconds
+            }
+        }
+        
+        // Stop automatic slideshow
+        function stopSlideshow() {
+            clearInterval(slideInterval);
+        }
+        
+        // Only set up controls if there are multiple slides
+        if (slides.length > 1) {
+            // Event listeners for navigation
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    nextSlide();
+                    stopSlideshow();
+                    startSlideshow();
+                });
+            }
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    prevSlide();
+                    stopSlideshow();
+                    startSlideshow();
+                });
+            }
+            
+            // Event listeners for indicators
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showSlide(index);
+                    stopSlideshow();
+                    startSlideshow();
+                });
+            });
+            
+            // Pause slideshow on hover
+            slideshow.addEventListener('mouseenter', stopSlideshow);
+            slideshow.addEventListener('mouseleave', startSlideshow);
+            
+            // Start the slideshow
+            startSlideshow();
+        } else {
+            // Hide navigation and indicators if only one slide
+            if (prevBtn) prevBtn.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
+            if (indicators.length > 0) {
+                indicators[0].style.display = 'none';
+            }
+        }
+    });
+    
+    // Only convert simple product cards to slideshow if they actually have multiple images
+    const simpleProductCards = document.querySelectorAll('.product-card:not(:has(.product-slideshow))');
+    
+    // Define which products actually have multiple images
+    const productsWithMultipleImages = {
+        'bracelet': ['bracelet.png', 'bracelet2.png', 'bracelet3.png', 'bracelet4.png', 'bracelet5.png'],
+        'watch': ['watch.png', 'watch2.png'],
+        'individual': ['individual.png', 'individual2.png'],
+        'anklet': ['anklet.png', 'anklet2.png', 'anklet3.png'],
+        'ring': ['ring.png', 'ring2.png', 'ring3.png', 'ring4.png', 'ring5.png'],
+        'apple-watch': ['apple-watch.png', 'apple-watch2.png','apple-watch3.png'],
+        'keychain': ['keychain.png', 'keychain2.png']
+    };
+    
+    simpleProductCards.forEach(card => {
+        const productType = card.dataset.type;
+        
+        // Only create slideshow if this product has multiple images defined
+        if (productsWithMultipleImages[productType]) {
+            const img = card.querySelector('.product-image');
+            
+            if (img) {
+                const imageContainer = card.querySelector('.product-image-container') || card;
+                const imagePaths = productsWithMultipleImages[productType];
+                
+                // Create slideshow structure
+                let slidesHTML = '';
+                let indicatorsHTML = '';
+                
+                imagePaths.forEach((path, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    slidesHTML += `
+                        <div class="product-slide ${isActive}">
+                            <img src="products/${path}" alt="${productType} design ${index + 1}">
+                        </div>
+                    `;
+                    
+                    if (imagePaths.length > 1) {
+                        const indicatorActive = index === 0 ? 'active' : '';
+                        indicatorsHTML += `<div class="slideshow-indicator ${indicatorActive}"></div>`;
+                    }
+                });
+                
+                const slideshowHTML = `
+                    <div class="product-slideshow" data-product="${productType}">
+                        ${slidesHTML}
+                        ${imagePaths.length > 1 ? `
+                            <div class="slideshow-indicators">
+                                ${indicatorsHTML}
+                            </div>
+                            <div class="slideshow-nav prev">‹</div>
+                            <div class="slideshow-nav next">›</div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                // Replace the simple image with slideshow
+                if (imageContainer.classList.contains('product-image-container')) {
+                    imageContainer.innerHTML = slideshowHTML;
+                } else {
+                    // Create container if it doesn't exist
+                    const newContainer = document.createElement('div');
+                    newContainer.className = 'product-image-container';
+                    newContainer.innerHTML = slideshowHTML;
+                    img.replaceWith(newContainer);
+                }
+            }
+        }
+    });
+    
+    // Re-initialize slideshows for newly created ones
+    setTimeout(() => {
+        const newSlideshows = document.querySelectorAll('.product-slideshow');
+        newSlideshows.forEach(slideshow => {
+            if (!slideshow.dataset.initialized) {
+                const slides = slideshow.querySelectorAll('.product-slide');
+                const indicators = slideshow.querySelectorAll('.slideshow-indicator');
+                const prevBtn = slideshow.querySelector('.slideshow-nav.prev');
+                const nextBtn = slideshow.querySelector('.slideshow-nav.next');
+                
+                let currentSlide = 0;
+                let slideInterval;
+                
+                function showSlide(index) {
+                    slides.forEach(slide => slide.classList.remove('active'));
+                    indicators.forEach(indicator => indicator.classList.remove('active'));
+                    
+                    currentSlide = index;
+                    slides[currentSlide].classList.add('active');
+                    if (indicators[currentSlide]) {
+                        indicators[currentSlide].classList.add('active');
+                    }
+                }
+                
+                function nextSlide() {
+                    let nextIndex = (currentSlide + 1) % slides.length;
+                    showSlide(nextIndex);
+                }
+                
+                function startSlideshow() {
+                    if (slides.length > 1) {
+                        slideInterval = setInterval(nextSlide, 2000);
+                    }
+                }
+                
+                function stopSlideshow() {
+                    clearInterval(slideInterval);
+                }
+                
+                // Only set up controls if there are multiple slides
+                if (slides.length > 1) {
+                    if (nextBtn) {
+                        nextBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            nextSlide();
+                            stopSlideshow();
+                            startSlideshow();
+                        });
+                    }
+                    
+                    if (prevBtn) {
+                        prevBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            prevSlide();
+                            stopSlideshow();
+                            startSlideshow();
+                        });
+                    }
+                    
+                    indicators.forEach((indicator, index) => {
+                        indicator.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            showSlide(index);
+                            stopSlideshow();
+                            startSlideshow();
+                        });
+                    });
+                    
+                    slideshow.addEventListener('mouseenter', stopSlideshow);
+                    slideshow.addEventListener('mouseleave', startSlideshow);
+                    
+                    startSlideshow();
+                }
+                
+                slideshow.dataset.initialized = 'true';
+            }
+        });
+    }, 100);
+
+     setTimeout(() => {
+        if (typeof initSpinWheel === 'function') {
+            initSpinWheel();
+        } else {
+            console.error('initSpinWheel function not found!');
+        }
+    }, 2000);
+
+});
+// =============================================
+// SPIN WHEEL SYSTEM - FIXED IMPLEMENTATION
+// =============================================
+
+// Global variables for spin wheel
+let userPoints = 0;
+let hasSpunToday = false;
+let isSpinning = false;
+let wheelChart = null;
+
+// ADD THIS AT THE TOP OF YOUR SPIN WHEEL CODE FOR TESTING
+hasSpunToday = false;
+localStorage.removeItem('lastSpinDate');
+
+let activeWheelRewards = {
+    freeCharm: { active: false, count: 0, minAmount: 10 },
+    discounts: [],
+    freeDelivery: { active: false, minAmount: 25 }
+};
+
+// Setup event listeners for spin wheel
+function setupSpinWheelEventListeners() {
+    const spinButton = document.getElementById('spin-button');
+    const closeSpin = document.getElementById('close-spin');
+    const closeNotification = document.getElementById('close-notification');
+
+    if (spinButton) {
+        spinButton.addEventListener('click', spinWheel);
+    }
+
+    if (closeSpin) {
+        closeSpin.addEventListener('click', () => {
+            const spinModal = document.getElementById('spin-wheel-modal');
+            if (spinModal) {
+                spinModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (closeNotification) {
+        closeNotification.addEventListener('click', hideRewardNotification);
+    }
+}
+// Show spin wheel modal
+function showSpinWheel() {
+    const spinModal = document.getElementById('spin-wheel-modal');
+    if (!spinModal) {
+        console.error('Spin wheel modal not found!');
+        return;
+    }
+    
+    // Don't show if already spun today (unless they won "spin again")
+    if (hasSpunToday && !activeWheelRewards.discounts.length && !activeWheelRewards.freeCharm.active && !activeWheelRewards.freeDelivery.active) {
+        console.log('Already spun today with no active rewards');
+        return;
+    }
+    
+    spinModal.classList.add('active');
+    
+    // Update button text based on whether it's free or costs points
+    const spinButton = document.getElementById('spin-button');
+    if (spinButton) {
+        const costText = spinButton.querySelector('.spin-cost-text');
+        if (costText) {
+            costText.textContent = hasSpunToday ? '(10 points)' : '(FREE)';
+        }
+    }
+    
+    console.log('🎡 Showing spin wheel');
+}
+
+
+// Select reward based on probabilities
+function selectReward() {
+    const random = Math.random() * 100;
+    let cumulativeProbability = 0;
+    
+    for (const reward of WHEEL_REWARDS) {
+        cumulativeProbability += reward.probability;
+        if (random <= cumulativeProbability) {
+            return reward;
+        }
+    }
+    
+    // Fallback to first reward
+    return WHEEL_REWARDS[0];
+}
+
+
+// Activate free charm reward
+function activateFreeCharmReward() {
+    if (!activeWheelRewards.freeCharm) {
+        activeWheelRewards.freeCharm = { active: false, count: 0, minAmount: 15 }; // Changed to 15 JOD
+    }
+    
+    activeWheelRewards.freeCharm.active = true;
+    activeWheelRewards.freeCharm.count = (activeWheelRewards.freeCharm.count || 0) + 1;
+    
+    showToast('🎁 Free Special Charm unlocked! Add 15 JOD to your order to claim it.', 'success');
+}
+
+// Activate discount reward - REPLACE OLD DISCOUNTS WITH NEW ONE
+function activateDiscountReward(percent) {
+    let minAmount;
+    
+    // Tiered minimum amounts based on discount percentage
+    switch(percent) {
+        case 5:
+            minAmount = 12;  // 5% off requires 12 JDs (CHANGED FROM 10)
+            break;
+        case 10:
+            minAmount = 15;  // 10% off requires 15 JDs
+            break;
+        case 15:
+            minAmount = 25;  // 15% off requires 25 JDs
+            break;
+        default:
+            minAmount = 15;
+    }
+    
+    // CRITICAL FIX: Clear ALL previous discounts and only keep the new one
+    activeWheelRewards.discounts = [{
+        percent: percent,
+        minAmount: minAmount,
+        id: `wheel-${percent}-off-${Date.now()}`,
+        timestamp: Date.now() // Add timestamp to track latest
+    }];
+    
+    console.log('💰 New discount activated, old discounts cleared:', {
+        percent: percent,
+        minAmount: minAmount,
+        remainingDiscounts: activeWheelRewards.discounts.length
+    });
+    
+    showToast(`💰 ${percent}% discount unlocked! Add ${minAmount} JOD to apply.`, 'success');
+}
+
+// Activate free delivery reward
+function activateFreeDeliveryReward() {
+    activeWheelRewards.freeDelivery = {
+        active: true,
+        minAmount: 25 // Free delivery requires 25 JOD
+    };
+    
+    showToast('🚚 FREE Delivery unlocked! Add 25 JOD to apply.', 'success');
+}
+
+function activateSpinAgainReward() {
+    // Give user another free spin
+    hasSpunToday = false;
+    localStorage.removeItem('lastSpinDate');
+    
+    // DON'T close the spin wheel modal - keep it open
+    const spinModal = document.getElementById('spin-wheel-modal');
+    if (spinModal) {
+        // Keep the modal open for another spin
+        const spinButton = document.getElementById('spin-button');
+        if (spinButton) {
+            spinButton.disabled = false;
+            spinButton.innerHTML = `
+                <span class="spin-text">SPIN AGAIN!</span>
+                <span class="spin-cost-text">(FREE)</span>
+            `;
+        }
+    }
+    
+    showToast('🎡 You won another spin! Spin again for free!', 'success');
+    isSpinning = false;
+}
+
+
+function showRewardNotification(reward) {
+    console.log('🎁 Showing reward notification:', reward);
+    
+    // Get or create notification element
+    let notification = document.getElementById('reward-notification');
+    const icon = document.getElementById('notification-icon');
+    const title = document.getElementById('notification-title');
+    const message = document.getElementById('notification-message');
+    const closeBtn = document.getElementById('close-notification');
+    
+    if (!notification || !icon || !title || !message) {
+        console.error('❌ Reward notification elements not found');
+        return;
+    }
+    
+    // Set notification content
+    icon.textContent = reward.icon || '🎁';
+    title.textContent = 'Congratulations!';
+    message.textContent = reward.message || 'You won a reward!';
+    
+    // Show notification
+    notification.classList.add('show');
+    console.log('✅ Reward notification shown');
+    
+    // Add confetti for all rewards except spin-again (to avoid distraction)
+    if (reward.id !== 'spin-again') {
+        triggerConfetti();
+    }
+    
+    // Add close event listener
+    if (closeBtn) {
+        closeBtn.onclick = hideRewardNotification;
+    }
+    
+    // Auto-hide after 5 seconds for spin-again, longer for others
+    const hideTime = reward.id === 'spin-again' ? 3000 : 5000;
+    setTimeout(() => {
+        hideRewardNotification();
+    }, hideTime);
+}
+
+function hideRewardNotification() {
+    const notification = document.getElementById('reward-notification');
+    if (notification) {
+        notification.classList.remove('show');
+        console.log('✅ Reward notification hidden');
+    }
+}
+
+// 🎉 Enhanced Confetti function with forced highest z-index
+function triggerConfetti() {
+  console.log('🎉 Triggering confetti!');
+  
+  // Create a custom canvas for confetti to ensure control
+  let confettiCanvas = document.createElement('canvas');
+  confettiCanvas.id = 'confetti-canvas';
+  confettiCanvas.style.cssText = `
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: none !important;
+    z-index: 10004 !important;
+  `;
+  
+  // Remove any existing confetti canvas
+  const existingCanvas = document.getElementById('confetti-canvas');
+  if (existingCanvas) {
+    existingCanvas.remove();
+  }
+  
+  document.body.appendChild(confettiCanvas);
+  
+  // Create confetti instance with our custom canvas
+  const confettiInstance = confetti.create(confettiCanvas, {
+    resize: true,
+    useWorker: true
+  });
+  
+  // Basic confetti burst
+  confettiInstance({
+    particleCount: 150,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff']
+  });
+  
+  // Additional effects for 5 seconds
+  const duration = 5000;
+  const animationEnd = Date.now() + duration;
+  const defaults = { 
+    startVelocity: 30, 
+    spread: 360, 
+    ticks: 60, 
+    zIndex: 10004 
+  };
+  
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+  
+  const interval = setInterval(function() {
+    const timeLeft = animationEnd - Date.now();
+    
+    if (timeLeft <= 0) {
+      clearInterval(interval);
+      // Clean up canvas after animation
+      setTimeout(() => {
+        if (confettiCanvas && confettiCanvas.parentNode) {
+          confettiCanvas.remove();
+        }
+      }, 3000);
+      return;
+    }
+    
+    const particleCount = 50 * (timeLeft / duration);
+    
+    // Random confetti from left and right
+    confettiInstance({
+      ...defaults,
+      particleCount,
+      origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+    });
+    confettiInstance({
+      ...defaults,
+      particleCount,
+      origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+    });
+  }, 250);
+}
+
+// Function to trigger confetti from any button or event
+function addConfettiToButton(buttonId) {
+  const button = document.getElementById(buttonId);
+  if (button) {
+    button.addEventListener('click', function() {
+      triggerConfetti();
+    });
+  }
+}
+
+// Add confetti to various actions
+document.addEventListener('DOMContentLoaded', function() {
+  // Add to cart button
+  addConfettiToButton('add-to-cart-bottom');
+  
+  // Order confirmation
+  const orderBtn = document.getElementById('order-btn');
+  if (orderBtn) {
+    orderBtn.addEventListener('click', function() {
+      if (cart.length > 0) {
+        setTimeout(triggerConfetti, 500); // Delay for order processing
+      }
+    });
+  }
+  
+  // Spin wheel reward
+  const spinButton = document.getElementById('spin-button');
+  if (spinButton) {
+    spinButton.addEventListener('click', function() {
+      // Confetti will be triggered in processReward function
+    });
+  }
+});
+
+
+
+function hideRewardNotification() {
+    const notification = document.getElementById('reward-notification');
+    if (notification) {
+        notification.classList.remove('show');
+    }
+}
+
+
+// Load user data from localStorage
+function loadUserData() {
+    const savedPoints = localStorage.getItem('userPoints');
+    const savedRewards = localStorage.getItem('activeWheelRewards');
+    const lastSpinDate = localStorage.getItem('lastSpinDate');
+    
+    userPoints = savedPoints ? parseInt(savedPoints) : 0;
+    hasSpunToday = lastSpinDate === new Date().toDateString();
+    
+    if (savedRewards) {
+        try {
+            activeWheelRewards = JSON.parse(savedRewards);
+        } catch (e) {
+            console.error('Error loading wheel rewards:', e);
+            activeWheelRewards = {
+                freeCharm: { active: false, count: 0, minAmount: 10 },
+                discounts: [],
+                freeDelivery: { active: false, minAmount: 25 }
+            };
+        }
+    }
+    
+    updatePointsDisplay();
+}
+
+// Save user data to localStorage
+function saveUserData() {
+    localStorage.setItem('userPoints', userPoints.toString());
+    localStorage.setItem('activeWheelRewards', JSON.stringify(activeWheelRewards));
+    if (hasSpunToday) {
+        localStorage.setItem('lastSpinDate', new Date().toDateString());
+    }
+}
+
+// Update points display
+function updatePointsDisplay() {
+    const pointsDisplay = document.getElementById('user-points');
+    if (pointsDisplay) {
+        pointsDisplay.textContent = userPoints;
+    }
+}
+
+
+
+
+
+
+// Select reward based on actual probabilities
+function selectRewardByProbability() {
+    const random = Math.random() * 100;
+    let cumulativeProbability = 0;
+    
+    for (const reward of WHEEL_REWARDS) {
+        cumulativeProbability += reward.probability;
+        if (random <= cumulativeProbability) {
+            return reward;
+        }
+    }
+    
+    return WHEEL_REWARDS[0];
+}
+
+function createWheel() {
+    const wheelCanvas = document.getElementById('wheel-canvas');
+    const ctx = wheelCanvas.getContext('2d');
+    
+    // Set canvas to high resolution
+    const scale = window.devicePixelRatio || 1;
+    wheelCanvas.width = 400 * scale;
+    wheelCanvas.height = 400 * scale;
+    wheelCanvas.style.width = '400px';
+    wheelCanvas.style.height = '400px';
+    ctx.scale(scale, scale);
+    
+    // Clear the canvas
+    ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+    
+    // Load HIGH QUALITY wheel image
+    const wheelImage = new Image();
+    wheelImage.src = 'basecharms/wheel-hd.png'; // Use high-res version
+    
+    // Add retry mechanism for image loading
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    wheelImage.onload = function() {
+        console.log('✅ High-quality wheel image loaded successfully');
+        
+        // Use high-quality rendering
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        
+        // Draw the wheel image with high quality
+        ctx.drawImage(wheelImage, 0, 0, 400, 400);
+        
+        // Add high-quality text labels
+        const centerX = 200;
+        const centerY = 200;
+        const radius = 180;
+        
+        ctx.font = 'bold 18px Arial'; // Bigger, bolder text
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+        ctx.lineWidth = 4;
+        
+    
+    };
+    
+    wheelImage.onerror = function() {
+        console.error('❌ Failed to load high-quality wheel image');
+        retryCount++;
+        if (retryCount <= maxRetries) {
+            console.log(`🔄 Retrying image load (attempt ${retryCount}/${maxRetries})`);
+            setTimeout(() => {
+                wheelImage.src = 'basecharms/wheel.png'; // Fallback to regular image
+            }, 1000);
+        } else {
+            console.error('❌ All image load attempts failed');
+            // Create a colored wheel as fallback
+            createColoredWheelFallback(ctx);
+        }
+    };
+    
+    // Set a timeout for image loading
+    setTimeout(() => {
+        if (!wheelImage.complete) {
+            console.log('⏰ Image loading timeout, using fallback');
+            createColoredWheelFallback(ctx);
+        }
+    }, 5000);
+}
+
+// Fallback function if image fails to load
+function createColoredWheelFallback(ctx) {
+    const centerX = 200;
+    const centerY = 200;
+    const radius = 180;
+    const segments = 6;
+    
+    for (let i = 0; i < segments; i++) {
+        const startAngle = (i * 60) * Math.PI / 180;
+        const endAngle = ((i + 1) * 60) * Math.PI / 180;
+        
+        // Draw segment
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = WHEEL_REWARDS[i].color;
+        ctx.fill();
+        ctx.stroke();
+        
+        // Add text
+        const midAngle = (startAngle + endAngle) / 2;
+        const textX = centerX + Math.cos(midAngle) * (radius - 50);
+        const textY = centerY + Math.sin(midAngle) * (radius - 50);
+        
+        ctx.font = 'bold 14px Arial';
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 3;
+        ctx.strokeText(WHEEL_REWARDS[i].name, textX, textY);
+        ctx.fillText(WHEEL_REWARDS[i].name, textX, textY);
+    }
+}
+
+function spinWheel() {
+    if (isSpinning) return;
+    
+    isSpinning = true;
+    const spinButton = document.getElementById('spin-button');
+    
+    if (spinButton) {
+        spinButton.disabled = true;
+        spinButton.innerHTML = 'Spinning...';
+    }
+
+    // Calculate random rotation (5-8 full rotations + random segment)
+    const fullRotations = 5 + Math.floor(Math.random() * 4);
+    const randomSegment = Math.floor(Math.random() * 6);
+    const segmentAngle = 60;
+    
+    // Calculate final angle (in degrees)
+    const finalAngle = (fullRotations * 360) + (randomSegment * segmentAngle);
+    
+    console.log('🎯 Target segment:', randomSegment + 1, 'Final angle:', finalAngle);
+    
+    // Animate the wheel canvas
+    const wheelCanvas = document.getElementById('wheel-canvas');
+    wheelCanvas.style.transition = 'transform 4s cubic-bezier(0.2, 0.8, 0.3, 1)';
+    wheelCanvas.style.transform = `rotate(${finalAngle}deg)`;
+    
+    // Determine winning segment and reward
+    setTimeout(() => {
+        const normalizedAngle = finalAngle % 360;
+        const winningSegmentIndex = Math.floor(normalizedAngle / 60) % 6;
+        const winningReward = WHEEL_REWARDS[winningSegmentIndex];
+        
+        console.log('🎉 Winning calculation:');
+        console.log('  Normalized angle:', normalizedAngle);
+        console.log('  Winning segment index:', winningSegmentIndex);
+        console.log('  Winning reward:', winningReward.name);
+        
+        // Process the reward
+        processReward(winningReward);
+        
+        // Reset wheel position for next spin - but only if it's NOT spin-again
+        if (winningReward.id !== 'spin-again') {
+            setTimeout(() => {
+                wheelCanvas.style.transition = 'none';
+                wheelCanvas.style.transform = 'rotate(0deg)';
+                
+                // Re-enable spin button if needed
+                if (spinButton) {
+                    spinButton.disabled = false;
+                    spinButton.innerHTML = `
+                        <span class="spin-text">SPIN NOW!</span>
+                        <span class="spin-cost-text">(10 points)</span>
+                    `;
+                }
+            }, 100);
+        } else {
+            // For spin-again, reset the wheel immediately so they can spin again
+            setTimeout(() => {
+                wheelCanvas.style.transition = 'none';
+                wheelCanvas.style.transform = 'rotate(0deg)';
+            }, 100);
+        }
+        
+    }, 4000);
+}
+function initSpinWheel() {
+    console.log('🎡 Initializing clean spin wheel...');
+    
+    // FOR TESTING - UNLIMITED SPINS
+    hasSpunToday = false;
+    localStorage.removeItem('lastSpinDate');
+    
+    loadUserData();
+    createWheel();
+    setupSpinWheelEventListeners();
+    
+    // Show spin wheel after delay
+    setTimeout(() => {
+        showSpinWheel();
+    }, 3000);
+}
+// Global variables for expiration
+let rewardExpirationTime = null;
+let expirationTimer = null;
+let currentWonReward = null;
+let globalCountdownTimer = null; // ← ADD THIS LINE
+
+const WHEEL_REWARDS = [
+    { 
+        id: '10-off', 
+        name: '10% OFF', 
+        probability: 20, // Increased from 15
+        icon: '💰', 
+        message: 'You won 10% OFF your order!',
+        color: '#45B7D1',
+        minAmount: 15
+    },
+    
+    { 
+        id: '5-off', 
+        name: '5% OFF', 
+        probability: 20, // Increased from 15
+        icon: '💰', 
+        message: 'You won 5% OFF your order!',
+        color: '#4ECDC4',
+        minAmount: 12
+    },
+    { 
+        id: 'free-charm', 
+        name: 'Free Special Charm', 
+        probability: 45, // Decreased from 50
+        icon: '🎁', 
+        message: 'You won a FREE Special Charm!',
+        color: '#FF6B6B',
+        minAmount: 10
+    },
+    { 
+        id: 'spin-again', 
+        name: 'Spin Again', 
+        probability: 5, // Decreased from 10 (makes it rarer)
+        icon: '🎡', 
+        message: 'You won another spin!',
+        color: '#FF9FF3'
+    },
+    { 
+        id: '15-off', 
+        name: '15% OFF', 
+        probability: 5, 
+        icon: '💰', 
+        message: 'You won 15% OFF your order!',
+        color: '#96CEB4',
+        minAmount: 25
+    },
+    
+    { 
+        id: 'free-delivery', 
+        name: 'FREE Delivery', 
+        probability: 5, 
+        icon: '🚚', 
+        message: 'You won FREE Delivery!',
+        color: '#FECA57',
+        minAmount: 25
+    }
+];
+// Your wheel segments configuration
+const WHEEL_SEGMENTS = [
+    { text: "PART 1", color: "#FF6B6B" },
+    { text: "PART 2", color: "#4ECDC4" },
+    { text: "PART 3", color: "#45B7D1" },
+    { text: "PART 4", color: "#96CEB4" },
+    { text: "PART 5", color: "#FECA57" },
+    { text: "PART 6", color: "#FF9FF3" }
+];
+
+function activateReward(reward) {
+    console.log('Activating reward:', reward);
+    
+    switch (reward.id) {
+        case 'free-charm':
+            activateFreeCharmReward();
+            break;
+        case '5-off':
+            activateDiscountReward(5);
+            break;
+        case '10-off':
+            activateDiscountReward(10);
+            break;
+        case '15-off':
+            activateDiscountReward(15);
+            break;
+        case 'free-delivery':
+            activateFreeDeliveryReward();
+            break;
+        case 'spin-again':
+            activateSpinAgainReward();
+            break;
+    }
+    
+    // Save the active rewards
+    saveUserData();
+                                                                                                        
+}
+function showExpirationPopup(reward) {
+    const popupHTML = `
+        <div class="modal active" id="reward-expiration-popup" style="z-index: 10002;">
+            <div class="order-modal-content">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+                    <h2 style="color: #d6336c; margin-bottom: 1rem;">Congratulations!</h2>
+                    <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">${reward.message}</p>
+                    
+                    <div class="expiration-timer">
+                        <h4>⏰ Limited Time Offer!</h4>
+                        <div class="timer" id="expiration-timer">30:00</div>
+                        <div class="timer-warning">You have 30 minutes to design your jewelry to claim your reward</div>
+                    </div>
+                    
+                    ${reward.minAmount > 0 ? `
+                    <div class="minimum-amount-warning">
+                        <span class="warning-icon">💰</span>
+                        Minimum order of ${reward.minAmount} JOD required to apply this reward
+                    </div>
+                    ` : ''}
+                    
+                    <div style="margin-top: 2rem;">
+                        <button class="btn confirm-order-btn" onclick="startDesigning()" style="margin-bottom: 1rem;">
+                            🎨 Start Designing Now!
+                        </button>
+                        <br>
+                        <button class="btn cancel-btn" onclick="closeExpirationPopup()">
+                            Maybe Later
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove any existing popup
+    const existingPopup = document.getElementById('reward-expiration-popup');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+    
+    // Add new popup
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+    
+    // 🎉 ADD CONFETTI TO POPUP TOO!
+    triggerConfetti();
+}
+
+// Start expiration countdown timer
+function startExpirationTimer() {
+    if (expirationTimer) {
+        clearInterval(expirationTimer);
+    }
+    
+    expirationTimer = setInterval(() => {
+        const now = new Date().getTime();
+        const timeLeft = rewardExpirationTime - now;
+        
+        if (timeLeft <= 0) {
+            // Time's up!
+            clearInterval(expirationTimer);
+            rewardExpired();
+            return;
+        }
+        
+        // Update timer display
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+        
+        const timerElement = document.getElementById('expiration-timer');
+        if (timerElement) {
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Add urgent styling when less than 5 minutes
+            const timerContainer = timerElement.closest('.expiration-timer');
+            if (timeLeft < 5 * 60 * 1000) {
+                timerContainer.classList.add('urgent');
+            }
+        }
+        
+    }, 1000);
+}
+
+// Handle reward expiration
+function rewardExpired() {
+    // Remove the reward from active rewards
+    if (currentWonReward) {
+        removeReward(currentWonReward);
+    }
+    
+    // Clear storage
+    localStorage.removeItem('rewardExpirationTime');
+    localStorage.removeItem('currentWonReward');
+    
+    // Show expiration message
+    const popup = document.getElementById('reward-expiration-popup');
+    if (popup) {
+        popup.innerHTML = `
+            <div class="order-modal-content">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">⏰</div>
+                    <h2 style="color: #ff6b6b; margin-bottom: 1rem;">Time's Up!</h2>
+                    <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+                        Your reward has expired. Spin the wheel again for another chance!
+                    </p>
+                    <button class="btn confirm-order-btn" onclick="closeExpirationPopup()">
+                        OK
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Auto-close after 5 seconds
+        setTimeout(() => {
+            closeExpirationPopup();
+        }, 5000);
+    }
+    
+    // Update price display
+    updatePrice();
+}
+
+// Go to checkout function
+function goToCheckout() {
+    closeExpirationPopup();
+    
+    // Open cart if not already open
+    const cartPreview = document.getElementById('cart-preview');
+    if (cartPreview) {
+        cartPreview.classList.add('active');
+    }
+    
+    // Scroll to cart section
+    const cartSection = document.querySelector('.action-buttons');
+    if (cartSection) {
+        cartSection.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// Close expiration popup
+function closeExpirationPopup() {
+    const popup = document.getElementById('reward-expiration-popup');
+    if (popup) {
+        popup.remove();
+    }
+}
+
+// Remove reward from active rewards
+function removeReward(reward) {
+    switch (reward.id) {
+        case 'free-charm':
+            if (activeWheelRewards.freeCharm && activeWheelRewards.freeCharm.count > 0) {
+                activeWheelRewards.freeCharm.count--;
+                if (activeWheelRewards.freeCharm.count <= 0) {
+                    activeWheelRewards.freeCharm.active = false;
+                }
+            }
+            break;
+        case '5-off':
+        case '10-off':
+        case '15-off':
+            activeWheelRewards.discounts = activeWheelRewards.discounts.filter(d => 
+                !d.id.includes(reward.id.replace('-off', ''))
+            );
+            break;
+        case 'free-delivery':
+            activeWheelRewards.freeDelivery.active = false;
+            break;
+    }
+}
+
+// Check for existing rewards on page load
+function checkExistingRewards() {
+    const savedExpiration = localStorage.getItem('rewardExpirationTime');
+    const savedReward = localStorage.getItem('currentWonReward');
+    
+    if (savedExpiration && savedReward) {
+        const expirationTime = parseInt(savedExpiration);
+        const now = new Date().getTime();
+        
+        if (now < expirationTime) {
+            // Reward still valid
+            rewardExpirationTime = expirationTime;
+            currentWonReward = JSON.parse(savedReward);
+            activateReward(currentWonReward);
+            startExpirationTimer();
+        } else {
+            // Reward expired
+            localStorage.removeItem('rewardExpirationTime');
+            localStorage.removeItem('currentWonReward');
+        }
+    }
+}
+
+
+// Start designing function
+function startDesigning() {
+    closeExpirationPopup();
+    
+    // Close spin modal if open
+    const spinModal = document.getElementById('spin-wheel-modal');
+    if (spinModal) {
+        spinModal.classList.remove('active');
+    }
+    
+    // Show the designer page and hide homepage
+    const homepage = document.getElementById('homepage');
+    const designerPage = document.getElementById('designer-page');
+    
+    if (homepage && designerPage) {
+        homepage.style.display = 'none';
+        designerPage.style.display = 'block';
+    }
+    
+    // Scroll to top of designer
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Show a quick tip about the reward
+    showToast(`🎉 Your reward is active! Add ${currentWonReward?.minAmount || 15} JOD to your design to claim it.`, 'success');
+}
+
+// Show global countdown banner
+function showGlobalCountdownBanner() {
+    // Remove existing banner
+    const existingBanner = document.querySelector('.global-countdown-banner');
+    if (existingBanner) {
+        existingBanner.remove();
+    }
+    
+    // Create new banner
+    const bannerHTML = `
+        <div class="global-countdown-banner" id="global-countdown-banner">
+            <div class="banner-content">
+                <span class="banner-icon">⏰</span>
+                <span class="banner-text">Limited Time Reward!</span>
+                <span class="banner-timer" id="global-timer">30:00</span>
+                <button class="banner-action" onclick="startDesigning()">
+                    🎨 Start Designing
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('afterbegin', bannerHTML);
+    
+    // Show the banner
+    const banner = document.getElementById('global-countdown-banner');
+    if (banner) {
+        banner.style.display = 'block';
+    }
+}
+
+// Start global countdown timer
+function startGlobalCountdownTimer() {
+    if (globalCountdownTimer) {
+        clearInterval(globalCountdownTimer);
+    }
+    
+    // Show the global banner
+    showGlobalCountdownBanner();
+    
+    globalCountdownTimer = setInterval(() => {
+        const now = new Date().getTime();
+        const timeLeft = rewardExpirationTime - now;
+        
+        if (timeLeft <= 0) {
+            // Time's up!
+            clearInterval(globalCountdownTimer);
+            removeGlobalCountdownBanner();
+            rewardExpired();
+            return;
+        }
+        
+        // Update both timers
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+        const timerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        // Update popup timer
+        const popupTimer = document.getElementById('expiration-timer');
+        if (popupTimer) {
+            popupTimer.textContent = timerText;
+        }
+        
+        // Update global banner timer
+        const globalTimer = document.getElementById('global-timer');
+        if (globalTimer) {
+            globalTimer.textContent = timerText;
+        }
+        
+        // Add urgent styling when less than 5 minutes
+        const banner = document.getElementById('global-countdown-banner');
+        const popupTimerContainer = document.querySelector('.expiration-timer');
+        
+        if (timeLeft < 5 * 60 * 1000) {
+            if (banner) banner.classList.add('urgent');
+            if (popupTimerContainer) popupTimerContainer.classList.add('urgent');
+        }
+        
+    }, 1000);
+}
+
+// Remove global countdown banner
+function removeGlobalCountdownBanner() {
+    const banner = document.getElementById('global-countdown-banner');
+    if (banner) {
+        banner.remove();
+    }
+}
+function processReward(reward) {
+    console.log('🎉 Processing reward:', reward);
+    
+    // Handle spin-again reward differently - DON'T close the modal
+    if (reward.id === 'spin-again') {
+        activateSpinAgainReward();
+        
+        // Reset spinning state but KEEP modal open
+        isSpinning = false;
+        
+        // Re-enable the spin button for another spin
+        const spinButton = document.getElementById('spin-button');
+        if (spinButton) {
+            spinButton.disabled = false;
+            spinButton.innerHTML = `
+                <span class="spin-text">SPIN AGAIN!</span>
+                <span class="spin-cost-text">(FREE)</span>
+            `;
+        }
+        
+        // Show notification but DON'T close spin wheel
+        showRewardNotification(reward);
+        return; // Stop here, don't process further
+    }
+
+    // For all other rewards, close the spin modal
+    const spinModal = document.getElementById('spin-wheel-modal');
+    if (spinModal) {
+        spinModal.classList.remove('active');
+        console.log('✅ Spin modal closed for regular reward');
+    }
+
+    // Reset spinning state
+    isSpinning = false;
+    
+    // CRITICAL FIX: Clear ALL previous rewards before activating new one
+    console.log('🔄 Clearing old rewards before activating new one');
+    activeWheelRewards.discounts = []; // Clear all discounts
+    activeWheelRewards.freeDelivery.active = false; // Disable free delivery
+    // Note: We keep free charms since they can stack
+    
+    // Mark that user has spun today
+    hasSpunToday = true;
+    localStorage.setItem('lastSpinDate', new Date().toDateString());
+
+    // Store the won reward with its minimum amount
+    currentWonReward = {
+        ...reward,
+        minAmount: reward.id === 'free-charm' ? 10 : reward.minAmount
+    };
+
+    // Set expiration time (30 minutes from now)
+    rewardExpirationTime = new Date().getTime() + (30 * 60 * 1000);
+    localStorage.setItem('rewardExpirationTime', rewardExpirationTime);
+    localStorage.setItem('currentWonReward', JSON.stringify(currentWonReward));
+
+    // Activate the reward (this will only activate the new one)
+    activateRewardWithMinimum(reward, currentWonReward.minAmount);
+
+    // Save user data
+    saveUserData();
+
+    // Update price display to show new rewards only
+    updatePrice();
+
+    // Show the reward notification popup
+    showRewardNotification(reward);
+    
+    // Show expiration popup
+    showExpirationPopup(currentWonReward);
+
+    // Start both timers
+    startExpirationTimer();
+    startGlobalCountdownTimer();
+
+    console.log('✅ New reward activated, old rewards cleared');
+    console.log('📊 Current active rewards:', {
+        discounts: activeWheelRewards.discounts,
+        freeDelivery: activeWheelRewards.freeDelivery,
+        freeCharm: activeWheelRewards.freeCharm
+    });
+}
+
+// New function to activate rewards with minimum amounts
+// New function to activate rewards with minimum amounts
+function activateRewardWithMinimum(reward, minAmount) {
+    console.log('🎁 Activating SINGLE reward:', reward.id, 'with minAmount:', minAmount);
+    
+    switch (reward.id) {
+        case 'free-charm':
+            if (!activeWheelRewards.freeCharm) {
+                activeWheelRewards.freeCharm = { active: false, count: 0, minAmount: minAmount };
+            }
+            activeWheelRewards.freeCharm.active = true;
+            activeWheelRewards.freeCharm.count = (activeWheelRewards.freeCharm.count || 0) + 1;
+            activeWheelRewards.freeCharm.minAmount = 10; // FORCE 10 JDs minimum
+            console.log('✅ Free charm activated with 10 JD minimum');
+            break;
+        case '5-off':
+        case '10-off':
+        case '15-off':
+            // Clear any existing discounts first
+            activeWheelRewards.discounts = [];
+            
+            const percent = parseInt(reward.id.replace('-off', ''));
+            activeWheelRewards.discounts.push({
+                percent: percent,
+                minAmount: minAmount,
+                id: `wheel-${reward.id}-${Date.now()}`,
+                timestamp: Date.now()
+            });
+            console.log('✅ Single discount activated:', percent + '%');
+            break;
+        case 'free-delivery':
+            // Clear any existing free delivery
+            activeWheelRewards.freeDelivery.active = false;
+            
+            activeWheelRewards.freeDelivery = {
+                active: true,
+                minAmount: minAmount
+            };
+            console.log('✅ Free delivery activated');
+            break;
+    }
+    
+    // Save the active rewards
+    saveUserData();
+    console.log('✅ Rewards saved - only one active reward');
+}
+// Update discount display to show minimum requirements
+function updateDiscountDisplayWithMinimum(subtotal) {
+    const discountMessages = document.getElementById('discount-messages');
+    if (!discountMessages) return;
+    
+    let messagesHTML = '';
+    
+    // Check wheel rewards with 15 JOD minimum
+    if (hasSpunToday) {
+        // Check free charm
+        if (activeWheelRewards.freeCharm.active && activeWheelRewards.freeCharm.count > 0) {
+            const qualifies = subtotal >= 15;
+            messagesHTML += `
+                <div class="wheel-reward-message ${qualifies ? 'applied' : 'available'}">
+                    🎁 Free Special Charm ${qualifies ? '✅ APPLIED' : `- Add ${(15 - subtotal).toFixed(2)} JOD more`}
+                </div>
+            `;
+        }
+        
+        // Check discounts
+        activeWheelRewards.discounts.forEach(discount => {
+            const qualifies = subtotal >= 15;
+            const icon = discount.percent === 5 || discount.percent === 10 ? '💰' : '🚚';
+            messagesHTML += `
+                <div class="wheel-reward-message ${qualifies ? 'applied' : 'available'}">
+                    ${icon} ${discount.percent}% OFF ${qualifies ? '✅ APPLIED' : `- Add ${(15 - subtotal).toFixed(2)} JOD more`}
+                </div>
+            `;
+        });
+        
+        // Check free delivery
+        if (activeWheelRewards.freeDelivery.active) {
+            const qualifies = subtotal >= 25; // Free delivery still 25 JOD
+            messagesHTML += `
+                <div class="wheel-reward-message ${qualifies ? 'applied' : 'available'}">
+                    🚚 FREE Delivery ${qualifies ? '✅ APPLIED' : `- Add ${(25 - subtotal).toFixed(2)} JOD more`}
+                </div>
+            `;
+        }
+    }
+    
+    discountMessages.innerHTML = messagesHTML;
+}
+
+// Check for existing rewards on page load
+function checkExistingRewards() {
+    const savedExpiration = localStorage.getItem('rewardExpirationTime');
+    const savedReward = localStorage.getItem('currentWonReward');
+    
+    if (savedExpiration && savedReward) {
+        const expirationTime = parseInt(savedExpiration);
+        const now = new Date().getTime();
+        
+        if (now < expirationTime) {
+            // Reward still valid
+            rewardExpirationTime = expirationTime;
+            currentWonReward = JSON.parse(savedReward);
+            activateReward(currentWonReward);
+            startExpirationTimer();
+            startGlobalCountdownTimer();
+        } else {
+            // Reward expired
+            localStorage.removeItem('rewardExpirationTime');
+            localStorage.removeItem('currentWonReward');
+        }
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    checkExistingRewards();
+});
+
+window.initSpinWheel = initSpinWheel;
