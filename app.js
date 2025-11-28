@@ -445,7 +445,123 @@ function displayOrderHistory(orders) {
 
     ordersContent.innerHTML = ordersHTML;
 }
+function updateCartDisplay() {
+    const cartItemsContainer = document.getElementById('cart-items');
+    const cartCount = document.querySelector('.cart-count');
+    const cartSubtotal = document.getElementById('cart-subtotal');
+    const cartDiscountInfo = document.getElementById('cart-discount-info');
+    const cartDiscountAmount = document.getElementById('cart-discount-amount');
+    const cartDelivery = document.getElementById('cart-delivery');
+    const cartTotal = document.querySelector('.cart-total');
+    
+    cartCount.textContent = cart.length;
+    
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
+        cartSubtotal.textContent = 'Subtotal: 0.00 JDs';
+        cartTotal.textContent = 'Total: 0.00 JDs';
+        cartDiscountInfo.style.display = 'none';
+        cartDelivery.textContent = 'Delivery Fee: 2.50 JDs';
+        return;
+    }
+    
+    let itemsHTML = '';
+    const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
+    const discountedSubtotal = cart.reduce((sum, item) => sum + item.price, 0);
+    const deliveryFee = 2.5;
+    
+    // 🎯 CHECK MINIMUM ORDER FOR DISCOUNT
+    const MINIMUM_ORDER = 15.00;
+    const qualifiesForDiscount = subtotal >= MINIMUM_ORDER;
+    let additionalDiscount = 0;
+    
+    if (qualifiesForDiscount) {
+        const currentDate = new Date();
+        const discountEndDate = new Date('2025-10-31');
+        
+        if (currentDate <= discountEndDate) {
+            const potentialDiscount = subtotal * 0.1;
+            const alreadyDiscounted = subtotal - discountedSubtotal;
+            additionalDiscount = Math.min(potentialDiscount - alreadyDiscounted, 5 - alreadyDiscounted);
+        }
+    }
+    
+    const totalBeforeDiscount = discountedSubtotal + deliveryFee;
+    const finalTotal = totalBeforeDiscount - additionalDiscount;
 
+    // Display cart items
+    cart.forEach((item, index) => {
+        itemsHTML += `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <div class="cart-item-symbol">${item.symbol}</div>
+                    <div class="cart-item-details">
+                        <div>${item.product} (${item.size})</div>
+                        <div>${item.materialType}</div>
+                        <div>${item.price.toFixed(2)} JDs</div>
+                    </div>
+                </div>
+                <button class="remove-item" data-index="${index}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+    });
+    
+    cartItemsContainer.innerHTML = itemsHTML;
+    cartSubtotal.textContent = `Subtotal: ${discountedSubtotal.toFixed(2)} JDs`;
+    cartDelivery.textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
+    
+    // 🎯 BEAUTIFUL CART DISCOUNT DISPLAY
+    if (additionalDiscount > 0) {
+        cartDiscountInfo.style.display = 'block';
+        cartDiscountAmount.innerHTML = `
+            <div class="cart-discount-applied">
+                <span class="discount-badge">🎉 10% OFF</span>
+                <span class="discount-amount">-${additionalDiscount.toFixed(2)} JDs</span>
+            </div>
+        `;
+        
+        cartTotal.innerHTML = `
+            <div class="cart-total-with-discount">
+                <div class="price-comparison">
+                    <span class="original-price">${totalBeforeDiscount.toFixed(2)} JDs</span>
+                    <span class="final-price">${finalTotal.toFixed(2)} JDs</span>
+                </div>
+                <div class="savings-message">
+                    You saved ${additionalDiscount.toFixed(2)} JDs!
+                </div>
+            </div>
+        `;
+    } else if (qualifiesForDiscount) {
+        cartDiscountInfo.style.display = 'block';
+        cartDiscountAmount.innerHTML = `
+            <div class="cart-discount-eligible">
+                <span class="discount-badge">⭐ ELIGIBLE</span>
+                <span>10% discount will be applied at checkout</span>
+            </div>
+        `;
+        cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
+    } else {
+        cartDiscountInfo.style.display = 'block';
+        const amountNeeded = (MINIMUM_ORDER - subtotal).toFixed(2);
+        cartDiscountAmount.innerHTML = `
+            <div class="cart-discount-not-eligible">
+                <span class="discount-badge">📢 ALMOST THERE</span>
+                <span>Add ${amountNeeded} JOD for 10% OFF</span>
+            </div>
+        `;
+        cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
+    }
+
+    // Reattach event listeners
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', function() {
+            const index = parseInt(this.dataset.index);
+            removeFromCart(index);
+        });
+    });
+}
 // Remove the old standalone order history section
 function removeStandaloneOrderHistory() {
     const oldOrderHistory = document.getElementById('order-history-section');
