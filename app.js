@@ -7173,9 +7173,6 @@ function showGlobalCountdownBanner() {
                 <span class="banner-icon">⏰</span>
                 <span class="banner-text">Limited Time Reward!</span>
                 <span class="banner-timer" id="global-timer">30:00</span>
-                <button class="banner-action" onclick="startDesigning()">
-                    🎨 Start Designing
-                </button>
             </div>
         </div>
     `;
