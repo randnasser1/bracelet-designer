@@ -3181,6 +3181,66 @@ canvas[class*="confetti"] {
     font-size: 0.8rem;
     font-weight: bold;
 }
+/* Ensure back button is above countdown */
+.back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: #d6336c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  z-index: 10010; /* Higher than countdown banner */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+/* Countdown banner should be below back button */
+.global-countdown-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  z-index: 10005; /* Lower than back button */
+  box-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+}
+
+/* When countdown is urgent, ensure back button still shows */
+.global-countdown-banner.urgent {
+  z-index: 10005; /* Still below back button */
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .back-btn {
+    top: 15px;
+    left: 15px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .global-countdown-banner {
+    padding: 8px 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    top: 10px;
+    left: 10px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .global-countdown-banner {
+    padding-top: 40px; /* Make space for back button */
+  }
+}
 </style>
 </head>
 
@@ -3472,7 +3532,21 @@ canvas[class*="confetti"] {
     </div>
       </div>
 <div id="designer-page" class="designer-page" style="display: none;">
+<!-- Add this at the top of designer-page -->
+<button id="back-to-home" class="back-btn">
+  <i class="fas fa-arrow-left"></i> Change Product
+</button>
 
+  <div class="global-countdown-banner" id="global-countdown-banner" style="display: none;">
+    <div class="banner-content">
+      <span class="banner-icon">⏰</span>
+      <span class="banner-text">Limited Time Reward!</span>
+      <span class="banner-timer" id="global-timer">30:00</span>
+      <button class="banner-action" onclick="startDesigning()">
+        🎨 Start Designing
+      </button>
+    </div>
+  </div>
    <!-- Add this right after the body tag -->
     <button id="cart-button" class="cart-button">
     <i class="fas fa-shopping-cart"></i>
@@ -3513,10 +3587,7 @@ canvas[class*="confetti"] {
 
 
 
-<!-- Add this at the top of designer-page -->
-<button id="back-to-home" class="back-btn">
-  <i class="fas fa-arrow-left"></i> Change Product
-</button>
+
    
 <!-- Free Shipping Progress -->
 <div class="shipping-progress" id="shipping-progress" style="display: none;">
