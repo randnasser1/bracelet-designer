@@ -6574,16 +6574,21 @@ function createWheel() {
     // Clear the canvas
     ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
     
+    // Show loading state
+    showWheelLoading();
+    
     // Load HIGH QUALITY wheel image
     const wheelImage = new Image();
-    wheelImage.src = 'basecharms/wheel.png'; // Use high-res version
+    wheelImage.src = 'basecharms/wheel.png';
     
-    // Add retry mechanism for image loading
     let retryCount = 0;
     const maxRetries = 3;
     
     wheelImage.onload = function() {
         console.log('✅ High-quality wheel image loaded successfully');
+        
+        // Hide loading state
+        hideWheelLoading();
         
         // Use high-quality rendering
         ctx.imageSmoothingEnabled = true;
@@ -6592,80 +6597,153 @@ function createWheel() {
         // Draw the wheel image with high quality
         ctx.drawImage(wheelImage, 0, 0, 400, 400);
         
-        // Add high-quality text labels
-        const centerX = 200;
-        const centerY = 200;
-        const radius = 180;
-        
-        ctx.font = 'bold 18px Arial'; // Bigger, bolder text
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.strokeStyle = 'rgba(0,0,0,0.8)';
-        ctx.lineWidth = 4;
-        
-    
+        // Now show the spin wheel modal since image is ready
+        showSpinWheelAfterImageLoad();
     };
     
     wheelImage.onerror = function() {
         console.error('❌ Failed to load high-quality wheel image');
         retryCount++;
+        
         if (retryCount <= maxRetries) {
             console.log(`🔄 Retrying image load (attempt ${retryCount}/${maxRetries})`);
             setTimeout(() => {
-                wheelImage.src = 'basecharms/wheel.png'; // Fallback to regular image
+                wheelImage.src = 'basecharms/wheel.png';
             }, 1000);
         } else {
             console.error('❌ All image load attempts failed');
-            // Create a colored wheel as fallback
-            createColoredWheelFallback(ctx);
+            hideWheelLoading();
+            showWheelError();
         }
     };
     
     // Set a timeout for image loading
     setTimeout(() => {
         if (!wheelImage.complete) {
-            console.log('⏰ Image loading timeout, using fallback');
-            createColoredWheelFallback(ctx);
+            console.log('⏰ Image loading timeout');
+            hideWheelLoading();
+            showWheelError();
         }
-    }, 5000);
+    }, 8000); // Increased timeout to 8 seconds
 }
 
-// Fallback function if image fails to load
-function createColoredWheelFallback(ctx) {
-    const centerX = 200;
-    const centerY = 200;
-    const radius = 180;
-    const segments = 6;
+// Show loading state for wheel
+function showWheelLoading() {
+    const wheelCanvas = document.getElementById('wheel-canvas');
+    if (!wheelCanvas) return;
     
-    for (let i = 0; i < segments; i++) {
-        const startAngle = (i * 60) * Math.PI / 180;
-        const endAngle = ((i + 1) * 60) * Math.PI / 180;
-        
-        // Draw segment
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-        ctx.closePath();
-        ctx.fillStyle = WHEEL_REWARDS[i].color;
-        ctx.fill();
-        ctx.stroke();
-        
-        // Add text
-        const midAngle = (startAngle + endAngle) / 2;
-        const textX = centerX + Math.cos(midAngle) * (radius - 50);
-        const textY = centerY + Math.sin(midAngle) * (radius - 50);
-        
-        ctx.font = 'bold 14px Arial';
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 3;
-        ctx.strokeText(WHEEL_REWARDS[i].name, textX, textY);
-        ctx.fillText(WHEEL_REWARDS[i].name, textX, textY);
+    const loadingHTML = `
+        <div class="wheel-loading" style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #d6336c;
+            font-weight: bold;
+            z-index: 10;
+        ">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">🎡</div>
+            <div>Loading Spin Wheel...</div>
+        </div>
+    `;
+    
+    wheelCanvas.insertAdjacentHTML('afterend', loadingHTML);
+}
+
+// Hide loading state
+function hideWheelLoading() {
+    const loadingElement = document.querySelector('.wheel-loading');
+    if (loadingElement) {
+        loadingElement.remove();
     }
 }
+
+// Show error state
+function showWheelError() {
+    const wheelCanvas = document.getElementById('wheel-canvas');
+    if (!wheelCanvas) return;
+    
+    const errorHTML = `
+        <div class="wheel-error" style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #ff6b6b;
+            font-weight: bold;
+            z-index: 10;
+        ">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">❌</div>
+            <div>Failed to load wheel</div>
+            <button onclick="retryWheelLoad()" style="
+                margin-top: 1rem;
+                padding: 0.5rem 1rem;
+                background: #d6336c;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            ">Retry</button>
+        </div>
+    `;
+    
+    wheelCanvas.insertAdjacentHTML('afterend', errorHTML);
+}
+
+// Retry wheel loading
+function retryWheelLoad() {
+    const errorElement = document.querySelector('.wheel-error');
+    if (errorElement) {
+        errorElement.remove();
+    }
+    createWheel();
+}
+
+// Show spin wheel only after image has loaded
+function showSpinWheelAfterImageLoad() {
+    const spinModal = document.getElementById('spin-wheel-modal');
+    if (!spinModal) {
+        console.error('Spin wheel modal not found!');
+        return;
+    }
+    
+    const spinStats = getSpinStatistics();
+    
+    // Don't show if no spins remaining
+    if (spinStats.spinsRemaining <= 0 && !hasSpunToday) {
+        showSpinLimitReached();
+        return;
+    }
+    
+    // Now show the modal since wheel is ready
+    spinModal.classList.add('active');
+    
+    // Update button text based on spins remaining
+    const spinButton = document.getElementById('spin-button');
+    if (spinButton) {
+        if (spinStats.spinsRemaining > 0) {
+            spinButton.disabled = false;
+            spinButton.innerHTML = `
+                <span class="spin-text">SPIN NOW!</span>
+                <span class="spin-cost-text">(FREE)</span>
+            `;
+        } else {
+            spinButton.disabled = true;
+            spinButton.innerHTML = `
+                <span class="spin-text">DAILY SPIN USED</span>
+                <span class="spin-cost-text">(Come back tomorrow)</span>
+            `;
+        }
+    }
+    
+    // Update spin counter display
+    updateSpinCounterDisplay(spinStats);
+    
+    console.log('🎡 Spin wheel shown - image loaded successfully');
+}
+
 
 function spinWheel() {
     if (isSpinning) return;
@@ -6821,15 +6899,10 @@ function initSpinWheel() {
     const canSpin = checkDailySpinEligibility();
     
     if (canSpin) {
-        createWheel();
+        createWheel(); // This will handle showing the modal when image loads
         setupSpinWheelEventListeners();
         
-        // Auto-show wheel if they haven't spun today
-        if (!hasSpunToday) {
-            setTimeout(() => {
-                showSpinWheel();
-            }, 3000);
-        }
+        // REMOVED the auto-show timeout - wheel will show after image loads
     } else {
         console.log('❌ User cannot spin today');
     }
