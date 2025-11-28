@@ -3127,6 +3127,60 @@ canvas[class*="confetti"] {
     transform: none !important;
     box-shadow: none !important;
 }
+/* Wheel Reward Badges in Cart */
+.cart-discount-applied .discount-badge {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.cart-discount-not-eligible .discount-badge {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.discount-amount {
+    color: #4CAF50;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.cart-total-with-discount {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.price-comparison {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.final-price {
+    font-weight: bold;
+    color: #d6336c;
+    font-size: 1.1rem;
+}
+
+.savings-message {
+    color: #4CAF50;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
 </style>
 </head>
 
