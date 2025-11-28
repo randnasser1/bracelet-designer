@@ -3386,6 +3386,796 @@ canvas[class*="confetti"] {
 .win-button-hidden {
     display: none !important;
 }
+/* Spin Countdown Display - Thin and non-obstructive */
+.spin-countdown-display {
+    position: relative;
+    margin: 5px 20px 10px 20px; /* Reduced top margin */
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 6px 12px; /* Thinner padding */
+    border-radius: 8px;
+    z-index: 5; /* Lower than sticky bracelet container */
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    min-width: 200px;
+    max-width: 300px;
+    animation: slideInDown 0.5s ease-out;
+    height: 40px; /* Fixed thin height */
+    display: flex;
+    align-items: center;
+}
+
+/* Make countdown content more compact */
+.countdown-active {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.countdown-icon {
+    font-size: 1rem; /* Smaller icon */
+}
+
+.countdown-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.countdown-title {
+    font-size: 0.7rem; /* Smaller text */
+    opacity: 0.9;
+    line-height: 1;
+}
+
+.countdown-timer {
+    font-size: 0.9rem; /* Smaller timer */
+    font-weight: bold;
+    font-family: monospace;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-align: center;
+    line-height: 1;
+}
+
+/* Ready state when countdown ends */
+.countdown-ready {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+
+.countdown-ready .countdown-icon {
+    font-size: 1.2rem;
+}
+
+.countdown-ready .countdown-text {
+    flex: 1;
+}
+
+.countdown-ready .countdown-title {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.spin-now-btn {
+    background: #ffeb3b;
+    color: #333;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.spin-now-btn:hover {
+    background: #ffd600;
+    transform: scale(1.05);
+}
+
+/* Ensure bracelet container is above countdown */
+.bracelet-container.sticky-active {
+    z-index: 100; /* Higher than countdown */
+    position: sticky;
+    top: 0;
+    background: #fff0f5;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f5a0c2;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+/* Spin Countdown Display - Proper placement and styling */
+.spin-countdown-display {
+    position: relative;
+    margin: 10px 20px 15px 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 10px;
+    z-index: 10;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    min-width: 200px;
+    max-width: 300px;
+    animation: slideInDown 0.5s ease-out;
+    height: 45px;
+    display: flex;
+    align-items: center;
+}
+
+/* Make it more compact */
+.countdown-active {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.countdown-icon {
+    font-size: 1.1rem;
+}
+
+.countdown-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.countdown-title {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    line-height: 1;
+}
+
+.countdown-timer {
+    font-size: 0.95rem;
+    font-weight: bold;
+    font-family: monospace;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 6px;
+    border-radius: 4px;
+    text-align: center;
+    line-height: 1;
+}
+
+/* Ready state when countdown ends */
+.countdown-ready {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    padding: 8px 14px;
+    border-radius: 10px;
+}
+
+.countdown-ready .countdown-icon {
+    font-size: 1.3rem;
+}
+
+.countdown-ready .countdown-text {
+    flex: 1;
+}
+
+.countdown-ready .countdown-title {
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.spin-now-btn {
+    background: #ffeb3b;
+    color: #333;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.spin-now-btn:hover {
+    background: #ffd600;
+    transform: scale(1.05);
+}
+
+/* Ensure proper stacking order */
+.back-btn {
+    z-index: 10010 !important;
+}
+.cart-button{
+  position: fixed;
+      z-index: 10011 !important;
+
+}
+.auth-button{
+   position: relative;
+      z-index: 10012 !important;
+}
+.bracelet-container.sticky-active {
+    z-index: 100 !important;
+}
+
+.spin-countdown-display {
+    z-index: 5 !important;
+}
+/* Spin Countdown Display - Fixed at bottom */
+.spin-countdown-display {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    z-index: 1000; /* High but below modals */
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    min-width: 280px;
+    max-width: 350px;
+    animation: slideInUp 0.5s ease-out;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+
+/* Make it more compact */
+.countdown-active {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
+.countdown-icon {
+    font-size: 1.2rem;
+}
+
+.countdown-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+}
+
+.countdown-title {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    line-height: 1;
+}
+
+.countdown-timer {
+    font-size: 1rem;
+    font-weight: bold;
+    font-family: monospace;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-align: center;
+    line-height: 1;
+    min-width: 80px;
+}
+
+/* Ready state when countdown ends */
+.countdown-ready {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    padding: 10px 20px;
+    border-radius: 25px;
+    justify-content: center;
+}
+
+.countdown-ready .countdown-icon {
+    font-size: 1.4rem;
+}
+
+.countdown-ready .countdown-text {
+    flex: 1;
+}
+
+.countdown-ready .countdown-title {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.spin-now-btn {
+    background: #ffeb3b;
+    color: #333;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+}
+
+.spin-now-btn:hover {
+    background: #ffd600;
+    transform: scale(1.05);
+}
+
+/* Animation for bottom entry */
+@keyframes slideInUp {
+    from {
+        transform: translateX(-50%) translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .spin-countdown-display {
+        bottom: 15px;
+        left: 15px;
+        right: 15px;
+        transform: none;
+        min-width: auto;
+        max-width: none;
+    }
+    
+    .countdown-active {
+        gap: 8px;
+    }
+    
+    .countdown-title {
+        font-size: 0.75rem;
+    }
+    
+    .countdown-timer {
+        font-size: 0.9rem;
+    }
+}
+
+/* Ensure it doesn't interfere with other bottom elements */
+.spin-countdown-display {
+    pointer-events: auto;
+}
+
+
+
+/* Spin Countdown Display - Fixed at bottom */
+.spin-countdown-display {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    z-index: 1000; /* High but below modals */
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    min-width: 280px;
+    max-width: 350px;
+    animation: slideInUp 0.5s ease-out;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+
+/* Make it more compact */
+.countdown-active {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
+.countdown-icon {
+    font-size: 1.2rem;
+}
+
+.countdown-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+}
+
+.countdown-title {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    line-height: 1;
+}
+
+.countdown-timer {
+    font-size: 1rem;
+    font-weight: bold;
+    font-family: monospace;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-align: center;
+    line-height: 1;
+    min-width: 80px;
+}
+
+/* Ready state when countdown ends */
+.countdown-ready {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    padding: 10px 20px;
+    border-radius: 25px;
+    justify-content: center;
+}
+
+.countdown-ready .countdown-icon {
+    font-size: 1.4rem;
+}
+
+.countdown-ready .countdown-text {
+    flex: 1;
+}
+
+.countdown-ready .countdown-title {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.spin-now-btn {
+    background: #ffeb3b;
+    color: #333;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+}
+
+.spin-now-btn:hover {
+    background: #ffd600;
+    transform: scale(1.05);
+}
+
+/* Animation for bottom entry */
+@keyframes slideInUp {
+    from {
+        transform: translateX(-50%) translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .spin-countdown-display {
+        bottom: 15px;
+        left: 15px;
+        right: 15px;
+        transform: none;
+        min-width: auto;
+        max-width: none;
+    }
+    
+    .countdown-active {
+        gap: 8px;
+    }
+    
+    .countdown-title {
+        font-size: 0.75rem;
+    }
+    
+    .countdown-timer {
+        font-size: 0.9rem;
+    }
+}
+
+/* Ensure it doesn't interfere with other bottom elements */
+.spin-countdown-display {
+    pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+    .cart-button {
+        bottom: 70px; /* Adjust for mobile */
+    }
+}.cart-button {
+    position: fixed;
+    top: 12px !important;
+    right: 110px;
+    /* Remove bottom positioning since we're using top now */
+    bottom: auto !important;
+}
+
+/* Global Countdown Banner (Reward) - Fixed at bottom */
+.global-countdown-banner {
+    position: fixed;
+    bottom: 90px; /* Above the spin countdown */
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 25px;
+    z-index: 1001; /* Above spin countdown */
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+    min-width: 320px;
+    max-width: 450px;
+    animation: slideInUp 0.5s ease-out;
+    text-align: center;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+
+.global-countdown-banner .banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.global-countdown-banner .banner-icon {
+    font-size: 1.3rem;
+}
+
+.global-countdown-banner .banner-text {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.global-countdown-banner .banner-timer {
+    font-size: 1.1rem;
+    font-weight: bold;
+    font-family: monospace;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 8px;
+    border-radius: 6px;
+    min-width: 60px;
+}
+
+.global-countdown-banner .banner-action {
+    background: #ffeb3b;
+    color: #333;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.global-countdown-banner .banner-action:hover {
+    background: #ffd600;
+    transform: scale(1.05);
+}
+
+/* Spin Countdown (Next Free Spin) - Fixed at bottom */
+.spin-countdown-display {
+    position: fixed;
+    bottom: 20px; /* Below the reward countdown */
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    z-index: 1000; /* Below reward countdown */
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    min-width: 280px;
+    max-width: 350px;
+    animation: slideInUp 0.5s ease-out;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+
+/* Make sure they don't overlap on mobile */
+@media (max-width: 768px) {
+    .global-countdown-banner {
+        bottom: 80px;
+        left: 15px;
+        right: 15px;
+        transform: none;
+        min-width: auto;
+        max-width: none;
+    }
+    
+    .spin-countdown-display {
+        bottom: 15px;
+        left: 15px;
+        right: 15px;
+        transform: none;
+        min-width: auto;
+        max-width: none;
+    }
+    
+    .global-countdown-banner .banner-content {
+        gap: 8px;
+    }
+    
+    .global-countdown-banner .banner-text {
+        font-size: 0.8rem;
+    }
+    
+    .global-countdown-banner .banner-timer {
+        font-size: 1rem;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateX(-50%) translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+/* Countdown Display Styles */
+.countdown-display {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 320px;
+    max-width: 400px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: slideUpIn 0.3s ease-out;
+}
+
+.countdown-display.global-countdown {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+}
+
+.countdown-display.spin-countdown {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.countdown-active,
+.countdown-ready,
+.countdown-expired {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+}
+
+.countdown-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.countdown-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.countdown-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+}
+
+.countdown-timer {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.countdown-subtitle {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin-top: 2px;
+}
+
+.countdown-action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.countdown-action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.countdown-action-btn.spin-now-btn {
+    background: rgba(255, 255, 255, 0.9);
+    color: #667eea;
+    font-weight: bold;
+}
+
+.countdown-action-btn.spin-now-btn:hover {
+    background: white;
+    transform: translateY(-1px);
+}
+
+@keyframes slideUpIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .countdown-display {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        transform: none;
+        max-width: none;
+        min-width: auto;
+    }
+    
+    .countdown-active,
+    .countdown-ready,
+    .countdown-expired {
+        gap: 8px;
+    }
+    
+    .countdown-title {
+        font-size: 0.85rem;
+    }
+    
+    .countdown-timer {
+        font-size: 1rem;
+    }
+    
+    .countdown-action-btn {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+    }
+}
+
 </style>
 </head>
 
@@ -3683,16 +4473,7 @@ canvas[class*="confetti"] {
   <i class="fas fa-arrow-left"></i> Change Product
 </button>
 
-  <div class="global-countdown-banner" id="global-countdown-banner" style="display: none;">
-    <div class="banner-content">
-      <span class="banner-icon">⏰</span>
-      <span class="banner-text">Limited Time Reward!</span>
-      <span class="banner-timer" id="global-timer">30:00</span>
-      <button class="banner-action" onclick="startDesigning()">
-        🎨 Start Designing
-      </button>
-    </div>
-  </div>
+ 
 
 
   <div class="price-display">
@@ -3912,21 +4693,7 @@ canvas[class*="confetti"] {
         </div>
     </div>
 <!-- Custom Charms -->
-<div class="charm-pool">
-    <h3>Custom Charms (+3.5 JDs each)</h3>
-    <div class="custom-charm-upload">
-        <input type="file" id="custom-charm-upload" accept="image/*" style="display: none;">
-        <button class="btn" onclick="document.getElementById('custom-charm-upload').click()">
-            <i class="fas fa-upload"></i> Upload Image
-        </button>
-        <div class="custom-charm-preview" id="custom-charm-preview">
-            <span>Preview</span>
-        </div>
-        <button class="btn" id="add-custom-charm">
-            <i class="fas fa-plus"></i> Add Custom Charm
-        </button>
-    </div>
-</div>
+
   <!-- Modal for charm removal confirmation -->
   <div class="modal" id="remove-charm-modal">
     <div class="modal-content">
@@ -4038,7 +4805,16 @@ canvas[class*="confetti"] {
     </div>
   </div>
 
-
+ <div class="global-countdown-banner" id="global-countdown-banner" style="display: none;">
+    <div class="banner-content">
+      <span class="banner-icon">⏰</span>
+      <span class="banner-text">Limited Time Reward!</span>
+      <span class="banner-timer" id="global-timer">30:00</span>
+      <button class="banner-action" onclick="startDesigning()">
+        🎨 Start Designing
+      </button>
+    </div>
+  </div>
   <!-- Order Confirmation Modal -->
   <div class="modal" id="order-confirmation">
     <div class="order-modal-content">
