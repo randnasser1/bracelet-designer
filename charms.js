@@ -384,17 +384,13 @@ const specialCharms = [
   { src: 'special/newc2s/c2152.png', category: 'newc2s', quantity: 0 },
   { src: 'special/newc2s/c2153.png', category: 'newc2s', quantity: 1 },
   { src: 'special/newc2s/c2154.png', category: 'newc2s', quantity: 0 },
-  { src: 'special/newc2s/c2155.png', category: 'newc2s', quantity: 1 },
   { src: 'special/newc2s/c2156.png', category: 'newc2s', quantity: 1 },
-  { src: 'special/newc2s/c2157.png', category: 'newc2s', quantity: 1 },
-  { src: 'special/newc2s/c2158.png', category: 'newc2s', quantity: 1 },
   { src: 'special/newc2s/c2159.png', category: 'newc2s', quantity: 1 },
   { src: 'special/newc2s/c2160.png', category: 'newc2s', quantity: 1 },
   { src: 'special/newc2s/c2161.png', category: 'newc2s', quantity: 1 },
   { src: 'special/newc2s/c2162.png', category: 'newc2s', quantity: 1 },
   { src: 'special/newc2s/c2163.png', category: 'newc2s', quantity: 1 },
   { src: 'special/newc2s/c2164.png', category: 'newc2s', quantity: 1 },
-  { src: 'special/newc2s/c2165.png', category: 'newc2s', quantity: 1 },
   { src: 'special/newc2s/c2166.png', category: 'newc2s', quantity: 1 },
   { src: 'special/newc2s/c226.png', category: 'newc2s', quantity: 7 },
   { src: 'special/newc2s/c227.png', category: 'newc2s', quantity: 7 },
@@ -1016,5 +1012,17 @@ const rareCharms = [
 {src:'rares/winter/53.png', category: 'winter', quantity: 1},
 {src:'rares/winter/54.png', category: 'winter', quantity: 1},
 {src:'rares/winter/55.png', category: 'winter', quantity: 1},
+
+
+{src:'rares/newc2r/c2142.png', category: 'winter', quantity: 1},
+{src:'rares/newc2r/c28.png', category: 'winter', quantity: 1},
+{src:'rares/newc2r/c229.png', category: 'winter', quantity: 1},
+{src:'rares/newc2r/c2125.png', category: 'winter', quantity: 1},
+{src:'rares/new-collection/2x.png', category: 'winter', quantity: 1},
+{src:'special/newc2s/c2155.png', category: 'winter', quantity: 1},
+{src:'special/newc2s/c2157.png', category: 'winter', quantity: 1},
+{src:'special/newc2s/c2165.png', category: 'winter', quantity: 1},
+{src:'special/newc2s/c2158.png', category: 'winter', quantity: 1},
+
 ];
 
