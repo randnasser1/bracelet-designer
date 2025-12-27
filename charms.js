@@ -986,6 +986,15 @@ const rareCharms = [
 { src: 'rares/dangly/c4c4139-gold.png', category: 'dangly', quantity: 1 },
 { src: 'rares/dangly/c4c4140.png', category: 'dangly', quantity: 1 },
 { src: 'rares/dangly/c4c5141-gold.png', category: 'dangly', quantity: 1 },
+  {src:'rares/newc2r/c2142.png', category: 'winter', quantity: 1},
+{src:'rares/newc2r/c28.png', category: 'winter', quantity: 1},
+{src:'rares/newc2r/c229.png', category: 'winter', quantity: 1},
+{src:'rares/newc2r/c2125.png', category: 'winter', quantity: 1},
+{src:'rares/new-collection/2x.png', category: 'winter', quantity: 1},
+{src:'special/newc2s/c2155.png', category: 'winter', quantity: 1},
+{src:'special/newc2s/c2157.png', category: 'winter', quantity: 1},
+{src:'special/newc2s/c2165.png', category: 'winter', quantity: 1},
+{src:'special/newc2s/c2158.png', category: 'winter', quantity: 1},
   {src:'rares/winter/30.png', category: 'winter', quantity: 1},
 {src:'rares/winter/31.png', category: 'winter', quantity: 1},
 {src:'rares/winter/32.png', category: 'winter', quantity: 1},
@@ -1014,15 +1023,7 @@ const rareCharms = [
 {src:'rares/winter/55.png', category: 'winter', quantity: 1},
 
 
-{src:'rares/newc2r/c2142.png', category: 'winter', quantity: 1},
-{src:'rares/newc2r/c28.png', category: 'winter', quantity: 1},
-{src:'rares/newc2r/c229.png', category: 'winter', quantity: 1},
-{src:'rares/newc2r/c2125.png', category: 'winter', quantity: 1},
-{src:'rares/new-collection/2x.png', category: 'winter', quantity: 1},
-{src:'special/newc2s/c2155.png', category: 'winter', quantity: 1},
-{src:'special/newc2s/c2157.png', category: 'winter', quantity: 1},
-{src:'special/newc2s/c2165.png', category: 'winter', quantity: 1},
-{src:'special/newc2s/c2158.png', category: 'winter', quantity: 1},
+
 
 ];
 
