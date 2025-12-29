@@ -2355,6 +2355,11 @@ function initProduct(product) {
         if (individualControls) individualControls.style.display = 'none';
         if (sizeControls) sizeControls.style.display = 'block';
         initSpecialProductWithBase(product);
+         if (product === 'watch') {
+            setTimeout(() => {
+                initWatchPool();
+            }, 100);
+        }
     } 
     else if (product === 'individual') {
         if (individualControls) individualControls.style.display = 'flex';
