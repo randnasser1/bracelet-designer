@@ -884,90 +884,71 @@ function showSetWarning(charmSet) {
     }
 }
 function calculatePrice(includeDelivery = false) {
-    console.log('🔄 Calculating price for:', currentProduct);
-    
     // Handle individual charms separately
     if (currentProduct === 'individual') {
-        return calculateIndividualPrice(includeDelivery);
+        const basePrice = 3; // Fixed base price of 3 JDs for individual charms
+        
+        let charmCost = 0;
+        const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
+        
+        placedCharms.forEach(charm => {
+            if (charm.dataset.type === 'special') {
+                charmCost += 2;
+            } else if (charm.dataset.type === 'rare') {
+                charmCost += 3;
+            } else if (charm.dataset.type === 'custom') {
+                charmCost += 3.5;
+            } else if (charm.classList.contains('long-charm')) {
+                charmCost += 6;
+            }
+        });
+        
+        const subtotal = basePrice + charmCost;
+        const delivery = includeDelivery ? 2.5 : 0;
+        const total = subtotal + delivery;
+        
+        return {
+            subtotal: parseFloat(subtotal.toFixed(2)),
+            discount: 0,
+            total: parseFloat(total.toFixed(2)),
+            delivery: parseFloat(delivery.toFixed(2))
+        };
     }
      
-    // Get product data
+    // Verify valid product and size data
+    if (!PRODUCTS[currentProduct] || !SIZE_CHARTS[currentProduct] || !SIZE_CHARTS[currentProduct][currentSize]) {
+        console.error(`Missing price data for ${currentProduct} size ${currentSize}`);
+        return {
+            subtotal: 0,
+            discount: 0,
+            total: 0,
+            delivery: 0,
+            basePrice: 0,
+            charmCost: 0
+        };
+    }
+
     const product = PRODUCTS[currentProduct];
     const sizeData = SIZE_CHARTS[currentProduct][currentSize];
     
-    if (!product || !sizeData) {
-        console.error('Missing product data:', { currentProduct, currentSize });
-        return getDefaultPriceData(includeDelivery);
-    }
-
     // Calculate base price
-    let basePrice = product.basePrice;
-    let sizeUpgradePrice = isFullGlam ? 0 : sizeData.price;
+    let originalPrice = isFullGlam ? product.fullGlam : (product.basePrice + sizeData.price);
+    let totalPrice = originalPrice;
 
     // Apply material upgrades
-    let materialUpgrade = 0;
-    if (materialType === 'gold') {
-        materialUpgrade = 1;
+    if (materialType === 'gold' && currentProduct === 'bracelet') {
+        totalPrice += 1;
+        originalPrice -= 1;
+    } else if (materialType === 'gold') {
+        totalPrice += 1;
+        originalPrice += 1;
     } else if (materialType === 'mix') {
-        materialUpgrade = 2.5;
+        totalPrice += 2.5;
+        originalPrice += 2.5;
     }
-
-    // Calculate original price
-    let originalPrice = basePrice + sizeUpgradePrice + materialUpgrade;
 
     // Count all placed charms and calculate costs
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
-    let charmCost = calculateCharmCost(placedCharms);
-
-    // Total before discounts
-    let subtotal = originalPrice + charmCost;
-
-    // Apply discounts (ONLY wheel discounts)
-    let discountApplied = 0;
-    let wheelDiscount = 0;
-
-    // ONLY apply wheel discounts if user has actually won them
-    const MINIMUM_FOR_WHEEL_REWARDS = 15.00;
-    const qualifiesForWheelRewards = subtotal >= MINIMUM_FOR_WHEEL_REWARDS;
-    
-    if (hasSpunToday && activeWheelRewards.discounts.length > 0 && qualifiesForWheelRewards) {
-        wheelDiscount = calculateWheelDiscount(subtotal);
-        discountApplied = wheelDiscount;
-        
-        console.log('💰 Applying wheel discount:', {
-            subtotal: subtotal,
-            wheelDiscount: wheelDiscount,
-            finalDiscount: discountApplied
-        });
-    }
-
-    // Final price after discounts - FIXED: Actually subtract the discount
-    let totalPrice = subtotal - discountApplied;
-    
-    // Calculate delivery
-    let deliveryFee = includeDelivery ? calculateDeliveryFee(subtotal) : 0;
-
-    // Ensure all values are valid numbers
-    const result = {
-        subtotal: parseFloat(subtotal.toFixed(2)),
-        discount: parseFloat(discountApplied.toFixed(2)),
-        total: parseFloat((includeDelivery ? totalPrice + deliveryFee : totalPrice).toFixed(2)),
-        delivery: parseFloat(deliveryFee.toFixed(2)),
-        basePrice: parseFloat(originalPrice.toFixed(2)),
-        charmCost: parseFloat(charmCost.toFixed(2)),
-        qualifiesForDiscount: false,
-        minimumForDiscount: 15,
-        wheelDiscount: parseFloat(wheelDiscount.toFixed(2)),
-        qualifiesForWheelRewards: qualifiesForWheelRewards,
-        minimumForWheelRewards: MINIMUM_FOR_WHEEL_REWARDS
-    };
-
-    console.log('Final price calculation:', result);
-    return result;
-}
-
-// Calculate charm costs separately
-function calculateCharmCost(placedCharms) {
     let specialCount = 0;
     let rareCount = 0;
     let customCount = 0;
@@ -985,167 +966,85 @@ function calculateCharmCost(placedCharms) {
             customCount++;
         }
     });
-
-    let charmCost = 0;
-    
-    // Apply free special charms only if user won them from wheel
-    let freeSpecials = 0;
-    if (activeWheelRewards.freeCharm.active && activeWheelRewards.freeCharm.count > 0) {
-        // Check if order qualifies for free charm (10 JD minimum)
-        const subtotal = calculateSubtotal(); // Calculate current subtotal
-        if (subtotal >= 10) { // CHANGED: 10 JD minimum for free charm
-            freeSpecials = Math.min(specialCount, activeWheelRewards.freeCharm.count);
-            console.log('🎁 Applying free special charms:', freeSpecials, 'out of', specialCount);
-        }
+     
+    // Apply charm costs to both prices
+    if (!isFullGlam) {
+        const includedSpecials = 1;
+        const paidSpecials = Math.max(0, specialCount - includedSpecials);
+        totalPrice += paidSpecials * 2;
+        originalPrice += paidSpecials * 2;
     }
-    
-    const paidSpecials = Math.max(0, specialCount - freeSpecials);
-    charmCost += paidSpecials * 2;
      
     // Add costs for rare, custom, and long charms
-    charmCost += rareCount * 3;
-    charmCost += customCount * 3.5;
-    charmCost += longCharmCount * 6;
-
-    return charmCost;
-}
-
-// Helper function to calculate current subtotal
-function calculateSubtotal() {
-    if (currentProduct === 'individual') {
-        return 3; // Base price for individual charms
-    }
+    totalPrice += rareCount * 3;
+    originalPrice += rareCount * 3;
     
-    const product = PRODUCTS[currentProduct];
-    const sizeData = SIZE_CHARTS[currentProduct][currentSize];
+    totalPrice += customCount * 3.5;
+    originalPrice += customCount * 3.5;
     
-    if (!product || !sizeData) return 0;
+    totalPrice += longCharmCount * 6;
+    originalPrice += longCharmCount * 6;
 
-    // Calculate base price
-    let basePrice = product.basePrice;
-    let sizeUpgradePrice = isFullGlam ? 0 : sizeData.price;
-
-    // Apply material upgrades
-    let materialUpgrade = 0;
-    if (materialType === 'gold') {
-        materialUpgrade = 1;
-    } else if (materialType === 'mix') {
-        materialUpgrade = 2.5;
-    }
-
-    // Calculate original price
-    let originalPrice = basePrice + sizeUpgradePrice + materialUpgrade;
-
-    return originalPrice;
-}
-
-// Individual price calculation
-function calculateIndividualPrice(includeDelivery = false) {
-    const basePrice = 3;
+    // Check for discount eligibility
+    let discountApplied = 0;
+    const MINIMUM_FOR_DISCOUNT = 15.00;
+    let qualifiesForDiscount = originalPrice >= MINIMUM_FOR_DISCOUNT;
     
-    let charmCost = 0;
-    const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
-    
-    placedCharms.forEach(charm => {
-        if (charm.dataset.type === 'special') {
-            charmCost += 2;
-        } else if (charm.dataset.type === 'rare') {
-            charmCost += 3;
-        } else if (charm.dataset.type === 'custom') {
-            charmCost += 3.5;
-        } else if (charm.classList.contains('long-charm')) {
-            charmCost += 6;
+    if (qualifiesForDiscount) {
+        // Check for first order discount
+        if (checkFirstOrderDiscount()) {
+            discountApplied = Math.min(originalPrice * 0.1, 5);
+            totalPrice = originalPrice - discountApplied;
         }
-    });
-    
-    const subtotal = basePrice + charmCost;
-    const delivery = includeDelivery ? calculateDeliveryFee(subtotal) : 0;
-    const total = subtotal + delivery;
-    
-    return {
-        subtotal: parseFloat(subtotal.toFixed(2)),
-        discount: 0, // No discounts for individual charms
-        total: parseFloat(total.toFixed(2)),
-        delivery: parseFloat(delivery.toFixed(2)),
-        basePrice: basePrice,
-        charmCost: parseFloat(charmCost.toFixed(2)),
-        longCharmCount: 0,
-        specialCount: 0,
-        rareCount: 0,
-        customCount: 0,
-        qualifiesForDiscount: false,
-        minimumForDiscount: 15,
-        wheelDiscount: 0
-    };
-}
-
-// Default price data for errors
-function getDefaultPriceData(includeDelivery = false) {
-    const delivery = includeDelivery ? 2.5 : 0;
-    return {
-        subtotal: 0,
-        discount: 0,
-        total: delivery,
-        delivery: delivery,
-        basePrice: 0,
-        charmCost: 0,
-        longCharmCount: 0,
-        specialCount: 0,
-        rareCount: 0,
-        customCount: 0,
-        qualifiesForDiscount: false,
-        minimumForDiscount: 15,
-        wheelDiscount: 0
-    };
-}
-function calculateWheelDiscount(subtotal) {
-    let bestDiscount = 0;
-    
-    // Only consider the LATEST discount (there should only be one now)
-    if (activeWheelRewards.discounts.length > 0) {
-        // Get the most recent discount (should be only one)
-        const discount = activeWheelRewards.discounts[0];
         
-        // Only apply if order meets minimum amount
-        if (subtotal >= discount.minAmount) {
-            // Calculate discount amount
-            const discountAmount = subtotal * (discount.percent / 100);
-            
-            // Apply maximum cap if needed (for 10% and 15% discounts)
-            let finalDiscount = discountAmount;
-            if (discount.percent === 10 || discount.percent === 15) {
-                finalDiscount = Math.min(discountAmount, 5); // Max 5 JD for higher discounts
-            }
-            
-            bestDiscount = finalDiscount;
-            
-            console.log('✅ Applying discount:', {
-                percent: discount.percent,
-                minAmount: discount.minAmount,
-                subtotal: subtotal,
-                discountAmount: discountAmount,
-                finalDiscount: finalDiscount
-            });
-        } else {
-            console.log('❌ Discount not applied - below minimum:', {
-                percent: discount.percent,
-                minAmount: discount.minAmount,
-                subtotal: subtotal,
-                needed: discount.minAmount - subtotal
-            });
+        // Check for seasonal discount
+        const currentDate = new Date();
+        const discountEndDate = new Date('2025-11-30');
+        if (currentDate <= discountEndDate) {
+            const seasonalDiscount = Math.min(originalPrice * 0.1, 5);
+            discountApplied = Math.max(discountApplied, seasonalDiscount);
+            totalPrice = originalPrice - discountApplied;
         }
     }
-    
-    return bestDiscount;
-}
-// NEW: Calculate delivery fee with wheel free delivery
-function calculateDeliveryFee(subtotal) {
-    if (activeWheelRewards.freeDelivery.active && subtotal >= activeWheelRewards.freeDelivery.minAmount) {
-        return 0;
-    }
-    return 2.5; // Standard delivery fee
-}
 
+    // Ensure all values are valid numbers
+    originalPrice = parseFloat(originalPrice.toFixed(2));
+    totalPrice = parseFloat(totalPrice.toFixed(2));
+    discountApplied = parseFloat(discountApplied.toFixed(2));
+
+    if (includeDelivery) {
+        const deliveryFee = 2.5;
+        return {
+            subtotal: originalPrice,
+            discount: discountApplied,
+            total: totalPrice + deliveryFee,
+            delivery: deliveryFee,
+            basePrice: isFullGlam ? product.fullGlam : product.basePrice + sizeData.price,
+            charmCost: totalPrice - (isFullGlam ? product.fullGlam : product.basePrice + sizeData.price),
+            longCharmCount: longCharmCount,
+            specialCount: specialCount,
+            rareCount: rareCount,
+            customCount: customCount,
+            qualifiesForDiscount: qualifiesForDiscount,
+            minimumForDiscount: MINIMUM_FOR_DISCOUNT
+        };
+    }
+    
+    return {
+        subtotal: originalPrice,
+        discount: discountApplied,
+        total: totalPrice,
+        delivery: 0,
+        basePrice: isFullGlam ? product.fullGlam : product.basePrice + sizeData.price,
+        charmCost: totalPrice - (isFullGlam ? product.fullGlam : product.basePrice + sizeData.price),
+        longCharmCount: longCharmCount,
+        specialCount: specialCount,
+        rareCount: rareCount,
+        customCount: customCount,
+        qualifiesForDiscount: qualifiesForDiscount,
+        minimumForDiscount: MINIMUM_FOR_DISCOUNT
+    };
+}
 function safeDisplayPrice(price) {
     if (isNaN(price) || price === null || price === undefined) {
         return '0.00';
@@ -1260,34 +1159,7 @@ function updateJewelryPiece() {
         jewelryPiece.appendChild(slot);
     }
 }
-function setupSpinWheelEventListeners() {
-    const spinButton = document.getElementById('spin-button');
-    const winButton = document.getElementById('win-button'); // NEW
-    const closeSpin = document.getElementById('close-spin');
-    const closeNotification = document.getElementById('close-notification');
 
-    // NEW: Win button opens the spin wheel
-    if (winButton) {
-        winButton.addEventListener('click', showSpinWheel);
-    }
-
-    if (spinButton) {
-        spinButton.addEventListener('click', spinWheel);
-    }
-
-    if (closeSpin) {
-        closeSpin.addEventListener('click', () => {
-            const spinModal = document.getElementById('spin-wheel-modal');
-            if (spinModal) {
-                spinModal.classList.remove('active');
-            }
-        });
-    }
-
-    if (closeNotification) {
-        closeNotification.addEventListener('click', hideRewardNotification);
-    }
-}
 function getCharmSet(charmSrc) {
   return Object.values(CHARM_SETS).find(set => 
     set.charms.some(charm => charmSrc.includes(charm))
@@ -1369,30 +1241,24 @@ function updateCartDisplay() {
     const discountedSubtotal = cart.reduce((sum, item) => sum + item.price, 0);
     const deliveryFee = 2.5;
     
-    // 🎯 CHECK WHEEL REWARDS INSTEAD OF OLD DISCOUNT
-    let wheelDiscount = 0;
-    let wheelDiscountPercent = 0;
-    let wheelDiscountMinAmount = 0;
+    // 🎯 CHECK MINIMUM ORDER FOR DISCOUNT
+    const MINIMUM_ORDER = 15.00;
+    const qualifiesForDiscount = subtotal >= MINIMUM_ORDER;
+    let additionalDiscount = 0;
     
-    // Check for active wheel discounts
-    if (hasSpunToday && activeWheelRewards.discounts.length > 0) {
-        const discount = activeWheelRewards.discounts[0];
-        wheelDiscountPercent = discount.percent;
-        wheelDiscountMinAmount = discount.minAmount;
+    if (qualifiesForDiscount) {
+        const currentDate = new Date();
+        const discountEndDate = new Date('2025-10-31');
         
-        if (subtotal >= wheelDiscountMinAmount) {
-            wheelDiscount = Math.min(subtotal * (wheelDiscountPercent / 100), 5);
+        if (currentDate <= discountEndDate) {
+            const potentialDiscount = subtotal * 0.1;
+            const alreadyDiscounted = subtotal - discountedSubtotal;
+            additionalDiscount = Math.min(potentialDiscount - alreadyDiscounted, 5 - alreadyDiscounted);
         }
     }
     
-    // Check for free delivery
-    let finalDeliveryFee = deliveryFee;
-    if (hasSpunToday && activeWheelRewards.freeDelivery.active && subtotal >= activeWheelRewards.freeDelivery.minAmount) {
-        finalDeliveryFee = 0;
-    }
-    
-    const totalBeforeDiscount = discountedSubtotal + finalDeliveryFee;
-    const finalTotal = totalBeforeDiscount - wheelDiscount;
+    const totalBeforeDiscount = discountedSubtotal + deliveryFee;
+    const finalTotal = totalBeforeDiscount - additionalDiscount;
 
     // Display cart items
     cart.forEach((item, index) => {
@@ -1415,15 +1281,15 @@ function updateCartDisplay() {
     
     cartItemsContainer.innerHTML = itemsHTML;
     cartSubtotal.textContent = `Subtotal: ${discountedSubtotal.toFixed(2)} JDs`;
-    cartDelivery.textContent = `Delivery Fee: ${finalDeliveryFee.toFixed(2)} JDs`;
+    cartDelivery.textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
     
-    // 🎯 WHEEL REWARDS DISPLAY IN CART
-    if (wheelDiscount > 0) {
+    // 🎯 BEAUTIFUL CART DISCOUNT DISPLAY
+    if (additionalDiscount > 0) {
         cartDiscountInfo.style.display = 'block';
         cartDiscountAmount.innerHTML = `
             <div class="cart-discount-applied">
-                <span class="discount-badge">🎉 ${wheelDiscountPercent}% OFF (Wheel)</span>
-                <span class="discount-amount">-${wheelDiscount.toFixed(2)} JDs</span>
+                <span class="discount-badge">🎉 10% OFF</span>
+                <span class="discount-amount">-${additionalDiscount.toFixed(2)} JDs</span>
             </div>
         `;
         
@@ -1434,52 +1300,28 @@ function updateCartDisplay() {
                     <span class="final-price">${finalTotal.toFixed(2)} JDs</span>
                 </div>
                 <div class="savings-message">
-                    Wheel Reward: Saved ${wheelDiscount.toFixed(2)} JDs!
+                    You saved ${additionalDiscount.toFixed(2)} JDs!
                 </div>
             </div>
         `;
-    } 
-    else if (hasSpunToday && activeWheelRewards.discounts.length > 0) {
-        // Has wheel discount but doesn't qualify yet
-        const discount = activeWheelRewards.discounts[0];
-        const amountNeeded = (discount.minAmount - subtotal).toFixed(2);
-        
+    } else if (qualifiesForDiscount) {
         cartDiscountInfo.style.display = 'block';
         cartDiscountAmount.innerHTML = `
-            <div class="cart-discount-not-eligible">
-                <span class="discount-badge">🎡 ${discount.percent}% OFF Available</span>
-                <span>Add ${amountNeeded} JOD to apply wheel discount</span>
+            <div class="cart-discount-eligible">
+                <span class="discount-badge">⭐ ELIGIBLE</span>
+                <span>10% discount will be applied at checkout</span>
             </div>
         `;
         cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
-    }
-    else if (finalDeliveryFee === 0) {
-        // Free delivery applied
+    } else {
         cartDiscountInfo.style.display = 'block';
-        cartDiscountAmount.innerHTML = `
-            <div class="cart-discount-applied">
-                <span class="discount-badge">🚚 FREE Delivery (Wheel)</span>
-                <span class="discount-amount">-2.50 JDs</span>
-            </div>
-        `;
-        cartTotal.textContent = `Total: ${finalTotal.toFixed(2)} JDs`;
-    }
-    else if (hasSpunToday && activeWheelRewards.freeDelivery.active) {
-        // Has free delivery but doesn't qualify yet
-        const amountNeeded = (activeWheelRewards.freeDelivery.minAmount - subtotal).toFixed(2);
-        
-        cartDiscountInfo.style.display = 'block';
+        const amountNeeded = (MINIMUM_ORDER - subtotal).toFixed(2);
         cartDiscountAmount.innerHTML = `
             <div class="cart-discount-not-eligible">
-                <span class="discount-badge">🚚 FREE Delivery Available</span>
-                <span>Add ${amountNeeded} JOD for free delivery</span>
+                <span class="discount-badge">📢 ALMOST THERE</span>
+                <span>Add ${amountNeeded} JOD for 10% OFF</span>
             </div>
         `;
-        cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
-    }
-    else {
-        // No wheel rewards or not qualified
-        cartDiscountInfo.style.display = 'none';
         cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
     }
 
@@ -1557,147 +1399,62 @@ function updatePrice() {
             }
         }
 
-        // Update discount display with wheel rewards
-        updateDiscountDisplayWithWheelRewards(priceData);
+        // Rest of your discount messages code remains the same...
+        if (discountMessages) {
+            discountMessages.innerHTML = '';
+            
+            if (priceData.subtotal > 0) {
+                if (priceData.qualifiesForDiscount) {
+                    if (priceData.discount > 0) {
+                        discountMessages.innerHTML = `
+                            <div class="discount-banner success">
+                                <div class="discount-icon">🎊</div>
+                                <div class="discount-content">
+                                    <div class="discount-title">Discount Applied!</div>
+                                    <div class="discount-details">
+                                        <span class="original-price">${safeDisplayPrice(priceData.subtotal)} JOD</span>
+                                        <span class="discount-arrow">→</span>
+                                        <span class="final-price">${safeDisplayPrice(priceData.total)} JOD</span>
+                                    </div>
+                                    <div class="discount-savings">You save ${safeDisplayPrice(priceData.discount)} JOD! (10% OFF)</div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        discountMessages.innerHTML = `
+                            <div class="discount-banner eligible">
+                                <div class="discount-icon">⭐</div>
+                                <div class="discount-content">
+                                    <div class="discount-title">You Qualify for 10% OFF!</div>
+                                    <div class="discount-details">Complete your order to apply the discount</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    const amountNeeded = (priceData.minimumForDiscount - priceData.subtotal).toFixed(2);
+                    discountMessages.innerHTML = `
+                        <div class="discount-banner not-eligible">
+                            <div class="discount-icon">📢</div>
+                            <div class="discount-content">
+                                <div class="discount-title">Almost There!</div>
+                                <div class="discount-details">Add <span class="amount-needed">${safeDisplayPrice(amountNeeded)} JOD</span> more to get 10% OFF</div>
+                                <div class="discount-minimum">Minimum order: 15.00 JOD</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
 
     } catch (error) {
         console.log('Price update failed:', error);
-        // FalRlback to safe values
+        // Fallback to safe values
         const totalPriceElement = document.getElementById('total-price');
         if (totalPriceElement) {
             totalPriceElement.textContent = 'Total: 0.00 JDs';
         }
     }
-}
-function updateDiscountDisplayWithWheelRewards(priceData) {
-    const discountMessages = document.getElementById('discount-messages');
-    if (!discountMessages) return;
-    
-    // Clear previous messages
-    discountMessages.innerHTML = '';
-    
-    const subtotal = priceData.subtotal;
-    let messagesHTML = '';
-
-    console.log('📊 Displaying active rewards:', {
-        hasSpunToday: hasSpunToday,
-        discounts: activeWheelRewards.discounts.length,
-        freeCharm: activeWheelRewards.freeCharm.active,
-        freeDelivery: activeWheelRewards.freeDelivery.active
-    });
-
-    // ONLY show wheel rewards if user has spun the wheel today AND won rewards
-    if (hasSpunToday) {
-        // Check free charm status - UPDATED to 10 JD minimum
-        if (activeWheelRewards.freeCharm.active && activeWheelRewards.freeCharm.count > 0) {
-            const minAmount = 10; // CHANGED: 10 JOD minimum for free charm
-            const qualifies = subtotal >= minAmount;
-            const amountNeeded = (minAmount - subtotal).toFixed(2);
-            
-            if (qualifies) {
-                messagesHTML += `
-                    <div class="discount-banner eligible">
-                        <div class="discount-icon">🎁</div>
-                        <div class="discount-content">
-                            <div class="discount-title">Free Special Charm APPLIED!</div>
-                            <div class="discount-details">You have ${activeWheelRewards.freeCharm.count} free special charm(s)</div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                messagesHTML += `
-                    <div class="discount-banner not-eligible">
-                        <div class="discount-icon">🎁</div>
-                        <div class="discount-content">
-                            <div class="discount-title">Free Special Charm Available!</div>
-                            <div class="discount-details">Add <span class="amount-needed">${safeDisplayPrice(amountNeeded)} JOD</span> more to get FREE Special Charm</div>
-                            <div class="discount-minimum">Minimum order: ${minAmount}.00 JOD</div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        // Check discounts - show only if there are any
-        if (activeWheelRewards.discounts.length > 0) {
-            const discount = activeWheelRewards.discounts[0];
-            
-            // Use the actual minimum amount from the discount object
-            const minAmount = discount.minAmount || (discount.percent === 5 ? 12 : 15);
-            const qualifies = subtotal >= minAmount;
-            const amountNeeded = (minAmount - subtotal).toFixed(2);
-            
-            let icon;
-            switch(discount.percent) {
-                case 15:
-                    icon = '💰';
-                    break;
-                case 10:
-                    icon = '💎';
-                    break;
-                case 5:
-                    icon = '✨';
-                    break;
-                default:
-                    icon = '💎';
-            }
-            
-            if (qualifies) {
-                messagesHTML += `
-                    <div class="discount-banner eligible">
-                        <div class="discount-icon">${icon}</div>
-                        <div class="discount-content">
-                            <div class="discount-title">${discount.percent}% OFF APPLIED!</div>
-                            <div class="discount-details">You're saving ${priceData.wheelDiscount.toFixed(2)} JOD</div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                messagesHTML += `
-                    <div class="discount-banner not-eligible">
-                        <div class="discount-icon">${icon}</div>
-                        <div class="discount-content">
-                            <div class="discount-title">${discount.percent}% OFF Available!</div>
-                            <div class="discount-details">Add <span class="amount-needed">${safeDisplayPrice(amountNeeded)} JOD</span> more to get ${discount.percent}% OFF</div>
-                            <div class="discount-minimum">Minimum order: ${minAmount}.00 JOD</div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        // Check free delivery (only show if won)
-        if (activeWheelRewards.freeDelivery.active) {
-            const minAmount = activeWheelRewards.freeDelivery.minAmount || 25;
-            const qualifies = subtotal >= minAmount;
-            const amountNeeded = (minAmount - subtotal).toFixed(2);
-            
-            if (qualifies) {
-                messagesHTML += `
-                    <div class="discount-banner eligible">
-                        <div class="discount-icon">🚚</div>
-                        <div class="discount-content">
-                            <div class="discount-title">FREE Delivery APPLIED!</div>
-                            <div class="discount-details">You saved 2.50 JOD on delivery</div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                messagesHTML += `
-                    <div class="discount-banner not-eligible">
-                        <div class="discount-icon">🚚</div>
-                        <div class="discount-content">
-                            <div class="discount-title">FREE Delivery Available!</div>
-                            <div class="discount-details">Add <span class="amount-needed">${safeDisplayPrice(amountNeeded)} JOD</span> more to get FREE Delivery</div>
-                            <div class="discount-minimum">Minimum order: ${minAmount}.00 JOD</div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-    }
-
-    discountMessages.innerHTML = messagesHTML;
 }
 function getCharmBreakdownText() {
     const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
@@ -1710,16 +1467,11 @@ function getCharmBreakdownText() {
         else if (type === 'custom') customCount++;
     });
 
-    // Check for free special charms from wheel
-    let freeSpecials = 0;
-    if (activeWheelRewards.freeCharm.active && activeWheelRewards.freeCharm.count > 0) {
-        freeSpecials = activeWheelRewards.freeCharm.count;
-    }
-    
+    const product = PRODUCTS[currentProduct];
+    const freeSpecials = isFullGlam ? product.baseSlots : product.includedSpecial;
     const paidSpecials = Math.max(0, specialCount - freeSpecials);
 
-    let text = `Charms: ${specialCount} special`;
-    if (freeSpecials > 0) text += ` (${Math.min(specialCount, freeSpecials)} free from wheel)`;
+    let text = `Charms: ${Math.min(specialCount, freeSpecials)}/${freeSpecials} free specials`;
     if (paidSpecials > 0) text += `, ${paidSpecials} paid (+${(paidSpecials * 2).toFixed(2)} JD)`;
     if (rareCount > 0) text += `, ${rareCount} rare (+${(rareCount * 3).toFixed(2)} JD)`;
     if (customCount > 0) text += `, ${customCount} custom (+${(customCount * 3.5).toFixed(2)} JD)`;
@@ -2057,259 +1809,8 @@ function centerJewelryPiece() {
   // Update scroll indicators
   updateScrollIndicators();
 }
-function hideSpinWheelCompletely() {
-    const spinModal = document.getElementById('spin-wheel-modal');
-    const spinIndicator = document.getElementById('spin-indicator');
-    const winButton = document.getElementById('win-button');
-    
-    if (spinModal && spinModal.parentNode) {
-        spinModal.parentNode.removeChild(spinModal);
-    }
-    if (spinIndicator && spinIndicator.parentNode) {
-        spinIndicator.parentNode.removeChild(spinIndicator);
-    }
-    if (winButton && winButton.parentNode) {
-        winButton.parentNode.removeChild(winButton);
-    }
-    
-    console.log('🗑️ Removed spin wheel elements completely');
-}
-// Function to update spacing dynamically
-function updateScrollSpacing() {
-    const braceletContainer = document.querySelector('.bracelet-container');
-    const countdownDisplay = document.getElementById('spin-countdown-display');
-    
-    if (!braceletContainer || !countdownDisplay) return;
-    
-    const scrollY = window.scrollY;
-    const isSticky = braceletContainer.classList.contains('sticky-active');
-    
-    if (isSticky) {
-        // When sticky, add extra top margin to body to prevent overlap
-        document.body.style.paddingTop = '60px'; // Adjust based on your header height
-        countdownDisplay.style.marginBottom = '10px'; // Space between countdown and sticky bracelet
-    } else {
-        // Reset when not sticky
-        document.body.style.paddingTop = '0';
-        countdownDisplay.style.marginBottom = '15px';
-    }
-}
 
-// Update the existing sticky header function
-function updateStickyHeader() {
-    const braceletContainer = document.querySelector('.bracelet-container');
-    if (!braceletContainer) return;
-    
-    const scrollY = window.scrollY;
-    if (scrollY > 100) {
-        braceletContainer.classList.add('sticky-active');
-        braceletContainer.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-    } else {
-        braceletContainer.classList.remove('sticky-active');
-        braceletContainer.style.boxShadow = 'none';
-    }
-    
-    // Update spacing when scroll state changes
-    updateScrollSpacing();
-}
-
-// Enhanced scroll event listener
-window.addEventListener('scroll', function() {
-    updateStickyHeader();
-    updateScrollSpacing();
-});
-
-window.addEventListener('resize', function() {
-    updateStickyHeader();
-    updateScrollSpacing();
-});
-
-// Initial setup
-document.addEventListener('DOMContentLoaded', function() {
-    updateStickyHeader();
-    updateScrollSpacing();
-});
-function showSpinCountdown(timeLeft) {
-    hideGlobalCountdown();
-    hideSpinCountdown();
-    
-    // Only show if there's no active reward countdown
-    if (rewardExpirationTime && new Date().getTime() < rewardExpirationTime) {
-        console.log('🎁 Active reward in progress, skipping spin countdown');
-        return;
-    }
-    
-    const countdownDisplay = document.createElement('div');
-    countdownDisplay.id = 'spin-countdown-display';
-    countdownDisplay.className = 'countdown-display spin-countdown';
-    countdownDisplay.innerHTML = `
-        <div class="countdown-active">
-            <div class="countdown-icon">⏰</div>
-            <div class="countdown-text">
-                <div class="countdown-title">Next Free Spin In:</div>
-                <div class="countdown-timer">${formatTimeRemaining(timeLeft)}</div>
-                <div class="countdown-subtitle">Spin daily for amazing rewards</div>
-            </div>
-            <button class="countdown-action-btn" onclick="showSpinWheel()">
-                Remind Me
-            </button>
-        </div>
-    `;
-    
-    document.body.appendChild(countdownDisplay);
-    updateSpinCountdownTimer(timeLeft);
-}
-function updateCountdownTimer(timeLeft) {
-    const countdownDisplay = document.getElementById('spin-countdown-display');
-    if (!countdownDisplay) return;
-    
-    const countdown = setInterval(() => {
-        timeLeft -= 1000;
-        
-        // Check if reward became active
-        if (rewardExpirationTime && new Date().getTime() < rewardExpirationTime) {
-            clearInterval(countdown);
-            hideSpinCountdown();
-            return;
-        }
-        
-        if (timeLeft <= 0) {
-            clearInterval(countdown);
-            // Replace with wheel invitation
-            replaceCountdownWithWheel(countdownDisplay);
-            return;
-        }
-        
-        // Update the timer display
-        const timerElement = countdownDisplay.querySelector('.countdown-timer');
-        if (timerElement) {
-            timerElement.textContent = formatTimeRemaining(timeLeft);
-        }
-    }, 1000);
-}
-
-
-function replaceCountdownWithWheel(countdownElement) {
-    // Replace countdown with spin wheel invitation
-    countdownElement.innerHTML = `
-        <div class="countdown-ready">
-            <div class="countdown-icon">🎡</div>
-            <div class="countdown-text">
-                <div class="countdown-title">Free Spin Available!</div>
-            </div>
-            <button class="spin-now-btn" onclick="showSpinWheel()">
-                SPIN NOW!
-            </button>
-        </div>
-    `;
-    
-    // Change to success color
-    countdownElement.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
-    
-    console.log('🎡 Countdown replaced with spin wheel invitation');
-    
-    // Auto-show spin wheel after 3 seconds
-    setTimeout(() => {
-        showSpinWheel();
-    }, 3000);
-}
-
-function formatTimeRemaining(milliseconds) {
-    const hours = Math.floor(milliseconds / (1000 * 60 * 60));
-    const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000);
-    
-    if (hours > 0) {
-        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    } else {
-        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-}
-
-function manageCountdowns() {
-    // Check for active reward first
-    if (rewardExpirationTime && new Date().getTime() < rewardExpirationTime) {
-        const timeLeft = rewardExpirationTime - new Date().getTime();
-        showGlobalCountdown(timeLeft);
-        return;
-    }
-    
-    // Check for spin eligibility
-    const now = new Date();
-    const lastSpinTime = localStorage.getItem('lastSpinTime');
-    
-    if (lastSpinTime) {
-        const timeSinceLastSpin = now.getTime() - parseInt(lastSpinTime);
-        const twentyFourHours = 24 * 60 * 60 * 1000;
-        
-        if (timeSinceLastSpin < twentyFourHours) {
-            const timeLeft = twentyFourHours - timeSinceLastSpin;
-            showSpinCountdown(timeLeft);
-        } else {
-            // Spin available - don't show countdown
-            hideSpinCountdown();
-        }
-    } else {
-        // No spin recorded - spin available
-        hideSpinCountdown();
-    }
-}
-
-// Initialize countdowns when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Check countdowns after a short delay
-    setTimeout(() => {
-        manageCountdowns();
-    }, 1000);
-    
-    // Check countdowns every minute
-    setInterval(manageCountdowns, 60000);
-});
-
-
-function checkDailySpinEligibility() {
-    const now = new Date();
-    const lastSpinDate = localStorage.getItem('lastSpinDate');
-    const lastSpinTime = localStorage.getItem('lastSpinTime');
-    
-    // Don't show spin countdown if there's an active reward
-    if (rewardExpirationTime && now.getTime() < rewardExpirationTime) {
-        console.log('🎁 Active reward in progress, hiding spin countdown');
-        hideSpinCountdown();
-        return false;
-    }
-    
-    // If user has spun before
-    if (lastSpinDate && lastSpinTime) {
-        const timeSinceLastSpin = now.getTime() - parseInt(lastSpinTime);
-        const twentyFourHours = 24 * 60 * 60 * 1000;
-        
-        // If less than 24 hours have passed, show countdown
-        if (timeSinceLastSpin < twentyFourHours) {
-            hasSpunToday = true;
-            const timeLeft = twentyFourHours - timeSinceLastSpin;
-            
-            // Show countdown UI
-            showSpinCountdown(timeLeft);
-            console.log('⏰ Next spin available in:', formatTimeRemaining(timeLeft));
-            
-            return false;
-        } else {
-            // 24 hours have passed - reset and allow spin
-            console.log('✅ 24 hours passed - spin available again');
-            localStorage.removeItem('lastSpinDate');
-            localStorage.removeItem('lastSpinTime');
-            hasSpunToday = false;
-            hideSpinCountdown();
-            return true;
-        }
-    }
-    
-    // No spin record found - can spin
-    hasSpunToday = false;
-    hideSpinCountdown();
-    return true;
-}
+// Call this after initializing jewelry piece and after any updates
 document.addEventListener('DOMContentLoaded', function() {
   centerJewelryPiece();
   
@@ -2318,8 +1819,22 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initProduct(product) {
-    console.log('🔄 Initializing product:', product);
-    
+    // Store existing charms before clearing (only for individual mode)
+    let existingCharms = [];
+    if (currentProduct === 'individual') {
+        existingCharms = Array.from(jewelryPiece.querySelectorAll('.slot'))
+            .map(slot => {
+                const charm = slot.querySelector('img:not([data-type="base"])');
+                return charm ? {
+                    src: charm.src,
+                    type: charm.dataset.type,
+                    isLong: slot.classList.contains('long-slot'),
+                    isDangly: slot.classList.contains('has-dangly')
+                } : null;
+            })
+            .filter(Boolean);
+    }
+
     // Set the current product
     currentProduct = product;
     
@@ -2330,7 +1845,7 @@ function initProduct(product) {
         currentSize = '15.2-16.2';
     } else if (product !== 'individual') {
         // For other products, use their first available size
-        const sizes = Object.keys(SIZE_CHARTS[product] || {});
+        const sizes = Object.keys(SIZE_CHARTS[product]);
         if (sizes.length > 0) {
             currentSize = sizes[0];
         }
@@ -2339,13 +1854,15 @@ function initProduct(product) {
     // Update UI elements
     const individualControls = document.getElementById('individual-controls');
     const sizeControls = document.getElementById('size-controls');
-    
+    const materialSelector = document.querySelector('.material-selector');
+    const fullGlamBtn = document.getElementById('full-glam-btn');
+    const addCharmsLabel = document.querySelector('.add-charms-label');
+
     // Reset design state
-    if (jewelryPiece) {
-        jewelryPiece.innerHTML = '';
-    }
+    jewelryPiece.innerHTML = '';
     selectedCharm = null;
     hideSelectedCharmPreview();
+    usedCharms.clear();
 
     // Update size dropdown
     updateSizeOptions(product);
@@ -2354,34 +1871,65 @@ function initProduct(product) {
     if (product === 'watch' || product === 'apple-watch' || product === 'keychain') {
         if (individualControls) individualControls.style.display = 'none';
         if (sizeControls) sizeControls.style.display = 'block';
+        if (materialSelector) materialSelector.style.display = 'none';
+        if (fullGlamBtn) fullGlamBtn.style.display = 'none';
+        
         initSpecialProductWithBase(product);
-         if (product === 'watch') {
-            setTimeout(() => {
-                initWatchPool();
-            }, 100);
-        }
     } 
     else if (product === 'individual') {
+        // Show individual controls
         if (individualControls) individualControls.style.display = 'flex';
+        
+        // Hide irrelevant elements
         if (sizeControls) sizeControls.style.display = 'none';
-        updateIndividualSlots();
+        if (materialSelector) materialSelector.style.display = 'none';
+        if (fullGlamBtn) fullGlamBtn.style.display = 'none';
+        if (addCharmsLabel) addCharmsLabel.style.display = 'none';
+        
+        // Initialize individual slots with preserved charms
+        updateIndividualSlots(existingCharms);
     } 
     else {
         if (individualControls) individualControls.style.display = 'none';
         if (sizeControls) sizeControls.style.display = 'block';
+        if (materialSelector) materialSelector.style.display = 'flex';
+        if (fullGlamBtn) fullGlamBtn.style.display = 'block';
+        if (addCharmsLabel) addCharmsLabel.style.display = 'block';
+        
         initJewelryPiece();
         isFullGlam = false;
-        const fullGlamBtn = document.getElementById('full-glam-btn');
         if (fullGlamBtn) fullGlamBtn.classList.remove('active');
     }
-
+    if (product === 'watch') {
+        initWatchPool(); // Initialize watch pool for watch products
+        if (individualControls) individualControls.style.display = 'none';
+        if (sizeControls) sizeControls.style.display = 'block';
+        if (materialSelector) materialSelector.style.display = 'none';
+        if (fullGlamBtn) fullGlamBtn.style.display = 'none';
+        
+        initSpecialProductWithBase(product);
+    }else {
+        // Hide watch pool for other products
+        if (watchPoolContainer) watchPoolContainer.style.display = 'none';
+        // ... rest of initialization ...
+    }
     // Update material display
     updateBaseCharms();
     
-    // Update price display with correct base price
+    // Update product button active state
+    document.querySelectorAll('.product-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.type === product) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Update price display
     updatePrice();
     
-    console.log('✅ Product initialized:', { currentProduct, currentSize, basePrice: PRODUCTS[product]?.basePrice });
+    setTimeout(() => {
+        centerJewelryPiece();
+    }, 100);
 }
 function isLoveOrDolphinCharm(src) {
     const loveDolphinCharmPaths = [
@@ -3157,16 +2705,6 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
         // Send email notifications
         await sendOrderNotifications(orderRef.id, orderData);
 
-        // ========== INTEGRATION POINT ==========
-        // Call the integrated success handler with wheel rewards
-        onOrderSuccess({
-            ...orderData,
-            clientOrderId: orderRef.id,
-            timestamp: new Date().toISOString(),
-            firestoreId: orderRef.id
-        });
-        // ========== END INTEGRATION ==========
-
         // Clear cart and reset form
         cart.length = 0;
         updateCartDisplay();
@@ -3177,9 +2715,10 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
         orderIdSpan.textContent = orderRef.id;
         orderModal.classList.remove('active');
         orderConfirmation.classList.add('active');
-        if (auth.currentUser) {
+         if (auth.currentUser) {
             setTimeout(expandOrdersForNewOrder, 1000);
         }
+        showToast('Order submitted successfully!', 'success');
         
     } catch (error) {
         console.error('Order submission failed:', error);
@@ -3193,225 +2732,25 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
     }
 }
 
-// Enhanced email notification with reward details
+// Email notification function
 async function sendOrderNotifications(orderId, orderData) {
     try {
         // Get the cloud function
         const sendOrderEmails = firebase.functions().httpsCallable('sendOrderEmails');
         
-        // Prepare reward details for email
-        const rewardDetails = orderData.wheelRewards.appliedRewards
-            .filter(r => r.applied)
-            .map(r => `${r.name}: ${r.savings.toFixed(2)} JOD savings`)
-            .join(', ');
-        
-        // Call the function with enhanced data
+        // Call the function
         const result = await sendOrderEmails({
             orderId: orderId,
             orderData: orderData,
             customerEmail: orderData.customer.email,
-            customerName: orderData.customer.name,
-            rewardDetails: rewardDetails,
-            totalSavings: orderData.wheelRewards.appliedRewards
-                .filter(r => r.applied)
-                .reduce((sum, r) => sum + r.savings, 0)
+            customerName: orderData.customer.name
         });
         
-        console.log('📧 Email notifications sent with reward details:', result.data);
+        console.log('Email notifications sent:', result.data);
     } catch (error) {
         console.error('Failed to send email notifications:', error);
+        // Don't throw error - order should still be saved even if emails fail
     }
-}
-// Helper function to determine which rewards were applied to this order
-function getAppliedRewardsForOrder(totalJOD) {
-    const appliedRewards = [];
-    const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
-    
-    // Check free charm application
-    if (activeWheelRewards.freeCharm.active && activeWheelRewards.freeCharm.count > 0) {
-        const minAmount = activeWheelRewards.freeCharm.minAmount || 10;
-        if (subtotal >= minAmount) {
-            appliedRewards.push({
-                type: 'free-charm',
-                name: 'Free Special Charm',
-                count: activeWheelRewards.freeCharm.count,
-                minAmount: minAmount,
-                applied: true,
-                savings: calculateFreeCharmSavings()
-            });
-        } else {
-            appliedRewards.push({
-                type: 'free-charm',
-                name: 'Free Special Charm',
-                count: activeWheelRewards.freeCharm.count,
-                minAmount: minAmount,
-                applied: false,
-                reason: `Order below minimum (${minAmount} JOD required)`
-            });
-        }
-    }
-    
-    // Check discount application
-    if (activeWheelRewards.discounts.length > 0) {
-        const discount = activeWheelRewards.discounts[0];
-        const minAmount = discount.minAmount;
-        
-        if (subtotal >= minAmount) {
-            const discountAmount = Math.min(subtotal * (discount.percent / 100), 5);
-            appliedRewards.push({
-                type: 'discount',
-                name: `${discount.percent}% OFF`,
-                percent: discount.percent,
-                minAmount: minAmount,
-                applied: true,
-                savings: discountAmount,
-                originalSubtotal: subtotal,
-                discountedSubtotal: subtotal - discountAmount
-            });
-        } else {
-            appliedRewards.push({
-                type: 'discount',
-                name: `${discount.percent}% OFF`,
-                percent: discount.percent,
-                minAmount: minAmount,
-                applied: false,
-                reason: `Order below minimum (${minAmount} JOD required)`
-            });
-        }
-    }
-    
-    // Check free delivery application
-    if (activeWheelRewards.freeDelivery.active) {
-        const minAmount = activeWheelRewards.freeDelivery.minAmount || 25;
-        
-        if (subtotal >= minAmount) {
-            appliedRewards.push({
-                type: 'free-delivery',
-                name: 'FREE Delivery',
-                minAmount: minAmount,
-                applied: true,
-                savings: 2.5
-            });
-        } else {
-            appliedRewards.push({
-                type: 'free-delivery',
-                name: 'FREE Delivery',
-                minAmount: minAmount,
-                applied: false,
-                reason: `Order below minimum (${minAmount} JOD required)`
-            });
-        }
-    }
-    
-    return appliedRewards;
-}
-// Enhanced order success handler
-function onOrderSuccess(orderData) {
-    console.log('✅ Order completed successfully with rewards:', orderData.wheelRewards);
-    
-    // Add points for completing order
-    addPointsAfterOrder(orderData.amountJOD);
-    
-    // Track reward usage in analytics
-    trackRewardUsage(orderData);
-    
-    // Consume used rewards
-    consumeUsedRewards(orderData.wheelRewards.appliedRewards);
-    
-    // Show success message with reward summary
-    showOrderSuccessWithRewards(orderData);
-}
-
-// Track reward usage for analytics
-function trackRewardUsage(orderData) {
-    const rewards = orderData.wheelRewards.appliedRewards;
-    
-    rewards.forEach(reward => {
-        if (reward.applied) {
-            console.log(`🎯 Reward used: ${reward.name} - Savings: ${reward.savings} JOD`);
-            
-            // You can send this to analytics services like Google Analytics
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'reward_used', {
-                    'reward_type': reward.type,
-                    'reward_name': reward.name,
-                    'savings_amount': reward.savings,
-                    'order_value': orderData.amountJOD
-                });
-            }
-        }
-    });
-}
-
-// Consume rewards that were used in the order
-function consumeUsedRewards(appliedRewards) {
-    appliedRewards.forEach(reward => {
-        if (reward.applied) {
-            switch (reward.type) {
-                case 'free-charm':
-                    // Reduce free charm count
-                    if (activeWheelRewards.freeCharm.count > 0) {
-                        activeWheelRewards.freeCharm.count--;
-                        if (activeWheelRewards.freeCharm.count <= 0) {
-                            activeWheelRewards.freeCharm.active = false;
-                        }
-                        console.log(`🎁 Consumed 1 free charm. Remaining: ${activeWheelRewards.freeCharm.count}`);
-                    }
-                    break;
-                    
-                case 'discount':
-                    // Discounts are one-time use, clear them
-                    activeWheelRewards.discounts = [];
-                    console.log('💰 Discount consumed and cleared');
-                    break;
-                    
-                case 'free-delivery':
-                    // Free delivery is one-time use
-                    activeWheelRewards.freeDelivery.active = false;
-                    console.log('🚚 Free delivery consumed');
-                    break;
-            }
-        }
-    });
-    
-    // Save updated rewards
-    saveUserData();
-}
-
-// Show enhanced order success message
-function showOrderSuccessWithRewards(orderData) {
-    const rewards = orderData.wheelRewards.appliedRewards;
-    const appliedRewards = rewards.filter(r => r.applied);
-    
-    if (appliedRewards.length > 0) {
-        let savingsMessage = '🎉 Order Complete! \n\n';
-        let totalSavings = 0;
-        
-        appliedRewards.forEach(reward => {
-            savingsMessage += `✅ ${reward.name}: Saved ${reward.savings.toFixed(2)} JOD\n`;
-            totalSavings += reward.savings;
-        });
-        
-        savingsMessage += `\n💰 Total Savings: ${totalSavings.toFixed(2)} JOD`;
-        
-        showToast(savingsMessage, 'success');
-    } else {
-        showToast('✅ Order completed successfully!', 'success');
-    }
-}
-// Calculate savings from free charms
-function calculateFreeCharmSavings() {
-    const placedCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'));
-    let specialCount = 0;
-    
-    placedCharms.forEach(charm => {
-        if (charm.dataset.type === 'special') {
-            specialCount++;
-        }
-    });
-    
-    const freeSpecials = Math.min(specialCount, activeWheelRewards.freeCharm.count);
-    return freeSpecials * 2; // Each special charm costs 2 JDs
 }
 async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null) {
     const paymentMethod = formData.get('payment') || (paypalData ? 'PayPal' : 'Unknown');
@@ -3432,31 +2771,6 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         };
     });
 
-    // Build wheel rewards data for the order
-    const wheelRewardsData = {
-        // Current active rewards at time of order
-        activeRewards: {
-            freeCharm: activeWheelRewards.freeCharm,
-            discounts: activeWheelRewards.discounts,
-            freeDelivery: activeWheelRewards.freeDelivery
-        },
-        // Applied rewards in this order
-        appliedRewards: getAppliedRewardsForOrder(totalJOD),
-        // Wheel spin history
-        spinInfo: {
-            hasSpunToday: hasSpunToday,
-            userPoints: userPoints,
-            lastSpinDate: localStorage.getItem('lastSpinDate')
-        },
-        // Won reward details
-        wonReward: currentWonReward ? {
-            id: currentWonReward.id,
-            name: currentWonReward.name,
-            minAmount: currentWonReward.minAmount,
-            wonAt: new Date().toISOString()
-        } : null
-    };
-
     // Build order data with user info
     const orderData = {
         clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
@@ -3471,8 +2785,8 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         },
         // Enhanced user linking
         userId: currentUser ? currentUser.uid : null,
-        userEmail: currentUser ? currentUser.email : formData.get('customer-email'),
-        isGuestOrder: currentUser ? false : true,
+    userEmail: currentUser ? currentUser.email : formData.get('customer-email'),
+    isGuestOrder: currentUser ? false : true,
         userName: currentUser ? currentUser.displayName : formData.get('full-name'),
         paymentMethod: paymentMethod,
         currency: "JOD",
@@ -3485,10 +2799,6 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         subtotal: cart.reduce((sum, item) => sum + item.price, 0),
         deliveryFee: 2.5,
         total: totalJOD,
-        
-        // WHEEL REWARDS DATA - ADDED HERE
-        wheelRewards: wheelRewardsData,
-        
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         status: 'pending',
         // Add for easy querying
@@ -5079,7 +4389,12 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Application loaded with minor issues');
     }
 });
-function updateStickyHeader() {
+
+document.addEventListener('DOMContentLoaded', function() {
+    const braceletContainer = document.querySelector('.bracelet-container');
+    let jewelryPiece = document.getElementById('jewelry-piece');
+    
+    function updateStickyHeader() {
     const braceletContainer = document.querySelector('.bracelet-container');
     if (!braceletContainer) return;
     
@@ -5092,18 +4407,6 @@ function updateStickyHeader() {
         braceletContainer.style.boxShadow = 'none';
     }
 }
-
-// Run on scroll and resize
-window.addEventListener('scroll', updateStickyHeader);
-window.addEventListener('resize', updateStickyHeader);
-
-// Initial check
-updateStickyHeader();
-document.addEventListener('DOMContentLoaded', function() {
-    const braceletContainer = document.querySelector('.bracelet-container');
-    let jewelryPiece = document.getElementById('jewelry-piece');
-    
-    
 
 // Run on scroll and resize
 window.addEventListener('scroll', updateStickyHeader);
@@ -5169,28 +4472,28 @@ function initializeRecommendedCharms() {
         console.error('❌ Recommended charms elements not found');
         return;
     }
- // Your actual recommended charms
+
+    // Your actual recommended charms
     const recommendedCharmNames = [
         'rares/newc2r/c224.png',
         'rares/sporty/sporty2.png',
+        'rares/sporty/sporty13.png',
         'rares/love/c218.png',
         'rares/gold/gold11.png',
-        'rares/dangly/c4c4109.png',
-        'rares/newc2r/c229.png',
         'rares/love/c219.png',
         'special/teddy/teddy2.png',
         'rares/graduation/grad.png',
         'special/new-collection/50.png',
+     'rares/sporty/sporty9.png',
         'rares/hgs/hgs6.png',
          'rares/newc2r/c222.png',
 
-        'rares/dangly/c4c4108.png',
+        'rares/gold/gold8.png',
         'special/bows/pink.png',
         'special/beach/x15.png',
         'rares/new-collection/19-gold.png',
         'special/cute specials/special.png',
         'rares/disney/stitch.png',
-        'rares/dangly/c4c4134.png',
         'rares/hgs/20.png',
         'special/red/94-gold.png',
         'rares/newc3r/c31.png',
@@ -5289,6 +4592,56 @@ function resumeRecommendedScroll() {
     }
 }
 
+function handleRecommendedCharmClick(charmItem, charmImg) {
+    console.log('🎯 Recommended charm clicked');
+    
+    // Stop scrolling when charm is selected
+    stopRecommendedScroll();
+    
+    // If clicking the same charm that's already selected, deselect it
+    if (charmItem.classList.contains('selected')) {
+        console.log('🔽 Deselecting charm');
+        charmItem.classList.remove('selected');
+        charmImg.classList.remove('selected');
+        selectedCharm = null;
+        hideSelectedCharmPreview();
+        resumeRecommendedScroll(); // Resume scrolling when deselected
+        return;
+    }
+    
+    // Remove selection from all recommended charms
+    document.querySelectorAll('.recommended-charm-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    // Remove selection from all regular charms
+    document.querySelectorAll('.charms-grid .charm').forEach(charm => {
+        charm.classList.remove('selected');
+    });
+    
+    // Select this charm
+    charmItem.classList.add('selected');
+    charmImg.classList.add('selected');
+    
+    // Set as the global selected charm
+    selectedCharm = charmImg;
+    
+    // Ensure data attributes are properly set
+    ensureCharmDataAttributes(selectedCharm);
+    
+    // Update preview
+    updateSelectedCharmPreview(charmImg);
+    
+    console.log('✅ Charm selected and locked:', selectedCharm);
+    console.log('✅ Charm data:', selectedCharm.dataset);
+    
+    // Resume scrolling after 5 seconds if still selected
+    setTimeout(() => {
+        if (selectedCharm === charmImg) {
+            resumeRecommendedScroll();
+        }
+    }, 5000);
+}
 
 function handleRecommendedCharmClick(charmItem, charmImg) {
     console.log('🎯 Recommended charm clicked:', charmImg.dataset.name);
@@ -5890,7 +5243,19 @@ function showMinimumAmountMessage() {
         }
     }
 }
-
+function checkFirstOrderDiscount() {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return false;
+    
+    const hasOrderedBefore = localStorage.getItem(`hasOrdered_${currentUser.uid}`);
+    
+    if (!hasOrderedBefore) {
+        showToast("🎊 Welcome! Use code WELCOME10 for 10% off your first order!", 'success');
+        return true;
+    }
+    
+    return false;
+}
 function setupCollapsibleOrders() {
     const profileHeader = document.getElementById('profile-header');
     const collapseBtn = document.getElementById('collapse-orders');
@@ -5983,2098 +5348,3 @@ function updateShippingProgress() {
         }
     }
 }
-
-// NEW: Load user data from localStorage
-function loadUserData() {
-    const savedPoints = localStorage.getItem('userPoints');
-    const savedRewards = localStorage.getItem('activeWheelRewards');
-    const lastSpinDate = localStorage.getItem('lastSpinDate');
-    
-    userPoints = savedPoints ? parseInt(savedPoints) : 0;
-    hasSpunToday = lastSpinDate === new Date().toDateString();
-    
-    if (savedRewards) {
-        try {
-            activeWheelRewards = JSON.parse(savedRewards);
-        } catch (e) {
-            console.error('Error loading wheel rewards:', e);
-            activeWheelRewards = {
-                freeCharm: { active: false, count: 0, minAmount: 10 },
-                discounts: [],
-                freeDelivery: { active: false, minAmount: 25 }
-            };
-        }
-    }
-    
-    updatePointsDisplay();
-}
-
-// NEW: Save user data to localStorage
-function saveUserData() {
-    localStorage.setItem('userPoints', userPoints.toString());
-    localStorage.setItem('activeWheelRewards', JSON.stringify(activeWheelRewards));
-}
-
-// NEW: Update points display
-function updatePointsDisplay() {
-    const pointsDisplay = document.getElementById('user-points');
-    if (pointsDisplay) {
-        pointsDisplay.textContent = userPoints;
-    }
-}
-
-// NEW: Add points after order completion
-function addPointsAfterOrder(orderTotal) {
-    const pointsEarned = 5; // 5 points per order as specified
-    userPoints += pointsEarned;
-    saveUserData();
-    updatePointsDisplay();
-    
-    showToast(`🎉 You earned ${pointsEarned} points! Total: ${userPoints} points`, 'success');
-}
-
-// NEW: Apply wheel rewards when order is placed
-function applyWheelRewardsToOrder(orderData) {
-    const subtotal = orderData.subtotal || orderData.total - (orderData.delivery || 0);
-    const appliedRewards = [];
-    
-    // Apply free charm if qualified
-    if (activeWheelRewards.freeCharm.active && activeWheelRewards.freeCharm.count > 0 && subtotal >= activeWheelRewards.freeCharm.minAmount) {
-        appliedRewards.push('free-charm');
-        // Consume one free charm
-        activeWheelRewards.freeCharm.count--;
-        if (activeWheelRewards.freeCharm.count <= 0) {
-            activeWheelRewards.freeCharm.active = false;
-        }
-    }
-    
-    // Note: Discounts and free delivery are already applied in calculatePrice
-    
-    // Save updated rewards
-    saveUserData();
-    
-    return appliedRewards;
-}
-
-function getWheelRewardsCartHTML() {
-    let html = '<div class="cart-wheel-rewards">';
-    
-    if (activeWheelRewards.freeCharm.active) {
-        html += `<div class="cart-reward-item">🎁 ${activeWheelRewards.freeCharm.count} Free Special Charm(s) available</div>`;
-    }
-    
-    activeWheelRewards.discounts.forEach(discount => {
-        html += `<div class="cart-reward-item">💰 ${discount.percent}% OFF on orders above ${discount.minAmount} JOD</div>`;
-    });
-    
-    if (activeWheelRewards.freeDelivery) {
-        html += `<div class="cart-reward-item">🚚 FREE Delivery on orders above 25 JOD</div>`;
-    }
-    
-    html += '</div>';
-    return html;
-}
-
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    function initializeProductText() {
-        const productCards = document.querySelectorAll('.product-card');
-        const productNames = {
-            'bracelet': 'Bracelet',
-            'watch': 'Watch',
-            'individual': 'Single charms-No bracelet',
-            'anklet': 'Anklet',
-            'ring': 'Ring',
-            'apple-watch': 'Apple Watch',
-            'keychain': 'Key chain'
-        };
-
-        productCards.forEach(card => {
-            const productType = card.dataset.type;
-            let productText = card.querySelector('.product-text');
-            
-            // Create text element if it doesn't exist
-            if (!productText) {
-                productText = document.createElement('div');
-                productText.className = 'product-text';
-                card.appendChild(productText);
-            }
-            
-            // Set the appropriate text
-            if (productNames[productType]) {
-                productText.textContent = productNames[productType];
-            }
-        });
-    }
-
-    // Initialize product text first
-    initializeProductText();
-    // Initialize all product slideshows
-    const slideshows = document.querySelectorAll('.product-slideshow');
-    
-    slideshows.forEach(slideshow => {
-        const slides = slideshow.querySelectorAll('.product-slide');
-        const indicators = slideshow.querySelectorAll('.slideshow-indicator');
-        const prevBtn = slideshow.querySelector('.slideshow-nav.prev');
-        const nextBtn = slideshow.querySelector('.slideshow-nav.next');
-        
-        let currentSlide = 0;
-        let slideInterval;
-        
-        // Function to show a specific slide
-        function showSlide(index) {
-            // Remove active class from all slides and indicators
-            slides.forEach(slide => slide.classList.remove('active'));
-            indicators.forEach(indicator => indicator.classList.remove('active'));
-            
-            // Add active class to current slide and indicator
-            currentSlide = index;
-            slides[currentSlide].classList.add('active');
-            if (indicators[currentSlide]) {
-                indicators[currentSlide].classList.add('active');
-            }
-        }
-        
-        // Function to go to next slide
-        function nextSlide() {
-            let nextIndex = (currentSlide + 1) % slides.length;
-            showSlide(nextIndex);
-        }
-        
-        // Function to go to previous slide
-        function prevSlide() {
-            let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
-            showSlide(prevIndex);
-        }
-        
-        // Start automatic slideshow
-        function startSlideshow() {
-            if (slides.length > 1) {
-                slideInterval = setInterval(nextSlide, 2000); // Change slide every 2 seconds
-            }
-        }
-        
-        // Stop automatic slideshow
-        function stopSlideshow() {
-            clearInterval(slideInterval);
-        }
-        
-        // Only set up controls if there are multiple slides
-        if (slides.length > 1) {
-            // Event listeners for navigation
-            if (nextBtn) {
-                nextBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    nextSlide();
-                    stopSlideshow();
-                    startSlideshow();
-                });
-            }
-            
-            if (prevBtn) {
-                prevBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    prevSlide();
-                    stopSlideshow();
-                    startSlideshow();
-                });
-            }
-            
-            // Event listeners for indicators
-            indicators.forEach((indicator, index) => {
-                indicator.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    showSlide(index);
-                    stopSlideshow();
-                    startSlideshow();
-                });
-            });
-            
-            // Pause slideshow on hover
-            slideshow.addEventListener('mouseenter', stopSlideshow);
-            slideshow.addEventListener('mouseleave', startSlideshow);
-            
-            // Start the slideshow
-            startSlideshow();
-        } else {
-            // Hide navigation and indicators if only one slide
-            if (prevBtn) prevBtn.style.display = 'none';
-            if (nextBtn) nextBtn.style.display = 'none';
-            if (indicators.length > 0) {
-                indicators[0].style.display = 'none';
-            }
-        }
-    });
-    
-    // Only convert simple product cards to slideshow if they actually have multiple images
-    const simpleProductCards = document.querySelectorAll('.product-card:not(:has(.product-slideshow))');
-    
-    // Define which products actually have multiple images
-    const productsWithMultipleImages = {
-        'bracelet': ['bracelet.png', 'bracelet2.png', 'bracelet3.png', 'bracelet4.png', 'bracelet5.png'],
-        'watch': ['watch.png', 'watch2.png'],
-        'individual': ['individual.png', 'individual2.png'],
-        'anklet': ['anklet.png', 'anklet2.png', 'anklet3.png'],
-        'ring': ['ring.png', 'ring2.png', 'ring3.png', 'ring4.png', 'ring5.png'],
-        'apple-watch': ['apple-watch.png', 'apple-watch2.png','apple-watch3.png'],
-        'keychain': ['keychain.png', 'keychain2.png']
-    };
-    
-    simpleProductCards.forEach(card => {
-        const productType = card.dataset.type;
-        
-        // Only create slideshow if this product has multiple images defined
-        if (productsWithMultipleImages[productType]) {
-            const img = card.querySelector('.product-image');
-            
-            if (img) {
-                const imageContainer = card.querySelector('.product-image-container') || card;
-                const imagePaths = productsWithMultipleImages[productType];
-                
-                // Create slideshow structure
-                let slidesHTML = '';
-                let indicatorsHTML = '';
-                
-                imagePaths.forEach((path, index) => {
-                    const isActive = index === 0 ? 'active' : '';
-                    slidesHTML += `
-                        <div class="product-slide ${isActive}">
-                            <img src="products/${path}" alt="${productType} design ${index + 1}">
-                        </div>
-                    `;
-                    
-                    if (imagePaths.length > 1) {
-                        const indicatorActive = index === 0 ? 'active' : '';
-                        indicatorsHTML += `<div class="slideshow-indicator ${indicatorActive}"></div>`;
-                    }
-                });
-                
-                const slideshowHTML = `
-                    <div class="product-slideshow" data-product="${productType}">
-                        ${slidesHTML}
-                        ${imagePaths.length > 1 ? `
-                            <div class="slideshow-indicators">
-                                ${indicatorsHTML}
-                            </div>
-                            <div class="slideshow-nav prev">‹</div>
-                            <div class="slideshow-nav next">›</div>
-                        ` : ''}
-                    </div>
-                `;
-                
-                // Replace the simple image with slideshow
-                if (imageContainer.classList.contains('product-image-container')) {
-                    imageContainer.innerHTML = slideshowHTML;
-                } else {
-                    // Create container if it doesn't exist
-                    const newContainer = document.createElement('div');
-                    newContainer.className = 'product-image-container';
-                    newContainer.innerHTML = slideshowHTML;
-                    img.replaceWith(newContainer);
-                }
-            }
-        }
-    });
-    
-    // Re-initialize slideshows for newly created ones
-    setTimeout(() => {
-        const newSlideshows = document.querySelectorAll('.product-slideshow');
-        newSlideshows.forEach(slideshow => {
-            if (!slideshow.dataset.initialized) {
-                const slides = slideshow.querySelectorAll('.product-slide');
-                const indicators = slideshow.querySelectorAll('.slideshow-indicator');
-                const prevBtn = slideshow.querySelector('.slideshow-nav.prev');
-                const nextBtn = slideshow.querySelector('.slideshow-nav.next');
-                
-                let currentSlide = 0;
-                let slideInterval;
-                
-                function showSlide(index) {
-                    slides.forEach(slide => slide.classList.remove('active'));
-                    indicators.forEach(indicator => indicator.classList.remove('active'));
-                    
-                    currentSlide = index;
-                    slides[currentSlide].classList.add('active');
-                    if (indicators[currentSlide]) {
-                        indicators[currentSlide].classList.add('active');
-                    }
-                }
-                
-                function nextSlide() {
-                    let nextIndex = (currentSlide + 1) % slides.length;
-                    showSlide(nextIndex);
-                }
-                
-                function startSlideshow() {
-                    if (slides.length > 1) {
-                        slideInterval = setInterval(nextSlide, 2000);
-                    }
-                }
-                
-                function stopSlideshow() {
-                    clearInterval(slideInterval);
-                }
-                
-                // Only set up controls if there are multiple slides
-                if (slides.length > 1) {
-                    if (nextBtn) {
-                        nextBtn.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            nextSlide();
-                            stopSlideshow();
-                            startSlideshow();
-                        });
-                    }
-                    
-                    if (prevBtn) {
-                        prevBtn.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            prevSlide();
-                            stopSlideshow();
-                            startSlideshow();
-                        });
-                    }
-                    
-                    indicators.forEach((indicator, index) => {
-                        indicator.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            showSlide(index);
-                            stopSlideshow();
-                            startSlideshow();
-                        });
-                    });
-                    
-                    slideshow.addEventListener('mouseenter', stopSlideshow);
-                    slideshow.addEventListener('mouseleave', startSlideshow);
-                    
-                    startSlideshow();
-                }
-                
-                slideshow.dataset.initialized = 'true';
-            }
-        });
-    }, 100);
-
-     setTimeout(() => {
-        if (typeof initSpinWheel === 'function') {
-            initSpinWheel();
-        } else {
-            console.error('initSpinWheel function not found!');
-        }
-    }, 2000);
-
-});
-// =============================================
-// SPIN WHEEL SYSTEM - FIXED IMPLEMENTATION
-// =============================================
-
-// Global variables for spin wheel
-let userPoints = 0;
-let hasSpunToday = false;
-let isSpinning = false;
-let wheelChart = null;
-
-
-let activeWheelRewards = {
-    freeCharm: { active: false, count: 0, minAmount: 10 },
-    discounts: [],
-    freeDelivery: { active: false, minAmount: 25 }
-};
-
-// Setup event listeners for spin wheel
-function setupSpinWheelEventListeners() {
-    const spinButton = document.getElementById('spin-button');
-    const closeSpin = document.getElementById('close-spin');
-    const closeNotification = document.getElementById('close-notification');
-
-    if (spinButton) {
-        spinButton.addEventListener('click', spinWheel);
-    }
-
-    if (closeSpin) {
-        closeSpin.addEventListener('click', () => {
-            const spinModal = document.getElementById('spin-wheel-modal');
-            if (spinModal) {
-                spinModal.classList.remove('active');
-            }
-        });
-    }
-
-    if (closeNotification) {
-        closeNotification.addEventListener('click', hideRewardNotification);
-    }
-}
-function replaceGlobalCountdownWithExpired(countdownElement) {
-    countdownElement.innerHTML = `
-        <div class="countdown-expired">
-            <div class="countdown-icon">⏰</div>
-            <div class="countdown-text">
-                <div class="countdown-title">Reward Expired</div>
-                <div class="countdown-subtitle">Spin the wheel for new rewards</div>
-            </div>
-            <button class="countdown-action-btn" onclick="hideGlobalCountdown()">
-                Dismiss
-            </button>
-        </div>
-    `;
-    
-    countdownElement.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
-    
-    setTimeout(() => {
-        hideGlobalCountdown();
-    }, 5000);
-}
-function replaceSpinCountdownWithReady(countdownElement) {
-    countdownElement.innerHTML = `
-        <div class="countdown-ready">
-            <div class="countdown-icon">🎡</div>
-            <div class="countdown-text">
-                <div class="countdown-title">Free Spin Available!</div>
-                <div class="countdown-subtitle">Spin now for amazing rewards</div>
-            </div>
-            <button class="countdown-action-btn spin-now-btn" onclick="showSpinWheel()">
-                SPIN NOW!
-            </button>
-        </div>
-    `;
-    
-    countdownElement.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
-    
-    console.log('🎡 Spin countdown completed - spin available');
-    
-    // Auto-show spin wheel after 3 seconds
-    setTimeout(() => {
-        showSpinWheel();
-    }, 3000);
-}
-function hideGlobalCountdown() {
-    const countdownDisplay = document.getElementById('global-countdown-display');
-    if (countdownDisplay) {
-        countdownDisplay.remove();
-    }
-    if (globalCountdownTimer) {
-        clearInterval(globalCountdownTimer);
-        globalCountdownTimer = null;
-    }
-}
-
-function hideSpinCountdown() {
-    const countdownDisplay = document.getElementById('spin-countdown-display');
-    if (countdownDisplay) {
-        countdownDisplay.remove();
-    }
-    if (spinCountdownTimer) {
-        clearInterval(spinCountdownTimer);
-        spinCountdownTimer = null;
-    }
-}
-function updateSpinCountdownTimer(timeLeft) {
-    const countdownDisplay = document.getElementById('spin-countdown-display');
-    if (!countdownDisplay) return;
-    
-    spinCountdownTimer = setInterval(() => {
-        timeLeft -= 1000;
-        
-        // Check if reward became active
-        if (rewardExpirationTime && new Date().getTime() < rewardExpirationTime) {
-            clearInterval(spinCountdownTimer);
-            hideSpinCountdown();
-            return;
-        }
-        
-        if (timeLeft <= 0) {
-            clearInterval(spinCountdownTimer);
-            replaceSpinCountdownWithReady(countdownDisplay);
-            return;
-        }
-        
-        const timerElement = countdownDisplay.querySelector('.countdown-timer');
-        if (timerElement) {
-            timerElement.textContent = formatTimeRemaining(timeLeft);
-        }
-    }, 1000);
-}
-function updateSpinCounterDisplay(spinStats) {
-    let spinCounter = document.getElementById('spin-counter');
-    
-    if (!spinCounter) {
-        spinCounter = document.createElement('div');
-        spinCounter.id = 'spin-counter';
-        spinCounter.className = 'spin-counter';
-        
-        const wheelControls = document.querySelector('.wheel-controls');
-        if (wheelControls) {
-            wheelControls.insertBefore(spinCounter, wheelControls.querySelector('.spin-info'));
-        }
-    }
-    
-    const lastSpinTime = parseInt(localStorage.getItem('lastSpinTime'));
-    const canSpin = checkDailySpinEligibility();
-    
-    if (canSpin) {
-        spinCounter.innerHTML = `
-            <div class="spin-counter-content">
-                <div class="spins-remaining">
-                    <span class="counter-icon">🎡</span>
-                    <span class="counter-text">Free Spin Available!</span>
-                </div>
-            </div>
-        `;
-    } else {
-        spinCounter.innerHTML = `
-            <div class="spin-counter-content">
-                <div class="spins-remaining">
-                    <span class="counter-icon">⏰</span>
-                    <span class="counter-text">Next spin in: <span id="next-spin-timer">24:00:00</span></span>
-                </div>
-            </div>
-        `;
-        startNextSpinCountdown();
-    }
-}
-
-function startNextSpinCountdown() {
-    // Calculate next available spin time (24 hours from last spin)
-    const lastSpinTime = parseInt(localStorage.getItem('lastSpinTime'));
-    const nextSpinTime = lastSpinTime + (24 * 60 * 60 * 1000); // 24 hours later
-    
-    const countdownElement = document.getElementById('next-spin-timer');
-    if (!countdownElement) return;
-    
-    const countdown = setInterval(() => {
-        const now = new Date().getTime();
-        const timeLeft = nextSpinTime - now;
-        
-        if (timeLeft <= 0) {
-            clearInterval(countdown);
-            countdownElement.textContent = '00:00:00';
-            // Refresh the page or reset spins
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
-            return;
-        }
-        
-        // Calculate hours, minutes, seconds
-        const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-        
-        countdownElement.textContent = 
-            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }, 1000);
-}
-// Select reward based on probabilities
-function selectReward() {
-    const random = Math.random() * 100;
-    let cumulativeProbability = 0;
-    
-    for (const reward of WHEEL_REWARDS) {
-        cumulativeProbability += reward.probability;
-        if (random <= cumulativeProbability) {
-            return reward;
-        }
-    }
-    
-    // Fallback to first reward
-    return WHEEL_REWARDS[0];
-}
-
-
-// Activate free charm reward
-function activateFreeCharmReward() {
-    if (!activeWheelRewards.freeCharm) {
-        activeWheelRewards.freeCharm = { active: false, count: 0, minAmount: 15 }; // Changed to 15 JOD
-    }
-    
-    activeWheelRewards.freeCharm.active = true;
-    activeWheelRewards.freeCharm.count = (activeWheelRewards.freeCharm.count || 0) + 1;
-    
-    showToast('🎁 Free Special Charm unlocked! Add 15 JOD to your order to claim it.', 'success');
-}
-
-// Activate discount reward - REPLACE OLD DISCOUNTS WITH NEW ONE
-function activateDiscountReward(percent) {
-    let minAmount;
-    
-    // Tiered minimum amounts based on discount percentage
-    switch(percent) {
-        case 5:
-            minAmount = 12;  // 5% off requires 12 JDs (CHANGED FROM 10)
-            break;
-        case 10:
-            minAmount = 15;  // 10% off requires 15 JDs
-            break;
-        case 15:
-            minAmount = 25;  // 15% off requires 25 JDs
-            break;
-        default:
-            minAmount = 15;
-    }
-    
-    // CRITICAL FIX: Clear ALL previous discounts and only keep the new one
-    activeWheelRewards.discounts = [{
-        percent: percent,
-        minAmount: minAmount,
-        id: `wheel-${percent}-off-${Date.now()}`,
-        timestamp: Date.now() // Add timestamp to track latest
-    }];
-    
-    console.log('💰 New discount activated, old discounts cleared:', {
-        percent: percent,
-        minAmount: minAmount,
-        remainingDiscounts: activeWheelRewards.discounts.length
-    });
-    
-    showToast(`💰 ${percent}% discount unlocked! Add ${minAmount} JOD to apply.`, 'success');
-}
-
-// Activate free delivery reward
-function activateFreeDeliveryReward() {
-    activeWheelRewards.freeDelivery = {
-        active: true,
-        minAmount: 25 // Free delivery requires 25 JOD
-    };
-    
-    showToast('🚚 FREE Delivery unlocked! Add 25 JOD to apply.', 'success');
-}
-
-function showSpinWheel() {
-    const spinModal = document.getElementById('spin-wheel-modal');
-    if (!spinModal) return;
-    
-    const canSpin = checkDailySpinEligibility();
-    
-    if (canSpin) {
-        // User can spin - show wheel
-        spinModal.classList.add('active');
-        console.log('🎡 Spin wheel opened');
-    } else {
-        // User cannot spin yet - check if we should show countdown
-        const lastSpinTime = parseInt(localStorage.getItem('lastSpinTime'));
-        if (lastSpinTime) {
-            const timeSinceLastSpin = new Date().getTime() - lastSpinTime;
-            const twentyFourHours = 24 * 60 * 60 * 1000;
-            const timeLeft = twentyFourHours - timeSinceLastSpin;
-            
-            if (timeLeft > 0) {
-                // Show countdown in the same place
-                showSpinCountdown(timeLeft);
-                console.log('⏰ Showing countdown instead of wheel');
-            }
-        }
-    }
-}
-
-function showSpinCountdownModal() {
-    const lastSpinTime = parseInt(localStorage.getItem('lastSpinTime'));
-    const timeSinceLastSpin = new Date().getTime() - lastSpinTime;
-    const twentyFourHours = 24 * 60 * 60 * 1000;
-    const timeLeft = twentyFourHours - timeSinceLastSpin;
-    
-    // Create or show countdown modal
-    let countdownModal = document.getElementById('spin-countdown-modal');
-    
-    if (!countdownModal) {
-        countdownModal = document.createElement('div');
-        countdownModal.id = 'spin-countdown-modal';
-        countdownModal.className = 'modal active';
-        countdownModal.innerHTML = `
-            <div class="order-modal-content">
-                <h2>⏰ Come Back Soon!</h2>
-                <div class="countdown-modal-content">
-                    <div class="countdown-icon-large">🎡</div>
-                    <p>Your next free spin will be available in:</p>
-                    <div class="modal-countdown-timer">${formatTimeRemaining(timeLeft)}</div>
-                    <p class="countdown-note">Spin the wheel every 24 hours to win amazing rewards!</p>
-                    <button class="btn cancel-btn" onclick="document.getElementById('spin-countdown-modal').remove()">
-                        Close
-                    </button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(countdownModal);
-    }
-    
-    // Update the modal timer
-    const timerElement = countdownModal.querySelector('.modal-countdown-timer');
-    const updateModalTimer = setInterval(() => {
-        timeLeft -= 1000;
-        
-        if (timeLeft <= 0) {
-            clearInterval(updateModalTimer);
-            timerElement.textContent = '00:00:00';
-            timerElement.innerHTML = '<span style="color: #4CAF50;">🎉 Ready to spin!</span>';
-            countdownModal.querySelector('p').textContent = 'Your free spin is now available!';
-            return;
-        }
-        
-        timerElement.textContent = formatTimeRemaining(timeLeft);
-    }, 1000);
-}
-
-
-document.addEventListener('DOMContentLoaded', function() {
-        checkDailySpinEligibility();
-
-    // Initialize spin wheel state
-    updateSpinIndicator();
-    
-    // Also check on page load and hide if needed
-});
-
-// Also update when user data changes
-function loadUserData() {
-    // ... your existing loadUserData code ...
-    
-    // Update indicator after loading user data
-    updateSpinIndicator();
-}
-function activateSpinAgainReward() {
-    // Give user another free spin
-    hasSpunToday = false; // REMOVE THIS LINE
- localStorage.removeItem('lastSpinDate'); // REMOVE THIS LINE
-    // DON'T close the spin wheel modal - keep it open
-    const spinModal = document.getElementById('spin-wheel-modal');
-    if (spinModal) {
-        // Keep the modal open for another spin
-        const spinButton = document.getElementById('spin-button');
-        if (spinButton) {
-            spinButton.disabled = false;
-            spinButton.innerHTML = `
-                <span class="spin-text">SPIN AGAIN!</span>
-                <span class="spin-cost-text">(FREE)</span>
-            `;
-        }
-    }
-    
-    showToast('🎡 You won another spin! Spin again for free!', 'success');
-    isSpinning = false;
-}
-
-
-function showRewardNotification(reward) {
-    console.log('🎁 Showing reward notification:', reward);
-    
-    // Get or create notification element
-    let notification = document.getElementById('reward-notification');
-    const icon = document.getElementById('notification-icon');
-    const title = document.getElementById('notification-title');
-    const message = document.getElementById('notification-message');
-    const closeBtn = document.getElementById('close-notification');
-    
-    if (!notification || !icon || !title || !message) {
-        console.error('❌ Reward notification elements not found');
-        return;
-    }
-    
-    // Set notification content
-    icon.textContent = reward.icon || '🎁';
-    title.textContent = 'Congratulations!';
-    message.textContent = reward.message || 'You won a reward!';
-    
-    // Show notification
-    notification.classList.add('show');
-    console.log('✅ Reward notification shown');
-    
-    // Add confetti for all rewards except spin-again (to avoid distraction)
-    if (reward.id !== 'spin-again') {
-        triggerConfetti();
-    }
-    
-    // Add close event listener
-    if (closeBtn) {
-        closeBtn.onclick = hideRewardNotification;
-    }
-    
-    // Auto-hide after 5 seconds for spin-again, longer for others
-    const hideTime = reward.id === 'spin-again' ? 3000 : 5000;
-    setTimeout(() => {
-        hideRewardNotification();
-    }, hideTime);
-}
-
-function hideRewardNotification() {
-    const notification = document.getElementById('reward-notification');
-    if (notification) {
-        notification.classList.remove('show');
-        console.log('✅ Reward notification hidden');
-    }
-}
-
-// 🎉 Enhanced Confetti function with forced highest z-index
-function triggerConfetti() {
-  console.log('🎉 Triggering confetti!');
-  
-  // Create a custom canvas for confetti to ensure control
-  let confettiCanvas = document.createElement('canvas');
-  confettiCanvas.id = 'confetti-canvas';
-  confettiCanvas.style.cssText = `
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    pointer-events: none !important;
-    z-index: 10004 !important;
-  `;
-  
-  // Remove any existing confetti canvas
-  const existingCanvas = document.getElementById('confetti-canvas');
-  if (existingCanvas) {
-    existingCanvas.remove();
-  }
-  
-  document.body.appendChild(confettiCanvas);
-  
-  // Create confetti instance with our custom canvas
-  const confettiInstance = confetti.create(confettiCanvas, {
-    resize: true,
-    useWorker: true
-  });
-  
-  // Basic confetti burst
-  confettiInstance({
-    particleCount: 150,
-    spread: 70,
-    origin: { y: 0.6 },
-    colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff']
-  });
-  
-  // Additional effects for 5 seconds
-  const duration = 5000;
-  const animationEnd = Date.now() + duration;
-  const defaults = { 
-    startVelocity: 30, 
-    spread: 360, 
-    ticks: 60, 
-    zIndex: 10004 
-  };
-  
-  function randomInRange(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-  
-  const interval = setInterval(function() {
-    const timeLeft = animationEnd - Date.now();
-    
-    if (timeLeft <= 0) {
-      clearInterval(interval);
-      // Clean up canvas after animation
-      setTimeout(() => {
-        if (confettiCanvas && confettiCanvas.parentNode) {
-          confettiCanvas.remove();
-        }
-      }, 3000);
-      return;
-    }
-    
-    const particleCount = 50 * (timeLeft / duration);
-    
-    // Random confetti from left and right
-    confettiInstance({
-      ...defaults,
-      particleCount,
-      origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
-    });
-    confettiInstance({
-      ...defaults,
-      particleCount,
-      origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
-    });
-  }, 250);
-}
-
-// Function to trigger confetti from any button or event
-function addConfettiToButton(buttonId) {
-  const button = document.getElementById(buttonId);
-  if (button) {
-    button.addEventListener('click', function() {
-      triggerConfetti();
-    });
-  }
-}
-
-// Add confetti to various actions
-document.addEventListener('DOMContentLoaded', function() {
-  // Add to cart button
-  addConfettiToButton('add-to-cart-bottom');
-  
-  // Order confirmation
-  const orderBtn = document.getElementById('order-btn');
-  if (orderBtn) {
-    orderBtn.addEventListener('click', function() {
-      if (cart.length > 0) {
-        setTimeout(triggerConfetti, 500); // Delay for order processing
-      }
-    });
-  }
-  
-  // Spin wheel reward
-  const spinButton = document.getElementById('spin-button');
-  if (spinButton) {
-    spinButton.addEventListener('click', function() {
-      // Confetti will be triggered in processReward function
-    });
-  }
-});
-
-
-
-function hideRewardNotification() {
-    const notification = document.getElementById('reward-notification');
-    if (notification) {
-        notification.classList.remove('show');
-    }
-}
-
-
-// Load user data from localStorage
-function loadUserData() {
-    const savedPoints = localStorage.getItem('userPoints');
-    const savedRewards = localStorage.getItem('activeWheelRewards');
-    const lastSpinDate = localStorage.getItem('lastSpinDate');
-    
-    userPoints = savedPoints ? parseInt(savedPoints) : 0;
-    hasSpunToday = lastSpinDate === new Date().toDateString();
-    
-    if (savedRewards) {
-        try {
-            activeWheelRewards = JSON.parse(savedRewards);
-        } catch (e) {
-            console.error('Error loading wheel rewards:', e);
-            activeWheelRewards = {
-                freeCharm: { active: false, count: 0, minAmount: 10 },
-                discounts: [],
-                freeDelivery: { active: false, minAmount: 25 }
-            };
-        }
-    }
-    
-    updatePointsDisplay();
-}
-
-// Save user data to localStorage
-function saveUserData() {
-    localStorage.setItem('userPoints', userPoints.toString());
-    localStorage.setItem('activeWheelRewards', JSON.stringify(activeWheelRewards));
-    if (hasSpunToday) {
-        localStorage.setItem('lastSpinDate', new Date().toDateString());
-    }
-}
-
-// Update points display
-function updatePointsDisplay() {
-    const pointsDisplay = document.getElementById('user-points');
-    if (pointsDisplay) {
-        pointsDisplay.textContent = userPoints;
-    }
-}
-
-
-
-
-
-
-// Select reward based on actual probabilities
-function selectRewardByProbability() {
-    const random = Math.random() * 100;
-    let cumulativeProbability = 0;
-    
-    for (const reward of WHEEL_REWARDS) {
-        cumulativeProbability += reward.probability;
-        if (random <= cumulativeProbability) {
-            return reward;
-        }
-    }
-    
-    return WHEEL_REWARDS[0];
-}
-
-function createWheel() {
-    const wheelCanvas = document.getElementById('wheel-canvas');
-    const ctx = wheelCanvas.getContext('2d');
-    
-    // Set canvas to high resolution
-    const scale = window.devicePixelRatio || 1;
-    wheelCanvas.width = 400 * scale;
-    wheelCanvas.height = 400 * scale;
-    wheelCanvas.style.width = '400px';
-    wheelCanvas.style.height = '400px';
-    ctx.scale(scale, scale);
-    
-    // Clear the canvas
-    ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
-    
-    // Show loading state
-    showWheelLoading();
-    
-    // Load HIGH QUALITY wheel image
-    const wheelImage = new Image();
-    wheelImage.src = 'basecharms/wheel.png';
-    
-    let retryCount = 0;
-    const maxRetries = 3;
-    
-    wheelImage.onload = function() {
-        console.log('✅ High-quality wheel image loaded successfully');
-        
-        // Hide loading state
-        hideWheelLoading();
-        
-        // Use high-quality rendering
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        
-        // Draw the wheel image with high quality
-        ctx.drawImage(wheelImage, 0, 0, 400, 400);
-        
-        // Now show the spin wheel modal since image is ready
-        showSpinWheelAfterImageLoad();
-    };
-    
-    wheelImage.onerror = function() {
-        console.error('❌ Failed to load high-quality wheel image');
-        retryCount++;
-        
-        if (retryCount <= maxRetries) {
-            console.log(`🔄 Retrying image load (attempt ${retryCount}/${maxRetries})`);
-            setTimeout(() => {
-                wheelImage.src = 'basecharms/wheel.png';
-            }, 1000);
-        } else {
-            console.error('❌ All image load attempts failed');
-            hideWheelLoading();
-            showWheelError();
-        }
-    };
-    
-    // Set a timeout for image loading
-    setTimeout(() => {
-        if (!wheelImage.complete) {
-            console.log('⏰ Image loading timeout');
-            hideWheelLoading();
-            showWheelError();
-        }
-    }, 8000); // Increased timeout to 8 seconds
-}
-
-// Show loading state for wheel
-function showWheelLoading() {
-    const wheelCanvas = document.getElementById('wheel-canvas');
-    if (!wheelCanvas) return;
-    
-    const loadingHTML = `
-        <div class="wheel-loading" style="
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #d6336c;
-            font-weight: bold;
-            z-index: 10;
-        ">
-            <div style="font-size: 2rem; margin-bottom: 1rem;">🎡</div>
-            <div>Loading Spin Wheel...</div>
-        </div>
-    `;
-    
-    wheelCanvas.insertAdjacentHTML('afterend', loadingHTML);
-}
-
-// Hide loading state
-function hideWheelLoading() {
-    const loadingElement = document.querySelector('.wheel-loading');
-    if (loadingElement) {
-        loadingElement.remove();
-    }
-}
-
-// Show error state
-function showWheelError() {
-    const wheelCanvas = document.getElementById('wheel-canvas');
-    if (!wheelCanvas) return;
-    
-    const errorHTML = `
-        <div class="wheel-error" style="
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #ff6b6b;
-            font-weight: bold;
-            z-index: 10;
-        ">
-            <div style="font-size: 2rem; margin-bottom: 1rem;">❌</div>
-            <div>Failed to load wheel</div>
-            <button onclick="retryWheelLoad()" style="
-                margin-top: 1rem;
-                padding: 0.5rem 1rem;
-                background: #d6336c;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-            ">Retry</button>
-        </div>
-    `;
-    
-    wheelCanvas.insertAdjacentHTML('afterend', errorHTML);
-}
-
-// Retry wheel loading
-function retryWheelLoad() {
-    const errorElement = document.querySelector('.wheel-error');
-    if (errorElement) {
-        errorElement.remove();
-    }
-    createWheel();
-}
-
-// Show spin wheel only after image has loaded
-function showSpinWheelAfterImageLoad() {
-    const spinModal = document.getElementById('spin-wheel-modal');
-    if (!spinModal) {
-        console.error('Spin wheel modal not found!');
-        return;
-    }
-    
-    const spinStats = getSpinStatistics();
-    
-    // Don't show if no spins remaining
-    if (spinStats.spinsRemaining <= 0 && !hasSpunToday) {
-        showSpinLimitReached();
-        return;
-    }
-    
-    // Now show the modal since wheel is ready
-    spinModal.classList.add('active');
-    
-    // Update button text based on spins remaining
-    const spinButton = document.getElementById('spin-button');
-    if (spinButton) {
-        if (spinStats.spinsRemaining > 0) {
-            spinButton.disabled = false;
-            spinButton.innerHTML = `
-                <span class="spin-text">SPIN NOW!</span>
-                <span class="spin-cost-text">(FREE)</span>
-            `;
-        } else {
-            spinButton.disabled = true;
-            spinButton.innerHTML = `
-                <span class="spin-text">DAILY SPIN USED</span>
-                <span class="spin-cost-text">(Come back tomorrow)</span>
-            `;
-        }
-    }
-    
-    // Update spin counter display
-    updateSpinCounterDisplay(spinStats);
-    
-    console.log('🎡 Spin wheel shown - image loaded successfully');
-}
-
-
-function spinWheel() {
-    if (isSpinning) return;
-    
-    isSpinning = true;
-    const spinButton = document.getElementById('spin-button');
-    
-    if (spinButton) {
-        spinButton.disabled = true;
-        spinButton.innerHTML = 'Spinning...';
-    }
-
-    // Calculate random rotation (5-8 full rotations + random segment)
-    const fullRotations = 5 + Math.floor(Math.random() * 4);
-    const randomSegment = Math.floor(Math.random() * 6);
-    const segmentAngle = 60;
-    
-    // Calculate final angle (in degrees)
-    const finalAngle = (fullRotations * 360) + (randomSegment * segmentAngle);
-    
-    console.log('🎯 Target segment:', randomSegment + 1, 'Final angle:', finalAngle);
-    
-    // Animate the wheel canvas
-    const wheelCanvas = document.getElementById('wheel-canvas');
-    wheelCanvas.style.transition = 'transform 4s cubic-bezier(0.2, 0.8, 0.3, 1)';
-    wheelCanvas.style.transform = `rotate(${finalAngle}deg)`;
-    
-    // Determine winning segment and reward
-    setTimeout(() => {
-        const normalizedAngle = finalAngle % 360;
-        const winningSegmentIndex = Math.floor(normalizedAngle / 60) % 6;
-        const winningReward = WHEEL_REWARDS[winningSegmentIndex];
-        
-        console.log('🎉 Winning calculation:');
-        console.log('  Normalized angle:', normalizedAngle);
-        console.log('  Winning segment index:', winningSegmentIndex);
-        console.log('  Winning reward:', winningReward.name);
-        
-        // Process the reward
-        processReward(winningReward);
-        
-        // Reset wheel position for next spin - but only if it's NOT spin-again
-        if (winningReward.id !== 'spin-again') {
-            setTimeout(() => {
-                wheelCanvas.style.transition = 'none';
-                wheelCanvas.style.transform = 'rotate(0deg)';
-                
-                // Re-enable spin button if needed
-                if (spinButton) {
-                    spinButton.disabled = false;
-                    spinButton.innerHTML = `
-                        <span class="spin-text">SPIN NOW!</span>
-                        <span class="spin-cost-text">(10 points)</span>
-                    `;
-                }
-            }, 100);
-        } else {
-            // For spin-again, reset the wheel immediately so they can spin again
-            setTimeout(() => {
-                wheelCanvas.style.transition = 'none';
-                wheelCanvas.style.transform = 'rotate(0deg)';
-            }, 100);
-        }
-        
-    }, 4000);
-}
-function updateWinButtonState() {
-    const winButton = document.getElementById('win-button');
-    if (!winButton) return;
-    
-    const canSpin = checkDailySpinEligibility();
-    
-    if (canSpin) {
-        winButton.innerHTML = '🎡 SPIN TO WIN! 🎡';
-        winButton.disabled = false;
-        winButton.style.opacity = '1';
-    } else {
-        winButton.innerHTML = '🎡 DAILY SPIN USED 🎡';
-        winButton.disabled = true;
-        winButton.style.opacity = '0.7';
-        
-        // Update the tooltip text
-        const container = winButton.closest('.win-button-container');
-        const tooltip = container.querySelector('p');
-        if (tooltip) {
-            tooltip.textContent = 'Come back tomorrow for another spin!';
-        }
-    }
-}
-
-// Call this when page loads and when user spins
-document.addEventListener('DOMContentLoaded', function() {
-    updateWinButtonState();
-});
-
-
-function updateSpinIndicator() {
-    const spinIndicator = document.getElementById('spin-indicator');
-    const winButton = document.getElementById('win-button');
-    const spinModal = document.getElementById('spin-wheel-modal');
-    
-    const canSpin = checkDailySpinEligibility();
-    
-    console.log('🔄 Updating spin indicator - canSpin:', canSpin);
-    
-    if (canSpin) {
-        // SHOW elements
-        if (spinIndicator) {
-            spinIndicator.classList.remove('spin-wheel-hidden');
-            spinIndicator.style.display = 'flex';
-        }
-        if (winButton) {
-            winButton.classList.remove('win-button-hidden');
-            winButton.style.display = 'block';
-        }
-        if (spinModal) {
-            spinModal.classList.remove('spin-wheel-hidden');
-        }
-    } else {
-        // COMPLETELY HIDE elements
-        if (spinIndicator) {
-            spinIndicator.classList.add('spin-wheel-hidden');
-            spinIndicator.style.display = 'none';
-        }
-        if (winButton) {
-            winButton.classList.add('win-button-hidden');
-            winButton.style.display = 'none';
-        }
-        if (spinModal) {
-            spinModal.classList.add('spin-wheel-hidden');
-            spinModal.classList.remove('active');
-        }
-    }
-}
-
-// Get user's spin data with persistence
-function getUserSpinData() {
-    const userKey = auth.currentUser ? `spinData_${auth.currentUser.uid}` : 'spinData_guest';
-    const savedData = localStorage.getItem(userKey);
-    
-    if (savedData) {
-        try {
-            const data = JSON.parse(savedData);
-            const today = new Date().toDateString();
-            
-            // Reset daily spins if it's a new day
-            if (data.lastSpinDate !== today) {
-                data.dailySpins = 0;
-                data.lastSpinDate = today;
-            }
-            
-            return data;
-        } catch (e) {
-            console.error('Error parsing spin data:', e);
-        }
-    }
-    
-    // Default data
-    return {
-        dailySpins: 0,
-        totalSpins: 0,
-        lastSpinDate: new Date().toDateString(),
-        spinHistory: []
-    };
-}
-
-function saveUserSpinData() {
-    const userKey = auth.currentUser ? `spinData_${auth.currentUser.uid}` : 'spinData_guest';
-    const spinData = getUserSpinData();
-    
-    // Update spin data with current timestamp
-    const now = new Date();
-    spinData.dailySpins += 1;
-    spinData.totalSpins += 1;
-    spinData.lastSpinDate = now.toDateString();
-    spinData.lastSpinTime = now.getTime(); // Add timestamp
-    
-    localStorage.setItem(userKey, JSON.stringify(spinData));
-    localStorage.setItem('lastSpinDate', spinData.lastSpinDate);
-    localStorage.setItem('lastSpinTime', spinData.lastSpinTime.toString()); // Save timestamp
-    
-    console.log('💾 Saved spin data with timestamp:', spinData.lastSpinTime);
-}
-
-function showSpinLimitReached() {
-    const lastSpinTime = parseInt(localStorage.getItem('lastSpinTime'));
-    const nextSpinTime = lastSpinTime + (24 * 60 * 60 * 1000);
-    const timeUntilReset = nextSpinTime - new Date().getTime();
-    
-    const hoursUntilReset = Math.floor(timeUntilReset / (1000 * 60 * 60));
-    const minutesUntilReset = Math.floor((timeUntilReset % (1000 * 60 * 60)) / (1000 * 60));
-    
-    showToast(`🎡 Come back in ${hoursUntilReset}h ${minutesUntilReset}m for your next free spin!`, 'info');
-}
-function hideSpinElements() {
-    const spinModal = document.getElementById('spin-wheel-modal');
-    const spinIndicator = document.getElementById('spin-indicator');
-    const winButton = document.getElementById('win-button');
-    
-    if (spinModal) {
-        spinModal.classList.add('spin-wheel-hidden');
-        spinModal.classList.remove('active');
-    }
-    if (spinIndicator) {
-        spinIndicator.classList.add('spin-wheel-hidden');
-        spinIndicator.style.display = 'none';
-    }
-    if (winButton) {
-        winButton.classList.add('win-button-hidden');
-        winButton.style.display = 'none';
-    }
-    
-    console.log('👻 Hidden all spin elements');
-}
-function initSpinWheel() {
-    console.log('🎡 Initializing spin wheel with indicator...');
-    
-    loadUserData();
-    
-    // Initialize the wheel
-    createWheel();
-    setupSpinWheelEventListeners();
-    
-    // Update the indicator visibility
-    updateSpinIndicator();
-    
-    console.log('✅ Spin wheel initialized with indicator');
-}
-// Global variables for expiration
-let rewardExpirationTime = null;
-let expirationTimer = null;
-let currentWonReward = null;
-let globalCountdownTimer = null; // ← ADD THIS LINE
-let spinCountdownTimer = null;
-
-const WHEEL_REWARDS = [
-    { 
-        id: '10-off', 
-        name: '10% OFF', 
-        probability: 20, // Increased from 15
-        icon: '💰', 
-        message: 'You won 10% OFF your order!',
-        color: '#45B7D1',
-        minAmount: 15
-    },
-    
-    { 
-        id: '5-off', 
-        name: '5% OFF', 
-        probability: 20, // Increased from 15
-        icon: '💰', 
-        message: 'You won 5% OFF your order!',
-        color: '#4ECDC4',
-        minAmount: 12
-    },
-    { 
-        id: 'free-charm', 
-        name: 'Free Special Charm', 
-        probability: 45, // Decreased from 50
-        icon: '🎁', 
-        message: 'You won a FREE Special Charm!',
-        color: '#FF6B6B',
-        minAmount: 10
-    },
-    { 
-        id: 'spin-again', 
-        name: 'Spin Again', 
-        probability: 5, // Decreased from 10 (makes it rarer)
-        icon: '🎡', 
-        message: 'You won another spin!',
-        color: '#FF9FF3'
-    },
-    { 
-        id: '15-off', 
-        name: '15% OFF', 
-        probability: 5, 
-        icon: '💰', 
-        message: 'You won 15% OFF your order!',
-        color: '#96CEB4',
-        minAmount: 25
-    },
-    
-    { 
-        id: 'free-delivery', 
-        name: 'FREE Delivery', 
-        probability: 5, 
-        icon: '🚚', 
-        message: 'You won FREE Delivery!',
-        color: '#FECA57',
-        minAmount: 25
-    }
-];
-// Your wheel segments configuration
-const WHEEL_SEGMENTS = [
-    { text: "PART 1", color: "#FF6B6B" },
-    { text: "PART 2", color: "#4ECDC4" },
-    { text: "PART 3", color: "#45B7D1" },
-    { text: "PART 4", color: "#96CEB4" },
-    { text: "PART 5", color: "#FECA57" },
-    { text: "PART 6", color: "#FF9FF3" }
-];
-
-function activateReward(reward) {
-    console.log('Activating reward:', reward);
-    
-    switch (reward.id) {
-        case 'free-charm':
-            activateFreeCharmReward();
-            break;
-        case '5-off':
-            activateDiscountReward(5);
-            break;
-        case '10-off':
-            activateDiscountReward(10);
-            break;
-        case '15-off':
-            activateDiscountReward(15);
-            break;
-        case 'free-delivery':
-            activateFreeDeliveryReward();
-            break;
-        case 'spin-again':
-            activateSpinAgainReward();
-            break;
-    }
-    
-    // Save the active rewards
-    saveUserData();
-                                                                                                        
-}
-// Update the expiration popup to show 24 hours
-function showExpirationPopup(reward) {
-    const popupHTML = `
-        <div class="modal active" id="reward-expiration-popup" style="z-index: 10002;">
-            <div class="order-modal-content">
-                <div style="text-align: center; padding: 2rem;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
-                    <h2 style="color: #d6336c; margin-bottom: 1rem;">Congratulations!</h2>
-                    <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">${reward.message}</p>
-                    
-                    <div class="expiration-timer">
-                        <h4>⏰ Limited Time Offer!</h4>
-                        <div class="timer" id="expiration-timer">24:00:00</div>
-                        <div class="timer-warning">You have 24 hours to use your reward</div>
-                    </div>
-                    
-                    ${reward.minAmount > 0 ? `
-                    <div class="minimum-amount-warning">
-                        <span class="warning-icon">💰</span>
-                        Minimum order of ${reward.minAmount} JOD required to apply this reward
-                    </div>
-                    ` : ''}
-                    
-                    <div style="margin-top: 2rem;">
-                        <button class="btn confirm-order-btn" onclick="startDesigning()" style="margin-bottom: 1rem;">
-                            🎨 Start Designing Now!
-                        </button>
-                        <br>
-                        <button class="btn cancel-btn" onclick="closeExpirationPopup()">
-                            Maybe Later
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Remove any existing popup
-    const existingPopup = document.getElementById('reward-expiration-popup');
-    if (existingPopup) {
-        existingPopup.remove();
-    }
-    
-    // Add new popup
-    document.body.insertAdjacentHTML('beforeend', popupHTML);
-    
-    // Add confetti
-    triggerConfetti();
-}
-
-// Start expiration countdown timer
-function startExpirationTimer() {
-    if (expirationTimer) {
-        clearInterval(expirationTimer);
-    }
-    
-    expirationTimer = setInterval(() => {
-        const now = new Date().getTime();
-        const timeLeft = rewardExpirationTime - now;
-        
-        if (timeLeft <= 0) {
-            // Time's up!
-            clearInterval(expirationTimer);
-            rewardExpired();
-            return;
-        }
-        
-        // Update timer display
-        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-        
-        const timerElement = document.getElementById('expiration-timer');
-        if (timerElement) {
-            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            // Add urgent styling when less than 5 minutes
-            const timerContainer = timerElement.closest('.expiration-timer');
-            if (timeLeft < 5 * 60 * 1000) {
-                timerContainer.classList.add('urgent');
-            }
-        }
-        
-    }, 1000);
-}
-
-function rewardExpired() {
-    console.log('⏰ Reward expired, showing spin countdown');
-    
-    // Remove the reward from active rewards
-    if (currentWonReward) {
-        removeReward(currentWonReward);
-    }
-    
-    // Clear storage
-    localStorage.removeItem('rewardExpirationTime');
-    localStorage.removeItem('currentWonReward');
-    
-    // Remove global countdown banner
-    removeGlobalCountdownBanner();
-    
-    // Show expiration message
-    const popup = document.getElementById('reward-expiration-popup');
-    if (popup) {
-        popup.innerHTML = `
-            <div class="order-modal-content">
-                <div style="text-align: center; padding: 2rem;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">⏰</div>
-                    <h2 style="color: #ff6b6b; margin-bottom: 1rem;">Time's Up!</h2>
-                    <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">
-                        Your reward has expired. Spin the wheel again for another chance!
-                    </p>
-                    <button class="btn confirm-order-btn" onclick="closeExpirationPopup()">
-                        OK
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        // Auto-close after 3 seconds and show spin countdown
-        setTimeout(() => {
-            closeExpirationPopup();
-            // Calculate time until next spin and show countdown
-            checkDailySpinEligibility();
-        }, 3000);
-    } else {
-        // If no popup, just check and show spin countdown
-        checkDailySpinEligibility();
-    }
-    
-    // Update price display
-    updatePrice();
-}
-
-// Go to checkout function
-function goToCheckout() {
-    closeExpirationPopup();
-    
-    // Open cart if not already open
-    const cartPreview = document.getElementById('cart-preview');
-    if (cartPreview) {
-        cartPreview.classList.add('active');
-    }
-    
-    // Scroll to cart section
-    const cartSection = document.querySelector('.action-buttons');
-    if (cartSection) {
-        cartSection.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-
-// Close expiration popup
-function closeExpirationPopup() {
-    const popup = document.getElementById('reward-expiration-popup');
-    if (popup) {
-        popup.remove();
-    }
-}
-
-// Remove reward from active rewards
-function removeReward(reward) {
-    switch (reward.id) {
-        case 'free-charm':
-            if (activeWheelRewards.freeCharm && activeWheelRewards.freeCharm.count > 0) {
-                activeWheelRewards.freeCharm.count--;
-                if (activeWheelRewards.freeCharm.count <= 0) {
-                    activeWheelRewards.freeCharm.active = false;
-                }
-            }
-            break;
-        case '5-off':
-        case '10-off':
-        case '15-off':
-            activeWheelRewards.discounts = activeWheelRewards.discounts.filter(d => 
-                !d.id.includes(reward.id.replace('-off', ''))
-            );
-            break;
-        case 'free-delivery':
-            activeWheelRewards.freeDelivery.active = false;
-            break;
-    }
-}
-
-// Check for existing rewards on page load
-function checkExistingRewards() {
-    const savedExpiration = localStorage.getItem('rewardExpirationTime');
-    const savedReward = localStorage.getItem('currentWonReward');
-    
-    if (savedExpiration && savedReward) {
-        const expirationTime = parseInt(savedExpiration);
-        const now = new Date().getTime();
-        
-        if (now < expirationTime) {
-            // Reward still valid
-            rewardExpirationTime = expirationTime;
-            currentWonReward = JSON.parse(savedReward);
-            activateReward(currentWonReward);
-            startExpirationTimer();
-        } else {
-            // Reward expired
-            localStorage.removeItem('rewardExpirationTime');
-            localStorage.removeItem('currentWonReward');
-        }
-    }
-}
-
-
-// Start designing function
-function startDesigning() {
-    closeExpirationPopup();
-    
-    // Close spin modal if open
-    const spinModal = document.getElementById('spin-wheel-modal');
-    if (spinModal) {
-        spinModal.classList.remove('active');
-    }
-    
-    // Show the designer page and hide homepage
-    const homepage = document.getElementById('homepage');
-    const designerPage = document.getElementById('designer-page');
-    
-    if (homepage && designerPage) {
-        homepage.style.display = 'none';
-        designerPage.style.display = 'block';
-    }
-    
-    // Scroll to top of designer
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Show a quick tip about the reward
-    showToast(`🎉 Your reward is active! Add ${currentWonReward?.minAmount || 15} JOD to your design to claim it.`, 'success');
-}
-
-function showGlobalCountdown(timeLeft) {
-    hideGlobalCountdown();
-    hideSpinCountdown();
-    
-    const countdownDisplay = document.createElement('div');
-    countdownDisplay.id = 'global-countdown-display';
-    countdownDisplay.className = 'countdown-display global-countdown';
-    countdownDisplay.innerHTML = `
-        <div class="countdown-active">
-            <div class="countdown-icon">🎉</div>
-            <div class="countdown-text">
-                <div class="countdown-title">Limited Time Reward!</div>
-                <div class="countdown-timer">${formatTimeRemaining(timeLeft)}</div>
-                <div class="countdown-subtitle">Complete your order to claim</div>
-            </div>
-            <button class="countdown-action-btn" onclick="startDesigning()">
-                Design Now
-            </button>
-        </div>
-    `;
-    
-    document.body.appendChild(countdownDisplay);
-    updateGlobalCountdownTimer(timeLeft);
-}
-function updateGlobalCountdownTimer(timeLeft) {
-    const countdownDisplay = document.getElementById('global-countdown-display');
-    if (!countdownDisplay) return;
-    
-    globalCountdownTimer = setInterval(() => {
-        timeLeft -= 1000;
-        
-        if (timeLeft <= 0) {
-            clearInterval(globalCountdownTimer);
-            replaceGlobalCountdownWithExpired(countdownDisplay);
-            return;
-        }
-        
-        const timerElement = countdownDisplay.querySelector('.countdown-timer');
-        if (timerElement) {
-            timerElement.textContent = formatTimeRemaining(timeLeft);
-        }
-    }, 1000);
-}
-// Start global countdown timer
-function startGlobalCountdownTimer() {
-    if (globalCountdownTimer) {
-        clearInterval(globalCountdownTimer);
-    }
-    
-    // Show the global banner at BOTTOM
-    showGlobalCountdownBanner();
-    
-    // Hide spin countdown when reward is active
-    hideSpinCountdown();
-    
-    globalCountdownTimer = setInterval(() => {
-        const now = new Date().getTime();
-        const timeLeft = rewardExpirationTime - now;
-        
-        if (timeLeft <= 0) {
-            // Time's up!
-            clearInterval(globalCountdownTimer);
-            removeGlobalCountdownBanner();
-            rewardExpired();
-            return;
-        }
-        
-        // Update timer
-        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-        const timerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        
-        // Update global banner timer
-        const globalTimer = document.getElementById('global-timer');
-        if (globalTimer) {
-            globalTimer.textContent = timerText;
-        }
-        
-        // Add urgent styling when less than 5 minutes
-        const banner = document.getElementById('global-countdown-banner');
-        if (timeLeft < 5 * 60 * 1000) {
-            banner.classList.add('urgent');
-        }
-        
-    }, 1000);
-}
-
-// Remove global countdown banner
-function removeGlobalCountdownBanner() {
-    const banner = document.getElementById('global-countdown-banner');
-    if (banner) {
-        banner.remove();
-    }
-}
-function processReward(reward) {
-    console.log('🎉 Processing reward:', reward);
-    
-    // Handle spin-again reward differently - DON'T close the modal
-    if (reward.id === 'spin-again') {
-        activateSpinAgainReward();
-        
-        // Reset spinning state but KEEP modal open
-        isSpinning = false;
-        
-        // Re-enable the spin button for another spin
-        const spinButton = document.getElementById('spin-button');
-        if (spinButton) {
-            spinButton.disabled = false;
-            spinButton.innerHTML = `
-                <span class="spin-text">SPIN AGAIN!</span>
-                <span class="spin-cost-text">(FREE)</span>
-            `;
-        }
-        
-        // Show notification but DON'T close spin wheel
-        showRewardNotification(reward);
-        return; // Stop here, don't process further
-    }
-
-    // For all other rewards, mark as spun for the day
-    hasSpunToday = true;
-    saveUserSpinData(); // Save that they've used their daily spin
-    
-    // Close the spin modal
-    const spinModal = document.getElementById('spin-wheel-modal');
-    if (spinModal) {
-        spinModal.classList.remove('active');
-        console.log('✅ Spin modal closed for regular reward');
-    }
-
-    // Reset spinning state
-    isSpinning = false;
-    
-    // CRITICAL FIX: Clear ALL previous rewards before activating new one
-    console.log('🔄 Clearing old rewards before activating new one');
-    activeWheelRewards.discounts = []; // Clear all discounts
-    activeWheelRewards.freeDelivery.active = false; // Disable free delivery
-    // Note: We keep free charms since they can stack
-    
-    // Mark that user has spun today
-    localStorage.setItem('lastSpinDate', new Date().toDateString());
-
-    // Store the won reward with its minimum amount
-    currentWonReward = {
-        ...reward,
-        minAmount: reward.id === 'free-charm' ? 10 : reward.minAmount
-    };
-
-    // Set expiration time (24 hours for rewards)
-    rewardExpirationTime = new Date().getTime() + (45 * 60 * 1000);
-    localStorage.setItem('rewardExpirationTime', rewardExpirationTime);
-    localStorage.setItem('currentWonReward', JSON.stringify(currentWonReward));
-
-    // Add to spin history
-    addToSpinHistory(reward);
-    updateSpinIndicator();
-
-    // Activate the reward (this will only activate the new one)
-    activateRewardWithMinimum(reward, currentWonReward.minAmount);
-
-    // Save user data
-    saveUserData();
-
-    // Update price display to show new rewards only
-    updatePrice();
-
-    // Show the reward notification popup
-    showRewardNotification(reward);
-    
-    // Show expiration popup (24 hours now)
-    showExpirationPopup(currentWonReward);
-
-    // Start both timers
-    startExpirationTimer();
-    startGlobalCountdownTimer();
-
-    console.log('✅ New reward activated, daily spin used');
-    console.log('📊 Current active rewards:', {
-        discounts: activeWheelRewards.discounts,
-        freeDelivery: activeWheelRewards.freeDelivery,
-        freeCharm: activeWheelRewards.freeCharm
-    });
-}
-// Track spin history
-function addToSpinHistory(reward) {
-    const userKey = auth.currentUser ? `spinData_${auth.currentUser.uid}` : 'spinData_guest';
-    const spinData = getUserSpinData();
-    
-    if (!spinData.spinHistory) {
-        spinData.spinHistory = [];
-    }
-    
-    spinData.spinHistory.push({
-        reward: reward.name,
-        date: new Date().toISOString(),
-        type: reward.id
-    });
-    
-    // Keep only last 50 spins
-    if (spinData.spinHistory.length > 50) {
-        spinData.spinHistory = spinData.spinHistory.slice(-50);
-    }
-    
-    localStorage.setItem(userKey, JSON.stringify(spinData));
-}
-
-// Get spin statistics
-function getSpinStatistics() {
-    const spinData = getUserSpinData();
-    return {
-        totalSpins: spinData.totalSpins || 0,
-        spinsToday: spinData.dailySpins || 0,
-        spinsRemaining: Math.max(0, 1 - (spinData.dailySpins || 0)),
-        lastSpin: spinData.lastSpinDate
-    };
-}
-// New function to activate rewards with minimum amounts
-// New function to activate rewards with minimum amounts
-function activateRewardWithMinimum(reward, minAmount) {
-    console.log('🎁 Activating SINGLE reward:', reward.id, 'with minAmount:', minAmount);
-    
-    switch (reward.id) {
-        case 'free-charm':
-            if (!activeWheelRewards.freeCharm) {
-                activeWheelRewards.freeCharm = { active: false, count: 0, minAmount: minAmount };
-            }
-            activeWheelRewards.freeCharm.active = true;
-            activeWheelRewards.freeCharm.count = (activeWheelRewards.freeCharm.count || 0) + 1;
-            activeWheelRewards.freeCharm.minAmount = 10; // FORCE 10 JDs minimum
-            console.log('✅ Free charm activated with 10 JD minimum');
-            break;
-        case '5-off':
-        case '10-off':
-        case '15-off':
-            // Clear any existing discounts first
-            activeWheelRewards.discounts = [];
-            
-            const percent = parseInt(reward.id.replace('-off', ''));
-            activeWheelRewards.discounts.push({
-                percent: percent,
-                minAmount: minAmount,
-                id: `wheel-${reward.id}-${Date.now()}`,
-                timestamp: Date.now()
-            });
-            console.log('✅ Single discount activated:', percent + '%');
-            break;
-        case 'free-delivery':
-            // Clear any existing free delivery
-            activeWheelRewards.freeDelivery.active = false;
-            
-            activeWheelRewards.freeDelivery = {
-                active: true,
-                minAmount: minAmount
-            };
-            console.log('✅ Free delivery activated');
-            break;
-    }
-    
-    // Save the active rewards
-    saveUserData();
-    console.log('✅ Rewards saved - only one active reward');
-}
-// Update discount display to show minimum requirements
-function updateDiscountDisplayWithMinimum(subtotal) {
-    const discountMessages = document.getElementById('discount-messages');
-    if (!discountMessages) return;
-    
-    let messagesHTML = '';
-    
-    // Check wheel rewards with 15 JOD minimum
-    if (hasSpunToday) {
-        // Check free charm
-        if (activeWheelRewards.freeCharm.active && activeWheelRewards.freeCharm.count > 0) {
-            const qualifies = subtotal >= 15;
-            messagesHTML += `
-                <div class="wheel-reward-message ${qualifies ? 'applied' : 'available'}">
-                    🎁 Free Special Charm ${qualifies ? '✅ APPLIED' : `- Add ${(15 - subtotal).toFixed(2)} JOD more`}
-                </div>
-            `;
-        }
-        
-        // Check discounts
-        activeWheelRewards.discounts.forEach(discount => {
-            const qualifies = subtotal >= 15;
-            const icon = discount.percent === 5 || discount.percent === 10 ? '💰' : '🚚';
-            messagesHTML += `
-                <div class="wheel-reward-message ${qualifies ? 'applied' : 'available'}">
-                    ${icon} ${discount.percent}% OFF ${qualifies ? '✅ APPLIED' : `- Add ${(15 - subtotal).toFixed(2)} JOD more`}
-                </div>
-            `;
-        });
-        
-        // Check free delivery
-        if (activeWheelRewards.freeDelivery.active) {
-            const qualifies = subtotal >= 25; // Free delivery still 25 JOD
-            messagesHTML += `
-                <div class="wheel-reward-message ${qualifies ? 'applied' : 'available'}">
-                    🚚 FREE Delivery ${qualifies ? '✅ APPLIED' : `- Add ${(25 - subtotal).toFixed(2)} JOD more`}
-                </div>
-            `;
-        }
-    }
-    
-    discountMessages.innerHTML = messagesHTML;
-}
-
-// Check for existing rewards on page load
-function checkExistingRewards() {
-    const savedExpiration = localStorage.getItem('rewardExpirationTime');
-    const savedReward = localStorage.getItem('currentWonReward');
-    
-    if (savedExpiration && savedReward) {
-        const expirationTime = parseInt(savedExpiration);
-        const now = new Date().getTime();
-        
-        if (now < expirationTime) {
-            // Reward still valid
-            rewardExpirationTime = expirationTime;
-            currentWonReward = JSON.parse(savedReward);
-            activateReward(currentWonReward);
-            startExpirationTimer();
-            startGlobalCountdownTimer();
-        } else {
-            // Reward expired
-            localStorage.removeItem('rewardExpirationTime');
-            localStorage.removeItem('currentWonReward');
-        }
-    }
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    checkExistingRewards();
-});
-
-window.initSpinWheel = initSpinWheel;
