@@ -999,7 +999,7 @@ function calculatePrice(includeDelivery = false) {
         
         // Check for seasonal discount
         const currentDate = new Date();
-        const discountEndDate = new Date('2025-11-30');
+        const discountEndDate = new Date('2026-2-13');
         if (currentDate <= discountEndDate) {
             const seasonalDiscount = Math.min(originalPrice * 0.1, 5);
             discountApplied = Math.max(discountApplied, seasonalDiscount);
