@@ -8047,31 +8047,36 @@ function updateDiscountDisplayWithMinimum(subtotal) {
     
     discountMessages.innerHTML = messagesHTML;
 }
-function disableSpinWheelSystem() {
-    // Disable all wheel functionality
-    hasSpunToday = false;
-    isSpinning = false;
-    
-    // Clear all active rewards
-    activeWheelRewards = {
-        freeCharm: { active: false, count: 0, minAmount: 10 },
-        discounts: [],
-        freeDelivery: { active: false, minAmount: 25 }
-    };
-    
-    // Hide spin wheel elements
-    hideSpinElements();
-    
-    // Clear any stored wheel data
-    localStorage.removeItem('hasSpunToday');
-    localStorage.removeItem('activeWheelRewards');
-    localStorage.removeItem('lastSpinDate');
-    localStorage.removeItem('lastSpinTime');
-    localStorage.removeItem('rewardExpirationTime');
-    localStorage.removeItem('currentWonReward');
-    
-    console.log('🛑 Spin wheel system disabled - event ended');
+// 🛑 SPIN WHEEL EVENT ENDED - DISABLE ALL FUNCTIONALITY
+hasSpunToday = false;
+isSpinning = false;
+activeWheelRewards = {
+    freeCharm: { active: false, count: 0, minAmount: 10 },
+    discounts: [],
+    freeDelivery: { active: false, minAmount: 25 }
+};
+
+// Override the showSpinWheel function to prevent it from opening
+function showSpinWheel() {
+    console.log('🎡 Spin wheel event has ended');
+    showToast('The spin wheel event has ended. Check back for future promotions!', 'info');
 }
+
+// Override spinWheel function
+function spinWheel() {
+    console.log('🎡 Spin wheel event has ended');
+    showToast('The spin wheel event has ended. Thank you for participating!', 'info');
+}
+
+// Remove wheel event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const spinButton = document.getElementById('spin-button');
+    if (spinButton) {
+        spinButton.onclick = function() {
+            showToast('The spin wheel event has ended. Check back soon for new promotions!', 'info');
+        };
+    }
+});
 // Check for existing rewards on page load
 function checkExistingRewards() {
     const savedExpiration = localStorage.getItem('rewardExpirationTime');
@@ -8096,9 +8101,5 @@ function checkExistingRewards() {
     }
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    disableSpinWheelSystem();
-});
 
 window.initSpinWheel = initSpinWheel;
