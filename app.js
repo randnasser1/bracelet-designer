@@ -113,14 +113,14 @@ const SIZE_CHARTS = {
 };
 
 const PRODUCTS = {
-    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 1, fullGlam: 29 },
-    anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 1, fullGlam: 42 },
-    necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 1, fullGlam: 64 },
-    ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 },
+    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 0, fullGlam: 29 },
+    anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 0, fullGlam: 42 },
+    necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 0, fullGlam: 64 },
+    ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 0, fullGlam: 15 },
     individual: { basePrice: 3, baseSlots: 1, includedSpecial: 0, fullGlam: 0 },
-    'watch': { basePrice: 20, baseSlots: 14, includedSpecial: 1, fullGlam: 35 }, // Bracelet charms -4
-    'apple-watch': { basePrice: 18, baseSlots: 13, includedSpecial: 1, fullGlam: 32 }, // Bracelet charms -5
-    'keychain': { basePrice: 6, baseSlots: 5, includedSpecial: 1, fullGlam: 13 }
+    'watch': { basePrice: 20, baseSlots: 14, includedSpecial: 0, fullGlam: 35 }, // Bracelet charms -4
+    'apple-watch': { basePrice: 18, baseSlots: 13, includedSpecial: 0, fullGlam: 32 }, // Bracelet charms -5
+    'keychain': { basePrice: 6, baseSlots: 5, includedSpecial: 0, fullGlam: 13 }
 };
 let currentWatchBase = 'basecharms/watch1.png'; // Default watch base
 
@@ -8047,36 +8047,7 @@ function updateDiscountDisplayWithMinimum(subtotal) {
     
     discountMessages.innerHTML = messagesHTML;
 }
-// 🛑 SPIN WHEEL EVENT ENDED - DISABLE ALL FUNCTIONALITY
-hasSpunToday = false;
-isSpinning = false;
-activeWheelRewards = {
-    freeCharm: { active: false, count: 0, minAmount: 10 },
-    discounts: [],
-    freeDelivery: { active: false, minAmount: 25 }
-};
 
-// Override the showSpinWheel function to prevent it from opening
-function showSpinWheel() {
-    console.log('🎡 Spin wheel event has ended');
-    showToast('The spin wheel event has ended. Check back for future promotions!', 'info');
-}
-
-// Override spinWheel function
-function spinWheel() {
-    console.log('🎡 Spin wheel event has ended');
-    showToast('The spin wheel event has ended. Thank you for participating!', 'info');
-}
-
-// Remove wheel event listeners
-document.addEventListener('DOMContentLoaded', function() {
-    const spinButton = document.getElementById('spin-button');
-    if (spinButton) {
-        spinButton.onclick = function() {
-            showToast('The spin wheel event has ended. Check back soon for new promotions!', 'info');
-        };
-    }
-});
 // Check for existing rewards on page load
 function checkExistingRewards() {
     const savedExpiration = localStorage.getItem('rewardExpirationTime');
@@ -8101,5 +8072,9 @@ function checkExistingRewards() {
     }
 }
 
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    checkExistingRewards();
+});
 
 window.initSpinWheel = initSpinWheel;
