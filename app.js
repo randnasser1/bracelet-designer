@@ -470,7 +470,293 @@ function formatOrderDate(timestamp) {
         day: 'numeric'
     });
 }
+// Initialize user circle on page load
+document.addEventListener('DOMContentLoaded', () => {
+    // Wait a bit for auth to initialize
+    setTimeout(initUserCircle, 1000);
+});
+document.addEventListener('DOMContentLoaded', function() {
+    function initializeProductText() {
+        const productCards = document.querySelectorAll('.product-card');
+        const productNames = {
+            'bracelet': 'Bracelet',
+            'watch': 'Watch',
+            'individual': 'Single charms-No bracelet',
+            'anklet': 'Anklet',
+            'ring': 'Ring',
+            'apple-watch': 'Apple Watch',
+            'keychain': 'Key chain'
+        };
 
+        productCards.forEach(card => {
+            const productType = card.dataset.type;
+            let productText = card.querySelector('.product-text');
+            
+            // Create text element if it doesn't exist
+            if (!productText) {
+                productText = document.createElement('div');
+                productText.className = 'product-text';
+                card.appendChild(productText);
+            }
+            
+            // Set the appropriate text
+            if (productNames[productType]) {
+                productText.textContent = productNames[productType];
+            }
+        });
+    }
+
+    // Initialize product text first
+    initializeProductText();
+    // Initialize all product slideshows
+    const slideshows = document.querySelectorAll('.product-slideshow');
+    
+    slideshows.forEach(slideshow => {
+        const slides = slideshow.querySelectorAll('.product-slide');
+        const indicators = slideshow.querySelectorAll('.slideshow-indicator');
+        const prevBtn = slideshow.querySelector('.slideshow-nav.prev');
+        const nextBtn = slideshow.querySelector('.slideshow-nav.next');
+        
+        let currentSlide = 0;
+        let slideInterval;
+        
+        // Function to show a specific slide
+        function showSlide(index) {
+            // Remove active class from all slides and indicators
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(indicator => indicator.classList.remove('active'));
+            
+            // Add active class to current slide and indicator
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            if (indicators[currentSlide]) {
+                indicators[currentSlide].classList.add('active');
+            }
+        }
+        
+        // Function to go to next slide
+        function nextSlide() {
+            let nextIndex = (currentSlide + 1) % slides.length;
+            showSlide(nextIndex);
+        }
+        
+        // Function to go to previous slide
+        function prevSlide() {
+            let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prevIndex);
+        }
+        
+        // Start automatic slideshow
+        function startSlideshow() {
+            if (slides.length > 1) {
+                slideInterval = setInterval(nextSlide, 2000); // Change slide every 2 seconds
+            }
+        }
+        
+        // Stop automatic slideshow
+        function stopSlideshow() {
+            clearInterval(slideInterval);
+        }
+        
+        // Only set up controls if there are multiple slides
+        if (slides.length > 1) {
+            // Event listeners for navigation
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    nextSlide();
+                    stopSlideshow();
+                    startSlideshow();
+                });
+            }
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    prevSlide();
+                    stopSlideshow();
+                    startSlideshow();
+                });
+            }
+            
+            // Event listeners for indicators
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showSlide(index);
+                    stopSlideshow();
+                    startSlideshow();
+                });
+            });
+            
+            // Pause slideshow on hover
+            slideshow.addEventListener('mouseenter', stopSlideshow);
+            slideshow.addEventListener('mouseleave', startSlideshow);
+            
+            // Start the slideshow
+            startSlideshow();
+        } else {
+            // Hide navigation and indicators if only one slide
+            if (prevBtn) prevBtn.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
+            if (indicators.length > 0) {
+                indicators[0].style.display = 'none';
+            }
+        }
+    });
+    
+    // Only convert simple product cards to slideshow if they actually have multiple images
+    const simpleProductCards = document.querySelectorAll('.product-card:not(:has(.product-slideshow))');
+    
+    // Define which products actually have multiple images
+    const productsWithMultipleImages = {
+        'bracelet': ['bracelet.png', 'bracelet2.png', 'bracelet3.png', 'bracelet4.png', 'bracelet5.png'],
+        'watch': ['watch.png', 'watch2.png'],
+        'individual': ['individual.png', 'individual2.png'],
+        'anklet': ['anklet.png', 'anklet2.png', 'anklet3.png'],
+        'ring': ['ring.png', 'ring2.png', 'ring3.png', 'ring4.png', 'ring5.png'],
+        'apple-watch': ['apple-watch.png', 'apple-watch2.png','apple-watch3.png'],
+        'keychain': ['keychain.png', 'keychain2.png']
+    };
+    
+    simpleProductCards.forEach(card => {
+        const productType = card.dataset.type;
+        
+        // Only create slideshow if this product has multiple images defined
+        if (productsWithMultipleImages[productType]) {
+            const img = card.querySelector('.product-image');
+            
+            if (img) {
+                const imageContainer = card.querySelector('.product-image-container') || card;
+                const imagePaths = productsWithMultipleImages[productType];
+                
+                // Create slideshow structure
+                let slidesHTML = '';
+                let indicatorsHTML = '';
+                
+                imagePaths.forEach((path, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    slidesHTML += `
+                        <div class="product-slide ${isActive}">
+                            <img src="products/${path}" alt="${productType} design ${index + 1}">
+                        </div>
+                    `;
+                    
+                    if (imagePaths.length > 1) {
+                        const indicatorActive = index === 0 ? 'active' : '';
+                        indicatorsHTML += `<div class="slideshow-indicator ${indicatorActive}"></div>`;
+                    }
+                });
+                
+                const slideshowHTML = `
+                    <div class="product-slideshow" data-product="${productType}">
+                        ${slidesHTML}
+                        ${imagePaths.length > 1 ? `
+                            <div class="slideshow-indicators">
+                                ${indicatorsHTML}
+                            </div>
+                            <div class="slideshow-nav prev">‹</div>
+                            <div class="slideshow-nav next">›</div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                // Replace the simple image with slideshow
+                if (imageContainer.classList.contains('product-image-container')) {
+                    imageContainer.innerHTML = slideshowHTML;
+                } else {
+                    // Create container if it doesn't exist
+                    const newContainer = document.createElement('div');
+                    newContainer.className = 'product-image-container';
+                    newContainer.innerHTML = slideshowHTML;
+                    img.replaceWith(newContainer);
+                }
+            }
+        }
+    });
+    
+    // Re-initialize slideshows for newly created ones
+    setTimeout(() => {
+        const newSlideshows = document.querySelectorAll('.product-slideshow');
+        newSlideshows.forEach(slideshow => {
+            if (!slideshow.dataset.initialized) {
+                const slides = slideshow.querySelectorAll('.product-slide');
+                const indicators = slideshow.querySelectorAll('.slideshow-indicator');
+                const prevBtn = slideshow.querySelector('.slideshow-nav.prev');
+                const nextBtn = slideshow.querySelector('.slideshow-nav.next');
+                
+                let currentSlide = 0;
+                let slideInterval;
+                
+                function showSlide(index) {
+                    slides.forEach(slide => slide.classList.remove('active'));
+                    indicators.forEach(indicator => indicator.classList.remove('active'));
+                    
+                    currentSlide = index;
+                    slides[currentSlide].classList.add('active');
+                    if (indicators[currentSlide]) {
+                        indicators[currentSlide].classList.add('active');
+                    }
+                }
+                
+                function nextSlide() {
+                    let nextIndex = (currentSlide + 1) % slides.length;
+                    showSlide(nextIndex);
+                }
+                
+                function startSlideshow() {
+                    if (slides.length > 1) {
+                        slideInterval = setInterval(nextSlide, 2000);
+                    }
+                }
+                
+                function stopSlideshow() {
+                    clearInterval(slideInterval);
+                }
+                
+                // Only set up controls if there are multiple slides
+                if (slides.length > 1) {
+                    if (nextBtn) {
+                        nextBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            nextSlide();
+                            stopSlideshow();
+                            startSlideshow();
+                        });
+                    }
+                    
+                    if (prevBtn) {
+                        prevBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            prevSlide();
+                            stopSlideshow();
+                            startSlideshow();
+                        });
+                    }
+                    
+                    indicators.forEach((indicator, index) => {
+                        indicator.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            showSlide(index);
+                            stopSlideshow();
+                            startSlideshow();
+                        });
+                    });
+                    
+                    slideshow.addEventListener('mouseenter', stopSlideshow);
+                    slideshow.addEventListener('mouseleave', startSlideshow);
+                    
+                    startSlideshow();
+                }
+                
+                slideshow.dataset.initialized = 'true';
+            }
+        });
+    }, 100);
+
+
+
+});
 async function viewOrderDetails(orderId) {
     try {
         const orderDoc = await db.collection('orders').doc(orderId).get();
