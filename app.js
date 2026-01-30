@@ -8047,7 +8047,31 @@ function updateDiscountDisplayWithMinimum(subtotal) {
     
     discountMessages.innerHTML = messagesHTML;
 }
-
+function disableSpinWheelSystem() {
+    // Disable all wheel functionality
+    hasSpunToday = false;
+    isSpinning = false;
+    
+    // Clear all active rewards
+    activeWheelRewards = {
+        freeCharm: { active: false, count: 0, minAmount: 10 },
+        discounts: [],
+        freeDelivery: { active: false, minAmount: 25 }
+    };
+    
+    // Hide spin wheel elements
+    hideSpinElements();
+    
+    // Clear any stored wheel data
+    localStorage.removeItem('hasSpunToday');
+    localStorage.removeItem('activeWheelRewards');
+    localStorage.removeItem('lastSpinDate');
+    localStorage.removeItem('lastSpinTime');
+    localStorage.removeItem('rewardExpirationTime');
+    localStorage.removeItem('currentWonReward');
+    
+    console.log('🛑 Spin wheel system disabled - event ended');
+}
 // Check for existing rewards on page load
 function checkExistingRewards() {
     const savedExpiration = localStorage.getItem('rewardExpirationTime');
@@ -8074,7 +8098,7 @@ function checkExistingRewards() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    checkExistingRewards();
+    disableSpinWheelSystem();
 });
 
 window.initSpinWheel = initSpinWheel;
