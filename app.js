@@ -113,14 +113,14 @@ const SIZE_CHARTS = {
 };
 
 const PRODUCTS = {
-    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 0, fullGlam: 29 },
-    anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 0, fullGlam: 42 },
-    necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 0, fullGlam: 64 },
-    ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 0, fullGlam: 15 },
+    bracelet: { basePrice: 10, baseSlots: 18, includedSpecial: 1, fullGlam: 29 },
+    anklet: { basePrice: 15, baseSlots: 23, includedSpecial: 1, fullGlam: 42 },
+    necklace: { basePrice: 22, baseSlots: 34, includedSpecial: 1, fullGlam: 64 },
+    ring: { basePrice: 7.5, baseSlots: 7, includedSpecial: 1, fullGlam: 15 },
     individual: { basePrice: 3, baseSlots: 1, includedSpecial: 0, fullGlam: 0 },
-    'watch': { basePrice: 20, baseSlots: 14, includedSpecial: 0, fullGlam: 35 }, // Bracelet charms -4
-    'apple-watch': { basePrice: 18, baseSlots: 13, includedSpecial: 0, fullGlam: 32 }, // Bracelet charms -5
-    'keychain': { basePrice: 6, baseSlots: 5, includedSpecial: 0, fullGlam: 13 }
+    'watch': { basePrice: 20, baseSlots: 14, includedSpecial: 1, fullGlam: 35 }, // Bracelet charms -4
+    'apple-watch': { basePrice: 18, baseSlots: 13, includedSpecial: 1, fullGlam: 32 }, // Bracelet charms -5
+    'keychain': { basePrice: 6, baseSlots: 5, includedSpecial: 1, fullGlam: 13 }
 };
 let currentWatchBase = 'basecharms/watch1.png'; // Default watch base
 
