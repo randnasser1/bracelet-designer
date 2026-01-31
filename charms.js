@@ -1,6 +1,8 @@
-// Auto-generated charm inventory
-
-const specialCharms = [
+// charms.js - Use IIFE to prevent global pollution
+(function() {
+    // Only declare if not already declared
+    if (typeof window.specialCharms === 'undefined') {
+         window.specialCharms = [
   // 8ball charms
  
   // beach charms
@@ -464,8 +466,10 @@ const specialCharms = [
 
   // butterflies charms
 ];
-
-const rareCharms = [
+ }
+    
+    if (typeof window.rareCharms === 'undefined') {
+         window.rareCharms = [
  
   //
   { src: 'rares/new-collection/10.png', category: 'butterflies', quantity: 1 },
@@ -1026,4 +1030,8 @@ const rareCharms = [
 
 
 ];
+}
+    
+    console.log('✅ charms.js loaded successfully');
+})();
 
