@@ -1288,8 +1288,7 @@ function updatePrice() {
                 // Discount is already applied
                 discountOfferElement.classList.add('success');
                 discountOfferElement.innerHTML = `
-                    <div class="discount-line1">🎉 15% OFF!</div>
-                    <div class="discount-line2">Saved ${safeDisplayPrice(priceData.discount)}</div>
+                    <div class="discount-line1">🎉 15% OFF! Saved ${safeDisplayPrice(priceData.discount)}</div>
                 `;
                 
                 // Update total to show discount
@@ -1306,8 +1305,7 @@ function updatePrice() {
                 // Eligible for discount
                 discountOfferElement.classList.add('info');
                 discountOfferElement.innerHTML = `
-                    <div class="discount-line1">⭐ 15% OFF!</div>
-                    <div class="discount-line2">Ready to apply</div>
+                    <div class="discount-line1">⭐ 15% OFF! Ready to apply</div>
                 `;
                 
             } else if (priceData.subtotal > 0 && priceData.subtotal < priceData.minimumForDiscount) {
@@ -1315,16 +1313,14 @@ function updatePrice() {
                 const amountNeeded = (priceData.minimumForDiscount - priceData.subtotal).toFixed(2);
                 discountOfferElement.classList.add('warning');
                 discountOfferElement.innerHTML = `
-                    <div class="discount-line1">Add ${amountNeeded} JDs</div>
-                    <div class="discount-line2">for 15% OFF!</div>
+                    <div class="discount-line1">Add ${amountNeeded} JDs for 15% OFF!</div>
                 `;
                 
             } else {
                 // Default message
                 discountOfferElement.classList.add('info');
                 discountOfferElement.innerHTML = `
-                    <div class="discount-line1">Add 5 JDs</div>
-                    <div class="discount-line2">to get 15% OFF!</div>
+                    <div class="discount-line1">Add 5 JDs to get 15% OFF!</div>
                 `;
             }
         }
@@ -2840,7 +2836,7 @@ function addCharmToSlot(slot, src, type, isSoldOut) {
 function showCustomWarningModal(message) {
     let warningModal = document.getElementById('custom-warning-modal');
     
-    
+
     
     warningModal.querySelector('.warning-message').innerHTML = message;
     warningModal.style.display = 'flex';
@@ -4165,7 +4161,10 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             updatePrice();
         }, 500);
-        
+          setTimeout(() => {
+        initializeGoldToggle();
+        initializeCharmFilters();
+    }, 2000);
     } catch (error) {
         console.error('Initialization error:', error);
         console.log('Application loaded with minor issues');
@@ -5833,6 +5832,7 @@ function filterCharmsByCategory(category) {
     
     const grid = document.getElementById('modern-charms-grid');
     const goldToggleWrapper = document.querySelector('.gold-toggle-wrapper');
+    const goldToggleSection = document.querySelector('.gold-toggle-section');
     
     if (!grid) return;
     
@@ -5843,25 +5843,39 @@ function filterCharmsByCategory(category) {
     if (goldToggleWrapper) {
         if (hasGoldVariants) {
             goldToggleWrapper.classList.remove('no-gold');
-            console.log(`✅ Showing gold toggle for ${category} (has gold variants)`);
         } else {
             goldToggleWrapper.classList.add('no-gold');
-            console.log(`❌ Hiding gold toggle for ${category} (no gold variants)`);
-            
-            // Reset to silver view when hiding toggle
+        }
+    }
+    
+    // Update featured gold toggle section visibility
+    if (goldToggleSection) {
+        if (hasGoldVariants) {
+            goldToggleSection.style.display = 'block';
+        } else {
+            goldToggleSection.style.display = 'none';
+            // Reset to silver view when hiding section
             showGoldVariants = false;
+            
+            // Update both toggles
             const goldToggle = document.getElementById('gold-toggle');
-            if (goldToggle) {
-                goldToggle.classList.remove('active');
-                const handle = goldToggle.querySelector('.toggle-handle');
-                if (handle) {
-                    handle.style.transform = 'translateX(3px)';
+            const featuredGoldToggle = document.getElementById('featured-gold-toggle');
+            
+            [goldToggle, featuredGoldToggle].forEach(toggle => {
+                if (toggle) {
+                    toggle.classList.remove('active');
+                    const handle = toggle.querySelector('.toggle-handle');
+                    if (handle) {
+                        handle.style.transform = 'translateX(3px)';
+                    }
+                    if (toggle.id === 'gold-toggle') {
+                        const track = toggle.querySelector('.toggle-track');
+                        if (track) {
+                            track.style.background = 'linear-gradient(90deg, #c0c0c0 100%, #ffd700 0%)';
+                        }
+                    }
                 }
-                const track = goldToggle.querySelector('.toggle-track');
-                if (track) {
-                    track.style.background = 'linear-gradient(90deg, #c0c0c0 100%, #ffd700 0%)';
-                }
-            }
+            });
         }
     }
     
@@ -5906,43 +5920,43 @@ function filterCharmsByCategory(category) {
                 <p class="hint">Try a different filter or toggle gold/silver</p>
             </div>
         `;
+        updateCharmCount();
         return;
     }
     
     // Display filtered charms
-    // In your filterCharmsByCategory function, when creating grid charms:
-filteredCharms.forEach((charm, index) => {
-    if (!charm.src || charm.quantity <= 0) return;
-    
-    const charmItem = document.createElement('div');
-    charmItem.className = 'modern-charm';
-    charmItem.dataset.category = charm.category || 'uncategorized';
-    
-    // Check if it's gold
-    const isGoldVariant = charm.src.includes('-gold.png');
-    charmItem.dataset.isGold = isGoldVariant;
-    
-    if (charm.src.includes('rares/')) {
-        charmItem.dataset.type = 'rare';
-    } else if (charm.src.includes('special/')) {
-        charmItem.dataset.type = 'special';
-    }
-    
-    // Create charm image with proper styling
-    const img = createCharm(charm.src, charm.name || `Charm ${index + 1}`, 
-                          charmItem.dataset.type, 
-                          charm.category === 'dangly');
-    
-    
-    
-    charmItem.appendChild(img);
-    grid.appendChild(charmItem);
-    
-    // Add click handler
-    charmItem.addEventListener('click', () => {
-        handleModernCharmSelection(charmItem, img, charm);
+    filteredCharms.forEach((charm, index) => {
+        if (!charm.src || charm.quantity <= 0) return;
+        
+        const charmItem = document.createElement('div');
+        charmItem.className = 'modern-charm';
+        charmItem.dataset.category = charm.category || 'uncategorized';
+        
+        // Check if it's gold
+        const isGoldVariant = charm.src.includes('-gold.png');
+        charmItem.dataset.isGold = isGoldVariant;
+        
+        if (charm.src.includes('rares/')) {
+            charmItem.dataset.type = 'rare';
+        } else if (charm.src.includes('special/')) {
+            charmItem.dataset.type = 'special';
+        }
+        
+        // Create charm image with proper styling
+        const img = createCharm(charm.src, charm.name || `Charm ${index + 1}`, 
+                              charmItem.dataset.type, 
+                              charm.category === 'dangly');
+        
+        
+        
+        charmItem.appendChild(img);
+        grid.appendChild(charmItem);
+        
+        // Add click handler
+        charmItem.addEventListener('click', () => {
+            handleModernCharmSelection(charmItem, img, charm);
+        });
     });
-});
     
     console.log(`✅ Displayed ${filteredCharms.length} charms for category: ${category}`);
     updateCharmCount();
@@ -6011,90 +6025,203 @@ function checkIfCategoryHasGoldVariants(category) {
 }
 let filtersInitialized = false;
 function initializeGoldToggle() {
+    console.log('🔧 initializeGoldToggle called');
+    
     const goldToggle = document.getElementById('gold-toggle');
-    if (!goldToggle) return;
+    const featuredGoldToggle = document.getElementById('featured-gold-toggle');
     
-    // Set initial state
-    goldToggle.classList.toggle('active', showGoldVariants);
+    // Handle main gold toggle
+    if (goldToggle) {
+        console.log('Found main gold toggle');
+        goldToggle.classList.toggle('active', showGoldVariants);
+        
+        // Remove any existing listeners first
+        const newGoldToggle = goldToggle.cloneNode(true);
+        goldToggle.parentNode.replaceChild(newGoldToggle, goldToggle);
+        
+        // Get the fresh reference
+        const freshGoldToggle = document.getElementById('gold-toggle');
+        
+        freshGoldToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            console.log('Main gold toggle clicked');
+            
+            showGoldVariants = !showGoldVariants;
+            this.classList.toggle('active');
+            
+            const handle = this.querySelector('.toggle-handle');
+            const track = this.querySelector('.toggle-track');
+            
+            if (showGoldVariants) {
+                console.log('Switching to GOLD view');
+                if (handle) handle.style.transform = 'translateX(42px)';
+                if (track) track.style.background = 'linear-gradient(90deg, #c0c0c0 0%, #ffd700 100%)';
+            } else {
+                console.log('Switching to SILVER view');
+                if (handle) handle.style.transform = 'translateX(3px)';
+                if (track) track.style.background = 'linear-gradient(90deg, #c0c0c0 100%, #ffd700 0%)';
+            }
+            
+            // Sync featured toggle if exists
+            if (featuredGoldToggle) {
+                featuredGoldToggle.classList.toggle('active', showGoldVariants);
+                const featuredHandle = featuredGoldToggle.querySelector('.toggle-handle');
+                if (featuredHandle) {
+                    featuredHandle.style.transform = showGoldVariants ? 'translateX(64px)' : 'translateX(3px)';
+                }
+            }
+            
+            // Get current category and re-filter
+            const activeItem = document.querySelector('.menu-item.active, .sub-item.active, .filter-chip.active');
+            const currentCategory = activeItem ? activeItem.dataset.category : 'all';
+            
+            console.log(`Refiltering category: ${currentCategory} with gold: ${showGoldVariants}`);
+            filterCharmsByCategory(currentCategory);
+        });
+    }
     
-    // Add click event
-    goldToggle.addEventListener('click', function() {
-        showGoldVariants = !showGoldVariants;
-        this.classList.toggle('active');
+    // Handle featured gold toggle
+    if (featuredGoldToggle) {
+        console.log('Found featured gold toggle');
+        featuredGoldToggle.classList.toggle('active', showGoldVariants);
         
-        // Update toggle visuals
-        const handle = this.querySelector('.toggle-handle');
-        const track = this.querySelector('.toggle-track');
+        // Remove any existing listeners first
+        const newFeaturedToggle = featuredGoldToggle.cloneNode(true);
+        featuredGoldToggle.parentNode.replaceChild(newFeaturedToggle, featuredGoldToggle);
         
-        if (showGoldVariants) {
-            handle.style.transform = 'translateX(42px)';
-            track.style.background = 'linear-gradient(90deg, #c0c0c0 0%, #ffd700 100%)';
-        } else {
-            handle.style.transform = 'translateX(3px)';
-            track.style.background = 'linear-gradient(90deg, #c0c0c0 100%, #ffd700 0%)';
-        }
+        // Get the fresh reference
+        const freshFeaturedToggle = document.getElementById('featured-gold-toggle');
         
-        console.log(`🔄 Gold filter changed to: ${showGoldVariants ? 'GOLD' : 'SILVER'}`);
-        
-        // Get current category and re-filter
-        const activeItem = document.querySelector('.menu-item.active, .sub-item.active');
-        const currentCategory = activeItem ? activeItem.dataset.category : 'all';
-        
-        // Re-filter with new gold setting
-        filterCharmsByCategory(currentCategory);
-        
-        // Update charm count
-        updateCharmCount();
-    });
+        freshFeaturedToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            console.log('Featured gold toggle clicked');
+            
+            showGoldVariants = !showGoldVariants;
+            this.classList.toggle('active');
+            
+            const handle = this.querySelector('.toggle-handle');
+            if (handle) {
+                handle.style.transform = showGoldVariants ? 'translateX(64px)' : 'translateX(3px)';
+            }
+            
+            // Sync main toggle if exists
+            if (goldToggle) {
+                const mainToggle = document.getElementById('gold-toggle');
+                if (mainToggle) {
+                    mainToggle.classList.toggle('active', showGoldVariants);
+                    const mainHandle = mainToggle.querySelector('.toggle-handle');
+                    const mainTrack = mainToggle.querySelector('.toggle-track');
+                    if (mainHandle) {
+                        mainHandle.style.transform = showGoldVariants ? 'translateX(42px)' : 'translateX(3px)';
+                    }
+                    if (mainTrack) {
+                        mainTrack.style.background = showGoldVariants 
+                            ? 'linear-gradient(90deg, #c0c0c0 0%, #ffd700 100%)' 
+                            : 'linear-gradient(90deg, #c0c0c0 100%, #ffd700 0%)';
+                    }
+                }
+            }
+            
+            // Get current category and re-filter
+            const activeItem = document.querySelector('.menu-item.active, .sub-item.active, .filter-chip.active');
+            const currentCategory = activeItem ? activeItem.dataset.category : 'all';
+            
+            console.log(`Refiltering category: ${currentCategory} with gold: ${showGoldVariants}`);
+            filterCharmsByCategory(currentCategory);
+        });
+    }
     
-    console.log('Gold toggle initialized');
+    console.log('✅ Gold toggle initialization complete');
 }
 
 // Call this in your DOMContentLoaded after other initializations
-setTimeout(initializeGoldToggle, 1000);
+//setTimeout(initializeGoldToggle, 1000);
 function initializeCharmFilters() {
     if (filtersInitialized) return;
     
     console.log('Initializing charm filters...');
     
+    // Handle menu items
     const menuItems = document.querySelectorAll('.menu-item, .sub-item');
-    if (!menuItems.length) return;
-    
-    // Remove existing listeners first
-    menuItems.forEach(item => {
-        item.replaceWith(item.cloneNode(true));
-    });
-    
-    // Get fresh references
-    const freshItems = document.querySelectorAll('.menu-item, .sub-item');
-    
-    freshItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.stopPropagation();
-            
-            const category = this.dataset.category || 'all';
-            
-            // Debounce: Don't filter if already on this category
-            if (this.classList.contains('active')) return;
-            
-            console.log('Filter clicked:', category);
-            
-            // Update UI
-            freshItems.forEach(i => i.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Filter charms
-            filterCharmsByCategory(category);
+    if (menuItems.length) {
+        menuItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                const category = this.dataset.category || 'all';
+                
+                if (this.classList.contains('active')) return;
+                
+                console.log('Menu filter clicked:', category);
+                
+                // Update all UI elements
+                menuItems.forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.filter-chip').forEach(chip => {
+                    chip.classList.remove('active');
+                    if (chip.dataset.category === category) {
+                        chip.classList.add('active');
+                    }
+                });
+                this.classList.add('active');
+                
+                // Close menu
+                const menuContent = document.querySelector('.menu-content');
+                const menuToggle = document.querySelector('.menu-toggle');
+                if (menuContent && menuToggle) {
+                    menuContent.style.display = 'none';
+                    menuToggle.classList.remove('active');
+                }
+                
+                // Filter charms
+                filterCharmsByCategory(category);
+                updateFilterStatus(category);
+            });
         });
-    });
+    }
+    
+    // Handle filter chips in featured filters
+    const filterChips = document.querySelectorAll('.filter-chip');
+    if (filterChips.length) {
+        filterChips.forEach(chip => {
+            chip.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                const category = this.dataset.category || 'all';
+                
+                if (this.classList.contains('active')) return;
+                
+                console.log('Filter chip clicked:', category);
+                
+                // Update all UI elements
+                filterChips.forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.menu-item, .sub-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.category === category) {
+                        item.classList.add('active');
+                    }
+                });
+                this.classList.add('active');
+                
+                // Filter charms
+                filterCharmsByCategory(category);
+                updateFilterStatus(category);
+            });
+        });
+    }
     
     filtersInitialized = true;
     
     // Set default filter
     setTimeout(() => {
         const allMenuItem = document.querySelector('.menu-item[data-category="all"]');
+        const allFilterChip = document.querySelector('.filter-chip[data-category="all"]');
+        
         if (allMenuItem && !allMenuItem.classList.contains('active')) {
             allMenuItem.click();
+        } else if (allFilterChip && !allFilterChip.classList.contains('active')) {
+            allFilterChip.click();
         }
     }, 1000);
 }
@@ -6279,7 +6406,6 @@ function initFiltersOnce() {
     }
 }
 
-// Update filter status display
 function updateFilterStatus(category) {
     const filterStatus = document.getElementById('current-filter');
     if (!filterStatus) return;
@@ -6320,6 +6446,9 @@ function updateFilterStatus(category) {
     };
     
     filterStatus.textContent = categoryNames[category] || category;
+    
+    // Update charm count
+    setTimeout(updateCharmCount, 100);
 }
 // Emergency reload of charms.js
 setTimeout(() => {
@@ -6370,3 +6499,4 @@ function hidePointingFinger() {
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(showPointingFinger, 1000);
 });
+
