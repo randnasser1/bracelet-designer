@@ -3361,7 +3361,7 @@ function updateCharmInventory(charmSrc, newQuantity) {
     });
     
     // Update in our data arrays
-    const allCharms = [...specialCharms, ...rareCharms];
+    const allCharms = [ ...rareCharms,...specialCharms];
     const charmData = allCharms.find(c => c.src === charmSrc);
     if (charmData) charmData.quantity = newQuantity;
 }
@@ -3388,7 +3388,7 @@ function updateCharmQuantity(charmSrc) {
     });
     
     // Update in data arrays
-    const allCharms = [...specialCharms, ...rareCharms];
+    const allCharms = [ ...rareCharms,...specialCharms];
     const charmData = allCharms.find(c => c.src === charmSrc);
     if (charmData) charmData.quantity = quantity;
     
@@ -3417,7 +3417,7 @@ function restoreCharmQuantity(charmSrc) {
     });
     
     // Update in data arrays
-    const allCharms = [...specialCharms, ...rareCharms];
+    const allCharms = [...rareCharms,...specialCharms];
     const charmData = allCharms.find(c => c.src === charmSrc);
     if (charmData) charmData.quantity = quantity;
     
@@ -5880,7 +5880,7 @@ function filterCharmsByCategory(category) {
     }
     
     // Get all charms
-    const allCharms = [...specialCharms, ...rareCharms];
+    const allCharms = [ ...rareCharms,...specialCharms];
     
     // Filter by category first
     let filteredCharms = allCharms;
@@ -5988,7 +5988,7 @@ function detectCharmType(charmSrc, charmElement) {
     return 'regular';
 }
 function checkIfCategoryHasGoldVariants(category) {
-    const allCharms = [...specialCharms, ...rareCharms];
+    const allCharms = [ ...rareCharms,...specialCharms];
     
     if (category === 'all') {
         // Check if ANY charms in entire collection have gold
@@ -6294,7 +6294,7 @@ function populateCharmsGridWithRealData() {
         return;
     }
     
-    const allCharms = [...window.specialCharms, ...window.rareCharms];
+    const allCharms = [ ...window.rareCharms,...window.specialCharms];
     
     // Filter out sold out charms immediately
     const availableCharms = allCharms.filter(charm => {
