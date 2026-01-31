@@ -8622,211 +8622,156 @@ body.menu-open {
 /* 11. Make sure no parent elements clip the menu */
 body, html, .main-content, .designer-page {
     overflow: visible !important;
-}/* Menu Content - Positioned ABOVE everything */
-.menu-content {
-    position: fixed !important;
-    top: 50px !important; /* Adjust based on your layout */
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 320px !important;
-    max-width: 90vw !important;
-    max-height: 70vh !important;
-    overflow-y: auto !important;
-    z-index: 10000 !important; /* Very high z-index */
-    margin: 0 !important;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
-    border: 1px solid #f5a0c2 !important;
-    background: white !important;
-    border-radius: 12px !important;
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transition: all 0.3s ease !important;
+}/* Add to your existing CSS */
+
+/* Compact row for search and gold toggle */
+.search-gold-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0 15px 0;
+    width: 100%;
+    flex-wrap: wrap;
 }
 
-/* When menu is active */
-.collapsible-menu.active ~ .menu-content,
-.menu-content.show {
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    animation: slideDownMenu 0.3s ease !important;
-}
-
-/* Animation */
-@keyframes slideDownMenu {
-    from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-}
-
-/* Make sure nothing clips the menu */
-.featured-filters,
-.filter-row-compact,
-.filter-chips {
+/* Adjust the collapsible menu to fit in the row */
+.collapsible-menu {
+    flex: 1;
+    min-width: 150px;
     position: relative;
-    z-index: 1 !important;
 }
 
-/* Menu backdrop overlay */
-.menu-backdrop {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: rgba(0, 0, 0, 0.3) !important;
-    z-index: 9999 !important; /* Below menu but above everything else */
-    display: none !important;
-    opacity: 0 !important;
-    transition: opacity 0.3s ease !important;
+/* Make the search button fit in the row */
+.menu-toggle {
+    width: 100%;
+    min-width: 150px;
+    margin: 0;
 }
 
-.menu-backdrop.active {
-    display: block !important;
-    opacity: 1 !important;
+/* Gold toggle section - make it inline */
+.gold-toggle-section {
+    margin-left: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
 }
 
-/* Featured filters should not create stacking context */
-.featured-filters {
-    position: relative !important;
-    z-index: auto !important;
-    /* Remove properties that create stacking context */
-    transform: none !important;
-    opacity: 1 !important;
-    filter: none !important;
+/* Compact gold toggle */
+.gold-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff9e6;
+    border-radius: 20px;
+    border: 1px solid #ffd700;
+    padding: 5px 10px;
+    white-space: nowrap;
 }
 
-/* Collapsible menu button */
-.collapsible-menu {
-    position: relative !important;
-    display: inline-block !important;
+/* Make the gold toggle smaller for compact layout */
+#featured-gold-toggle {
+    width: 55px !important;
+    height: 26px !important;
 }
 
-/* Adjust for mobile */
+#featured-gold-toggle .toggle-handle {
+    width: 18px !important;
+    height: 18px !important;
+    top: 3px !important;
+    left: 3px !important;
+}
+
+#featured-gold-toggle.active .toggle-handle {
+    transform: translateX(29px) !important;
+}
+
+/* Mobile adjustments for the row */
 @media (max-width: 768px) {
-    .menu-content {
-        top: 60px !important;
-        width: 95vw !important;
-        max-height: 60vh !important;
-    }
-}/* Remove old positioning styles and replace with these */
-
-/* Menu Content - Appears directly under the search button */
-.collapsible-menu .menu-content {
-    position: absolute !important; /* Absolute to parent */
-    top: 100% !important; /* Directly below the button */
-    left: 0 !important; /* Align with left edge of button */
-    width: 320px !important;
-    max-width: 90vw !important;
-    max-height: 400px !important;
-    overflow-y: auto !important;
-    z-index: 10000 !important; /* Very high z-index */
-    margin-top: 5px !important;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
-    border: 1px solid #f5a0c2 !important;
-    background: white !important;
-    border-radius: 12px !important;
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transform: translateY(-10px) !important;
-    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease !important;
-}
-
-/* When menu is active */
-.collapsible-menu.active .menu-content {
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) !important;
-}
-
-/* Ensure the parent container doesn't clip the menu */
-.featured-filters {
-    position: relative !important; /* For positioning context */
-    overflow: visible !important; /* Crucial: don't clip children */
-    z-index: auto !important;
-}
-
-.filter-row-compact {
-    position: relative !important;
-}
-
-/* Collapsible menu needs to create stacking context */
-.collapsible-menu {
-    position: relative !important; /* This creates positioning context for the menu */
-    z-index: 1000 !important;
-    isolation: isolate !important; /* Create new stacking context */
-}
-
-/* Backdrop overlay */
-.menu-backdrop {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: rgba(0, 0, 0, 0.3) !important;
-    z-index: 9999 !important;
-    display: none !important;
-    opacity: 0 !important;
-    transition: opacity 0.3s ease !important;
-    pointer-events: none !important; /* Allow clicks through when not active */
-}
-
-.menu-backdrop.active {
-    display: block !important;
-    opacity: 1 !important;
-    pointer-events: auto !important; /* Block clicks when active */
-}
-
-/* Prevent body scroll when menu is open */
-body.menu-open {
-    overflow: hidden !important;
-}
-
-/* Ensure no parent elements clip the menu */
-.main-content, .designer-page {
-    overflow: visible !important;
-}
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
-    .collapsible-menu .menu-content {
-        width: 280px !important;
-        max-width: calc(100vw - 20px) !important;
-        max-height: 60vh !important;
-        left: 0 !important;
-        right: auto !important;
+    .search-gold-row {
+        gap: 8px;
     }
     
-    /* If menu would go off screen on mobile, adjust */
-    .collapsible-menu .menu-content {
-        left: 0 !important;
-        transform-origin: top left !important;
+    .collapsible-menu {
+        min-width: 120px;
+    }
+    
+    .menu-toggle {
+        min-width: 120px;
+        padding: 6px 12px !important;
+        font-size: 0.75rem !important;
+    }
+    
+    .gold-toggle-container {
+        padding: 4px 8px;
+    }
+    
+    .toggle-label {
+        font-size: 0.75rem !important;
+        min-width: 35px !important;
     }
 }
 
 @media (max-width: 480px) {
-    .collapsible-menu .menu-content {
-        width: calc(100vw - 40px) !important;
-        max-height: 50vh !important;
+    .search-gold-row {
+        flex-direction: row;
+        flex-wrap: nowrap;
     }
+    
+    .collapsible-menu {
+        flex: 1;
+    }
+    
+    .menu-toggle {
+        min-width: auto;
+    }
+    
+    .menu-toggle .filter-text {
+        display: none;
+    }
+    
+    .menu-toggle i {
+        margin-right: 0;
+    }
+    
+    .gold-toggle-section {
+        flex-shrink: 0;
+    }
+    
+    .gold-toggle-container {
+        padding: 3px 6px;
+    }
+    
+    #featured-gold-toggle {
+        width: 50px !important;
+        height: 24px !important;
+    }
+    
+    #featured-gold-toggle .toggle-handle {
+        width: 16px !important;
+        height: 16px !important;
+    }
+    
+    #featured-gold-toggle.active .toggle-handle {
+        transform: translateX(26px) !important;
+    }
+}/* Fix menu content positioning */
+.menu-content {
+    position: absolute !important;
+    top: 100% !important; /* Position below the button */
+    left: 50% !important; /* Start from 50% position */
+    transform: translateX(-50%) !important; /* Center it */
+    width: 280px !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+    z-index: 99999 !important;
+    margin-top: 5px !important;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2) !important;
+    border: 1px solid #f5a0c2 !important;
+    background: white !important;
+    border-radius: 12px !important;
+    display: none !important;
 }
 
-/* For very small screens, ensure menu fits */
-@media (max-width: 360px) {
-    .collapsible-menu .menu-content {
-        width: 280px !important;
-        max-width: 95vw !important;
-    }
-}
 </style>
 </head>
 
@@ -9087,7 +9032,11 @@ body.menu-open {
 <!-- Total Below (separate) -->
 <div class="total-container">
   <div id="total-price">Total: 12.00 JDs</div>
-    <div class="price-display side-by-side"> 
+    <div class="price-display side-by-side">
+  <!-- Left Column: Prices -->
+ 
+  
+  <!-- Right Column: Discount (RIGHT NEXT TO IT) -->
   <div class="discount-right" id="discount-offer">
     <div class="discount-line1">Add 5 JDs to get 15% OFF!</div>
   </div>
@@ -9252,91 +9201,85 @@ body.menu-open {
 
     <!-- Single Collapsible Menu -->
    
-
-<div class="menu-backdrop" id="menu-backdrop"></div>
-
-<div class="featured-filters">
-    <div class="filter-section">
-        <div class="filter-row-compact">
-            <!-- Search Button stays here -->
-            <div class="collapsible-menu">
-                <button class="menu-toggle">
-                    <i class="fas fa-search"></i> Search by Category
+<div class="search-gold-row">
+    <!-- Search Button -->
+    <div class="collapsible-menu">
+        <button class="menu-toggle">
+            <i class="fas fa-search"></i> <span class="filter-text">Search by Category</span>
+        </button>
+        <!-- Menu Content -->
+        <div class="menu-content">
+            <!-- All Charms -->
+            <button class="menu-item active" data-category="all">
+                <span>⭐ All Charms</span>
+            </button>
+            
+            <!-- Rare (+3 JDs) -->
+            <div class="menu-section">
+                <button class="menu-header" data-category="rare">
+                    <span>💎 Rare (3 JDs each)</span>
+                    <i class="fas fa-chevron-down"></i>
                 </button>
-                <!-- Menu Content -->
-                
+                <div class="sub-items">
+                    <button class="sub-item" data-category="hgs">Hot Girl Summer</button>
+                    <button class="sub-item" data-category="sanrio">Sanrio</button>
+                    <button class="sub-item" data-category="newc3r">Gulf and Egypt🌴🕌🐫</button>
+                    <button class="sub-item" data-category="butterflies">Butterflies ʚїɞ</button>
+                    <button class="sub-item" data-category="sporty">Sporty🏎️💨</button>
+                    <button class="sub-item" data-category="night">Whimsy🌙💤</button>
+                    <button class="sub-item" data-category="rcute">Cute🍓🐥</button>
+                    <button class="sub-item" data-category="careers">Careers💼</button>
+                    <button class="sub-item" data-category="pets">Pets🐶🐾</button>
+                    <button class="sub-item" data-category="gold">Gold</button>
+                    <button class="sub-item" data-category="disney">Disney</button>
+                    <button class="sub-item" data-category="love">Love/Friends/Family💗</button>
+                    <button class="sub-item" data-category="dangly">Dangly (many new⭐)</button>
+                    <button class="sub-item" data-category="random">Random</button>
+                    <button class="sub-item" data-category="long">Long</button>
+                    <button class="sub-item" data-category="graduation">Grad🎓✧˖°</button>
+                </div>
             </div>
             
-
-            
-            <!-- Gold Toggle at the END -->
-            <div class="gold-toggle-section">
-                <div class="gold-toggle-container">
-                    <span class="toggle-label">Silver</span>
-                    <div id="featured-gold-toggle" class="gold-toggle">
-                        <div class="toggle-track"></div>
-                        <div class="toggle-handle"></div>
-                    </div>
-                    <span class="toggle-label">Gold</span>
+            <!-- Special (+2 JDs) -->
+            <div class="menu-section">
+                <button class="menu-header" data-category="special">
+                    <span>✨ Special (2 JDs each)</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="sub-items">
+                    <button class="sub-item" data-category="newc2s">NEW Collection⭐!!</button>
+                    <button class="sub-item" data-category="teddy">Teddy Bears˚ʚ🧸ɞ˚</button>
+                    <button class="sub-item" data-category="girly">Girly</button>
+                    <button class="sub-item" data-category="bows">Bows🎀</button>
+                    <button class="sub-item" data-category="beach">Beach🌊🐚🫧</button>
+                    <button class="sub-item" data-category="red">Red</button>
+                    <button class="sub-item" data-category="cute">First collection</button>
+                    <button class="sub-item" data-category="cutespecials">Cute</button>
+                    <button class="sub-item" data-category="flowers">Flowers🌷</button>
+                    <button class="sub-item" data-category="fruity">Fruity✩🍉₊˚🍓⁺₊✧</button>
+                    <button class="sub-item" data-category="mushrooms">Mushrooms🍄</button>
+                    <button class="sub-item" data-category="simple">Simple & Cute</button>
                 </div>
             </div>
         </div>
     </div>
+   
+    <!-- Gold Toggle -->
+    <div class="gold-toggle-section">
+        <div class="gold-toggle-container">
+            <span class="toggle-label">Silver</span>
+            <div id="featured-gold-toggle" class="gold-toggle">
+                <div class="toggle-track"></div>
+                <div class="toggle-handle"></div>
+            </div>
+            <span class="toggle-label">Gold</span>
+        </div>
+    </div>
 </div>
-<div class="menu-content">
-                    <!-- All Charms -->
-                    <button class="menu-item active" data-category="all">
-                        <span>⭐ All Charms</span>
-                    </button>
-                    
-                    <!-- Rare (+3 JDs) -->
-                    <div class="menu-section">
-                        <button class="menu-header" data-category="rare">
-                            <span>💎 Rare (3 JDs each)</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="sub-items">
-                            <button class="sub-item" data-category="hgs">Hot Girl Summer</button>
-                            <button class="sub-item" data-category="sanrio">Sanrio</button>
-                            <button class="sub-item" data-category="newc3r">Gulf and Egypt🌴🕌🐫</button>
-                            <button class="sub-item" data-category="butterflies">Butterflies ʚїɞ</button>
-                            <button class="sub-item" data-category="sporty">Sporty🏎️💨</button>
-                            <button class="sub-item" data-category="night">Whimsy🌙💤</button>
-                            <button class="sub-item" data-category="rcute">Cute🍓🐥</button>
-                            <button class="sub-item" data-category="careers">Careers💼</button>
-                            <button class="sub-item" data-category="pets">Pets🐶🐾</button>
-                            <button class="sub-item" data-category="gold">Gold</button>
-                            <button class="sub-item" data-category="disney">Disney</button>
-                            <button class="sub-item" data-category="love">Love/Friends/Family💗</button>
-                            <button class="sub-item" data-category="dangly">Dangly (many new⭐)</button>
-                            <button class="sub-item" data-category="random">Random</button>
-                            <button class="sub-item" data-category="long">Long</button>
-                            <button class="sub-item" data-category="graduation">Grad🎓✧˖°</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Special (+2 JDs) -->
-                    <div class="menu-section">
-                        <button class="menu-header" data-category="special">
-                            <span>✨ Special (2 JDs each)</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="sub-items">
-                            <button class="sub-item" data-category="newc2s">NEW Collection⭐!!</button>
-                            <button class="sub-item" data-category="teddy">Teddy Bears˚ʚ🧸ɞ˚</button>
-                            <button class="sub-item" data-category="girly">Girly</button>
-                            <button class="sub-item" data-category="bows">Bows🎀</button>
-                            <button class="sub-item" data-category="beach">Beach🌊🐚🫧</button>
-                            <button class="sub-item" data-category="red">Red</button>
-                            <button class="sub-item" data-category="cute">First collection</button>
-                            <button class="sub-item" data-category="cutespecials">Cute</button>
-                            <button class="sub-item" data-category="flowers">Flowers🌷</button>
-                            <button class="sub-item" data-category="fruity">Fruity✩🍉₊˚🍓⁺₊✧</button>
-                            <button class="sub-item" data-category="mushrooms">Mushrooms🍄</button>
-                            <button class="sub-item" data-category="simple">Simple & Cute</button>
-                        </div>
-                    </div>
-                </div>
+
+<!-- Keep the menu backdrop for overlay -->
+<div class="menu-backdrop" id="menu-backdrop"></div>
+
 <div class="recommended-charms-bar" id="recommended-charms-bar">
         <div class="recommended-scroll-container">
             <div class="recommended-charms-scroll" id="recommended-charms-scroll">
