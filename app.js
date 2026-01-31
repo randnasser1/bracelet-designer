@@ -2430,17 +2430,7 @@ function handlePlaceOrderClick() {
     // Check minimum order amount
     const subtotal = cart.reduce((sum, item) => sum + item.originalPrice, 0);
     const MINIMUM_ORDER = 15.00;
-    
-    if (subtotal < MINIMUM_ORDER) {
-        const amountNeeded = (MINIMUM_ORDER - subtotal).toFixed(2);
-        showCustomWarningModal(
-            `🎯 Minimum Order Required!\n\n💳 Your current order: ${subtotal.toFixed(2)} JOD\n` +
-            `💰 You need: ${amountNeeded} JOD more\n` +
-            `🎁 Minimum for 10% discount: 15.00 JOD\n\n` +
-            `💡 Add more charms or upgrade to Full Glam!`
-        );
-        return;
-    }
+   
     
     // Validate charm sets
     const invalidSets = validateCartForCheckout();
