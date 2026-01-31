@@ -16,17 +16,11 @@ function waitForFirebase() {
         checkFirebase();
     });
 }
+window.charmDataLoaded = false;
 
 // Global variables - declare at the top
 let jewelryPiece;
-let specialCharmsGrid;
-let rareCharmsGrid;
-let customCharmUpload;
-let customCharmPreview;
-let addCustomCharmBtn;
-let specialCategoryTabs;
-let rareCategoryTabs;
-let customCharmImage = null;
+
 let cartButton;
 let cartPreview;
 let cartCloseBtn;
@@ -243,84 +237,7 @@ let currentDesign = {
 };
 window.orderFunctionalityInitialized = false;
 // Authentication functions
-function initAuth() {
-    const authButton = document.getElementById('auth-button');
-    const authModal = document.getElementById('auth-modal');
-    const closeAuth = document.getElementById('close-auth');
-    const authTabs = document.querySelectorAll('.auth-tab');
-    const authForms = document.querySelectorAll('.auth-form');
-    const loginForm = document.getElementById('login-form');
-    const signupForm = document.getElementById('signup-form');
-    const userProfile = document.getElementById('user-profile');
-    const logoutBtn = document.getElementById('logout-btn');
-    const userName = document.getElementById('user-name');
 
-    // Auth button click
-    authButton.addEventListener('click', () => {
-        authModal.classList.add('active');
-    });
-
-    // Close auth modal
-    closeAuth.addEventListener('click', () => {
-        authModal.classList.remove('active');
-    });
-
-    // Switch between login/signup tabs
-    authTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const targetTab = tab.dataset.tab;
-            
-            authTabs.forEach(t => t.classList.remove('active'));
-            authForms.forEach(f => f.classList.remove('active'));
-            
-            tab.classList.add('active');
-            document.getElementById(`${targetTab}-form`).classList.add('active');
-        });
-    });
-
-    // Login form submission
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        
-        try {
-            const user = await loginUser(email, password);
-            authModal.classList.remove('active');
-            loginForm.reset();
-            showToast('Login successful!', 'success');
-        } catch (error) {
-            showToast(error.message, 'error');
-        }
-    });
-
-    // Signup form submission
-    signupForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const name = document.getElementById('signup-name').value;
-        const email = document.getElementById('signup-email').value;
-        const password = document.getElementById('signup-password').value;
-        
-        try {
-            const user = await signUpUser(email, password, name);
-            authModal.classList.remove('active');
-            signupForm.reset();
-            showToast('Account created successfully!', 'success');
-        } catch (error) {
-            showToast(error.message, 'error');
-        }
-    });
-
-    // Logout
-    logoutBtn.addEventListener('click', () => {
-        logoutUser();
-    });
-
-    // Auth state listener
-    auth.onAuthStateChanged((user) => {
-        updateAuthUI(user);
-    });
-}
 
 // Auth functions
 async function signUpUser(email, password, displayName) {
@@ -470,293 +387,7 @@ function formatOrderDate(timestamp) {
         day: 'numeric'
     });
 }
-// Initialize user circle on page load
-document.addEventListener('DOMContentLoaded', () => {
-    // Wait a bit for auth to initialize
-    setTimeout(initUserCircle, 1000);
-});
-document.addEventListener('DOMContentLoaded', function() {
-    function initializeProductText() {
-        const productCards = document.querySelectorAll('.product-card');
-        const productNames = {
-            'bracelet': 'Bracelet',
-            'watch': 'Watch',
-            'individual': 'Single charms-No bracelet',
-            'anklet': 'Anklet',
-            'ring': 'Ring',
-            'apple-watch': 'Apple Watch',
-            'keychain': 'Key chain'
-        };
 
-        productCards.forEach(card => {
-            const productType = card.dataset.type;
-            let productText = card.querySelector('.product-text');
-            
-            // Create text element if it doesn't exist
-            if (!productText) {
-                productText = document.createElement('div');
-                productText.className = 'product-text';
-                card.appendChild(productText);
-            }
-            
-            // Set the appropriate text
-            if (productNames[productType]) {
-                productText.textContent = productNames[productType];
-            }
-        });
-    }
-
-    // Initialize product text first
-    initializeProductText();
-    // Initialize all product slideshows
-    const slideshows = document.querySelectorAll('.product-slideshow');
-    
-    slideshows.forEach(slideshow => {
-        const slides = slideshow.querySelectorAll('.product-slide');
-        const indicators = slideshow.querySelectorAll('.slideshow-indicator');
-        const prevBtn = slideshow.querySelector('.slideshow-nav.prev');
-        const nextBtn = slideshow.querySelector('.slideshow-nav.next');
-        
-        let currentSlide = 0;
-        let slideInterval;
-        
-        // Function to show a specific slide
-        function showSlide(index) {
-            // Remove active class from all slides and indicators
-            slides.forEach(slide => slide.classList.remove('active'));
-            indicators.forEach(indicator => indicator.classList.remove('active'));
-            
-            // Add active class to current slide and indicator
-            currentSlide = index;
-            slides[currentSlide].classList.add('active');
-            if (indicators[currentSlide]) {
-                indicators[currentSlide].classList.add('active');
-            }
-        }
-        
-        // Function to go to next slide
-        function nextSlide() {
-            let nextIndex = (currentSlide + 1) % slides.length;
-            showSlide(nextIndex);
-        }
-        
-        // Function to go to previous slide
-        function prevSlide() {
-            let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
-            showSlide(prevIndex);
-        }
-        
-        // Start automatic slideshow
-        function startSlideshow() {
-            if (slides.length > 1) {
-                slideInterval = setInterval(nextSlide, 2000); // Change slide every 2 seconds
-            }
-        }
-        
-        // Stop automatic slideshow
-        function stopSlideshow() {
-            clearInterval(slideInterval);
-        }
-        
-        // Only set up controls if there are multiple slides
-        if (slides.length > 1) {
-            // Event listeners for navigation
-            if (nextBtn) {
-                nextBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    nextSlide();
-                    stopSlideshow();
-                    startSlideshow();
-                });
-            }
-            
-            if (prevBtn) {
-                prevBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    prevSlide();
-                    stopSlideshow();
-                    startSlideshow();
-                });
-            }
-            
-            // Event listeners for indicators
-            indicators.forEach((indicator, index) => {
-                indicator.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    showSlide(index);
-                    stopSlideshow();
-                    startSlideshow();
-                });
-            });
-            
-            // Pause slideshow on hover
-            slideshow.addEventListener('mouseenter', stopSlideshow);
-            slideshow.addEventListener('mouseleave', startSlideshow);
-            
-            // Start the slideshow
-            startSlideshow();
-        } else {
-            // Hide navigation and indicators if only one slide
-            if (prevBtn) prevBtn.style.display = 'none';
-            if (nextBtn) nextBtn.style.display = 'none';
-            if (indicators.length > 0) {
-                indicators[0].style.display = 'none';
-            }
-        }
-    });
-    
-    // Only convert simple product cards to slideshow if they actually have multiple images
-    const simpleProductCards = document.querySelectorAll('.product-card:not(:has(.product-slideshow))');
-    
-    // Define which products actually have multiple images
-    const productsWithMultipleImages = {
-        'bracelet': ['bracelet.png', 'bracelet2.png', 'bracelet3.png', 'bracelet4.png', 'bracelet5.png'],
-        'watch': ['watch.png', 'watch2.png'],
-        'individual': ['individual.png', 'individual2.png'],
-        'anklet': ['anklet.png', 'anklet2.png', 'anklet3.png'],
-        'ring': ['ring.png', 'ring2.png', 'ring3.png', 'ring4.png', 'ring5.png'],
-        'apple-watch': ['apple-watch.png', 'apple-watch2.png','apple-watch3.png'],
-        'keychain': ['keychain.png', 'keychain2.png']
-    };
-    
-    simpleProductCards.forEach(card => {
-        const productType = card.dataset.type;
-        
-        // Only create slideshow if this product has multiple images defined
-        if (productsWithMultipleImages[productType]) {
-            const img = card.querySelector('.product-image');
-            
-            if (img) {
-                const imageContainer = card.querySelector('.product-image-container') || card;
-                const imagePaths = productsWithMultipleImages[productType];
-                
-                // Create slideshow structure
-                let slidesHTML = '';
-                let indicatorsHTML = '';
-                
-                imagePaths.forEach((path, index) => {
-                    const isActive = index === 0 ? 'active' : '';
-                    slidesHTML += `
-                        <div class="product-slide ${isActive}">
-                            <img src="products/${path}" alt="${productType} design ${index + 1}">
-                        </div>
-                    `;
-                    
-                    if (imagePaths.length > 1) {
-                        const indicatorActive = index === 0 ? 'active' : '';
-                        indicatorsHTML += `<div class="slideshow-indicator ${indicatorActive}"></div>`;
-                    }
-                });
-                
-                const slideshowHTML = `
-                    <div class="product-slideshow" data-product="${productType}">
-                        ${slidesHTML}
-                        ${imagePaths.length > 1 ? `
-                            <div class="slideshow-indicators">
-                                ${indicatorsHTML}
-                            </div>
-                            <div class="slideshow-nav prev">‹</div>
-                            <div class="slideshow-nav next">›</div>
-                        ` : ''}
-                    </div>
-                `;
-                
-                // Replace the simple image with slideshow
-                if (imageContainer.classList.contains('product-image-container')) {
-                    imageContainer.innerHTML = slideshowHTML;
-                } else {
-                    // Create container if it doesn't exist
-                    const newContainer = document.createElement('div');
-                    newContainer.className = 'product-image-container';
-                    newContainer.innerHTML = slideshowHTML;
-                    img.replaceWith(newContainer);
-                }
-            }
-        }
-    });
-    
-    // Re-initialize slideshows for newly created ones
-    setTimeout(() => {
-        const newSlideshows = document.querySelectorAll('.product-slideshow');
-        newSlideshows.forEach(slideshow => {
-            if (!slideshow.dataset.initialized) {
-                const slides = slideshow.querySelectorAll('.product-slide');
-                const indicators = slideshow.querySelectorAll('.slideshow-indicator');
-                const prevBtn = slideshow.querySelector('.slideshow-nav.prev');
-                const nextBtn = slideshow.querySelector('.slideshow-nav.next');
-                
-                let currentSlide = 0;
-                let slideInterval;
-                
-                function showSlide(index) {
-                    slides.forEach(slide => slide.classList.remove('active'));
-                    indicators.forEach(indicator => indicator.classList.remove('active'));
-                    
-                    currentSlide = index;
-                    slides[currentSlide].classList.add('active');
-                    if (indicators[currentSlide]) {
-                        indicators[currentSlide].classList.add('active');
-                    }
-                }
-                
-                function nextSlide() {
-                    let nextIndex = (currentSlide + 1) % slides.length;
-                    showSlide(nextIndex);
-                }
-                
-                function startSlideshow() {
-                    if (slides.length > 1) {
-                        slideInterval = setInterval(nextSlide, 2000);
-                    }
-                }
-                
-                function stopSlideshow() {
-                    clearInterval(slideInterval);
-                }
-                
-                // Only set up controls if there are multiple slides
-                if (slides.length > 1) {
-                    if (nextBtn) {
-                        nextBtn.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            nextSlide();
-                            stopSlideshow();
-                            startSlideshow();
-                        });
-                    }
-                    
-                    if (prevBtn) {
-                        prevBtn.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            prevSlide();
-                            stopSlideshow();
-                            startSlideshow();
-                        });
-                    }
-                    
-                    indicators.forEach((indicator, index) => {
-                        indicator.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            showSlide(index);
-                            stopSlideshow();
-                            startSlideshow();
-                        });
-                    });
-                    
-                    slideshow.addEventListener('mouseenter', stopSlideshow);
-                    slideshow.addEventListener('mouseleave', startSlideshow);
-                    
-                    startSlideshow();
-                }
-                
-                slideshow.dataset.initialized = 'true';
-            }
-        });
-    }, 100);
-
-
-
-});
 async function viewOrderDetails(orderId) {
     try {
         const orderDoc = await db.collection('orders').doc(orderId).get();
@@ -1570,46 +1201,46 @@ function updateCartDisplay() {
     cartDelivery.textContent = `Delivery Fee: ${deliveryFee.toFixed(2)} JDs`;
     
     // 🎯 BEAUTIFUL CART DISCOUNT DISPLAY
-    if (additionalDiscount > 0) {
-        cartDiscountInfo.style.display = 'block';
-        cartDiscountAmount.innerHTML = `
-            <div class="cart-discount-applied">
-                <span class="discount-badge">🎉 10% OFF</span>
-                <span class="discount-amount">-${additionalDiscount.toFixed(2)} JDs</span>
-            </div>
-        `;
-        
-        cartTotal.innerHTML = `
-            <div class="cart-total-with-discount">
-                <div class="price-comparison">
-                    <span class="original-price">${totalBeforeDiscount.toFixed(2)} JDs</span>
-                    <span class="final-price">${finalTotal.toFixed(2)} JDs</span>
-                </div>
-                <div class="savings-message">
-                    You saved ${additionalDiscount.toFixed(2)} JDs!
-                </div>
-            </div>
-        `;
-    } else if (qualifiesForDiscount) {
-        cartDiscountInfo.style.display = 'block';
-        cartDiscountAmount.innerHTML = `
-            <div class="cart-discount-eligible">
-                <span class="discount-badge">⭐ ELIGIBLE</span>
-                <span>10% discount will be applied at checkout</span>
-            </div>
-        `;
-        cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
-    } else {
-        cartDiscountInfo.style.display = 'block';
-        const amountNeeded = (MINIMUM_ORDER - subtotal).toFixed(2);
-        cartDiscountAmount.innerHTML = `
-            <div class="cart-discount-not-eligible">
-                <span class="discount-badge">📢 ALMOST THERE</span>
-                <span>Add ${amountNeeded} JOD for 10% OFF</span>
-            </div>
-        `;
-        cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
-    }
+    // In your updateCartDisplay function, update the discount section:
+if (additionalDiscount > 0) {
+    cartDiscountInfo.style.display = 'block';
+    cartDiscountAmount.innerHTML = `
+        <div class="cart-discount-applied">
+            <span class="discount-badge">🎉 10%</span>
+            <span class="discount-amount">-${additionalDiscount.toFixed(2)} JDs</span>
+        </div>
+    `;
+    
+    cartTotal.innerHTML = `
+        <div class="cart-total-with-discount">
+            <span class="original-price" style="text-decoration: line-through; font-size: 0.9rem; color: #999; margin-right: 8px;">
+                ${totalBeforeDiscount.toFixed(2)}
+            </span>
+            <span class="final-price" style="font-weight: bold; color: #d6336c; font-size: 1rem;">
+                ${finalTotal.toFixed(2)} JDs
+            </span>
+        </div>
+    `;
+} else if (qualifiesForDiscount) {
+    cartDiscountInfo.style.display = 'block';
+    cartDiscountAmount.innerHTML = `
+        <div class="cart-discount-eligible">
+            <span class="discount-badge">⭐</span>
+            <span>10% OFF at checkout</span>
+        </div>
+    `;
+    cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
+} else {
+    cartDiscountInfo.style.display = 'block';
+    const amountNeeded = (MINIMUM_ORDER - subtotal).toFixed(2);
+    cartDiscountAmount.innerHTML = `
+        <div class="cart-discount-not-eligible">
+            <span class="discount-badge">+${amountNeeded}</span>
+            <span>for 10% OFF</span>
+        </div>
+    `;
+    cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
+}
 
     // Reattach event listeners
     document.querySelectorAll('.remove-item').forEach(button => {
@@ -1631,114 +1262,86 @@ function updatePrice() {
     try {
         const priceData = calculatePrice(false);
         
+        // Update prices
         const basePriceElement = document.getElementById('base-price');
         const charmPriceElement = document.getElementById('charm-price');
         const totalPriceElement = document.getElementById('total-price');
-        const discountMessages = document.getElementById('discount-messages');
-
-        // Update basic price display with safe values
+        const discountOfferElement = document.getElementById('discount-offer');
+        
+        if (basePriceElement) {
+            basePriceElement.querySelector('span:last-child').textContent = `${safeDisplayPrice(priceData.base)} JDs`;
+        }
+        
+        if (charmPriceElement) {
+            charmPriceElement.querySelector('span:last-child').textContent = `${safeDisplayPrice(priceData.charmCost)} JDs`;
+        }
+        
         if (totalPriceElement) {
+            totalPriceElement.textContent = `Total: ${safeDisplayPrice(priceData.total)} JDs`;
+        }
+        
+        // Update discount offer on RIGHT side
+        if (discountOfferElement) {
+            discountOfferElement.className = 'discount-right'; // Reset class
+            
             if (priceData.discount > 0) {
-                const originalTotal = priceData.subtotal;
-                const discountedTotal = priceData.total;
-                
-                totalPriceElement.innerHTML = `
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="text-decoration: line-through; color: #999; font-size: 0.9rem;">
-                                ${safeDisplayPrice(originalTotal)} JDs
-                            </span>
-                            <span style="font-weight: bold; color: #d6336c; font-size: 1.1rem;">
-                                ${safeDisplayPrice(discountedTotal)} JDs
-                            </span>
-                        </div>
-                        <div style="background: #4CAF50; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">
-                            🎉 You save ${safeDisplayPrice(priceData.discount)} JDs!
-                        </div>
-                    </div>
+                // Discount is already applied
+                discountOfferElement.classList.add('success');
+                discountOfferElement.innerHTML = `
+                    <div class="discount-line1">🎉 15% OFF!</div>
+                    <div class="discount-line2">Saved ${safeDisplayPrice(priceData.discount)}</div>
                 `;
+                
+                // Update total to show discount
+                totalPriceElement.innerHTML = `
+                    <span style="text-decoration: line-through; color: #999; margin-right: 8px;">
+                        ${safeDisplayPrice(priceData.subtotal)} JDs
+                    </span>
+                    <span style="color: #d6336c;">
+                        ${safeDisplayPrice(priceData.total)} JDs
+                    </span>
+                `;
+                
+            } else if (priceData.qualifiesForDiscount && priceData.subtotal > 0) {
+                // Eligible for discount
+                discountOfferElement.classList.add('info');
+                discountOfferElement.innerHTML = `
+                    <div class="discount-line1">⭐ 15% OFF!</div>
+                    <div class="discount-line2">Ready to apply</div>
+                `;
+                
+            } else if (priceData.subtotal > 0 && priceData.subtotal < priceData.minimumForDiscount) {
+                // Need more to qualify
+                const amountNeeded = (priceData.minimumForDiscount - priceData.subtotal).toFixed(2);
+                discountOfferElement.classList.add('warning');
+                discountOfferElement.innerHTML = `
+                    <div class="discount-line1">Add ${amountNeeded} JDs</div>
+                    <div class="discount-line2">for 15% OFF!</div>
+                `;
+                
             } else {
-                totalPriceElement.textContent = `Total: ${safeDisplayPrice(priceData.total)} JDs`;
+                // Default message
+                discountOfferElement.classList.add('info');
+                discountOfferElement.innerHTML = `
+                    <div class="discount-line1">Add 5 JDs</div>
+                    <div class="discount-line2">to get 15% OFF!</div>
+                `;
             }
         }
         
-        if (basePriceElement) {
-            if (currentProduct === 'individual') {
-                basePriceElement.innerHTML = `<span>Base Price:</span><span>3.00 JDs</span>`;
-            } else {
-                const product = PRODUCTS[currentProduct];
-                if (isFullGlam) {
-                    basePriceElement.innerHTML = `<span>Full Glam Base:</span><span>${safeDisplayPrice(product.fullGlam)} JDs</span>`;
-                } else {
-                    const basePrice = product.basePrice + SIZE_CHARTS[currentProduct][currentSize].price;
-                    basePriceElement.innerHTML = `<span>Base Price:</span><span>${safeDisplayPrice(basePrice)} JDs</span>`;
-                }
-            }
-        }
-
-        if (charmPriceElement) {
-            if (currentProduct === 'individual') {
-                const charmCost = priceData.total - 3;
-                charmPriceElement.innerHTML = `<span>Charms:</span><span>${safeDisplayPrice(charmCost)} JDs</span>`;
-            } else {
-                charmPriceElement.innerHTML = `<span>Charms:</span><span>${safeDisplayPrice(priceData.charmCost)} JDs</span>`;
-            }
-        }
-
-        // Rest of your discount messages code remains the same...
-        if (discountMessages) {
-            discountMessages.innerHTML = '';
-            
-            if (priceData.subtotal > 0) {
-                if (priceData.qualifiesForDiscount) {
-                    if (priceData.discount > 0) {
-                        discountMessages.innerHTML = `
-                            <div class="discount-banner success">
-                                <div class="discount-icon">🎊</div>
-                                <div class="discount-content">
-                                    <div class="discount-title">Discount Applied!</div>
-                                    <div class="discount-details">
-                                        <span class="original-price">${safeDisplayPrice(priceData.subtotal)} JOD</span>
-                                        <span class="discount-arrow">→</span>
-                                        <span class="final-price">${safeDisplayPrice(priceData.total)} JOD</span>
-                                    </div>
-                                    <div class="discount-savings">You save ${safeDisplayPrice(priceData.discount)} JOD! (10% OFF)</div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        discountMessages.innerHTML = `
-                            <div class="discount-banner eligible">
-                                <div class="discount-icon">⭐</div>
-                                <div class="discount-content">
-                                    <div class="discount-title">You Qualify for 10% OFF!</div>
-                                    <div class="discount-details">Complete your order to apply the discount</div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                } else {
-                    const amountNeeded = (priceData.minimumForDiscount - priceData.subtotal).toFixed(2);
-                    discountMessages.innerHTML = `
-                        <div class="discount-banner not-eligible">
-                            <div class="discount-icon">📢</div>
-                            <div class="discount-content">
-                                <div class="discount-title">Almost There!</div>
-                                <div class="discount-details">Add <span class="amount-needed">${safeDisplayPrice(amountNeeded)} JOD</span> more to get 10% OFF</div>
-                                <div class="discount-minimum">Minimum order: 15.00 JOD</div>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-        }
-
     } catch (error) {
         console.log('Price update failed:', error);
-        // Fallback to safe values
+        // Set default values
         const totalPriceElement = document.getElementById('total-price');
-        if (totalPriceElement) {
-            totalPriceElement.textContent = 'Total: 0.00 JDs';
+        const discountOfferElement = document.getElementById('discount-offer');
+        
+        if (totalPriceElement) totalPriceElement.textContent = 'Total: 0.00 JDs';
+        if (discountOfferElement) {
+            discountOfferElement.className = 'discount-right info';
+            discountOfferElement.innerHTML = `
+                <div class="discount-line1">Add 5 JDs</div>
+                <div class="discount-line2">to get 15% OFF!</div>
+            `;
         }
     }
 }
@@ -1933,28 +1536,13 @@ function initSpecialProductWithBase(productType) {
 function handleCharmSelection(charmElement) {
     console.log('🎯 === CHARM SELECTION START ===');
     
-    // Debug what we're receiving
-    console.log('Charm element received:', charmElement);
-    console.log('Element details:', {
-        tagName: charmElement.tagName,
-        src: charmElement.src,
-        dataset: charmElement.dataset,
-        classList: Array.from(charmElement.classList),
-        outerHTML: charmElement.outerHTML
-    });
+    // Prevent selection if already sold out
+    if (charmElement.classList.contains('sold-out') || charmElement.classList.contains('out-of-stock')) {
+        alert('This charm is out of stock!');
+        return;
+    }
     
-    // Ensure consistent data attributes for all charm types
-    ensureCharmDataAttributes(charmElement);
-    
-    const charmSrc = charmElement.dataset.charm || charmElement.src;
-    const charmType = charmElement.dataset.type;
-    
-    console.log('📊 Final charm data:', { 
-        charmSrc, 
-        charmType
-    });
-    
-    // Toggle selection - SAME LOGIC FOR ALL CHARMS
+    // Toggle selection - Unified logic for all charms
     if (charmElement.classList.contains('selected')) {
         console.log('🔽 Deselecting charm');
         charmElement.classList.remove('selected');
@@ -1962,20 +1550,24 @@ function handleCharmSelection(charmElement) {
         hideSelectedCharmPreview();
     } else {
         console.log('🔼 Selecting new charm');
-        // Remove selection from ALL charms 
-        document.querySelectorAll('.charm.selected').forEach(c => {
+        
+        // Remove selection from ALL charms (including recommended)
+        document.querySelectorAll('.charm.selected, .recommended-charm-image.selected').forEach(c => {
             c.classList.remove('selected');
         });
         
+        // Select this charm
         charmElement.classList.add('selected');
         selectedCharm = charmElement;
-        console.log('✅ selectedCharm set to:', selectedCharm);
-        console.log('✅ selectedCharm dataset:', selectedCharm?.dataset);
+        
+        // Ensure data attributes
+        ensureCharmDataAttributes(charmElement);
+        
+        // Update preview
         updateSelectedCharmPreview(charmElement);
     }
     
     console.log('🎯 === CHARM SELECTION END ===');
-    console.log('Current selectedCharm:', selectedCharm);
 }
 function debugSelectedCharm() {
     console.log('=== DEBUG SELECTED CHARM ===');
@@ -2028,7 +1620,7 @@ function handleSlotClick(slot) {
             }
         }
         
-        // Now place the new charm
+        // Now place the new charm - use a unified function
         placeSelectedCharm(slot);
         
         // Resume scrolling after placing charm
@@ -2097,12 +1689,6 @@ function centerJewelryPiece() {
 }
 
 // Call this after initializing jewelry piece and after any updates
-document.addEventListener('DOMContentLoaded', function() {
-  centerJewelryPiece();
-  
-  // Also center when window resizes
-  window.addEventListener('resize', centerJewelryPiece);
-});
 
 function initProduct(product) {
     // Store existing charms before clearing (only for individual mode)
@@ -2526,7 +2112,6 @@ if (sizeSelect) {
         // Setup other functionality
         setupCategoryTabs();
         setupCartFunctionality();
-        setupCustomCharmHandlers();
 
     } catch (error) {
         console.error('Error setting up event listeners:', error);
@@ -3422,8 +3007,6 @@ function testCharmSelection() {
     }
 }
 
-// Make it available globally
-    // Get charm details using the exact path from your data
 function placeSelectedCharm(slot) {
     if (!selectedCharm) return;
 
@@ -3432,12 +3015,23 @@ function placeSelectedCharm(slot) {
     const charmType = selectedCharm.dataset.type;
     const charmSet = getCharmSet(charmSrc);
     const isWatch = currentProduct === 'watch' || currentProduct === 'apple-watch';
-    const baseSize = isWatch ? 40 : 84;
     
-    // Determine charm characteristics
+    // Determine if it's a long or dangly charm - Check both grid and recommended charms
     const isDanglyCharm = selectedCharm.classList.contains('dangly-charm') || 
-                         isLoveOrDolphinCharm(charmSrc);
-    const isLongCharm = selectedCharm.classList.contains('long-charm');
+                         isLoveOrDolphinCharm(charmSrc) ||
+                         charmSrc.includes('dangly') ||
+                         (selectedCharm.dataset.category && selectedCharm.dataset.category.includes('dangly'));
+    
+    const isLongCharm = selectedCharm.classList.contains('long-charm') ||
+                       charmSrc.includes('long') ||
+                       (selectedCharm.dataset.category && selectedCharm.dataset.category.includes('long'));
+
+    // For grid charms, check their category data
+    if (!isDanglyCharm && !isLongCharm) {
+        const charmCategory = selectedCharm.dataset.category;
+        if (charmCategory === 'dangly') isDanglyCharm = true;
+        if (charmCategory === 'long') isLongCharm = true;
+    }
 
     // Check inventory using exact path matching
     if (charmType !== 'custom') {
@@ -3456,7 +3050,9 @@ function placeSelectedCharm(slot) {
             return;
         }
     }
- if (charmSet) {
+
+    // Check charm set rules
+    if (charmSet) {
         // Check if any part of this set is already in current item
         const currentItemCharms = Array.from(jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])'))
             .map(img => img.src);
@@ -3477,6 +3073,7 @@ function placeSelectedCharm(slot) {
             }
         }
     }
+
     // Remove existing charm if any
     const existingCharm = slot.querySelector('img:not([data-type="base"])');
     if (existingCharm) {
@@ -3498,7 +3095,9 @@ function placeSelectedCharm(slot) {
     charmImg.dataset.charm = charmSrc; // Store exact path
     charmImg.style.objectFit = 'contain';
 
-    // Handle special charm types
+    // Set proper sizing based on charm type and product
+    const baseSize = isWatch ? 40 : 84;
+    
     if (isLongCharm) {
         const slotIndex = Array.from(jewelryPiece.children).indexOf(slot);
         if (slotIndex + 1 >= jewelryPiece.children.length) {
@@ -3563,7 +3162,7 @@ function placeSelectedCharm(slot) {
             }
         });
     }
-
+    hidePointingFinger();
     // Clear selection
     selectedCharm.classList.remove('selected');
     selectedCharm = null;
@@ -3688,24 +3287,35 @@ function createCharm(src, alt, type, isDangly = false) {
     img.className = 'charm';
     img.dataset.type = type;
     
-    // Check if it's a love/dolphin charm
-    const isSpecialDangly = isLoveOrDolphinCharm(src);
+    // Extract category from path to determine if long/dangly
+    const isDanglyFromPath = src.includes('dangly') || isDangly;
+    const isLongFromPath = src.includes('long');
+    
+    // Also check if it's in a dangly/long category
+    let category = '';
+    if (src.includes('rares/dangly/')) category = 'dangly';
+    else if (src.includes('rares/long/')) category = 'long';
+    
     const isWatchView = currentProduct === 'watch' || currentProduct === 'apple-watch';
     
-    if (isDangly || isSpecialDangly) {
+    if (isDanglyFromPath || category === 'dangly') {
         img.classList.add('dangly-charm');
-        // Different sizing for watches vs regular view
-        img.style.width = isWatchView ? '40px' : '84px';
-        img.style.height = isWatchView ? '80px' : '168px';
-    } 
-    else if (src.includes('long')) {
-        img.classList.add('long-charm');
         img.style.width = isWatchView ? '80px' : '168px';
         img.style.height = isWatchView ? '40px' : '84px';
+    } 
+    else if (isLongFromPath || category === 'long') {
+        img.classList.add('long-charm');
+        img.style.width = isWatchView ? '40px' : '84px';
+        img.style.height = isWatchView ? '80px' : '168px';
     } 
     else {
         img.style.width = isWatchView ? '40px' : '84px';
         img.style.height = isWatchView ? '40px' : '84px';
+    }
+    
+    // Store category information for later use
+    if (category) {
+        img.dataset.category = category;
     }
     
     return img;
@@ -3885,7 +3495,6 @@ function createBaseSlot() {
     return slot;
 }
 function initCharms() {
-    updateSpecialCharmsDisplay();
     updateRareCharmsDisplay();
     
     // Add click handlers for charms
@@ -3912,7 +3521,7 @@ function updateSpecialCharmsDisplay() {
     specialCharmsGrid.innerHTML = '';
 
     // Check if the current category has any gold variants
-    const hasGoldVariants = specialCharms.some(charm => {
+    const hasGoldVariantsInCurrentCategory = specialCharms.some(charm => {
         if (currentSpecialCategory === 'all') {
             return charm.src.includes('-gold.png');
         }
@@ -3933,7 +3542,7 @@ function updateSpecialCharmsDisplay() {
         const isOutOfStock = charm.quantity <= 0;
 
         // Only apply gold/silver filtering if this category has gold variants
-        if (hasGoldVariants) {
+        if (hasGoldVariantsInCurrentCategory) {
             if (showGoldVariants) {
                 if (isGoldVariant) {
                     if (isOutOfStock) outOfStockCharms.push(charm);
@@ -3964,7 +3573,7 @@ function updateSpecialCharmsDisplay() {
     });
 
     // Add gold toggle button if needed
-    if (hasGoldVariants) {
+    if (hasGoldVariantsInCurrentCategory) {
         const toggleContainer = document.createElement('div');
         toggleContainer.style.cssText = 'width:100%; display:flex; justify-content:center; margin:1rem 0; padding-top:1rem; border-top:1px dashed #f5a0c2;';
 
@@ -3977,8 +3586,7 @@ function updateSpecialCharmsDisplay() {
 
         toggleBtn.onclick = () => {
             showGoldVariants = !showGoldVariants;
-            updateSpecialCharmsDisplay();
-            updateRareCharmsDisplay();
+
         };
 
         toggleContainer.appendChild(toggleBtn);
@@ -4027,7 +3635,7 @@ function updateRareCharmsDisplay() {
     rareCharmsGrid.innerHTML = '';
  
     // Check if the current category has any gold variants (excluding the 'gold' category)
-    const hasGoldVariants = rareCharms.some(charm => {
+    const hasGoldVariantsInCurrentCategory = rareCharms.some(charm => {
         if (currentRareCategory === 'all') {
             return charm.src.includes('-gold.png') && charm.category !== 'gold';
         }
@@ -4083,7 +3691,7 @@ function updateRareCharmsDisplay() {
         }
 
         // For non-dangly charms, apply gold filtering if needed
-        if (hasGoldVariants) {
+        if (hasGoldVariantsInCurrentCategory) {
             if (showGoldVariants) {
                 if (isGoldVariant) {
                     if (isOutOfStock) outOfStockCharms.push(charm);
@@ -4125,7 +3733,7 @@ function updateRareCharmsDisplay() {
     });
 
     // Only add gold toggle if there are gold variants (excluding the gold category)
-    if (hasGoldVariants) {
+    if (hasGoldVariantsInCurrentCategory) {
         const toggleContainer = document.createElement('div');
         toggleContainer.style.cssText = 'width:100%; display:flex; justify-content:center; margin:1rem 0; padding-top:1rem; border-top:1px dashed #f5a0c2;';
 
@@ -4138,8 +3746,6 @@ function updateRareCharmsDisplay() {
 
         toggleBtn.onclick = () => {
             showGoldVariants = !showGoldVariants;
-            updateRareCharmsDisplay();
-            updateSpecialCharmsDisplay();
         };
 
         toggleContainer.appendChild(toggleBtn);
@@ -4283,7 +3889,6 @@ function setupCategoryTabs() {
             specialCategoryTabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
             currentSpecialCategory = tab.dataset.category;
-            updateSpecialCharmsDisplay();
         });
     });
 
@@ -4291,7 +3896,6 @@ function setupCategoryTabs() {
     if (firstSpecialCategory) {
         currentSpecialCategory = firstSpecialCategory;
         specialCategoryTabs[0].classList.add('active');
-        updateSpecialCharmsDisplay();
     }
 
     // Rare charms categories - select first category by default
@@ -4457,69 +4061,7 @@ function showToast(message, type = 'success') {
         }, 300);
     }, 3000);
 }
-function setupCustomCharmHandlers() {
-    // Get DOM elements
-    const customCharmUpload = document.getElementById('custom-charm-upload');
-    const customCharmPreview = document.getElementById('custom-charm-preview');
-    const addCustomCharmBtn = document.getElementById('add-custom-charm');
 
-    if (!customCharmUpload || !customCharmPreview || !addCustomCharmBtn) {
-        console.error('Custom charm elements not found');
-        return;
-    }
-
-    // Handle file selection
-    customCharmUpload.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Check if file is an image
-        if (!file.type.match('image.*')) {
-            alert('Please select an image file');
-            return;
-        }
-
-        // Create preview
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            customCharmPreview.innerHTML = '';
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            customCharmPreview.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-    });
-
-    // Handle add custom charm button
-    addCustomCharmBtn.addEventListener('click', function() {
-        const img = customCharmPreview.querySelector('img');
-        if (!img) {
-            alert('Please upload an image first');
-            return;
-        }
-
-        // Create a custom charm object
-        const customCharm = {
-            src: img.src,
-            type: 'custom',
-            element: img.cloneNode(true)
-        };
-
-        // Set this as the selected charm
-        selectedCharm = customCharm.element;
-        selectedCharm.dataset.type = 'custom';
-        selectedCharm.dataset.charm = img.src;
-        selectedCharm.classList.add('custom-charm');
-
-        // Clear the upload
-        customCharmPreview.innerHTML = '<span>Preview</span>';
-        customCharmUpload.value = '';
-
-        // Highlight the charm as selected
-        document.querySelectorAll('.charm').forEach(c => c.classList.remove('selected'));
-        selectedCharm.classList.add('selected');
-    });
-}
 
 function updateJewelrySize(size) {
   currentSize = size;
@@ -4539,7 +4081,18 @@ function updateJewelrySize(size) {
   }, 100);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
+    // ===== VARIABLE DECLARATIONS =====
+    const homepage = document.getElementById('homepage');
+    const designerPage = document.getElementById('designer-page');
+    const backBtn = document.getElementById('back-to-home');
+    const productCards = document.querySelectorAll('#homepage .product-card');
+    const productButtons = document.querySelectorAll('.product-btn');
+    const menu = document.querySelector('.collapsible-menu');
+    const menuToggle = document.querySelector('.menu-toggle'); // DECLARE HERE
+    const menuContent = document.querySelector('.menu-content'); // DECLARE HERE
+    setTimeout(initFiltersOnce, 1000);
+    // ===== MAIN INITIALIZATION =====
     try {
         // Initialize Firebase if not already initialized
         if (!window.firebaseInitialized) {
@@ -4552,8 +4105,9 @@ document.addEventListener('DOMContentLoaded', () => {
             setupOrderFunctionality();
             window.firebaseInitialized = true;
         }
-        initAuth();
+        
         setupAuthProtectedCheckout();
+        
         // Get DOM elements with null checks
         jewelryPiece = document.getElementById('jewelry-piece');
         specialCharmsGrid = document.getElementById('special-charms');
@@ -4580,27 +4134,11 @@ document.addEventListener('DOMContentLoaded', () => {
         orderConfirmation = document.getElementById('order-confirmation');
         closeConfirmation = document.getElementById('close-confirmation');
         orderIdSpan = document.getElementById('order-id');
-
-        // Check if essential elements exist
-        const essentialElements = [
-            'jewelry-piece', 'special-charms', 'rare-charms', 
-            'base-price', 'charm-price', 'total-price'
-        ];
         
-        const missingElements = essentialElements.filter(id => !document.getElementById(id));
-        
-        if (missingElements.length > 0) {
-            console.error('Missing essential elements:', missingElements);
-            // Don't proceed if essential elements are missing
-            return;
-        }
-
         if (disableCOD) {
             const codOption = document.getElementById('pay-cash');
             if (codOption) {
                 codOption.closest('.payment-option').style.display = 'none';
-                
-                // Check PayPal by default if COD is disabled
                 const paypalOption = document.getElementById('pay-paypal');
                 if (paypalOption) {
                     paypalOption.checked = true;
@@ -4645,75 +4183,731 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set up event listeners
         setupEventListeners();
         
-        // Set up custom charm handlers
-        if (customCharmUpload && customCharmPreview && addCustomCharmBtn) {
-            setupCustomCharmHandlers();
-        }
-
-        // Initialize order functionality if not already done
         if (!window.orderFormInitialized) {
             setupOrderFunctionality();
             window.orderFormInitialized = true;
         }
         
-        // Initialize charm displays
-        updateSpecialCharmsDisplay();
-        updateRareCharmsDisplay();
-        
-        // Update price display - only after everything is initialized
         updatePrice();
-        
-         console.log('Application initialized successfully');
+        console.log('Application initialized successfully');
         
         setTimeout(() => {
             updatePrice();
-        }, 500); // Give more time for DOM to be ready
+        }, 500);
         
     } catch (error) {
         console.error('Initialization error:', error);
-        // Don't show alert for minor errors
         console.log('Application loaded with minor issues');
     }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const braceletContainer = document.querySelector('.bracelet-container');
-    let jewelryPiece = document.getElementById('jewelry-piece');
+    
+    // ===== UI SETUP FUNCTIONS =====
+    function adjustJewelryWidth() {
+        if (jewelryPiece) {
+            const viewportWidth = window.innerWidth;
+            jewelryPiece.style.maxWidth = Math.min(viewportWidth - 40, 800) + 'px';
+        }
+    }
     
     function updateStickyHeader() {
-    const braceletContainer = document.querySelector('.bracelet-container');
-    if (!braceletContainer) return;
-    
-    const scrollY = window.scrollY;
-    if (scrollY > 100) {
-        braceletContainer.classList.add('sticky-active');
-        braceletContainer.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-    } else {
-        braceletContainer.classList.remove('sticky-active');
-        braceletContainer.style.boxShadow = 'none';
+        const braceletContainer = document.querySelector('.bracelet-container');
+        if (!braceletContainer) return;
+        const scrollY = window.scrollY;
+        if (scrollY > 100) {
+            braceletContainer.classList.add('sticky-active');
+            braceletContainer.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        } else {
+            braceletContainer.classList.remove('sticky-active');
+            braceletContainer.style.boxShadow = 'none';
+        }
     }
+    
+    function handleMobileViewport() {
+        if (!jewelryPiece) return;
+        const isMobile = window.innerWidth <= 480;
+        if (isMobile) {
+            jewelryPiece.style.overflowX = 'auto';
+            jewelryPiece.style.flexWrap = 'nowrap';
+            jewelryPiece.style.padding = '5px';
+        } else {
+            jewelryPiece.style.overflowX = '';
+            jewelryPiece.style.flexWrap = '';
+            jewelryPiece.style.padding = '';
+        }
+    }
+    
+    function updateCartButtonPosition() {
+        const cartButton = document.getElementById('cart-button');
+        if (!cartButton) return;
+        const scrollY = window.scrollY;
+        cartButton.style.top = scrollY > 100 ? '20px' : '90px';
+    }
+    
+    function initializeProductText() {
+        const productCards = document.querySelectorAll('.product-card');
+        const productNames = {
+            'bracelet': 'Bracelet',
+            'watch': 'Watch',
+            'individual': 'Single charms-No bracelet',
+            'anklet': 'Anklet',
+            'ring': 'Ring',
+            'apple-watch': 'Apple Watch',
+            'keychain': 'Key chain'
+        };
+        
+        productCards.forEach(card => {
+            const productType = card.dataset.type;
+            let productText = card.querySelector('.product-text');
+            if (!productText) {
+                productText = document.createElement('div');
+                productText.className = 'product-text';
+                card.appendChild(productText);
+            }
+            if (productNames[productType]) {
+                productText.textContent = productNames[productType];
+            }
+        });
+    }
+    
+    // ===== SETUP UI COMPONENTS =====
+    adjustJewelryWidth();
+    centerJewelryPiece();
+    
+    window.addEventListener('resize', adjustJewelryWidth);
+    window.addEventListener('resize', centerJewelryPiece);
+    window.addEventListener('scroll', updateStickyHeader);
+    window.addEventListener('resize', updateStickyHeader);
+    window.addEventListener('load', handleMobileViewport);
+    window.addEventListener('resize', handleMobileViewport);
+    window.addEventListener('scroll', updateCartButtonPosition);
+    window.addEventListener('load', updateCartButtonPosition);
+    
+    updateStickyHeader();
+    initializeProductText();
+    setupScrollArrows();
+    
+    // ===== PAGE NAVIGATION =====
+    productCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const productType = this.getAttribute('data-type');
+            console.log('Product card clicked:', productType);
+            
+            homepage.style.display = 'none';
+            designerPage.style.display = 'block';
+            
+            if (typeof initProduct === 'function') {
+                initProduct(productType);
+            } else {
+                console.error('initProduct function not found');
+                currentProduct = productType;
+                initJewelryPiece();
+                updatePrice();
+            }
+            
+            productButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-type') === productType) {
+                    btn.classList.add('active');
+                }
+            });
+        });
+    });
+    
+    if (backBtn) {
+        backBtn.addEventListener('click', function() {
+            designerPage.style.display = 'none';
+            homepage.style.display = 'block';
+        });
+    }
+    
+    productButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productType = this.getAttribute('data-type');
+            initProduct(productType);
+        });
+    });
+    
+// In your menu initialization code, replace the click handlers:
+
+if (menuToggle && menuContent) {
+    console.log('Initializing collapsible menu...');
+    
+    // Initialize with menu hidden
+    menuContent.style.display = 'none';
+    
+    // Toggle menu when clicking the button
+    menuToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        const isVisible = menuContent.style.display === 'block';
+        
+        if (isVisible) {
+            // Close menu
+            menuContent.style.display = 'none';
+            menuToggle.classList.remove('active');
+        } else {
+            // Open menu
+            menuContent.style.display = 'block';
+            menuToggle.classList.add('active');
+        }
+    });
+ // 1. SINGLE handler for menu headers (Rare and Special sections)
+document.querySelectorAll('.menu-header').forEach(header => {
+    header.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        console.log('Menu header clicked:', this.textContent);
+        
+        // Toggle the parent section
+        const section = this.closest('.menu-section');
+        
+        // Toggle this section
+        section.classList.toggle('active');
+        
+        // Update arrow
+        const arrow = this.querySelector('.fa-chevron-down');
+        if (arrow) {
+            arrow.style.transform = section.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
+        }
+        
+        // DON'T close the menu - headers only toggle subcategories
+        // DON'T filter charms - headers are not filter categories
+    });
+});
+
+// 2. THEN, handle actual filter items (sub-items and "All Charms")
+document.querySelectorAll('.sub-item, .menu-item[data-category="all"]').forEach(item => {
+    // Skip if it's a menu-header (headers are already handled above)
+    if (item.classList.contains('menu-header')) return;
+    
+    item.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        console.log('Filter item clicked:', this.dataset.category);
+        
+        const category = this.dataset.category || 'all';
+        
+        // Update active state
+        document.querySelectorAll('.menu-item.active, .sub-item.active').forEach(activeItem => {
+            activeItem.classList.remove('active');
+        });
+        this.classList.add('active');
+        
+        // CLOSE MENU IMMEDIATELY
+        menuContent.style.display = 'none';
+        menuToggle.classList.remove('active');
+        
+        // Filter charms (this happens after menu closes)
+        filterCharmsByCategory(category);
+        updateFilterStatus(category);
+    });
+});
+       // Close with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            console.log('🔑 Escape key pressed, closing menu');
+            menuContent.style.display = 'none';
+            menuToggle.classList.remove('active');
+            // Also close any open sections
+            document.querySelectorAll('.menu-section.active').forEach(section => {
+                section.classList.remove('active');
+            });
+        }
+    });
+    
+    // FIXED: Close menu when clicking outside or on the overlay
+document.addEventListener('click', function(e) {
+    if (menuContent.style.display !== 'block') return;
+    
+    const clickedElement = e.target;
+    
+    // Check if clicked on the menu toggle button
+    const isToggleClick = menuToggle.contains(clickedElement);
+    
+    // Check if clicked inside the actual menu content (not the ::before overlay)
+    const isRealMenuClick = clickedElement.closest('.menu-item, .sub-item, .menu-header, .menu-section');
+    
+    // If clicked outside AND not on toggle, close menu
+    if (!isToggleClick && !isRealMenuClick) {
+        menuContent.style.display = 'none';
+        menuToggle.classList.remove('active');
+        
+        // Also close any open sections
+        document.querySelectorAll('.menu-section.active').forEach(section => {
+            section.classList.remove('active');
+        });
+    }
+});
+    console.log('Menu initialization complete');
+}
+    
+    // Add error handling for price updates
+    window.addEventListener('error', function(e) {
+        if (e.message.includes('price') || e.message.includes('NaN')) {
+            console.log('Price calculation error detected, resetting...');
+            updatePrice();
+        }
+    });
+
+
+
+    function initializeProductText() {
+        const productCards = document.querySelectorAll('.product-card');
+        const productNames = {
+            'bracelet': 'Bracelet',
+            'watch': 'Watch',
+            'individual': 'Single charms-No bracelet',
+            'anklet': 'Anklet',
+            'ring': 'Ring',
+            'apple-watch': 'Apple Watch',
+            'keychain': 'Key chain'
+        };
+
+        productCards.forEach(card => {
+            const productType = card.dataset.type;
+            let productText = card.querySelector('.product-text');
+            
+            // Create text element if it doesn't exist
+            if (!productText) {
+                productText = document.createElement('div');
+                productText.className = 'product-text';
+                card.appendChild(productText);
+            }
+            
+            // Set the appropriate text
+            if (productNames[productType]) {
+                productText.textContent = productNames[productType];
+            }
+        });
+    }
+
+    // Initialize product text first
+    initializeProductText();
+    // Initialize all product slideshows
+    const slideshows = document.querySelectorAll('.product-slideshow');
+    
+    slideshows.forEach(slideshow => {
+        const slides = slideshow.querySelectorAll('.product-slide');
+        const indicators = slideshow.querySelectorAll('.slideshow-indicator');
+        const prevBtn = slideshow.querySelector('.slideshow-nav.prev');
+        const nextBtn = slideshow.querySelector('.slideshow-nav.next');
+        
+        let currentSlide = 0;
+        let slideInterval;
+        
+        // Function to show a specific slide
+        function showSlide(index) {
+            // Remove active class from all slides and indicators
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(indicator => indicator.classList.remove('active'));
+            
+            // Add active class to current slide and indicator
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            if (indicators[currentSlide]) {
+                indicators[currentSlide].classList.add('active');
+            }
+        }
+        
+        // Function to go to next slide
+        function nextSlide() {
+            let nextIndex = (currentSlide + 1) % slides.length;
+            showSlide(nextIndex);
+        }
+        
+        // Function to go to previous slide
+        function prevSlide() {
+            let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prevIndex);
+        }
+        
+        // Start automatic slideshow
+        function startSlideshow() {
+            if (slides.length > 1) {
+                slideInterval = setInterval(nextSlide, 2000); // Change slide every 2 seconds
+            }
+        }
+        
+        // Stop automatic slideshow
+        function stopSlideshow() {
+            clearInterval(slideInterval);
+        }
+        
+        // Only set up controls if there are multiple slides
+        if (slides.length > 1) {
+            // Event listeners for navigation
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    nextSlide();
+                    stopSlideshow();
+                    startSlideshow();
+                });
+            }
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    prevSlide();
+                    stopSlideshow();
+                    startSlideshow();
+                });
+            }
+            
+            // Event listeners for indicators
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showSlide(index);
+                    stopSlideshow();
+                    startSlideshow();
+                });
+            });
+            
+            // Pause slideshow on hover
+            slideshow.addEventListener('mouseenter', stopSlideshow);
+            slideshow.addEventListener('mouseleave', startSlideshow);
+            
+            // Start the slideshow
+            startSlideshow();
+        } else {
+            // Hide navigation and indicators if only one slide
+            if (prevBtn) prevBtn.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
+            if (indicators.length > 0) {
+                indicators[0].style.display = 'none';
+            }
+        }
+    });
+    
+    // Only convert simple product cards to slideshow if they actually have multiple images
+    const simpleProductCards = document.querySelectorAll('.product-card:not(:has(.product-slideshow))');
+    
+    // Define which products actually have multiple images
+    const productsWithMultipleImages = {
+        'bracelet': ['bracelet.png', 'bracelet2.png', 'bracelet3.png', 'bracelet4.png', 'bracelet5.png'],
+        'watch': ['watch.png', 'watch2.png'],
+        'individual': ['individual.png', 'individual2.png'],
+        'anklet': ['anklet.png', 'anklet2.png', 'anklet3.png'],
+        'ring': ['ring.png', 'ring2.png', 'ring3.png', 'ring4.png', 'ring5.png'],
+        'apple-watch': ['apple-watch.png', 'apple-watch2.png','apple-watch3.png'],
+        'keychain': ['keychain.png', 'keychain2.png']
+    };
+    
+    simpleProductCards.forEach(card => {
+        const productType = card.dataset.type;
+        
+        // Only create slideshow if this product has multiple images defined
+        if (productsWithMultipleImages[productType]) {
+            const img = card.querySelector('.product-image');
+            
+            if (img) {
+                const imageContainer = card.querySelector('.product-image-container') || card;
+                const imagePaths = productsWithMultipleImages[productType];
+                
+                // Create slideshow structure
+                let slidesHTML = '';
+                let indicatorsHTML = '';
+                
+                imagePaths.forEach((path, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    slidesHTML += `
+                        <div class="product-slide ${isActive}">
+                            <img src="products/${path}" alt="${productType} design ${index + 1}">
+                        </div>
+                    `;
+                    
+                    if (imagePaths.length > 1) {
+                        const indicatorActive = index === 0 ? 'active' : '';
+                        indicatorsHTML += `<div class="slideshow-indicator ${indicatorActive}"></div>`;
+                    }
+                });
+                
+                const slideshowHTML = `
+                    <div class="product-slideshow" data-product="${productType}">
+                        ${slidesHTML}
+                        ${imagePaths.length > 1 ? `
+                            <div class="slideshow-indicators">
+                                ${indicatorsHTML}
+                            </div>
+                            <div class="slideshow-nav prev">‹</div>
+                            <div class="slideshow-nav next">›</div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                // Replace the simple image with slideshow
+                if (imageContainer.classList.contains('product-image-container')) {
+                    imageContainer.innerHTML = slideshowHTML;
+                } else {
+                    // Create container if it doesn't exist
+                    const newContainer = document.createElement('div');
+                    newContainer.className = 'product-image-container';
+                    newContainer.innerHTML = slideshowHTML;
+                    img.replaceWith(newContainer);
+                }
+            }
+        }
+    });
+    
+    // Re-initialize slideshows for newly created ones
+    setTimeout(() => {
+        const newSlideshows = document.querySelectorAll('.product-slideshow');
+        newSlideshows.forEach(slideshow => {
+            if (!slideshow.dataset.initialized) {
+                const slides = slideshow.querySelectorAll('.product-slide');
+                const indicators = slideshow.querySelectorAll('.slideshow-indicator');
+                const prevBtn = slideshow.querySelector('.slideshow-nav.prev');
+                const nextBtn = slideshow.querySelector('.slideshow-nav.next');
+                
+                let currentSlide = 0;
+                let slideInterval;
+                
+                function showSlide(index) {
+                    slides.forEach(slide => slide.classList.remove('active'));
+                    indicators.forEach(indicator => indicator.classList.remove('active'));
+                    
+                    currentSlide = index;
+                    slides[currentSlide].classList.add('active');
+                    if (indicators[currentSlide]) {
+                        indicators[currentSlide].classList.add('active');
+                    }
+                }
+                
+                function nextSlide() {
+                    let nextIndex = (currentSlide + 1) % slides.length;
+                    showSlide(nextIndex);
+                }
+                
+                function startSlideshow() {
+                    if (slides.length > 1) {
+                        slideInterval = setInterval(nextSlide, 2000);
+                    }
+                }
+                
+                function stopSlideshow() {
+                    clearInterval(slideInterval);
+                }
+                
+                // Only set up controls if there are multiple slides
+                if (slides.length > 1) {
+                    if (nextBtn) {
+                        nextBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            nextSlide();
+                            stopSlideshow();
+                            startSlideshow();
+                        });
+                    }
+                    
+                    if (prevBtn) {
+                        prevBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            prevSlide();
+                            stopSlideshow();
+                            startSlideshow();
+                        });
+                    }
+                    
+                    indicators.forEach((indicator, index) => {
+                        indicator.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            showSlide(index);
+                            stopSlideshow();
+                            startSlideshow();
+                        });
+                    });
+                    
+                    slideshow.addEventListener('mouseenter', stopSlideshow);
+                    slideshow.addEventListener('mouseleave', startSlideshow);
+                    
+                    startSlideshow();
+                }
+                
+                slideshow.dataset.initialized = 'true';
+            }
+        });
+    }, 100);
+    
+    if (!menuToggle || !menuContent) return;
+    
+    // Toggle menu visibility
+    
+    
+    // Toggle sections
+    document.querySelectorAll('.menu-header').forEach(header => {
+        header.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const section = this.closest('.menu-section');
+            section.classList.toggle('active');
+            
+            // Update arrow
+            const arrow = this.querySelector('.fa-chevron-down');
+            if (arrow) {
+                arrow.style.transform = section.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
+            }
+        });
+    });
+    
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!menu.contains(e.target)) {
+            menuContent.style.display = 'none';
+            menu.classList.remove('active');
+        }
+    });
+
+        // Initialize with "All" charms by default
+    loadCharmsByCategory('all');
+    
+ // 1. FIRST, handle menu headers separately (Rare/Special toggles)
+document.querySelectorAll('.menu-header').forEach(header => {
+    header.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        console.log('Menu header clicked:', this.textContent);
+        
+        // Toggle the parent section
+        const section = this.closest('.menu-section');
+        const isActive = section.classList.contains('active');
+        
+        // Toggle this section
+        section.classList.toggle('active');
+        
+        // Update arrow
+        const arrow = this.querySelector('.fa-chevron-down');
+        if (arrow) {
+            arrow.style.transform = section.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
+        }
+        
+        // DON'T close the menu - headers only toggle subcategories
+        // DON'T filter charms - headers are not filter categories
+    });
+});
+
+// 2. THEN, handle actual filter items (sub-items and "All Charms")
+document.querySelectorAll('.sub-item, .menu-item[data-category="all"]').forEach(item => {
+    // Skip if it's a menu-header (headers are already handled above)
+    if (item.classList.contains('menu-header')) return;
+    
+    item.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        console.log('Filter item clicked:', this.dataset.category);
+        
+        const category = this.dataset.category || 'all';
+        
+        // Update active state
+        document.querySelectorAll('.menu-item.active, .sub-item.active').forEach(activeItem => {
+            activeItem.classList.remove('active');
+        });
+        this.classList.add('active');
+        
+        // CLOSE MENU IMMEDIATELY
+        menuContent.style.display = 'none';
+        menuToggle.classList.remove('active');
+        
+        // Filter charms (this happens after menu closes)
+        filterCharmsByCategory(category);
+        updateFilterStatus(category);
+    });
+});
+    
+    // Set "All" as default active
+    const allMenuItem = document.querySelector('.menu-item[data-category="all"]');
+    if (allMenuItem) {
+        allMenuItem.classList.add('active');
+    }
+
+        // Close menu by default on mobile
+    if (window.innerWidth <= 768) {
+        const menuContent = document.querySelector('.menu-content');
+        if (menuContent) {
+            menuContent.style.display = 'none';
+        }
+    }
+        // Wait for grid to load
+    setTimeout(() => {
+        // Add click events to ALL menu items
+        document.querySelectorAll('.menu-item, .sub-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const category = this.dataset.category || 'all';
+                console.log('Menu clicked:', category);
+                filterCharmsByCategory(category);
+            });
+        });
+        
+        // Test: Set default to "all" when page loads
+        filterCharmsByCategory('all');
+    }, 1000);
+
+
+  // Load charms data
+// In your DOMContentLoaded handler:
+setTimeout(() => {
+    console.log('Step 1: Checking DOM elements...');
+    
+    const grid = document.getElementById('modern-charms-grid');
+    if (!grid) {
+        console.log('No modern charms grid found');
+        return;
+    }
+    
+    console.log('Step 2: Loading charm data...');
+    
+    // Load charm data first
+    loadCharmDataWithRetry(2).then(() => {
+        console.log('✓ All charm data loaded');
+        
+        // Populate grid FIRST
+        populateCharmsGridWithRealData();
+        
+        // THEN initialize other components with delays
+        setTimeout(() => {
+            initializeCharmFilters();
+            initializeRecommendedCharms();
+        }, 1000);
+        
+    }).catch(error => {
+        console.error('Failed to load charm data:', error);
+    });
+}, 1500); // Increased delay
+});
+
+function loadCharmDataWithRetry(maxRetries = 3, retryCount = 0) {
+    return loadCharmDataDynamically().catch(error => {
+        if (retryCount < maxRetries) {
+            console.log(`🔄 Retry ${retryCount + 1}/${maxRetries}...`);
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve(loadCharmDataWithRetry(maxRetries, retryCount + 1));
+                }, 1000 * (retryCount + 1));
+            });
+        }
+        throw error;
+    });
 }
 
-// Run on scroll and resize
-window.addEventListener('scroll', updateStickyHeader);
-window.addEventListener('resize', updateStickyHeader);
+function showCharmDataError(grid) {
+    grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #d6336c;">
+            <p>⚠️ Could not load charms database</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">The charm images may not display properly</p>
+            <button onclick="reloadCharmData()" style="margin-top: 15px; padding: 10px 20px; background: #d6336c; color: white; border: none; border-radius: 8px; font-weight: bold;">
+                Try Again
+            </button>
+        </div>
+    `;
+}
 
-// Initial check
-updateStickyHeader();
-});
-document.addEventListener('DOMContentLoaded', function() {
-    let jewelryPiece = document.getElementById('jewelry-piece');
-
-     
-    function adjustJewelryWidth() {
-        const viewportWidth = window.innerWidth;
-        jewelryPiece.style.maxWidth = Math.min(viewportWidth - 40, 800) + 'px';
-    }
     
-    // Initialize and set up resize listener
-    adjustJewelryWidth();
-    window.addEventListener('resize', adjustJewelryWidth);
-});
+
+
 function handleMobileViewport() {
     const isMobile = window.innerWidth <= 480;
     let jewelryPiece = document.getElementById('jewelry-piece');
@@ -4755,8 +4949,8 @@ function initializeRecommendedCharms() {
     const recommendedScroll = document.getElementById('recommended-charms-scroll');
     
     if (!recommendedBar || !recommendedScroll) {
-        console.error('❌ Recommended charms elements not found');
-        return;
+        console.log('⚠️ Recommended charms elements not found - this is okay if you removed them');
+        return; // Just return instead of erroring
     }
 
     // Your actual recommended charms
@@ -4770,10 +4964,9 @@ function initializeRecommendedCharms() {
         'special/teddy/teddy2.png',
         'rares/graduation/grad.png',
         'special/new-collection/50.png',
-     'rares/sporty/sporty9.png',
+        'rares/sporty/sporty9.png',
         'rares/hgs/hgs6.png',
-         'rares/newc2r/c222.png',
-
+        'rares/newc2r/c222.png',
         'rares/gold/gold8.png',
         'special/bows/pink.png',
         'special/beach/x15.png',
@@ -4799,8 +4992,21 @@ function initializeRecommendedCharms() {
     // Clear existing content
     recommendedScroll.innerHTML = '';
 
+    // Filter out sold-out charms
+    const availableRecommendedCharms = recommendedCharmNames.filter(charmPath => {
+        // Check if charm exists in our inventory
+        const charmData = [...specialCharms, ...rareCharms].find(c => c.src === charmPath);
+        return !charmData || (charmData.quantity || 1) > 0;
+    });
+
+    if (availableRecommendedCharms.length === 0) {
+        console.log('No available recommended charms');
+        recommendedBar.style.display = 'none'; // Hide the bar if no charms
+        return;
+    }
+
     // Create charm elements
-    recommendedCharmNames.forEach((charmPath, index) => {
+    availableRecommendedCharms.forEach((charmPath, index) => {
         const charmItem = document.createElement('div');
         charmItem.className = 'recommended-charm-item';
         charmItem.dataset.index = index;
@@ -4844,7 +5050,7 @@ function initializeRecommendedCharms() {
         });
     });
 
-    console.log('✅ Recommended charms initialized with', recommendedCharmNames.length, 'charms');
+    console.log('✅ Recommended charms initialized with', availableRecommendedCharms.length, 'charms');
     
     // Start scrolling animation after a delay
     setTimeout(startRecommendedScroll, 2000);
@@ -5054,299 +5260,6 @@ function testRecommendedCharms() {
 
 // Make it available globally
 window.testRecommendedCharms = testRecommendedCharms;
-document.addEventListener('DOMContentLoaded', function() {
-    const homepage = document.getElementById('homepage');
-    const designerPage = document.getElementById('designer-page');
-    const backBtn = document.getElementById('back-to-home');
-    const productCards = document.querySelectorAll('#homepage .product-card');
-    const productButtons = document.querySelectorAll('.product-btn');
-     setupScrollArrows();
-
-setTimeout(() => {
-        initializeRecommendedCharms();
-    }, 1000); // Wait a bit for everything to load
-    // Show designer page and select corresponding product when product card is clicked
-    productCards.forEach(card => {
-        card.addEventListener('click', function() {
-            const productType = this.getAttribute('data-type');
-            
-            console.log('Product card clicked:', productType); // Debug log
-            
-            // Hide homepage and show designer
-            homepage.style.display = 'none';
-            designerPage.style.display = 'block';
-            
-            // Initialize the product directly using your existing function
-            if (typeof initProduct === 'function') {
-                initProduct(productType);
-            } else {
-                console.error('initProduct function not found');
-                // Fallback: manually trigger product initialization
-                currentProduct = productType;
-                initJewelryPiece();
-                updatePrice();
-            }
-            
-            // Update the product buttons to show active state
-            productButtons.forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.getAttribute('data-type') === productType) {
-                    btn.classList.add('active');
-                }
-            });
-        });
-    });
-    
-    // Back to homepage
-    if (backBtn) {
-        backBtn.addEventListener('click', function() {
-            designerPage.style.display = 'none';
-            homepage.style.display = 'block';
-        });
-    }
-    
-    // Also ensure the product buttons in designer page work
-    productButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const productType = this.getAttribute('data-type');
-            initProduct(productType);
-        });
-    });
-    setTimeout(() => {
-        updatePrice();
-    }, 500);
-    
-    // Add error handling for price updates
-    window.addEventListener('error', function(e) {
-        if (e.message.includes('price') || e.message.includes('NaN')) {
-            console.log('Price calculation error detected, resetting...');
-            updatePrice();
-        }
-    });
-});
-// Add this JavaScript to handle the guided tour
-document.addEventListener('DOMContentLoaded', function() {
-  // Guided Tour Variables
-  let currentTourStep = 0;
-  let tourSteps = [];
-  
-  // Initialize the tour based on current product type
-  function initializeTour() {
-    const productType = getCurrentProductType();
-    
-    // Define tour steps based on product type
-    tourSteps = [
-      {
-        title: "Welcome to Your Jewelry Designer!",
-        message: `Let me show you how to create your perfect ${productType}.`,
-        element: "#jewelry-piece",
-        position: "top"
-      },
-      {
-        title: "Choose Your Material",
-        message: "Select silver, gold, or mixed materials for your piece.",
-        element: ".control-group:has(.material-option)",
-        position: "top"
-      },
-      {
-        title: "Add Charms",
-        message: "Browse through our charm collections and click to add them to your design.",
-        element: ".charm-pools",
-        position: "top"
-      },
-      {
-        title: "Special & Rare Charms",
-        message: "Find unique charms in our special and rare collections.",
-        element: "#rare-charms",
-        position: "top"
-      },
-      {
-        title: "Custom Charms",
-        message: "Upload your own images to create custom charms.",
-        element: ".custom-charm-upload",
-        position: "top"
-      },
-      {
-        title: "Save & Order",
-        message: "Download your design or add it to cart when you're ready.",
-        element: ".action-buttons",
-        position: "top"
-      }
-    ];
-    
-    // Show help button only on designer page
-    const helpButton = document.getElementById('help-button');
-    const designerPage = document.getElementById('designer-page');
-    
-    if (designerPage && designerPage.style.display !== 'none') {
-      helpButton.style.display = 'flex';
-    } else {
-      helpButton.style.display = 'none';
-    }
-  }
-  
-  // Get current product type
-  function getCurrentProductType() {
-    // This would need to be implemented based on your product selection logic
-    // For now, return a default
-    return "jewelry piece";
-  }
-  
-  // Start the guided tour
-  function startTour() {
-    currentTourStep = 0;
-    showTourStep(currentTourStep);
-    document.getElementById('guided-tour').style.display = 'flex';
-  }
-  
-  // Show a specific tour step
-  // In the showTourStep function, add z-index to ensure the popup is on top
-function showTourStep(stepIndex) {
-    if (stepIndex >= tourSteps.length) {
-        endTour();
-        return;
-    }
-    
-    const step = tourSteps[stepIndex];
-    const tourPopup = document.getElementById('tour-popup');
-    const tourIndicator = document.getElementById('tour-indicator');
-    
-    // Make sure tour popup has highest z-index
-    tourPopup.style.zIndex = '10001';
-    
-    // Update tour content
-    document.getElementById('tour-title').textContent = step.title;
-    document.getElementById('tour-message').textContent = step.message;
-    document.getElementById('tour-progress').textContent = `Step ${stepIndex + 1} of ${tourSteps.length}`;
-    
-    // Position the tour popup in the center
-    tourPopup.style.position = 'fixed';
-    tourPopup.style.top = '50%';
-    tourPopup.style.left = '50%';
-    tourPopup.style.transform = 'translate(-50%, -50%)';
-    
-    // Position the tour indicator
-    if (step.element) {
-        const targetElement = document.querySelector(step.element);
-        if (targetElement) {
-            const rect = targetElement.getBoundingClientRect();
-            
-            // Calculate position based on step.position
-            let top, left;
-            switch(step.position) {
-                case 'top':
-                    top = rect.top - 70;
-                    left = rect.left + (rect.width / 2) - 25;
-                    break;
-                case 'bottom':
-                    top = rect.bottom + 20;
-                    left = rect.left + (rect.width / 2) - 25;
-                    break;
-                case 'left':
-                    top = rect.top + (rect.height / 2) - 25;
-                    left = rect.left - 70;
-                    break;
-                case 'right':
-                    top = rect.top + (rect.height / 2) - 25;
-                    left = rect.right + 20;
-                    break;
-                default:
-                    top = rect.top - 70;
-                    left = rect.left + (rect.width / 2) - 25;
-            }
-            
-            // Apply positioning
-            tourIndicator.style.top = `${top}px`;
-            tourIndicator.style.left = `${left}px`;
-            tourIndicator.style.display = 'flex';
-            tourIndicator.style.zIndex = '10002'; // Even higher than popup
-            
-            // Scroll element into view if needed
-            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    } else {
-        tourIndicator.style.display = 'none';
-    }
-    
-    // Update button text for last step
-    if (stepIndex === tourSteps.length - 1) {
-        document.getElementById('next-tour').textContent = 'Finish';
-    } else {
-        document.getElementById('next-tour').textContent = 'Next';
-    }
-    
-    currentTourStep = stepIndex;
-}
-  // End the tour
-  function endTour() {
-    document.getElementById('guided-tour').style.display = 'none';
-    document.getElementById('tour-indicator').style.display = 'none';
-    
-    // Show completion message
-    showQuickTip("You're all set! Start designing your perfect piece.");
-    
-    // Save that user has completed the tour
-    localStorage.setItem('jewelryTourCompleted', 'true');
-  }
-  
-  // Show quick tip
-  function showQuickTip(message) {
-    const quickTip = document.getElementById('quick-tip');
-    quickTip.textContent = message;
-    quickTip.style.display = 'block';
-    
-    setTimeout(() => {
-      quickTip.style.display = 'none';
-    }, 5000);
-  }
-  
-  // Event Listeners
-  document.getElementById('help-button').addEventListener('click', function() {
-    // Check if user has already completed the tour
-    
-      startTour();
-    
-  });
-  
-  document.getElementById('next-tour').addEventListener('click', function() {
-    showTourStep(currentTourStep + 1);
-  });
-  
-  document.getElementById('skip-tour').addEventListener('click', function() {
-    endTour();
-  });
-  
-  // Initialize tour when designer page is shown
-  const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-      if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-        const designerPage = document.getElementById('designer-page');
-        if (designerPage && designerPage.style.display !== 'none') {
-          initializeTour();
-          
-          // Check if we should auto-start the tour for first-time users
-          const tourCompleted = localStorage.getItem('jewelryTourCompleted');
-          if (!tourCompleted) {
-            // Small delay to let page render completely
-            setTimeout(() => {
-              startTour();
-            }, 1000);
-          }
-        }
-      }
-    });
-  });
-  
-  const designerPage = document.getElementById('designer-page');
-  if (designerPage) {
-    observer.observe(designerPage, { attributes: true });
-  }
-  
-  // Also initialize on page load if designer page is already visible
-  if (designerPage && designerPage.style.display !== 'none') {
-    initializeTour();
-  }
-});
 
 // Make it available in console
 window.addEventListener('scroll', updateCartButtonPosition);
@@ -5634,3 +5547,859 @@ function updateShippingProgress() {
         }
     }
 }
+
+let hasGoldVariantsInPool = false; // Renamed to avoid conflict
+// Modern Pool Manager - Complete Fixed Version
+function checkForGoldVariantsInPool(pool) {
+    const allCharms = getCurrentPoolCharms(pool);
+    return allCharms.some(charm => charm.src && charm.src.includes('-gold.png'));
+}
+
+function getCurrentPoolCharms(poolType) {
+    let allCharms = [];
+    
+    if (poolType === 'all' || poolType === 'special' || poolType === 'trending') {
+        allCharms = allCharms.concat(specialCharms.map(c => ({...c, type: 'special'})));
+    }
+    
+    if (poolType === 'all' || poolType === 'rare' || poolType === 'trending') {
+        allCharms = allCharms.concat(rareCharms.map(c => ({...c, type: 'rare'})));
+    }
+    
+    return allCharms;
+}
+
+
+
+// Initialize modern pool when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Wait a bit for everything to load
+    setTimeout(() => {
+        if (document.getElementById('modern-charms-grid')) {
+            console.log('Initializing modern pool...');
+        } else {
+            console.warn('Modern pool elements not found, using legacy pools');
+        }
+    }, 1000);
+});
+
+// Also update when product changes
+function updateModernPoolOnProductChange() {
+    if (document.getElementById('modern-charms-grid')) {
+        updateModernPoolDisplay();
+    }
+}// User Circle Management
+function initUserCircle() {
+    const userCircle = document.getElementById('user-circle');
+    const userPopup = document.getElementById('user-popup');
+    const logoutCircleBtn = document.getElementById('logout-circle');
+    const viewOrdersBtn = document.getElementById('view-orders');
+    const closeOrdersModal = document.getElementById('close-orders-modal');
+    const ordersModal = document.getElementById('orders-modal');
+    
+    if (!userCircle || !userPopup) return;
+    
+    // Toggle popup when clicking user circle
+    userCircle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        userPopup.classList.toggle('show');
+    });
+    
+    // Close popup when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!userCircle.contains(e.target) && !userPopup.contains(e.target)) {
+            userPopup.classList.remove('show');
+        }
+    });
+    
+    // Logout functionality
+    if (logoutCircleBtn) {
+        logoutCircleBtn.addEventListener('click', () => {
+            logoutUser();
+            userPopup.classList.remove('show');
+        });
+    }
+    
+    // View orders functionality
+    if (viewOrdersBtn) {
+        viewOrdersBtn.addEventListener('click', () => {
+            userPopup.classList.remove('show');
+            showOrdersModal();
+        });
+    }
+    
+    // Close orders modal
+    if (closeOrdersModal && ordersModal) {
+        closeOrdersModal.addEventListener('click', () => {
+            ordersModal.classList.remove('active');
+        });
+    }
+}
+
+function showOrdersModal() {
+    const ordersModal = document.getElementById('orders-modal');
+    const ordersList = document.getElementById('orders-list');
+    
+    if (!ordersModal || !ordersList) return;
+    
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+        ordersList.innerHTML = `
+            <div class="empty-orders-compact">
+                <i class="fas fa-user-slash"></i>
+                <p>Please login to view orders</p>
+            </div>
+        `;
+        ordersModal.classList.add('active');
+        return;
+    }
+    
+    // Show loading
+    ordersList.innerHTML = `
+        <div class="empty-orders-compact">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading orders...</p>
+        </div>
+    `;
+    
+    ordersModal.classList.add('active');
+    
+    // Load user orders
+    loadUserOrderHistory(currentUser.uid).then(orders => {
+        if (orders.length === 0) {
+            ordersList.innerHTML = `
+                <div class="empty-orders-compact">
+                    <i class="fas fa-shopping-bag"></i>
+                    <p>No orders yet</p>
+                    <p style="font-size: 0.8rem; margin-top: 5px;">Start designing your perfect piece!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const ordersHTML = orders.map(order => `
+            <div class="order-item-compact" data-order-id="${order.id}">
+                <div class="order-header-compact">
+                    <div class="order-id">#${order.clientOrderId}</div>
+                    <div class="order-status-compact status-${order.status}">
+                        ${order.status}
+                    </div>
+                </div>
+                <div style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">
+                    ${formatOrderDate(order.timestamp)}
+                </div>
+                <div class="order-total-compact">
+                    ${order.total} JOD
+                </div>
+                <button class="btn" style="margin-top: 8px; padding: 4px 12px; font-size: 0.8rem;" 
+                        onclick="viewOrderDetails('${order.id}')">
+                    View Details
+                </button>
+            </div>
+        `).join('');
+        
+        ordersList.innerHTML = ordersHTML;
+    }).catch(error => {
+        console.error('Error loading orders:', error);
+        ordersList.innerHTML = `
+            <div class="empty-orders-compact">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Error loading orders</p>
+                <p style="font-size: 0.8rem;">Please try again</p>
+            </div>
+        `;
+    });
+}
+
+// Update auth state handler
+function updateAuthUI(user) {
+    const authButton = document.getElementById('auth-button');
+    const userCircleContainer = document.getElementById('user-circle-container');
+    const circleUserName = document.getElementById('circle-user-name');
+    const circlePointsCount = document.getElementById('circle-points-count');
+    
+    if (user) {
+        // Hide login button, show user circle
+        if (authButton) authButton.style.display = 'none';
+        if (userCircleContainer) userCircleContainer.style.display = 'block';
+        
+        // Update user info
+        if (circleUserName) {
+            circleUserName.textContent = user.displayName || user.email.split('@')[0];
+        }
+        
+        // Load user points (you'll need to implement this)
+        loadUserPoints(user.uid).then(points => {
+            if (circlePointsCount) {
+                circlePointsCount.textContent = points || '0';
+            }
+        });
+        
+    } else {
+        // Show login button, hide user circle
+        if (authButton) authButton.style.display = 'block';
+        if (userCircleContainer) userCircleContainer.style.display = 'none';
+    }
+}
+
+// Load user points from Firestore
+async function loadUserPoints(userId) {
+    try {
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+            return userDoc.data().points || 0;
+        }
+        return 0;
+    } catch (error) {
+        console.error('Error loading user points:', error);
+        return 0;
+    }
+}
+
+// Update order history loading for compact view
+async function loadUserOrderHistory(userId) {
+    try {
+        const ordersRef = db.collection('orders');
+        const userOrdersQuery = ordersRef.where('userId', '==', userId);
+        const guestOrdersQuery = ordersRef.where('userEmail', '==', auth.currentUser.email);
+        
+        const [userSnapshot, guestSnapshot] = await Promise.all([
+            userOrdersQuery.get(),
+            guestOrdersQuery.get()
+        ]);
+        
+        const orders = [];
+        
+        userSnapshot.forEach(doc => {
+            orders.push({ id: doc.id, ...doc.data() });
+        });
+        
+        guestSnapshot.forEach(doc => {
+            if (!orders.find(order => order.id === doc.id)) {
+                orders.push({ id: doc.id, ...doc.data() });
+            }
+        });
+        
+        // Sort by timestamp
+        orders.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+        
+        return orders;
+        
+    } catch (error) {
+        console.error('Error loading order history:', error);
+        throw error;
+    }
+}
+
+// Format date for compact display
+function formatOrderDate(timestamp) {
+    if (!timestamp) return 'Date unknown';
+    
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const now = new Date();
+    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    
+    return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+// Initialize user circle on page load
+document.addEventListener('DOMContentLoaded', () => {
+    // Wait a bit for auth to initialize
+    setTimeout(initUserCircle, 1000);
+});
+
+//------------------------------
+function loadCharmsByCategory(category) {
+    console.log('Loading charms for category:', category);
+    
+    // Clear existing charms
+    const charmsGrid = document.querySelector('.modern-charms-grid');
+    if (charmsGrid) {
+        charmsGrid.innerHTML = '<div class="loading">Loading charms...</div>';
+    }
+    
+
+}
+
+
+function handleModernCharmSelection(charmElement, imgElement, charmData) {
+    console.log('🎯 Modern charm selected:', charmData.src);
+    
+    // Remove selection from all charms
+    document.querySelectorAll('.modern-charm.selected, .charm.selected').forEach(c => {
+        c.classList.remove('selected');
+    });
+    
+    // Check if sold out
+    if (charmData.quantity <= 0) {
+        alert('This charm is out of stock!');
+        return;
+    }
+    
+    // Select this charm
+    charmElement.classList.add('selected');
+    
+    // Create selected charm object
+    selectedCharm = imgElement.cloneNode(true);
+    selectedCharm.dataset.type = charmData.src.includes('rares/') ? 'rare' : 'special';
+    selectedCharm.dataset.charm = charmData.src;
+    selectedCharm.dataset.quantity = charmData.quantity || 1;
+    
+    console.log('✅ Charm selected:', {
+        src: selectedCharm.src,
+        type: selectedCharm.dataset.type,
+        quantity: selectedCharm.dataset.quantity
+    });
+    
+    // Update preview
+    updateSelectedCharmPreview(selectedCharm);
+}
+function filterCharmsByCategory(category) {
+    console.log(`🔍 filterCharmsByCategory called with: ${category} | Gold filter: ${showGoldVariants}`);
+    
+    const grid = document.getElementById('modern-charms-grid');
+    const goldToggleWrapper = document.querySelector('.gold-toggle-wrapper');
+    
+    if (!grid) return;
+    
+    // Check if this category has gold variants
+    const hasGoldVariants = checkIfCategoryHasGoldVariants(category);
+    
+    // Update gold toggle visibility
+    if (goldToggleWrapper) {
+        if (hasGoldVariants) {
+            goldToggleWrapper.classList.remove('no-gold');
+            console.log(`✅ Showing gold toggle for ${category} (has gold variants)`);
+        } else {
+            goldToggleWrapper.classList.add('no-gold');
+            console.log(`❌ Hiding gold toggle for ${category} (no gold variants)`);
+            
+            // Reset to silver view when hiding toggle
+            showGoldVariants = false;
+            const goldToggle = document.getElementById('gold-toggle');
+            if (goldToggle) {
+                goldToggle.classList.remove('active');
+                const handle = goldToggle.querySelector('.toggle-handle');
+                if (handle) {
+                    handle.style.transform = 'translateX(3px)';
+                }
+                const track = goldToggle.querySelector('.toggle-track');
+                if (track) {
+                    track.style.background = 'linear-gradient(90deg, #c0c0c0 100%, #ffd700 0%)';
+                }
+            }
+        }
+    }
+    
+    // Get all charms
+    const allCharms = [...specialCharms, ...rareCharms];
+    
+    // Filter by category first
+    let filteredCharms = allCharms;
+    
+    if (category !== 'all') {
+        filteredCharms = allCharms.filter(charm => {
+            // Handle special cases
+            if (category === 'rare') {
+                return charm.src.includes('rares/');
+            } else if (category === 'special') {
+                return charm.src.includes('special/');
+            } else {
+                return charm.category === category;
+            }
+        });
+    }
+    
+    console.log(`📊 After category filter: ${filteredCharms.length} charms`);
+    
+    // Filter by gold/silver if the category has gold variants
+    if (hasGoldVariants) {
+        filteredCharms = filteredCharms.filter(charm => {
+            const isGoldVariant = charm.src && charm.src.includes('-gold.png');
+            return showGoldVariants ? isGoldVariant : !isGoldVariant;
+        });
+        console.log(`📊 After gold filter: ${filteredCharms.length} charms (showGold: ${showGoldVariants})`);
+    }
+    
+    // Clear grid and display filtered charms
+    grid.innerHTML = '';
+    
+    if (filteredCharms.length === 0) {
+        grid.innerHTML = `
+            <div class="no-charms-message">
+                <i class="fas fa-search"></i>
+                <p>No charms found</p>
+                <p class="hint">Try a different filter or toggle gold/silver</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Display filtered charms
+    // In your filterCharmsByCategory function, when creating grid charms:
+filteredCharms.forEach((charm, index) => {
+    if (!charm.src || charm.quantity <= 0) return;
+    
+    const charmItem = document.createElement('div');
+    charmItem.className = 'modern-charm';
+    charmItem.dataset.category = charm.category || 'uncategorized';
+    
+    // Check if it's gold
+    const isGoldVariant = charm.src.includes('-gold.png');
+    charmItem.dataset.isGold = isGoldVariant;
+    
+    if (charm.src.includes('rares/')) {
+        charmItem.dataset.type = 'rare';
+    } else if (charm.src.includes('special/')) {
+        charmItem.dataset.type = 'special';
+    }
+    
+    // Create charm image with proper styling
+    const img = createCharm(charm.src, charm.name || `Charm ${index + 1}`, 
+                          charmItem.dataset.type, 
+                          charm.category === 'dangly');
+    
+    
+    
+    charmItem.appendChild(img);
+    grid.appendChild(charmItem);
+    
+    // Add click handler
+    charmItem.addEventListener('click', () => {
+        handleModernCharmSelection(charmItem, img, charm);
+    });
+});
+    
+    console.log(`✅ Displayed ${filteredCharms.length} charms for category: ${category}`);
+    updateCharmCount();
+}
+
+function detectCharmType(charmSrc, charmElement) {
+    // Check if already marked
+    if (charmElement.classList.contains('dangly-charm')) return 'dangly';
+    if (charmElement.classList.contains('long-charm')) return 'long';
+    
+    // Check by path
+    if (charmSrc.includes('dangly') || isLoveOrDolphinCharm(charmSrc)) {
+        return 'dangly';
+    }
+    
+    if (charmSrc.includes('long')) {
+        return 'long';
+    }
+    
+    // Check by category
+    const category = charmElement.dataset.category;
+    if (category === 'dangly') return 'dangly';
+    if (category === 'long') return 'long';
+    
+    // Check if in a dangly/long folder
+    if (charmSrc.includes('/dangly/')) return 'dangly';
+    if (charmSrc.includes('/long/')) return 'long';
+    
+    return 'regular';
+}
+function checkIfCategoryHasGoldVariants(category) {
+    const allCharms = [...specialCharms, ...rareCharms];
+    
+    if (category === 'all') {
+        // Check if ANY charms in entire collection have gold
+        return allCharms.some(charm => charm.src && charm.src.includes('-gold.png'));
+    } 
+    else if (category === 'rare') {
+        // Check if any RARE charms have gold
+        return allCharms.some(charm => 
+            charm.src && 
+            charm.src.includes('-gold.png') && 
+            charm.src.includes('rares/')
+        );
+    }
+    else if (category === 'special') {
+        // Check if any SPECIAL charms have gold
+        return allCharms.some(charm => 
+            charm.src && 
+            charm.src.includes('-gold.png') && 
+            charm.src.includes('special/')
+        );
+    }
+    else if (category === 'newc3r') {  // Gulf category - should return false
+        // Gulf category has NO gold charms
+        return false;
+    }
+    else {
+        // For other specific categories, check their gold status
+        return allCharms.some(charm => 
+            charm.src && 
+            charm.src.includes('-gold.png') && 
+            charm.category === category
+        );
+    }
+}
+let filtersInitialized = false;
+function initializeGoldToggle() {
+    const goldToggle = document.getElementById('gold-toggle');
+    if (!goldToggle) return;
+    
+    // Set initial state
+    goldToggle.classList.toggle('active', showGoldVariants);
+    
+    // Add click event
+    goldToggle.addEventListener('click', function() {
+        showGoldVariants = !showGoldVariants;
+        this.classList.toggle('active');
+        
+        // Update toggle visuals
+        const handle = this.querySelector('.toggle-handle');
+        const track = this.querySelector('.toggle-track');
+        
+        if (showGoldVariants) {
+            handle.style.transform = 'translateX(42px)';
+            track.style.background = 'linear-gradient(90deg, #c0c0c0 0%, #ffd700 100%)';
+        } else {
+            handle.style.transform = 'translateX(3px)';
+            track.style.background = 'linear-gradient(90deg, #c0c0c0 100%, #ffd700 0%)';
+        }
+        
+        console.log(`🔄 Gold filter changed to: ${showGoldVariants ? 'GOLD' : 'SILVER'}`);
+        
+        // Get current category and re-filter
+        const activeItem = document.querySelector('.menu-item.active, .sub-item.active');
+        const currentCategory = activeItem ? activeItem.dataset.category : 'all';
+        
+        // Re-filter with new gold setting
+        filterCharmsByCategory(currentCategory);
+        
+        // Update charm count
+        updateCharmCount();
+    });
+    
+    console.log('Gold toggle initialized');
+}
+
+// Call this in your DOMContentLoaded after other initializations
+setTimeout(initializeGoldToggle, 1000);
+function initializeCharmFilters() {
+    if (filtersInitialized) return;
+    
+    console.log('Initializing charm filters...');
+    
+    const menuItems = document.querySelectorAll('.menu-item, .sub-item');
+    if (!menuItems.length) return;
+    
+    // Remove existing listeners first
+    menuItems.forEach(item => {
+        item.replaceWith(item.cloneNode(true));
+    });
+    
+    // Get fresh references
+    const freshItems = document.querySelectorAll('.menu-item, .sub-item');
+    
+    freshItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            const category = this.dataset.category || 'all';
+            
+            // Debounce: Don't filter if already on this category
+            if (this.classList.contains('active')) return;
+            
+            console.log('Filter clicked:', category);
+            
+            // Update UI
+            freshItems.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter charms
+            filterCharmsByCategory(category);
+        });
+    });
+    
+    filtersInitialized = true;
+    
+    // Set default filter
+    setTimeout(() => {
+        const allMenuItem = document.querySelector('.menu-item[data-category="all"]');
+        if (allMenuItem && !allMenuItem.classList.contains('active')) {
+            allMenuItem.click();
+        }
+    }, 1000);
+}
+
+
+
+function loadCharmDataDynamically() {
+    return new Promise((resolve, reject) => {
+        // Check if already loaded
+        if (window.charmDataLoaded && window.specialCharms && window.rareCharms) {
+            console.log('✓ Charm data already loaded');
+            resolve();
+            return;
+        }
+        
+        // Check if script is already being loaded
+        if (window.charmDataLoading) {
+            console.log('⏳ Charm data already loading, waiting...');
+            const checkInterval = setInterval(() => {
+                if (window.charmDataLoaded) {
+                    clearInterval(checkInterval);
+                    resolve();
+                }
+            }, 100);
+            return;
+        }
+        
+        window.charmDataLoading = true;
+        console.log('📦 Loading charms.js...');
+        
+        const script = document.createElement('script');
+        script.src = 'charms.js?v=' + Date.now();
+        script.async = true;
+        
+        script.onload = () => {
+            console.log('✓ charms.js loaded successfully');
+            window.charmDataLoaded = true;
+            window.charmDataLoading = false;
+            
+            // Wait for data to be processed
+            setTimeout(() => {
+                if (window.specialCharms && window.rareCharms) {
+                    console.log(`✓ Charm data ready: ${window.specialCharms.length} special, ${window.rareCharms.length} rare`);
+                    resolve();
+                } else {
+                    reject('Charm data still not available');
+                }
+            }, 500);
+        };
+        
+        script.onerror = () => {
+            console.error('❌ Failed to load charms.js');
+            window.charmDataLoading = false;
+            reject('Failed to load charm data');
+        };
+        
+        document.head.appendChild(script);
+    });
+}
+function populateCharmsGridWithRealData() {
+    console.log('🔍 populateCharmsGridWithRealData called');
+    
+    const grid = document.getElementById('modern-charms-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '<div class="loading">Loading charms...</div>';
+    
+    if (!window.specialCharms || !window.rareCharms) {
+        console.log('⏳ Charm data not loaded yet');
+        return;
+    }
+    
+    const allCharms = [...window.specialCharms, ...window.rareCharms];
+    
+    // Filter out sold out charms immediately
+    const availableCharms = allCharms.filter(charm => {
+        return charm.quantity > 0;
+    });
+    
+    console.log(`✓ Filtered: ${availableCharms.length} available charms (removed ${allCharms.length - availableCharms.length} sold out)`);
+    
+    if (availableCharms.length === 0) {
+        grid.innerHTML = '<div class="loading">No available charms</div>';
+        return;
+    }
+    
+    grid.innerHTML = '';
+    
+    availableCharms.forEach((charm, index) => {
+        if (!charm.src) return;
+        
+        const charmItem = document.createElement('div');
+        charmItem.className = 'modern-charm';
+        charmItem.dataset.category = charm.category || 'uncategorized';
+        
+        // Check if it's gold
+        const isGoldVariant = charm.src.includes('-gold.png');
+        charmItem.dataset.isGold = isGoldVariant;
+        
+        if (charm.src.includes('rares/')) {
+            charmItem.dataset.type = 'rare';
+        } else if (charm.src.includes('special/')) {
+            charmItem.dataset.type = 'special';
+        }
+        
+        const img = document.createElement('img');
+        img.src = charm.src;
+        img.alt = charm.name || `Charm ${index + 1}`;
+        img.dataset.isGold = isGoldVariant;
+        
+        
+        
+        charmItem.appendChild(img);
+        grid.appendChild(charmItem);
+        
+        charmItem.addEventListener('click', () => {
+            handleModernCharmSelection(charmItem, img, charm);
+        });
+    });
+    
+    console.log(`✅ Populated grid with ${availableCharms.length} available charms`);
+    window.charmsLoaded = true;
+    
+    // Check current category and show/hide gold toggle
+    const activeItem = document.querySelector('.menu-item.active, .sub-item.active');
+    const currentCategory = activeItem ? activeItem.dataset.category : 'all';
+    setTimeout(() => {
+        filterCharmsByCategory(currentCategory);
+    }, 100);
+}function updateCharmCount() {
+    const grid = document.getElementById('modern-charms-grid');
+    const charmCount = document.getElementById('charm-count');
+    
+    if (!grid || !charmCount) return;
+    
+    // Count only visible charms (not sold out, not filtered out)
+    const visibleCharms = Array.from(grid.querySelectorAll('.modern-charm'))
+        .filter(charm => charm.style.display !== 'none' && charm.offsetParent !== null);
+    
+    charmCount.textContent = `${visibleCharms.length} charms`;
+}
+// In your app.js or script section
+// Hide sold out charms in JavaScript too
+function filterSoldOutCharms() {
+    document.querySelectorAll('.modern-charm.sold-out').forEach(charm => {
+        charm.style.display = 'none';
+    });
+}
+
+function reloadCharmData() {
+    console.log('🔄 Manually reloading charm data...');
+    
+    // Remove old script if exists
+    const oldScript = document.querySelector('script[src*="charms.js"]');
+    if (oldScript) {
+        oldScript.remove();
+    }
+    
+    // Reset flags
+    window.charmDataLoaded = false;
+    window.specialCharms = undefined;
+    window.rareCharms = undefined;
+    
+    // Reload
+    loadCharmDataDynamically().then(() => {
+        console.log('✅ Charm data reloaded successfully');
+        populateCharmsGridWithRealData();
+    }).catch(error => {
+        console.error('❌ Failed to reload charm data:', error);
+    });
+}
+// Also filter when switching categories
+document.querySelectorAll('.menu-item, .sub-item').forEach(item => {
+    item.addEventListener('click', () => {
+        setTimeout(filterSoldOutCharms, 100);
+    });
+});
+function initFiltersOnce() {
+    if (!filtersInitialized) {
+        initializeCharmFilters();
+        filtersInitialized = true;
+    }
+}
+
+// Update filter status display
+function updateFilterStatus(category) {
+    const filterStatus = document.getElementById('current-filter');
+    if (!filterStatus) return;
+    
+    // Map category codes to display names
+    const categoryNames = {
+        'all': '✨ All Charms',
+        'rare': '💎 Rare Charms',
+        'special': '✨ Special Charms',
+        'hgs': '🔥 Hot Girl Summer',
+        'sanrio': '🎀 Sanrio',
+        'newc3r': '🌴 Gulf & Egypt',
+        'butterflies': '🦋 Butterflies',
+        'sporty': '🏎️ Sporty',
+        'night': '🌙 Whimsy Night',
+        'rcute': '🍓 Cute',
+        'careers': '💼 Careers',
+        'pets': '🐾 Pets',
+        'gold': '⭐ Gold',
+        'disney': '🏰 Disney',
+        'love': '💗 Love/Family',
+        'dangly': '✨ Dangly',
+        'random': '🎲 Random',
+        'long': '📏 Long',
+        'graduation': '🎓 Graduation',
+        'newc2s': '🌟 New Collection',
+        'teddy': '🧸 Teddy Bears',
+        'girly': '👛 Girly',
+        'bows': '🎀 Bows',
+        'beach': '🏖️ Beach',
+        'red': '🔴 Red',
+        'cute': '🌸 First Collection',
+        'cutespecials': '💫 Cute Specials',
+        'flowers': '🌷 Flowers',
+        'fruity': '🍓 Fruity',
+        'mushrooms': '🍄 Mushrooms',
+        'simple': '✨ Simple & Cute'
+    };
+    
+    filterStatus.textContent = categoryNames[category] || category;
+}
+// Emergency reload of charms.js
+setTimeout(() => {
+    if (!window.specialCharms || !window.rareCharms) {
+        console.log('Attempting to load charms.js...');
+        const script = document.createElement('script');
+        script.src = 'charms.js?v=' + Date.now(); // Cache bust
+        script.onload = () => {
+            console.log('charms.js loaded, reinitializing...');
+            populateCharmsGridWithRealData();
+        };
+        document.head.appendChild(script);
+    }
+}, 2000);
+function showPointingFinger() {
+    const pointingFinger = document.getElementById('pointing-finger');
+    if (!pointingFinger) return;
+    
+    // Check if user is new or hasn't added charms yet
+    const hasAddedCharms = localStorage.getItem('hasAddedCharms');
+    const placedCharms = jewelryPiece.querySelectorAll('.slot img:not([data-type="base"])').length;
+    
+    // Show if no charms placed and it's first time or new session
+    if (placedCharms === 0 && (!hasAddedCharms || sessionStorage.getItem('showFinger') !== 'false')) {
+        pointingFinger.style.display = 'block';
+        
+        // Hide after 10 seconds or when charm is added
+        setTimeout(() => {
+            pointingFinger.style.display = 'none';
+            sessionStorage.setItem('showFinger', 'false');
+        }, 10000);
+    } else {
+        pointingFinger.style.display = 'none';
+    }
+}
+
+// Hide finger when charm is added
+function hidePointingFinger() {
+    const pointingFinger = document.getElementById('pointing-finger');
+    if (pointingFinger) {
+        pointingFinger.style.display = 'none';
+        localStorage.setItem('hasAddedCharms', 'true');
+        sessionStorage.setItem('showFinger', 'false');
+    }
+}
+
+// Call showPointingFinger when page loads and product changes
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(showPointingFinger, 1000);
+});
