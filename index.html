@@ -9418,6 +9418,114 @@ body, html, .main-content, .designer-page {
         max-width: 300px !important;
         max-height: 70vh !important;
     }
+}/* Enhanced Add to Cart Button - Subtle but effective */
+.add-to-cart-btn {
+    background: linear-gradient(135deg, #ff4081, #d6336c) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    padding: 12px 24px !important;
+    border-radius: 12px !important;
+    border: 2px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 
+        0 4px 15px rgba(214, 51, 108, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+    transform: translateY(0) !important;
+}
+
+/* Subtle glow effect */
+.add-to-cart-btn::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #ff4081, #d6336c, #ff4081);
+    z-index: -1;
+    border-radius: 14px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Hover effects */
+.add-to-cart-btn:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 
+        0 6px 20px rgba(214, 51, 108, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+    border-color: white !important;
+}
+
+.add-to-cart-btn:hover::before {
+    opacity: 0.7;
+}
+
+/* Active/click effect */
+.add-to-cart-btn:active {
+    transform: translateY(1px) !important;
+    box-shadow: 
+        0 2px 10px rgba(214, 51, 108, 0.3),
+        inset 0 2px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Subtle icon animation */
+.add-to-cart-btn i {
+    transition: transform 0.3s ease !important;
+}
+
+.add-to-cart-btn:hover i {
+    transform: scale(1.2) rotate(5deg) !important;
+}
+
+/* Text emphasis */
+.add-to-cart-btn span {
+    position: relative;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Add a subtle bounce animation on page load */
+@keyframes subtleBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.add-to-cart-btn {
+    animation: subtleBounce 1s ease 1;
+}
+
+/* Pulsing effect for attention */
+@keyframes pulseSubtle {
+    0% { box-shadow: 0 4px 15px rgba(214, 51, 108, 0.4); }
+    50% { box-shadow: 0 4px 20px rgba(214, 51, 108, 0.6); }
+    100% { box-shadow: 0 4px 15px rgba(214, 51, 108, 0.4); }
+}
+
+/* Add pulsing class when cart is empty or first item */
+.add-to-cart-btn.pulse {
+    animation: pulseSubtle 2s infinite !important;
+}
+
+/* Success feedback */
+.add-to-cart-btn.added {
+    background: linear-gradient(135deg, #4CAF50, #388E3C) !important;
+    border-color: #4CAF50 !important;
+}
+
+.add-to-cart-btn.added i {
+    animation: checkmark 0.5s ease !important;
+}
+
+@keyframes checkmark {
+    0% { transform: scale(0.5); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
 }
 </style>
 </head>
@@ -9805,10 +9913,10 @@ body, html, .main-content, .designer-page {
      <div class="controls">
       <div class="action-buttons">
       
-      <button class="btn add-to-cart-btn" id="add-to-cart-bottom">
-        <i class="fas fa-cart-plus"></i> Add to Cart
-      </button>
+     
     </div>
+        <button id="full-glam-btn" class="btn">Full Glam OFFER (18 free specials)</button>
+
     <!-- Size Selector (hidden for individual charms) -->
     <div class="control-group" id="size-controls">
         <label for="size">Size:</label>
@@ -9828,8 +9936,9 @@ body, html, .main-content, .designer-page {
     </div>
     
     <!-- Full Glam Toggle -->
-    <button id="full-glam-btn" class="btn">Full Glam OFFER (18 free specials)</button>
-    
+     <button class="btn add-to-cart-btn" id="add-to-cart-bottom">
+        <i class="fas fa-cart-plus"></i> Add to Cart
+      </button>
 <div id="individual-controls" style="display: none;">
     <button id="decrease-slots" class="control-btn minus-btn">-</button>
     <span id="slot-count">1</span>
