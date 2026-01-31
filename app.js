@@ -2840,26 +2840,7 @@ function addCharmToSlot(slot, src, type, isSoldOut) {
 function showCustomWarningModal(message) {
     let warningModal = document.getElementById('custom-warning-modal');
     
-    if (!warningModal) {
-        warningModal = document.createElement('div');
-        warningModal.id = 'custom-warning-modal';
-        warningModal.className = 'modal warning-modal';
-        warningModal.innerHTML = `
-            <div class="modal-content">
-                <span class="close-btn">&times;</span>
-                <div class="warning-message">${message}</div>
-                <button class="confirm-btn">OK, I Understand</button>
-            </div>
-        `;
-        document.body.appendChild(warningModal);
-        
-        warningModal.querySelector('.close-btn').addEventListener('click', () => {
-            warningModal.style.display = 'none';
-        });
-        warningModal.querySelector('.confirm-btn').addEventListener('click', () => {
-            warningModal.style.display = 'none';
-        });
-    }
+    
     
     warningModal.querySelector('.warning-message').innerHTML = message;
     warningModal.style.display = 'flex';
