@@ -8771,7 +8771,654 @@ body, html, .main-content, .designer-page {
     border-radius: 12px !important;
     display: none !important;
 }
+/* Reduce space above recommended charms bar */
+.recommended-charms-bar {
+    background: #fff0f5 !important;
+    padding: 4px 0 !important; /* Reduced from 8px */
+    margin: 2px 0 4px 0 !important; /* Reduced from 5px 0 8px */
+    border-radius: 10px; /* Slightly smaller */
+    border: 1px solid #f5a0c2;
+}
 
+/* Reduce space in search-gold row */
+.search-gold-row {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Reduced from 10px */
+    margin: 4px 0 8px 0 !important; /* Reduced from 10px 0 15px */
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+/* Make the filter menu toggle more compact */
+.menu-toggle {
+    background: linear-gradient(135deg, #d6336c, #ff85b3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px !important; /* Reduced padding */
+    font-size: 0.8rem !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px; /* Reduced gap */
+    min-width: 140px;
+    box-shadow: 0 2px 6px rgba(214, 51, 108, 0.3);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    height: 32px; /* Reduced height */
+    flex-shrink: 0;
+    margin: 0 !important;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+/* Make gold toggle more compact */
+.gold-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Reduced from 8px */
+    background: #fff9e6;
+    border-radius: 20px;
+    border: 1px solid #ffd700;
+    padding: 4px 8px !important; /* Reduced padding */
+    white-space: nowrap;
+}
+
+/* Reduce modern charms grid top margin */
+.modern-charms-container {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 2px 0 !important; /* Reduced from 0 */
+    border: none !important;
+}
+
+.modern-charms-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+    gap: 4px !important;
+    padding: 4px 2px !important; /* Reduced padding */
+    max-height: 60vh;
+    overflow-y: auto;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 2px 0 !important; /* Reduced from 5px */
+}
+
+/* Reduce the space in the recommended charms scroll container */
+.recommended-scroll-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    background: transparent !important;
+    border-radius: 8px; /* Reduced from 12px */
+    padding: 6px 0; /* Reduced from 10px */
+}
+
+.recommended-charms-scroll {
+    display: flex;
+    gap: 4px; /* Reduced from 6px */
+    padding: 0 10px; /* Reduced from 15px */
+    animation: scrollRecommended 20s linear infinite;
+    width: max-content;
+}
+
+/* Make recommended charm items smaller */
+.recommended-charm-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 65px; /* Reduced from 70px */
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    padding: 4px; /* Reduced from 5px */
+    border-radius: 6px; /* Reduced from 8px */
+    background: transparent !important;
+    border: 2px solid transparent !important;
+    flex-shrink: 0;
+}
+
+.recommended-charm-image {
+    width: 65px !important; /* Reduced from 70px */
+    height: 65px !important; /* Reduced from 70px */
+    object-fit: contain;
+    border-radius: 6px; /* Reduced from 8px */
+    cursor: pointer;
+    flex-shrink: 0;
+    background: transparent !important;
+}
+
+/* Mobile adjustments for even more compactness */
+@media (max-width: 768px) {
+    .recommended-charms-bar {
+        padding: 3px 0 !important;
+        margin: 2px 0 3px 0 !important;
+    }
+    
+    .search-gold-row {
+        gap: 6px;
+        margin: 3px 0 6px 0 !important;
+    }
+    
+    .menu-toggle {
+        padding: 5px 8px !important;
+        font-size: 0.75rem !important;
+        height: 30px;
+        min-width: 120px;
+    }
+    
+    .recommended-charm-item {
+        min-width: 55px;
+    }
+    
+    .recommended-charm-image {
+        width: 55px !important;
+        height: 55px !important;
+    }
+    
+    .modern-charms-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important;
+        gap: 3px !important;
+        padding: 3px 1px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .recommended-charms-bar {
+        padding: 2px 0 !important;
+        margin: 1px 0 2px 0 !important;
+    }
+    
+    .search-gold-row {
+        gap: 4px;
+        margin: 2px 0 4px 0 !important;
+    }
+    
+    .menu-toggle {
+        padding: 4px 6px !important;
+        font-size: 0.7rem !important;
+        height: 28px;
+        min-width: 100px;
+        gap: 3px;
+    }
+    
+    .menu-toggle .filter-text {
+        font-size: 0.7rem;
+    }
+    
+    .recommended-charm-item {
+        min-width: 50px;
+    }
+    
+    .recommended-charm-image {
+        width: 50px !important;
+        height: 50px !important;
+    }
+    
+    .gold-toggle-container {
+        padding: 3px 6px !important;
+        gap: 4px;
+    }
+    
+    #featured-gold-toggle {
+        width: 45px !important;
+        height: 22px !important;
+    }
+    
+    #featured-gold-toggle .toggle-handle {
+        width: 16px !important;
+        height: 16px !important;
+    }
+    
+    #featured-gold-toggle.active .toggle-handle {
+        transform: translateX(23px) !important;
+    }
+    
+    .modern-charms-grid {
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)) !important;
+        gap: 2px !important;
+        padding: 2px 0 !important;
+    }
+}
+
+/* For ultra-compact screens */
+@media (max-width: 360px) {
+    .search-gold-row {
+        gap: 3px;
+    }
+    
+    .menu-toggle {
+        min-width: 40px !important;
+        padding: 3px !important;
+        justify-content: center !important;
+    }
+    
+    .menu-toggle .filter-text {
+        display: none;
+    }
+    
+    .menu-toggle i {
+        margin: 0 !important;
+    }
+    
+    .gold-toggle-container {
+        padding: 2px 4px !important;
+    }
+    
+    .toggle-label {
+        font-size: 0.7rem !important;
+        min-width: 30px !important;
+    }
+    
+    .recommended-charm-item {
+        min-width: 45px;
+    }
+    
+    .recommended-charm-image {
+        width: 45px !important;
+        height: 45px !important;
+    }
+}/* FIX DISCOUNT RIGHT CONTAINER OVERFLOW */
+.discount-right {
+    flex: 1;
+    min-width: 140px;
+    max-width: 200px; /* Add max-width to prevent overflow */
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 10px 12px !important; /* Reduced padding */
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    overflow: hidden; /* Prevent content from overflowing */
+    word-wrap: break-word; /* Break long words */
+    white-space: normal; /* Allow text to wrap */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: fit-content; /* Adjust height to content */
+}
+
+/* Adjust discount text to fit */
+.discount-line1 {
+    font-size: 0.9rem !important; /* Slightly smaller font */
+    font-weight: bold;
+    margin-bottom: 2px;
+    line-height: 1.2;
+    white-space: normal; /* Allow wrapping */
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit to 2 lines */
+    -webkit-box-orient: vertical;
+    max-width: 100%;
+}
+
+.discount-line2 {
+    font-size: 0.8rem !important; /* Smaller subtitle */
+    opacity: 0.9;
+    line-height: 1.1;
+    white-space: normal;
+    max-width: 100%;
+}
+
+/* Different discount states with better fitting */
+.discount-right.warning {
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+    box-shadow: 0 3px 10px rgba(255, 152, 0, 0.3);
+}
+
+.discount-right.info {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    box-shadow: 0 3px 10px rgba(33, 150, 243, 0.3);
+}
+
+.discount-right.success {
+    background: linear-gradient(135deg, #4CAF50, #388E3C);
+    box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
+}
+
+/* Adjust the price display container to prevent overflow */
+.price-display.side-by-side {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 12px 15px !important;
+    border-radius: 10px;
+    margin: 10px 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid #f5a0c2;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px; /* Slightly reduced gap */
+    overflow: hidden; /* Prevent any overflow */
+}
+
+/* Make prices-left take less space to accommodate discount */
+.prices-left {
+    flex: 0 1 auto; /* Don't grow, allow shrink */
+    min-width: 120px;
+    max-width: 45%; /* Limit width */
+}
+
+/* Make discount-right more flexible */
+.discount-right {
+    flex: 0 1 auto; /* Don't grow, allow shrink */
+    min-width: 140px;
+    max-width: 50%; /* Limit width */
+    flex-grow: 1; /* Allow to grow if needed */
+}
+
+/* Mobile adjustments for discount overflow */
+@media (max-width: 768px) {
+    .price-display.side-by-side {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 10px !important;
+    }
+    
+    .prices-left {
+        width: 100%;
+        max-width: 100%;
+        order: 1;
+    }
+    
+    .discount-right {
+        width: 100%;
+        max-width: 100%;
+        order: 2;
+        margin-top: 5px;
+        max-width: none; /* Remove max-width on mobile */
+    }
+    
+    .discount-line1 {
+        font-size: 0.85rem !important;
+        -webkit-line-clamp: 3; /* Allow more lines on mobile */
+    }
+    
+    .discount-line2 {
+        font-size: 0.75rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .price-display.side-by-side {
+        padding: 8px !important;
+    }
+    
+    .discount-right {
+        padding: 8px 10px !important;
+    }
+    
+    .discount-line1 {
+        font-size: 0.8rem !important;
+        line-height: 1.1;
+    }
+    
+    .discount-line2 {
+        font-size: 0.7rem !important;
+    }
+}
+
+/* For very small screens, use even more compact discount */
+@media (max-width: 360px) {
+    .discount-right {
+        padding: 6px 8px !important;
+    }
+    
+    .discount-line1 {
+        font-size: 0.75rem !important;
+        -webkit-line-clamp: 4;
+    }
+    
+    .discount-line2 {
+        font-size: 0.65rem !important;
+        display: none; /* Hide subtitle on very small screens */
+    }
+}
+
+/* Alternative: Compact single-line discount for smaller screens */
+@media (max-width: 320px) {
+    .discount-right {
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .discount-line1 {
+        -webkit-line-clamp: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+/* Also fix the total container to prevent any overflow issues */
+.total-container {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    border: 1px solid #f5a0c2;
+    margin: 8px 0 15px 0;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    overflow: hidden; /* Prevent overflow */
+}/* Fix menu positioning and width */
+.menu-content {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    width: 250px !important; /* Fixed compact width */
+    max-width: calc(100vw - 20px) !important; /* Never exceed viewport */
+    max-height: 400px !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+    margin-top: 5px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+    border: 1px solid #f5a0c2 !important;
+    background: white !important;
+    border-radius: 12px !important;
+    display: none !important;
+    box-sizing: border-box !important; /* Include padding in width */
+}
+
+/* Ensure menu items don't overflow */
+.menu-item, .sub-item, .menu-header {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Make the sub-items more compact */
+.sub-items {
+    padding-left: 10px !important;
+}
+
+.sub-item {
+    padding: 4px 8px 4px 16px !important;
+    font-size: 0.75rem !important;
+}
+
+/* Better scrollbar for mobile */
+.menu-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.menu-content::-webkit-scrollbar-track {
+    background: #fff0f5;
+}
+
+.menu-content::-webkit-scrollbar-thumb {
+    background: #f5a0c2;
+    border-radius: 2px;
+}
+
+/* Mobile-specific fixes */
+@media (max-width: 768px) {
+    .menu-content {
+        width: 200px !important;
+        max-height: 350px !important;
+        left: 0 !important;
+        right: auto !important;
+    }
+    
+    .menu-item, .menu-header {
+        padding: 8px 10px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .sub-item {
+        padding: 4px 6px 4px 14px !important;
+        font-size: 0.7rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .menu-content {
+        width: 180px !important;
+        max-height: 300px !important;
+    }
+    
+    /* On very small screens, ensure menu doesn't go off-screen */
+    .collapsible-menu .menu-content {
+        left: 0 !important;
+        transform: none !important;
+    }
+    
+    /* Reduce padding further for small screens */
+    .menu-item, .menu-header {
+        padding: 6px 8px !important;
+        font-size: 0.75rem !important;
+    }
+    
+    .sub-item {
+        padding: 3px 6px 3px 12px !important;
+        font-size: 0.65rem !important;
+    }
+}
+
+/* For ultra-small screens */
+@media (max-width: 360px) {
+    .menu-content {
+        width: 160px !important;
+        max-height: 250px !important;
+    }
+    
+    /* Hide some text in menu headers if needed */
+    .menu-header span:not(.fa) {
+        font-size: 0.7rem !important;
+    }
+}
+
+/* Make sure menu is visible when open */
+.collapsible-menu.active .menu-content {
+    display: block !important;
+}
+
+/* Add a backdrop overlay when menu is open */
+.menu-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 999;
+    display: none;
+}
+
+.collapsible-menu.active ~ .menu-backdrop {
+    display: block;
+}.collapsible-menu {
+    position: relative;
+    display: inline-block; /* This helps with positioning */
+}
+
+.menu-content {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important; /* Changed from left: 0 to right: 0 */
+    left: auto !important; /* Reset left property */
+    width: 250px !important;
+    max-width: calc(100vw - 20px) !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+    margin-top: 5px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+    border: 1px solid #f5a0c2 !important;
+    background: white !important;
+    border-radius: 12px !important;
+    display: none !important;
+    box-sizing: border-box !important;
+}
+
+/* Mobile adjustments for right-aligned menu */
+@media (max-width: 768px) {
+    .menu-content {
+        right: 0 !important;
+        left: auto !important;
+        width: 220px !important;
+    }
+    
+    /* On small screens where menu might go off right edge, reposition */
+    .collapsible-menu .menu-content {
+        right: 0;
+        left: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .menu-content {
+        right: 0 !important;
+        width: 200px !important;
+    }
+    
+    /* If still going off screen, adjust to left on very small screens */
+    @media (max-width: 320px) {
+        .menu-content {
+            right: -50px !important; /* Adjust if needed */
+        }
+    }
+}
+
+/* If the menu is still going off screen on the right, you can use this alternative approach: */
+/* This checks if the menu would go off-screen and flips it to the left */
+.collapsible-menu .menu-content {
+    /* Default to right-aligned */
+    right: 0;
+    left: auto;
+}
+
+/* Media query for very small screens where right-aligned might not work */
+@media (max-width: 360px) {
+    .collapsible-menu {
+        position: static; /* Let the menu flow naturally */
+    }
+    
+    .menu-content {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translate(-50%, -50%) !important;
+        width: 90% !important;
+        max-width: 300px !important;
+        max-height: 70vh !important;
+    }
+}
 </style>
 </head>
 
@@ -9140,27 +9787,18 @@ body, html, .main-content, .designer-page {
   </div> <!-- Add the missing closing div and proper heading -->
 <!-- Recommended Charms - Simplified Version -->
 
-
-  <!-- Add this before the jewelry piece container -->
-    <div class="charm-name" id="preview-charm-name"></div>
-    <div class="charm-type" id="preview-charm-type"></div>
-
-
-
 <!-- Glowing pointing finger indicator -->
 
-<div class="pointing-finger-indicator" id="pointing-finger" style="display: none;">
-    <div class="finger-container">
-        <div class="finger-icon">👇</div>
-    </div>
-</div>
-   <div class="bracelet-container">
+
     
     <div id="jewelry-piece">
       <!-- Slots will be added here -->
     </div>
-  </div>
-  
+  <div class="pointing-finger-indicator" id="pointing-finger" style="display: none;">
+    <div class="finger-container">
+        <div class="finger-icon">👇</div>
+    </div>
+    </div>
 
   
 
@@ -9201,7 +9839,18 @@ body, html, .main-content, .designer-page {
 
     <!-- Single Collapsible Menu -->
    
-<div class="search-gold-row">
+
+
+<div class="recommended-charms-bar" id="recommended-charms-bar">
+        <div class="recommended-scroll-container">
+            <div class="recommended-charms-scroll" id="recommended-charms-scroll">
+                <!-- Recommended charms will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+
+    <div class="search-gold-row">
     <!-- Search Button -->
     <div class="collapsible-menu">
         <button class="menu-toggle">
@@ -9279,14 +9928,6 @@ body, html, .main-content, .designer-page {
 
 <!-- Keep the menu backdrop for overlay -->
 <div class="menu-backdrop" id="menu-backdrop"></div>
-
-<div class="recommended-charms-bar" id="recommended-charms-bar">
-        <div class="recommended-scroll-container">
-            <div class="recommended-charms-scroll" id="recommended-charms-scroll">
-                <!-- Recommended charms will be loaded here -->
-            </div>
-        </div>
-    </div>
     <!-- Modern Charms Grid -->
     <div class="modern-charms-container">
         <div class="modern-charms-grid" id="modern-charms-grid">
