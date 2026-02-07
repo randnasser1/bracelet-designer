@@ -234,7 +234,7 @@
   { src: 'special/new-collection/2-gold.png', category: 'red', quantity: 1 },
   { src: 'special/new-collection/3-gold.png', category: 'red', quantity: 1 },
   { src: 'special/new-collection/5-gold.png', category: 'red', quantity: 1 },
-  { src: 'special/new-collection/12-gold.png', category: 'red', quantity: 1 },
+  { src: 'special/new-collection/12-gold.png', category: 'red', quantity: 0 },
   // teddy charms
   { src: 'special/teddy/teddy.png', category: 'teddy', quantity: 3 },
   { src: 'special/teddy/84-gold.png', category: 'teddy', quantity: 11 },
@@ -593,7 +593,7 @@
   { src: 'rares/new-collection/3x.png', category: 'hgs', quantity: 0 },
   { src: 'rares/new-collection/5x.png', category: 'hgs', quantity: 1 },
   { src: 'rares/new-collection/7x.png', category: 'hgs', quantity: 1 },
-  { src: 'rares/new-collection/13-gold.png', category: 'hgs', quantity: 6 },
+  { src: 'rares/new-collection/13-gold.png', category: 'hgs', quantity: 0 },
   { src: 'rares/newc2r/c210.png', category: 'hgs', quantity: 1 },
   { src: 'rares/newc2r/c2100.png', category: 'hgs', quantity: 1 },
   { src: 'rares/newc2r/c2101.png', category: 'hgs', quantity: 1 },
