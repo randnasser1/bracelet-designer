@@ -1201,7 +1201,7 @@ if (additionalDiscount > 0) {
     cartDiscountInfo.style.display = 'block';
     cartDiscountAmount.innerHTML = `
         <div class="cart-discount-applied">
-            <span class="discount-badge">🎉 10%</span>
+            <span class="discount-badge">🎉 15%</span>
             <span class="discount-amount">-${additionalDiscount.toFixed(2)} JDs</span>
         </div>
     `;
@@ -1221,7 +1221,7 @@ if (additionalDiscount > 0) {
     cartDiscountAmount.innerHTML = `
         <div class="cart-discount-eligible">
             <span class="discount-badge">⭐</span>
-            <span>10% OFF at checkout</span>
+            <span>15% OFF at checkout</span>
         </div>
     `;
     cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
@@ -1231,7 +1231,7 @@ if (additionalDiscount > 0) {
     cartDiscountAmount.innerHTML = `
         <div class="cart-discount-not-eligible">
             <span class="discount-badge">+${amountNeeded}</span>
-            <span>for 10% OFF</span>
+            <span>for 15% OFF</span>
         </div>
     `;
     cartTotal.textContent = `Total: ${totalBeforeDiscount.toFixed(2)} JDs`;
@@ -2469,7 +2469,7 @@ function handlePlaceOrderClick() {
                     </span>
                 </div>
                 <div style="color: #4CAF50; font-size: 0.9rem; font-weight: bold;">
-                    🎉 10% Discount Applied! (-${discount.toFixed(2)} JDs)
+                    🎉 15% Discount Applied! (-${discount.toFixed(2)} JDs)
                 </div>
             </div>
         `;
@@ -5264,9 +5264,9 @@ function updateOfferBanner() {
     
     // Show appropriate message
     if (currentUser) {
-        offerText.innerHTML = `Welcome! Complete your first order over 15 JOD in <span id="countdown-timer">10:00</span> to get 10% OFF!`;
+        offerText.innerHTML = `Welcome! Complete your first order over 15 JOD in <span id="countdown-timer">10:00</span> to get 15% OFF!`;
     } else {
-        offerText.innerHTML = `New customer? Complete your order over 15 JOD in <span id="countdown-timer">10:00</span> to get 10% OFF!`;
+        offerText.innerHTML = `New customer? Complete your order over 15 JOD in <span id="countdown-timer">10:00</span> to get 15% OFF!`;
     }
     
     offerBanner.style.display = 'block';
@@ -5351,7 +5351,7 @@ function checkAllDiscountEligibility() {
     if (now <= discountEndDate && subtotal >= 15) {
         eligibleDiscounts.push({
             type: 'seasonal',
-            message: '🎊 Seasonal Sale: 10% off orders above 15 JOD!',
+            message: '🎊 Seasonal Sale: 15% off orders above 15 JOD!',
             maxAmount: 5,
             requiresAmount: 15
         });
@@ -5361,7 +5361,7 @@ function checkAllDiscountEligibility() {
     if (userQualifiesForCountdownDiscount() && subtotal >= 15) {
         eligibleDiscounts.push({
             type: 'countdown',
-            message: '⏰ Limited Time: 10% off your first order over 15 JOD!',
+            message: '⏰ Limited Time: 15% off your first order over 15 JOD!',
             maxAmount: 5,
             requiresAmount: 15
         });
@@ -5371,7 +5371,7 @@ function checkAllDiscountEligibility() {
     if (currentUser && !localStorage.getItem(`hasOrdered_${currentUser.uid}`) && subtotal >= 15) {
         eligibleDiscounts.push({
             type: 'welcome',
-            message: '🎉 Welcome! Enjoy 10% off your first order over 15 JOD!',
+            message: '🎉 Welcome! Enjoy 15% off your first order over 15 JOD!',
             maxAmount: 5,
             requiresAmount: 15
         });
