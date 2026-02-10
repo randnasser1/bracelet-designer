@@ -8230,25 +8230,20 @@ body.menu-open {
         gap: 6px !important;
     }
 }/* 1. Move menu content above all (not constrained by container) */
+/* FIXED: Featured filters - Normal flow, not fixed position */
 .featured-filters {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    position: relative !important; /* Changed from fixed */
     background: white !important;
-    z-index: 1001;
-    margin: 0 !important;
-    padding: 10px 15px !important;
-    border-radius: 0 0 12px 12px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
-    border: none !important;
+    z-index: 10 !important; /* Reduced from 1001 */
+    margin: 8px 0 !important; /* Restore normal margins */
+    padding: 8px 12px !important;
+    border-radius: 10px !important; /* Restore normal radius */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+    border: 1px solid #f0f0f0 !important;
     border-bottom: 1px solid #f5a0c2 !important;
 }
 
-/* Adjust the main content to account for fixed header */
-.bracelet-container {
-    margin-top: 80px !important; /* Add space for fixed menu */
-}
+
 
 .main-content {
     margin-top: 10px !important;
