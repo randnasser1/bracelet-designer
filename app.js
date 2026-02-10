@@ -554,13 +554,8 @@ function setupAuthProtectedCheckout() {
     
     if (placeOrderBtn) {
         placeOrderBtn.addEventListener('click', function(e) {
-            const currentUser = auth.currentUser;
-            
-            if (!currentUser) {
-                e.preventDefault();
-                showAccountCreationPrompt();
-                return false;
-            }
+            // Directly proceed to checkout without authentication
+            handlePlaceOrderClick();
         });
     }
 }
@@ -2552,14 +2547,14 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
         const totalJOD = subtotal + deliveryFee;
         const totalUSD = (totalJOD * JOD_TO_USD_RATE).toFixed(2);
 
-        // Create order data
+        // Create order data WITHOUT user authentication
         const orderData = await prepareOrderData(formData, totalJOD, totalUSD, isPayPalSuccess ? paypalData : null);
         
         // Submit to Firestore
         const orderRef = await db.collection('orders').add(orderData);
         console.log('Order submitted with ID:', orderRef.id);
 
-        // Send email notifications
+        // Send email notifications (optional - keep if you want)
         await sendOrderNotifications(orderRef.id, orderData);
 
         // Clear cart and reset form
@@ -2572,9 +2567,7 @@ async function handleFormSubmit(e, isPayPalSuccess = false, paypalData = null) {
         orderIdSpan.textContent = orderRef.id;
         orderModal.classList.remove('active');
         orderConfirmation.classList.add('active');
-         if (auth.currentUser) {
-            setTimeout(expandOrdersForNewOrder, 1000);
-        }
+        
         showToast('Order submitted successfully!', 'success');
         
     } catch (error) {
@@ -2609,9 +2602,9 @@ async function sendOrderNotifications(orderId, orderData) {
         // Don't throw error - order should still be saved even if emails fail
     }
 }
+// Update prepareOrderData to work without user
 async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null) {
     const paymentMethod = formData.get('payment') || (paypalData ? 'PayPal' : 'Unknown');
-    const currentUser = auth.currentUser;
     
     // Store design images as data URLs
     const itemsWithDesigns = cart.map((item) => {
@@ -2628,7 +2621,7 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         };
     });
 
-    // Build order data with user info
+    // Build order data WITHOUT user info
     const orderData = {
         clientOrderId: `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
         customer: {
@@ -2638,13 +2631,8 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
             governorate: formData.get('governorate') || 'Not provided',
             address: formData.get('address') || 'Not provided',
             notes: formData.get('notes') || null,
-            email: formData.get('customer-email') || (currentUser ? currentUser.email : null)
+            email: formData.get('customer-email') || null // Optional email field
         },
-        // Enhanced user linking
-        userId: currentUser ? currentUser.uid : null,
-    userEmail: currentUser ? currentUser.email : formData.get('customer-email'),
-    isGuestOrder: currentUser ? false : true,
-        userName: currentUser ? currentUser.displayName : formData.get('full-name'),
         paymentMethod: paymentMethod,
         currency: "JOD",
         amountJOD: totalJOD,
@@ -2658,8 +2646,7 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
         total: totalJOD,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         status: 'pending',
-        // Add for easy querying
-        userOrderIndex: currentUser ? `${currentUser.uid}_${Date.now()}` : null
+        isGuestOrder: true // Mark as guest order
     };
 
     // Handle payment proof for Cliq
@@ -5848,36 +5835,21 @@ function filterCharmsByCategory(category) {
         }
     }
     
-    // Update featured gold toggle section visibility
-    if (goldToggleSection) {
-        if (hasGoldVariants) {
-            goldToggleSection.style.display = 'block';
-        } else {
-            goldToggleSection.style.display = 'none';
-            // Reset to silver view when hiding section
-            showGoldVariants = false;
-            
-            // Update both toggles
-            const goldToggle = document.getElementById('gold-toggle');
-            const featuredGoldToggle = document.getElementById('featured-gold-toggle');
-            
-            [goldToggle, featuredGoldToggle].forEach(toggle => {
-                if (toggle) {
-                    toggle.classList.remove('active');
-                    const handle = toggle.querySelector('.toggle-handle');
-                    if (handle) {
-                        handle.style.transform = 'translateX(3px)';
-                    }
-                    if (toggle.id === 'gold-toggle') {
-                        const track = toggle.querySelector('.toggle-track');
-                        if (track) {
-                            track.style.background = 'linear-gradient(90deg, #c0c0c0 100%, #ffd700 0%)';
-                        }
-                    }
-                }
-            });
-        }
-    }
+   // Update the menu toggle to ensure proper visibility
+const menuToggle = document.querySelector('.menu-toggle');
+if (menuToggle) {
+    menuToggle.style.position = 'relative';
+    menuToggle.style.zIndex = '100';
+}
+
+// Make sure menu content is positioned properly
+const menuContent = document.querySelector('.menu-content');
+if (menuContent) {
+    menuContent.style.position = 'absolute';
+    menuContent.style.top = '100%';
+    menuContent.style.left = '0';
+    menuContent.style.zIndex = '1000';
+}
     
     // Get all charms
     const allCharms = [ ...rareCharms,...specialCharms];
