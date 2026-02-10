@@ -914,7 +914,7 @@
   { src: 'rares/newc2r/c2121.png', category: 'rcute', quantity: 1 },
   { src: 'rares/newc2r/c213.png', category: 'rcute', quantity: 1 },
   { src: 'rares/newc2r/c2139.png', category: 'rcute', quantity: 1 },
-  { src: 'rares/newc2r/c214.png', category: 'rcute', quantity: 1 },
+  { src: 'rares/newc2r/c214.png', category: 'rcute', quantity: 0 },
   { src: 'rares/newc2r/c2142.png', category: 'rcute', quantity: 1 },
   { src: 'rares/newc2r/c2109.png', category: 'rcute', quantity: 1 },
   { src: 'rares/newc2r/c251-gold.png', category: 'rcute', quantity: 5 },
