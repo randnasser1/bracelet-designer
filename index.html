@@ -9521,6 +9521,82 @@ body, html, .main-content, .designer-page {
     0% { transform: scale(0.5); }
     50% { transform: scale(1.3); }
     100% { transform: scale(1); }
+}/* Add these CSS rules to ensure proper layering */
+
+/* 1. Ensure cart button stays on top */
+.cart-button {
+    z-index: 10001 !important; /* Higher than search menu */
+}
+
+/* 2. Ensure cart preview stays on top */
+.cart-preview {
+    z-index: 10002 !important; /* Highest of all */
+}
+
+/* 3. Search menu should be below cart but above content */
+.menu-content {
+    z-index: 10000 !important; /* Lower than cart */
+}
+
+/* 4. User circle should be above search but below cart */
+.user-circle-container {
+    z-index: 10001 !important;
+}
+
+/* 5. Back button should be above search */
+.back-btn {
+    z-index: 10001 !important;
+}
+
+/* 6. Order modal should be on top of everything */
+#order-modal {
+    z-index: 10003 !important;
+}
+
+/* 7. Modal backdrop should be below modals but above everything else */
+.modal {
+    z-index: 10002 !important;
+}
+
+.modal .order-modal-content {
+    z-index: 10003 !important;
+}
+
+/* 8. Menu backdrop should be below menu but above content */
+.menu-backdrop {
+    z-index: 9999 !important; /* Below menu but above content */
+}
+
+/* 9. Ensure featured-filters doesn't interfere */
+.featured-filters {
+    z-index: 10 !important; /* Lower than menu */
+}
+
+/* 10. Ensure collapsible-menu doesn't create stacking issues */
+.collapsible-menu {
+    z-index: 10000 !important; /* Same as menu-content */
+    position: relative;
+}
+
+/* 11. Make sure bracelet container doesn't interfere */
+.bracelet-container {
+    z-index: 1 !important; /* Very low */
+}
+
+/* 12. Main content should be at the bottom */
+.main-content {
+    position: relative;
+    z-index: 1 !important;
+}
+
+/* 13. Recommended charms bar should be above main content but below search */
+.recommended-charms-bar {
+    z-index: 5 !important;
+}
+
+/* 14. Modern charms grid should be low */
+.modern-charms-container {
+    z-index: 2 !important;
 }
 </style>
 </head>
