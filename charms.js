@@ -64,7 +64,7 @@
   // bows charms
   { src: 'special/bows/beige.png', category: 'bows', quantity: 19 },
   { src: 'special/bows/62-gold.png', category: 'bows', quantity: 9 },
-  { src: 'special/bows/63-gold.png', category: 'bows', quantity: 3 },
+  { src: 'special/bows/63-gold.png', category: 'bows', quantity: 0 },
   { src: 'special/bows/64-gold.png', category: 'bows', quantity: 20 },
   { src: 'special/bows/65-gold.png', category: 'bows', quantity: 19 },
   { src: 'special/bows/66-gold.png', category: 'bows', quantity: 10 },
@@ -74,7 +74,7 @@
   { src: 'special/bows/black.png', category: 'bows', quantity: 20 },
   { src: 'special/bows/dark pink.png', category: 'bows', quantity: 14 },
   { src: 'special/bows/navy.png', category: 'bows', quantity: 10 },
-  { src: 'special/bows/pink.png', category: 'bows', quantity: 3 },
+  { src: 'special/bows/pink.png', category: 'bows', quantity: 0 },
   { src: 'special/bows/purple.png', category: 'bows', quantity: 8 },
   { src: 'special/bows/red.png', category: 'bows', quantity: 16 },
   { src: 'special/bows/wwhite.png', category: 'bows', quantity: 9 },
@@ -201,8 +201,8 @@
   { src: 'special/mushrooms/84-gold.png', category: 'mushrooms', quantity: 1 },
   // red charms
   { src: 'special/red/red.png', category: 'red', quantity: 0 },
-  { src: 'special/red/36-gold.png', category: 'red', quantity: 10 },
-  { src: 'special/red/37-gold.png', category: 'red', quantity: 10 },
+  { src: 'special/red/36-gold.png', category: 'red', quantity: 0 },
+  { src: 'special/red/37-gold.png', category: 'red', quantity: 0 },
   { src: 'special/red/89-gold.png', category: 'red', quantity: 1 },
   { src: 'special/red/90-gold.png', category: 'red', quantity: 5 },
   { src: 'special/red/92-gold.png', category: 'red', quantity: 2 },
