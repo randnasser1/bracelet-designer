@@ -649,7 +649,7 @@
   { src: 'rares/love/love7.png', category: 'love', quantity: 0 },
   { src: 'rares/love/love8.png', category: 'love', quantity: 3 },
   { src: 'rares/love/love9.png', category: 'love', quantity: 1 },
-  { src: 'rares/love/love10.png', category: 'love', quantity: 1 },
+  { src: 'rares/love/love10.png', category: 'love', quantity: 0 },
   { src: 'rares/love/love11.png', category: 'love', quantity:0 },
   { src: 'rares/love/mrmrs1.png', category: 'love', quantity: 1 },
   { src: 'rares/love/mrmrs2.png', category: 'love', quantity: 1 },
