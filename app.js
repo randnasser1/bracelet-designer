@@ -4913,6 +4913,8 @@ function initializeRecommendedCharms() {
     // Your actual recommended charms
     const recommendedCharmNames = [
         'rares/newc2r/c224.png',
+        'rares/hgs/25.png',
+        'rares/hgs/hgs5.png',
         'rares/love/c218.png',
         'rares/love/c219.png',
         'special/teddy/teddy2.png',
@@ -4920,11 +4922,10 @@ function initializeRecommendedCharms() {
         'special/new-collection/50.png',
         'rares/hgs/hgs6.png',
         'rares/newc2r/c222.png',
-        'rares/gold/gold8.png',
         'special/beach/x15.png',
         'rares/new-collection/csds.png',
         'rares/sporty/sporty7.png',
-        
+        'rares/newc2r/c261.png',
         'rares/new-collection/19-gold.png',
         'special/cute specials/special.png',
         'rares/disney/stitch.png',
@@ -4937,6 +4938,8 @@ function initializeRecommendedCharms() {
         'rares/sanrio/metalkitty.png',
         'rares/newc2r/c2145.png',
         'rares/newc2r/c29-gold.png',
+        'rares/newc2r/c2143.png',
+        'special/bows/wwhite.png',
         'rares/newc2r/c27.png',
         'rares/newc2r/c229.png',
         'rares/newc2r/c2115.png',
