@@ -11238,11 +11238,7 @@ body.keychain-mode-on .lego-dangly-sidebar {
       <div class="character-with-sidebar">
         <div class="character-section">
           <div class="canvas-wrapper">
-            <!-- Toggle sits on top of canvas, centred, outside overflow:hidden -->
-            <button id="lego-keychain-toggle" class="kc-toggle-btn kc-canvas-overlay">
-              <span class="kc-track"><span class="kc-handle"></span></span>
-              <span>🔗 Keychain <small>(+2 JD)</small></span>
-            </button>
+            
             <div class="character-canvas">
               <div class="loading active" id="main-loading">
                 <div class="spinner"></div>
@@ -11254,11 +11250,17 @@ body.keychain-mode-on .lego-dangly-sidebar {
               <div class="lego-piece piece-accessories" id="accessories-piece"></div>
               <div id="floating-charms-container" class="floating-charms-container"></div>
             </div><!-- /character-canvas -->
+            
           </div><!-- /canvas-wrapper -->
           <div class="view-controls">
             <button class="view-btn active" id="front-view"><i class="fas fa-eye"></i> Front View</button>
             <button class="view-btn" id="back-view"><i class="fas fa-eye-slash"></i> Back View</button>
           </div><!-- /view-controls -->
+          <!-- Toggle sits on top of canvas, centred, outside overflow:hidden -->
+            <button id="lego-keychain-toggle" class="kc-toggle-btn kc-canvas-overlay">
+              <span class="kc-track"><span class="kc-handle"></span></span>
+              <span>🔗 Keychain <small>(+2 JD)</small></span>
+            </button>
         </div><!-- /character-section -->
 
         <!-- Dangly Charms Pool (visible when keychain ON) -->
