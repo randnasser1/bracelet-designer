@@ -2831,26 +2831,28 @@ function addLegoToCart() {
         extraDetails.push(`${selectedDanglyCharmsForLego.length} charm(s) +${danglyCost} JD`);
     }
     
-    const cartItem = {
-        id: Date.now().toString(),
-        product: 'LEGO Character',
-        symbol: '🧱',
-        size: 'Custom',
-        materialType: extraDetails.length ? extraDetails.join(', ') : 'Standard LEGO',
-        price: totalPrice,
-        originalPrice: totalPrice,
-        legoCharacter: {
-            faces: currentLegoCharacter.faces,
-            hairs: currentLegoCharacter.hairs,
-            torsos: currentLegoCharacter.torsos,
-            legs: currentLegoCharacter.legs,
-            accessories: currentLegoCharacter.accessories,
-            view: currentLegoCharacter.currentView
-        },
-        keychainMode: isKeychainModeForLego,
-        keychainCharms: [...selectedDanglyCharmsForLego],
-        timestamp: new Date().toISOString()
-    };
+    // In your addLegoToCart function, add:
+const cartItem = {
+    id: Date.now().toString(),
+    product: 'LEGO Character',
+    symbol: '🧱',
+    size: 'Custom',
+    materialType: extraDetails.length ? extraDetails.join(', ') : 'Standard LEGO',
+    price: totalPrice,
+    originalPrice: totalPrice,
+    charms: [], // Add empty charms array for LEGO items
+    legoCharacter: {
+        faces: currentLegoCharacter.faces,
+        hairs: currentLegoCharacter.hairs,
+        torsos: currentLegoCharacter.torsos,
+        legs: currentLegoCharacter.legs,
+        accessories: currentLegoCharacter.accessories,
+        view: currentLegoCharacter.currentView
+    },
+    keychainMode: isKeychainModeForLego,
+    keychainCharms: [...selectedDanglyCharmsForLego],
+    timestamp: new Date().toISOString()
+};
 
     // Capture the character canvas (same element shown to the user)
     const charCanvas = document.querySelector('.character-canvas');
@@ -4304,12 +4306,17 @@ function setupCartFunctionality() {
 }
 function validateCharmsForSets(charms) {
     const invalidSets = [];
-    const currentItemCharmSrcs = charms.map(c => c.src);
+    
+    // Safety check
+    if (!charms || !Array.isArray(charms)) {
+        return invalidSets;
+    }
+    
+    const currentItemCharmSrcs = charms.map(c => c.src).filter(src => src);
 
-    // Check for sets with multiple charms in this item
     Object.values(CHARM_SETS).forEach(set => {
         const charmsInItem = set.charms.filter(setCharm => 
-            currentItemCharmSrcs.some(src => src.includes(setCharm))
+            currentItemCharmSrcs.some(src => src && src.includes(setCharm))
         ).length;
         
         if (charmsInItem > 1) {
@@ -4323,7 +4330,6 @@ function validateCharmsForSets(charms) {
 
     return invalidSets;
 }
-
 
 function blobToBase64(blob) {
     return new Promise((resolve, reject) => {
@@ -5222,12 +5228,26 @@ function wouldCompleteSetInCart(charmSet) {
 }
 function validateCartForCheckout() {
     const invalidSets = [];
-    const allCharmsInCart = cart.flatMap(item => item.charms.map(c => c.src));
+    
+    // SAFETY CHECK: Make sure cart exists and has items
+    if (!cart || cart.length === 0) {
+        return invalidSets;
+    }
+    
+    // Collect all charms safely - handle items without charms property
+    const allCharmsInCart = cart.flatMap(item => {
+        // Check if item has charms property and it's an array
+        if (item.charms && Array.isArray(item.charms)) {
+            return item.charms.map(c => c.src);
+        }
+        // For LEGO or other items without charms, return empty array
+        return [];
+    });
 
     Object.values(CHARM_SETS).forEach(set => {
         // Check for incomplete sets
         const foundCharms = set.charms.filter(charm => 
-            allCharmsInCart.some(c => c.includes(charm))
+            allCharmsInCart.some(c => c && c.includes(charm))
         ).length;
         
         if (foundCharms > 0 && foundCharms < set.requiredCount) {
@@ -5240,8 +5260,11 @@ function validateCartForCheckout() {
         
         // Check for multiple charms from same set in single items
         cart.forEach(item => {
+            // Skip items without charms array
+            if (!item.charms || !Array.isArray(item.charms)) return;
+            
             const charmsInItem = set.charms.filter(setCharm => 
-                item.charms.some(c => c.src.includes(setCharm))
+                item.charms.some(c => c.src && c.src.includes(setCharm))
             ).length;
             
             if (charmsInItem > 1) {
