@@ -402,7 +402,7 @@ function updateLegoPriceDisplay() {
     const breakdownSpan = document.getElementById('lego-price-breakdown');
     if (!legoPriceSpan) return;
 
-    let total = 7;
+    let total = 5.5; // Base price for LEGO character (reduced from 7 to 5.5 to accommodate keychain pricing) - EDITED
     let breakdown = [];
 
     // Helper: check if a piece ID in a category is premium
@@ -445,8 +445,8 @@ function updateLegoPriceDisplay() {
     legoPriceSpan.innerHTML = `<strong style="color:#d6336c;">${total}.00 JDs</strong>`;
     if (breakdownSpan) {
         breakdownSpan.innerHTML = breakdown.length > 0
-            ? `<span style="font-size:11px;">📝 Base 7 + ${breakdown.join(' + ')} = ${total} JDs</span>`
-            : '<span style="font-size:11px;">📝 Base LEGO (7 JDs)</span>';
+            ? `<span style="font-size:11px;">📝 Base 5.5 + ${breakdown.join(' + ')} = ${total} JDs</span>`
+            : '<span style="font-size:11px;">📝 Base LEGO (5.5 JDs)</span>';
     }
 }
 window.updateLegoPriceDisplay = updateLegoPriceDisplay;
