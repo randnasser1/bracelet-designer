@@ -397,40 +397,42 @@ function removeLegoKeychainCharm(index) {
     updateLegoPriceDisplay();
     showToast('Charm removed from keychain');
 }
+function getLegoPartCost(category, pieceId) {
+    if (pieceId === null || pieceId === undefined) return 0;
+    const pieces = legoPieces[category];
+    if (!pieces || !Array.isArray(pieces)) return 0;
+    const piece = pieces.find(p => p && p.id === pieceId);
+    if (!piece) return 0;
+    if (piece.price > 0) return piece.price;
+    if (!piece.baseName) return 0;
+    const displayFront = pieces.find(p => p.isDisplayImage && p.baseName === piece.baseName && p.view === 'front' && p.price > 0);
+    return displayFront ? displayFront.price : 0;
+}
+window.getLegoPartCost = getLegoPartCost;
+
 function updateLegoPriceDisplay() {
     const legoPriceSpan = document.getElementById('lego-price-display');
     const breakdownSpan = document.getElementById('lego-price-breakdown');
     if (!legoPriceSpan) return;
 
-    let total = 5.5; // Base price for LEGO character (reduced from 7 to 5.5 to accommodate keychain pricing) - EDITED
+    let total = 5.5;
     let breakdown = [];
 
-    // Helper: check if a piece ID in a category is premium
-    function isPieceInPremiumList(category, pieceId) {
-        if (pieceId === null || pieceId === undefined) return false;
-        if (!legoPieces[category] || !Array.isArray(legoPieces[category])) return false;
-        const piece = legoPieces[category].find(p => p && p.id === pieceId);
-        if (!piece || !piece.baseName) return false;
-        return LEGO_EXTRA_COST_PIECES.some(extra => piece.baseName === extra || piece.baseName.includes(extra));
+    if (currentLegoCharacter && currentLegoCharacter.faces !== null && currentLegoCharacter.faces !== undefined) {
+        const cost = getLegoPartCost('faces', currentLegoCharacter.faces);
+        if (cost > 0) { total += cost; breakdown.push(`Face +${cost}`); }
     }
-
     if (currentLegoCharacter && currentLegoCharacter.hairs !== null && currentLegoCharacter.hairs !== undefined) {
-        if (isPieceInPremiumList('hairs', currentLegoCharacter.hairs)) {
-            total += 2;
-            breakdown.push('Hair (premium) +2');
-        }
+        const cost = getLegoPartCost('hairs', currentLegoCharacter.hairs);
+        if (cost > 0) { total += cost; breakdown.push(`Hair +${cost}`); }
     }
     if (currentLegoCharacter && currentLegoCharacter.torsos !== null && currentLegoCharacter.torsos !== undefined) {
-        if (isPieceInPremiumList('torsos', currentLegoCharacter.torsos)) {
-            total += 2;
-            breakdown.push('Torso (premium) +2');
-        }
+        const cost = getLegoPartCost('torsos', currentLegoCharacter.torsos);
+        if (cost > 0) { total += cost; breakdown.push(`Torso +${cost}`); }
     }
     if (currentLegoCharacter && currentLegoCharacter.legs !== null && currentLegoCharacter.legs !== undefined) {
-        if (isPieceInPremiumList('legs', currentLegoCharacter.legs)) {
-            total += 2;
-            breakdown.push('Legs (premium) +2');
-        }
+        const cost = getLegoPartCost('legs', currentLegoCharacter.legs);
+        if (cost > 0) { total += cost; breakdown.push(`Legs +${cost}`); }
     }
 
     const keychainCost = isKeychainModeForLego ? 2 : 0;
@@ -442,7 +444,7 @@ function updateLegoPriceDisplay() {
 
     total += keychainCost + danglyCost;
 
-    legoPriceSpan.innerHTML = `<strong style="color:#d6336c;">${total}.00 JDs</strong>`;
+    legoPriceSpan.innerHTML = `<strong style="color:#d6336c;">${total} JDs</strong>`;
     if (breakdownSpan) {
         breakdownSpan.innerHTML = breakdown.length > 0
             ? `<span style="font-size:11px;">📝 Base 5.5 + ${breakdown.join(' + ')} = ${total} JDs</span>`
@@ -2494,10 +2496,17 @@ function loadLegoOptions(category) {
         img.src = piece.path;
         
         option.appendChild(imgDiv);
-        
+
+        if (piece.price > 0) {
+            const priceTag = document.createElement('div');
+            priceTag.className = 'lego-piece-price-tag';
+            priceTag.textContent = `+${piece.price} JD`;
+            option.appendChild(priceTag);
+        }
+
         option.addEventListener('click', (e) => {
             e.stopPropagation();
-            
+
             document.querySelectorAll(`.lego-option[data-category="${category}"]`).forEach(opt => {
                 opt.classList.remove('selected');
             });
@@ -2783,42 +2792,20 @@ if (typeof switchLegoView === 'function') {
     };
 }
 function addLegoToCart() {
-    let totalPrice = 7;
+    let totalPrice = 5.5;
     let extraDetails = [];
-    
-    const isPremium = (category, pieceId) => {
-        if (!pieceId || pieceId === null) return false;
-        let piece = null;
-        if (legoPieces[category]) {
-            piece = legoPieces[category].find(p => p.id === pieceId);
-        }
-        if (!piece && legoPieces.base) {
-            piece = legoPieces.base.find(p => p.id === pieceId);
-        }
-        if (!piece || !piece.baseName) return false;
-        return LEGO_EXTRA_COST_PIECES.some(extra => piece.baseName === extra || piece.baseName.includes(extra));
-    };
-    
-    if (currentLegoCharacter.hairs && currentLegoCharacter.hairs !== null) {
-        if (isPremium('hairs', currentLegoCharacter.hairs)) {
-            totalPrice += 2;
-            extraDetails.push('Premium Hair +2 JD');
-        }
-    }
-    
-    if (currentLegoCharacter.torsos && currentLegoCharacter.torsos !== null) {
-        if (isPremium('torsos', currentLegoCharacter.torsos)) {
-            totalPrice += 2;
-            extraDetails.push('Premium Torso +2 JD');
-        }
-    }
-    
-    if (currentLegoCharacter.legs && currentLegoCharacter.legs !== null) {
-        if (isPremium('legs', currentLegoCharacter.legs)) {
-            totalPrice += 2;
-            extraDetails.push('Premium Legs +2 JD');
-        }
-    }
+
+    const faceCost = getLegoPartCost('faces', currentLegoCharacter.faces);
+    if (faceCost > 0) { totalPrice += faceCost; extraDetails.push(`Face +${faceCost} JD`); }
+
+    const hairCost = getLegoPartCost('hairs', currentLegoCharacter.hairs);
+    if (hairCost > 0) { totalPrice += hairCost; extraDetails.push(`Hair +${hairCost} JD`); }
+
+    const torsoCost = getLegoPartCost('torsos', currentLegoCharacter.torsos);
+    if (torsoCost > 0) { totalPrice += torsoCost; extraDetails.push(`Torso +${torsoCost} JD`); }
+
+    const legsCost = getLegoPartCost('legs', currentLegoCharacter.legs);
+    if (legsCost > 0) { totalPrice += legsCost; extraDetails.push(`Legs +${legsCost} JD`); }
     
     if (isKeychainModeForLego) {
         totalPrice += 2;
@@ -2936,7 +2923,8 @@ function randomizeLegoCharacter() {
     
     currentLegoCharacter.currentView = 'front';
     switchLegoView('front');
-    
+    updateLegoPriceDisplay();
+
     // Update the current tab view
     const activeTab = document.querySelector('#lego-designer-page .tab.active');
     if (activeTab) {

@@ -1542,13 +1542,13 @@
   {
     "id": 84,
     "path": "hairs/display_4550736_0.png", 
-    "price":0,
+    "price":1,
     "category":  "hairs"
   },
   {
     "id": 85,
     "path": "hairs/display_4550736_1.png", 
-    "price":0,
+    "price":1,
     "category":  "hairs"
   },
   {
@@ -2106,97 +2106,97 @@
   {
     "id": 178,
     "path": "torsos/display_torsos23_0.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 179,
     "path": "torsos/display_torsos23_1.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 180,
     "path": "torsos/display_torsos24_0.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 181,
     "path": "torsos/display_torsos24_1.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 182,
     "path": "torsos/display_torsos25_0.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 183,
     "path": "torsos/display_torsos25_1.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 184,
     "path": "torsos/display_torsos26_0.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 185,
     "path": "torsos/display_torsos26_1.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 186,
     "path": "torsos/display_torsos27_0.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 187,
     "path": "torsos/display_torsos27_1.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 188,
     "path": "torsos/display_torsos28_0.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 189,
     "path": "torsos/display_torsos28_1.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 190,
     "path": "torsos/display_torsos29_0.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 191,
     "path": "torsos/display_torsos29_1.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 192,
     "path": "torsos/display_torsos2_0.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
     "id": 193,
     "path": "torsos/display_torsos2_1.png", 
-    "price":0,
+    "price":2,
     "category":  "torsos"
   },
   {
@@ -2814,193 +2814,193 @@
   {
     "id": 296,
     "path": "legs/display_pants0_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 297,
     "path": "legs/display_pants0_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 298,
     "path": "legs/display_pants1_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 299,
     "path": "legs/display_pants1_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 300,
     "path": "legs/display_pants2_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 301,
     "path": "legs/display_pants2_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 302,
     "path": "legs/display_pants3_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 303,
     "path": "legs/display_pants3_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 304,
     "path": "legs/display_pants4_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 305,
     "path": "legs/display_pants4_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 306,
     "path": "legs/display_pants5_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 307,
     "path": "legs/display_pants5_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 308,
     "path": "legs/display_pants6_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 309,
     "path": "legs/display_pants6_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 310,
     "path": "legs/display_pants7_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 311,
     "path": "legs/display_pants7_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 312,
     "path": "legs/pants0_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 313,
     "path": "legs/pants0_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 314,
     "path": "legs/pants1_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 315,
     "path": "legs/pants1_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 316,
     "path": "legs/pants2_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 317,
     "path": "legs/pants2_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 318,
     "path": "legs/pants3_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 319,
     "path": "legs/pants3_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 320,
     "path": "legs/pants4_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 321,
     "path": "legs/pants4_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 322,
     "path": "legs/pants5_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 323,
     "path": "legs/pants5_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 324,
     "path": "legs/pants6_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 325,
     "path": "legs/pants6_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 326,
     "path": "legs/pants7_0.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
     "id": 327,
     "path": "legs/pants7_1.png", 
-    "price":0,
+    "price":1,
     "category":  "legs"
   },
   {
@@ -3084,25 +3084,25 @@
   {
     "id": 341,
     "path": "faces/display_white_6_0.png", 
-    "price":0,
+    "price":2,
     "category":  "faces"
   },
   {
     "id": 342,
     "path": "faces/display_white_7_0.png", 
-    "price":0,
+    "price":2,
     "category":  "faces"
   },
   {
     "id": 343,
     "path": "faces/display_white_8_0.png", 
-    "price":0,
+    "price":2,
     "category":  "faces"
   },
   {
     "id": 344,
     "path": "faces/display_white_9_0.png", 
-    "price":0,
+    "price":2,
     "category":  "faces"
   },
   {
@@ -3114,13 +3114,13 @@
   {
     "id": 346,
     "path": "faces/display_yellow_20_0.png", 
-    "price":0,
+    "price":2,
     "category":  "faces"
   },
   {
     "id": 347,
     "path": "faces/display_yellow_21_0.png", 
-    "price":0,
+    "price":2,
     "category":  "faces"
   },
   {
@@ -3150,7 +3150,7 @@
   {
     "id": 352,
     "path": "faces/display_yellow_28_0.png", 
-    "price":0,
+    "price":2,
     "category":  "faces"
   },
   {
