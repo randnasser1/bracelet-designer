@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /mnt/c/Users/Lenovo/Desktop/Italiacharms -name \"*.js\" -o -name \"*.html\" -o -name \"*.css\" | grep -v node_modules | grep -v \".git\")",
+      "Read(//mnt/c/Users/Lenovo/Desktop/**)"
+    ]
+  }
+}

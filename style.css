@@ -1,0 +1,4372 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Parisienne&display=swap');
+
+/* Italia Charms Header Styles */
+.header-container {
+  margin-bottom: -10px; /* Pulls everything up slightly */
+}
+
+
+.location-subheader {
+  font-size: 0.85rem;
+  color: #a61e4d;
+  margin: 0 0 0.2rem 0 !important; /* Top Right Bottom Left */
+  line-height: 1.2;
+}
+
+/* For the decorative line */
+.header-container p:nth-of-type(1) {
+  margin: 0.1rem 0 0.5rem 0 !important;
+  line-height: 1;
+}
+.base-charm img {
+  width: 100px !important;
+  height: 100px !important;
+  object-fit: contain; /* Optional: keep image inside container without cropping */
+}
+
+.subtitle {
+  margin-top: 0.3rem !important;
+}
+.main-title {
+  font-family: 'Parisienne', cursive;
+  font-size: 4rem;
+  color: #d6336c;
+  margin: 0;
+  margin-bottom: 0.2rem !important; /* Reduced from default 1rem */
+
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  background: linear-gradient(to right, #ff85b3, #d6336c, #ff85b3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+}
+
+.main-title::before, .main-title::after {
+  content: "❀";
+  position: absolute;
+  color: #ff85b3;
+  font-size: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.main-title::before { left: -40px; }
+.main-title::after { right: -40px; }
+
+.subtitle {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.5rem;
+  color: #ff85b3;
+  margin-top: -1rem;
+}
+
+.welcome-popup {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(0,0,0,0.7) !important;
+  z-index: 9999 !important;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.welcome-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+}
+.welcome-content h2 {
+  font-family: 'Parisienne', cursive;
+  color: #d6336c;
+  font-size: 2rem;
+}
+
+.welcome-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #d6336c;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .main-title { font-size: 3rem; }
+  .main-title::before, .main-title::after { font-size: 1.5rem; }
+  .main-title::before { left: -30px; }
+  .main-title::after { right: -30px; }
+}
+
+@media (max-width: 480px) {
+  .main-title { font-size: 2.5rem; }
+  .main-title::before, .main-title::after { display: none; }
+}
+
+/* ==================== */
+/* BASE STYLES (Unchanged) */
+/* ==================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #ffe6f0;
+    color: #333;
+    margin: 0;
+    padding: 2rem;
+    text-align: center;
+}
+
+/* ==================== */
+/* CONTROLS (Unchanged) */
+/* ==================== */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+}
+
+.btn {
+    background: #ff85b3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1em;
+}
+
+.btn:hover {
+    background: #ff5fa3;
+}
+
+.download-btn {
+    background-color: #6c757d;
+    color: white;
+}
+
+.download-btn:hover {
+    background-color: #5a6268;
+}
+
+.add-to-cart-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #45a049;
+}
+
+/* ==================== */
+/* JEWELRY PIECE (Modified for long/dangly) */
+/* ==================== */
+
+
+/* Jewelry piece slots */
+
+
+
+/* Long charm in jewelry piece */
+
+.slot.long-slot {
+  width: 150px !important; /* Force 2x width */
+  height: 100px !important;
+  margin-right: 0 !important;
+  flex: 0 0 168px !important; /* Prevent flex shrinking */
+} 
+.slot.long-slot img.long-charm {
+    width: 150px !important;
+    height: 100px !important;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+        margin-right: 0; /* Remove any extra margin */
+
+}
+
+.slot.long-slot .long-charm {
+    width: 150px;
+    height: 100px;
+      position: relative;
+          z-index: 2;
+
+}
+
+/* Dangly charm in jewelry piece */
+.slot.has-dangly {
+    height: 220px;
+}
+
+.slot.has-dangly img.dangly-charm {
+    width: 100px !important;
+    height: 220px !important;
+    object-fit: contain;
+        z-index: 2;
+
+}
+.slot.long-slot img[data-type="base"] {
+    position: absolute;
+    z-index: 1;
+}
+
+/* ==================== */
+/* CHARM POOLS (Modified for dangly positioning) */
+/* ==================== */
+.charm-pools {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 1rem;
+}
+
+.charm-pool {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+}
+
+.charm-pool h3 {
+    color: #d6336c;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.category-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.category-tab {
+    background: #fff;
+    border: 2px solid #f5a0c2;
+    border-radius: 20px;
+    color: #d6336c;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.category-tab:hover {
+    background: #fce9f1;
+}
+
+.category-tab.active {
+    background: #d6336c;
+    color: #fff;
+}
+
+/* ==================== */
+/* CHARMS GRID (Modified for sold-out/dangly) */
+/* ==================== */
+.charms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+    gap: 0.5rem;
+    padding: 1rem;
+    background: #fff0f5;
+    border-radius: 16px;
+    margin: 1rem auto;
+}
+/* Charm pool sizes */
+.charms-grid .charm {
+    width: 75px;
+    height: 75px;
+}
+
+.charms-grid .long-charm {
+    width: 100px;
+    height: 50px;
+    grid-column: span 2;
+}
+
+.charms-grid .dangly-charm {
+    width: 48px;
+    height: 96px;
+}
+
+/* Dangly positioning at bottom */
+.dangly-charm-container {
+    order: 1;
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #f5a0c2;
+}
+
+.charm {
+    width: 75px;
+    height: 75px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    border-radius: 4px;
+    position: relative;
+}
+
+.charm:hover {
+    transform: scale(1.1);
+}
+
+.charm.selected {
+    box-shadow: 0 0 0 2px #d6336c;
+}
+
+/* Modified sold-out style (removed blur) */
+.charm.sold-out {
+    opacity: 0.5;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.charm.sold-out::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: 1;
+    border-radius: 4px;
+}
+
+/* Special charm types */
+.long-charm {
+    width: 100px;
+    height: 50px;
+    grid-column: span 2;
+}
+
+.dangly-charm {
+    width: 48px;
+    height: 96px;
+}
+
+/* ==================== */
+/* GOLD TOGGLE (Unchanged) */
+/* ==================== */
+.gold-toggle-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+    padding-top: 1rem;
+    border-top: 1px solid #f5a0c2;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.gold-toggle-btn {
+    background: white;
+    color: #d6336c;
+    border: 2px solid #d6336c;
+    border-radius: 20px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.gold-toggle-btn.active {
+    background: #d6336c;
+    color: white;
+}
+
+/* ==================== */
+/* CART STYLES (Unchanged) */
+/* ==================== */
+.cart-button-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+}
+
+.cart-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    background: #d6336c;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    border: 2px solid white;
+}
+
+.cart-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4444;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid white;
+}.cart-preview {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    width: 340px;
+    max-height: 70vh;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.15);
+    z-index: 1100; /* Higher than jewelry piece */
+    display: none;
+    overflow: hidden;
+    flex-direction: column;
+    
+}
+
+.cart-preview.active {
+    display: flex;
+}
+
+.cart-preview-header {
+    padding: 15px 20px;
+    background: #d6336c;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f5a0c2;
+}
+
+.cart-preview-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.cart-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 5px;
+}
+
+.cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-item-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.cart-item-symbol {
+    font-size: 1.5rem;
+    min-width: 40px;
+    text-align: center;
+    color: #d6336c;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+}
+
+.cart-item-details div:first-child {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.cart-item-details div {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.remove-item {
+    background: none;
+    border: none;
+    color: #d6336c;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 5px;
+    margin-left: 10px;
+}
+
+.cart-footer {
+    padding: 15px 20px;
+    background: #f9f9f9;
+    border-top: 1px solid #eee;
+}
+
+.cart-footer div {
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.cart-total {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #d6336c;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+#order-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    background: #d6336c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#order-btn:hover {
+    background: #c2255c;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 30px 0;
+    color: #999;
+    font-style: italic;
+}
+
+/* Scrollbar styling */
+.cart-items::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cart-items::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.cart-items::-webkit-scrollbar-thumb {
+    background: #d6336c;
+    border-radius: 3px;
+}
+
+
+.cart-total {
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: right;
+    color: #d6336c;
+    margin-bottom: 10px;
+}
+
+/* ==================== */
+/* MODAL STYLES (Unchanged) */
+/* ==================== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+.order-modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    margin: 20px auto;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.order-modal-content::-webkit-scrollbar {
+    display: none;
+}
+
+#order-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.payment-options {
+    margin: 1.5rem 0;
+}
+
+.payment-option {
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#payment-proof-container {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.order-summary {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.order-summary div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+#order-delivery {
+    color: #666;
+    font-size: 0.9em;
+}
+
+#order-total-price {
+    font-weight: bold;
+    color: #d6336c;
+    border-top: 1px solid #eee;
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.order-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+#order-btn {
+    margin-top: 15px;
+    padding: 12px;
+    font-size: 16px;
+    width: 100%;
+}
+
+#order-btn:hover {
+    background: #c2255c;
+}
+
+.confirm-order-btn {
+    background-color: #28a745;
+    color: white;
+    font-size: 1.1em;
+    padding: 0.8rem 2rem;
+    min-width: 200px;
+}
+
+.confirm-order-btn:hover {
+    background-color: #218838;
+}
+
+.cancel-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #c82333;
+}
+
+/* ==================== */
+/* RESPONSIVE (Unchanged) */
+/* ==================== */
+@media (max-width: 768px) {
+    .modal {
+        align-items: flex-start;
+    }
+    
+    .order-modal-content {
+        margin: 10px auto;
+        padding: 1.5rem;
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    .order-buttons {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    
+    .confirm-order-btn,
+    .cancel-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .cart-preview {
+        width: 90vw;
+        right: 5vw;
+        max-height: 75vh;
+    }
+    
+    .cart-items {
+        max-height: calc(75vh - 220px);
+        padding: 0 15px;
+    }
+    
+    .cart-item {
+        padding: 12px 0;
+    }
+    .cart-button {
+        width: 45px;
+        height: 45px;
+        top: 15px;
+        right: 15px;
+    }
+    
+    body {
+        padding: 1rem;
+    }
+    
+    .controls {
+        padding: 0.5rem;
+    }
+    
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9em;
+    }
+    
+    #jewelry-piece {
+        grid-template-columns: repeat(auto-fill, 80px);
+    }
+    
+    .slot {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .slot img {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .slot.long-slot {
+        width: 164px;
+    }
+    
+    .slot.long-slot .long-charm {
+        width: 160px;
+    }
+}
+
+/* ==================== */
+/* PRODUCT-SPECIFIC (Unchanged) */
+/* ==================== */
+.product-ring #jewelry-piece .slot {
+    width: 40px;
+    height: 40px;
+}
+
+.product-ring #jewelry-piece .slot img {
+    width: 36px;
+    height: 36px;
+}.pricing-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .pricing-category {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .pricing-category h4 {
+    color: #d6336c;
+    margin-top: 0;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed #f5a0c2;
+  }
+
+  .pricing-category ul {
+    padding-left: 1.2rem;
+    margin: 0;
+  }
+
+  .pricing-category li {
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .pricing-note {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    margin: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .contact-info {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-top: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-align: center;
+  }
+
+  .contact-info h4 {
+    color: #d6336c;
+    margin-top: 0;
+  }
+
+  .contact-info a {
+    color: #d6336c;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  .contact-info a:hover {
+    text-decoration: underline;
+  }
+/* Google Translate element styling */
+#google_translate_element {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+/* RTL support */
+html[dir="rtl"] {
+  direction: rtl;
+}
+
+html[dir="rtl"] .product-selector,
+html[dir="rtl"] .controls,
+html[dir="rtl"] .category-tabs {
+  justify-content: right;
+}
+
+html[dir="rtl"] .price-display,
+html[dir="rtl"] .pricing-info,
+html[dir="rtl"] .charm-pool h3 {
+  text-align: right;
+}
+
+/* Translate button styling */
+.translate-btn {
+  background: #4a6baf;
+  color: white;
+  transition: all 0.3s;
+}
+
+.translate-btn:hover {
+  background: #3a5a9f;
+}/* Custom Charm Upload Styles */
+.custom-charm-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #fff0f5;
+    border-radius: 12px;
+    margin-top: 1rem;
+}
+
+.custom-charm-preview {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #d6336c;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    overflow: hidden;
+}
+.custom-charm-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+#add-custom-charm {
+    background: #d6336c;
+    color: white;
+}
+
+#add-custom-charm:hover {
+    background: #c2255c;
+}
+/* Top Action Buttons - Mobile Friendly */
+.top-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem auto;
+  max-width: 100%;
+  padding: 0 10px;
+}
+
+.top-action-buttons .btn {
+  flex: 1 1 auto;
+  min-width: 80px;
+  max-width: 120px;
+  padding: 0.5rem 0.3rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+/* Pricing Info Toggle Fix */
+.pricing-info {
+  display: none;
+  margin: 1rem auto;
+  max-width: 95%;
+}
+
+.pricing-info.visible {
+  display: block;
+}
+
+/* Mobile Specific Styles */
+@media (max-width: 480px) {
+  .top-action-buttons {
+    gap: 0.3rem;
+    padding: 0 5px;
+  }
+  
+  .top-action-buttons .btn {
+    min-width: 70px;
+    font-size: 0.7rem;
+    padding: 0.4rem 0.2rem;
+  }
+  
+  /* Icon-only version for smallest screens */
+  @media (max-width: 350px) {
+    .top-action-buttons .btn-text {
+      display: none;
+    }
+    .top-action-buttons .btn {
+      min-width: 40px;
+      max-width: 40px;
+      border-radius: 50%;
+    }
+  }
+}.cart-item-symbol {
+    font-size: 2rem;
+    margin-right: 1rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff0f5;
+    border-radius: 50%;
+    border: 2px solid #f5a0c2;
+}
+
+.cart-item-info {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.cart-item-details {
+    font-size: 0.9rem;
+}
+
+.cart-item-details div:first-child {
+    font-weight: bold;
+    color: #d6336c;
+}
+ .selected-charm-preview {
+      position: fixed;
+      top: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      text-align: center;
+      display: none;
+    }
+    
+    .selected-charm-preview.active {
+      display: block;
+    }
+    
+    .selected-charm-preview img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      margin-bottom: 0.5rem;
+    }
+    
+    .selected-charm-preview .charm-name {
+      font-weight: bold;
+      color: #d6336c;
+      margin-bottom: 0.5rem;
+    }
+    
+    .selected-charm-preview .charm-type {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    /* Promotion Banner */
+    .promotion-banner {
+      background: linear-gradient(135deg, #ff85b3, #d6336c);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      border-radius: 10px;
+      margin: 1rem auto;
+      max-width: 800px;
+      box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
+      animation: pulse 2s infinite;
+    }
+    
+    .promotion-banner h3 {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+    
+    .promotion-banner p {
+      margin: 0.5rem 0 0;
+      font-size: 1.1rem;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+/* Custom scrollbar for jewelry piece */
+#jewelry-piece::-webkit-scrollbar {
+    height: 8px;
+    background-color: #ffe6f0;
+}
+
+#jewelry-piece::-webkit-scrollbar-thumb {
+    background-color: #d6336c;
+    border-radius: 10px;
+}
+
+#jewelry-piece::-webkit-scrollbar-track {
+    background-color: #ffe6f0;
+    border-radius: 10px;
+}/* Price display styling */
+.price-display {
+    background: #fff0f5;
+    padding: 15px;
+    border-radius: 16px;
+    margin: 20px auto;
+    width: fit-content;
+    max-width: 90%;
+    box-shadow: 0 2px 12px rgba(214, 51, 108, 0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.price-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+#total-price {
+    margin-top: 8px;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-right: 8px;
+  font-size: 0.9em;
+}
+
+.discounted-price {
+  color: #d6336c;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+/* Discount Messaging Styles */
+.discount-promo {
+    background: #fff8e6;
+    color: #d67700;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px dashed #ffc107;
+}
+
+.discount-promo i {
+    color: #d6336c;
+}
+
+.price-comparison {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.discount-badge {
+    background: #4CAF50;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 0.9rem;
+}
+
+.discount-badge .savings {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #999;
+    position: relative;
+}
+
+.original-price::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 2px;
+    background: #ff4444;
+    transform: rotate(-3deg);
+}
+
+/* Animation for discount badge */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .price-display {
+        padding: 12px;
+        margin: 15px auto;
+    }
+    
+    .price-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+/* Individual charm mode styles */
+#individual-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255,255,255,0.7);
+    padding: 0.8rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+#individual-controls button {
+    padding: 0.5rem 1rem;
+}
+
+#individual-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#slot-count {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 5px;
+    color: #d6336c;
+}
+
+.individual-slot {
+    background: transparent;
+    border: 2px dashed #d6336c;
+    position: relative;
+}
+
+.individual-slot:empty::after {
+    content: "+";
+    position: absolute;
+    color: #d6336c;
+    font-size: 1.8rem;
+    opacity: 0.5;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.individual-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}/* Add these styles */
+.slot-container {
+    position: relative;
+    display: inline-block;
+}
+
+
+.slot-control-btn:hover {
+    background: #a61e4d;
+    transform: scale(1.1);
+}
+
+.slot-control-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* For the last slot only */
+.slot-container:last-child .slot-control-btn.add-btn {
+    display: block;
+}
+
+.slot-container:not(:last-child) .slot-control-btn.add-btn {
+    display: none;
+}
+
+.slot-count-display {
+    font-weight: bold;
+    min-width: 80px;
+    text-align: center;
+}
+
+.slot-preview {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.slot-preview-item {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #d63363;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.slot-preview-item.active {
+    background: #d63363;
+}
+.slot-wrapper {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 5px;
+}
+
+/* For mobile devices */
+@media (max-width: 768px) {
+  .bracelet-sticky-container {
+    top: 60px; /* Adjust based on your header height */
+  }
+}
+
+.control-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: #ff85b3;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    transition: all 0.2s;
+}
+
+.control-btn:hover {
+    background: #d6336c;
+    transform: scale(1.1);
+}
+
+.control-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+}
+.slot-controls {
+    display: flex;
+    gap: 5px;
+    margin-left: 5px;
+}
+
+.slot-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ff85b3;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.slot-btn:hover {
+    background: #d6336c;
+    transform: scale(1.1);
+}
+
+.slot-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.remove-btn {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.add-btn {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.slot-control-btn {
+    width: 120px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+
+.slot-control-btn:hover {
+    background: #d6336c;
+    transform: scale(1.1);
+}
+
+.slot-control-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.slot-count-display {
+    font-weight: bold;
+    min-width: 80px;
+    text-align: center;
+}
+
+.slot-preview {
+    display: flex;
+    gap: 0px;
+    margin-top: 10px;
+}
+
+.slot-preview-item {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #d63363;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+.slot-control-btn i {
+    font-size: 12px;
+}
+.slot-preview-item.active {
+    background: #d63363;
+}
+
+.slot.adding {
+    animation: pulse 0.5s;
+}
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+.slot-container {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 2px; /* Reduced gap */
+}
+
+
+
+.add-slot-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ff85b3;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.add-slot-btn:hover {
+    background: #d6336c;
+    transform: scale(1.1);
+}
+
+.add-slot-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.add-slot-btn::after {
+    content: 'Add slot';
+    position: absolute;
+    top: -30px;
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+
+.add-slot-btn:hover::after {
+    opacity: 1;
+}
+
+.slot.special-base {
+    pointer-events: none;
+    margin: 0 auto;
+    position: relative;
+}
+
+.slot.special-base::after {
+    content: "Drag charms here";
+    position: absolute;
+    bottom: -30px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #d6336c;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Special Product Containers */
+.special-product-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1px;
+    align-items: center;
+    padding: 20px;
+    background: #fff0f5;
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
+/* Base Image Container */
+.product-base-container {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+}
+
+/* Base Images */
+.product-base-image {
+    pointer-events: none;
+    object-fit: contain;
+}
+
+/* Keychain specific */
+.keychain-container .product-base-image {
+    width: 150px;
+    margin-right: 20px;
+}
+
+/* Watch specific */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+    width: 200px;
+    margin: 0 20px;
+}
+
+/* Slots */
+.slot {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    flex-shrink: 0;
+    cursor: pointer;
+    background: transparent;
+}
+
+
+
+
+/* Scrollbar */
+.special-product-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.special-product-container::-webkit-scrollbar-track {
+    background: #ffe6f0;
+    border-radius: 10px;
+}
+
+.special-product-container::-webkit-scrollbar-thumb {
+    background: #d6336c;
+    border-radius: 10px;
+}
+/* Watch Pool Styles */
+.watch-pool-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    justify-content: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: #fff0f5;
+    border-radius: 16px;
+}
+
+.watch-option {
+    position: relative;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.watch-option:hover:not(.sold-out) {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(214, 51, 108, 0.3);
+}
+
+.watch-option.sold-out {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.watch-option img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 2px solid #f5a0c2;
+}
+
+.sold-out-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(214, 51, 108, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+.slot {
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+}
+
+
+.product-base-container {
+    scroll-snap-align: center;
+}
+
+/* For the watch base image */
+.product-base-image {
+    pointer-events: none;
+    object-fit: contain;
+}
+
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+  width: auto; /* Let it size naturally */
+  max-width: 300px; /* Maximum size */
+  height: 120px; /* Fixed height for consistency */
+  object-fit: contain;
+  margin: 0 15px;
+  flex-shrink: 0;
+}
+/* Add this to ensure proper container cleanup */
+.watch-pool-container {
+    transition: opacity 0.3s ease;
+}
+
+.watch-pool-container.removing {
+    opacity: 0;
+    pointer-events: none;
+}
+/* Ensure proper alignment for keychain */
+.keychain-container {
+  justify-content: flex-start; /* Align to start for scrolling */
+  min-height: auto;
+  padding-bottom: 15px; /* Space for scrollbar */
+}
+.keychain-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.keychain-container::-webkit-scrollbar-thumb {
+  background: #d6336c;
+  border-radius: 4px;
+}
+/* Keychain base specific styling */
+.keychain-container .product-base-image {
+    margin-right: 10px;
+}
+
+.slot {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    margin: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.slot img[data-type="base"] {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.slot img:not([data-type="base"]) {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+/* For watches/keychains */
+.special-product-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0px; /* Reduced from 15px */
+    align-items: center;
+    padding: 10px; /* Reduced from 20px */
+    scroll-snap-type: x mandatory;
+}
+
+.product-base-container {
+    scroll-snap-align: center;
+    margin: 0 10px; /* Consistent spacing */
+}
+
+/* For long charms */
+.slot.long-slot {
+    width: 180px !important;
+    height: 100px !important;
+    margin: 0 2px; /* Consistent margin */
+}
+
+
+
+#jewelry-piece {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0px;
+    padding: 10px;
+    background: #fff0f5;
+    border-radius: 16px;
+    margin: 0 auto;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* For individual mode */
+#jewelry-piece.individual-container {
+    justify-content: flex-start;
+}
+/* Temporary debug styles */
+.slot {
+    border: 1px dashed rgba(214, 51, 108, 0.3);
+}
+
+.slot:hover {
+    border-color: #d6336c;
+}
+
+#jewelry-piece {
+    outline: 2px solid rgba(0,0,255,0.2);
+}.slot-container {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.slot-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    margin-left: 8px;
+}
+
+.control-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #d6336c;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.2s;
+}
+
+.control-btn:hover {
+    background: #a61e4d;
+    transform: scale(1.1);
+}
+
+.control-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Make jewelry piece background transparent */
+#jewelry-piece {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Reduce gap between slots */
+#jewelry-piece {
+  gap: 0px; /* Reduced from 4px */
+}
+
+/* Remove dashed borders from slots */
+.slot {
+  border: none !important;
+}
+
+/* Unstick watch pool and adjust its styling */
+.watch-pool-container {
+  position: static;
+  margin: 15px auto;
+  background: #fff0f5;
+  border-radius: 16px;
+  padding: 15px;
+}
+
+/* Adjust individual slot controls positioning */
+.slot-container {
+  margin-right: 4px; /* Reduced from 8px */
+}
+
+.slot-controls {
+  margin-left: 4px; /* Reduced from 8px */
+}
+/* Reduce gap between slots in all jewelry pieces */
+#jewelry-piece {
+  gap: 0px; /* Remove gap completely or set to 1px if you want minimal spacing */
+  padding: 2px; /* Reduce padding inside the container */
+}
+
+/* Adjust slot margins */
+.slot {
+  margin: 0; /* Remove any margins */
+  padding: 0; /* Remove any padding */
+}
+
+/* For special products (watches, keychains) */
+.special-product-container {
+  gap: 0px; /* Remove gap between slots */
+  padding: 2px; /* Reduce padding */
+}
+
+/* For individual charm mode */
+#jewelry-piece.individual-container .slot-container {
+  margin-right: 2px; /* Reduced from larger value */
+}
+
+/* If you have any specific slot styles for different products, adjust them similarly */
+.bracelet-container .slot,
+.anklet-container .slot,
+.necklace-container .slot,
+.ring-container .slot {
+  margin: 0;
+  padding: 0;
+}
+
+/* Make sure base images don't create extra space */
+.slot img {
+  display: block; /* Remove any default inline spacing */
+}
+/* FORCE NO GAPS (add this at the end of your CSS) */
+#jewelry-piece * {
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+.slot {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+/* Fix for Flexbox gaps (if using flex) */
+#jewelry-piece {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 !important;
+}
+/* Keep jewelry piece sticky */
+.bracelet-sticky-container {
+  position: sticky !important;
+  top: 0;
+  z-index: 1000;
+  background: #fff0f5;
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+
+/* Ensure watches pool scrolls normally */
+.watch-pool-container {
+  position: static !important;/* Removes sticky behavior */
+  margin: 20px auto; /* Add spacing */
+}
+.bracelet-container {
+      position: sticky !important;
+      top: 0;
+      z-index: 1000;
+      background: #fff0f5;
+      padding: 10px 0;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    
+    #jewelry-piece {
+      display: flex;
+      overflow-x: auto;
+      padding: 10px;
+      background: #fff0f5;
+      border-radius: 16px;
+    }
+    
+    /* Normal scrolling for all charm pools */
+    .charm-pools {
+      position: static !important; /* Remove any sticky positioning */
+      overflow-y: auto;
+    }
+    
+    /* Specifically target watch pool to ensure it scrolls */
+    .watch-pool-container {
+      position: static !important; /* Force remove sticky */
+      overflow-y: visible;
+    }
+    
+    .slot {
+      width: 84px;
+      height: 84px;
+      flex-shrink: 0;
+    }
+
+    /* Add these styles to your CSS file */
+
+#jewelry-piece {
+    display: flex;
+    align-items: center; /* Vertical centering */
+    justify-content: center;
+    min-width: min-content;  /* Horizontal centering */
+    min-height: 200px; /* Give it some minimum height */
+    padding: 20px 0;
+}
+
+/* For watches specifically */
+.watch-container, .apple-watch-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    height: 70%;
+}
+
+/* Make slots align properly */
+.slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px;
+}
+
+/* Watch base image styling */
+
+img[src*="watch1.png"],
+img[src*="watch2.png"], 
+img[src*="watch3.png"],
+img[src*="watch4.png"],
+img[src*="watch5.png"]{
+    width: 400px !important;  /* Adjust this value to your preferred size */
+    height: auto !important;
+    object-fit: contain;
+    margin: 0 20px;
+}/* Center the jewelry piece vertically */
+
+
+img[src*="apple-watch-base.png"] {
+    width: 500px !important;  /* Adjust this value to your preferred size */
+    height: auto !important;
+    object-fit: contain;
+    margin: 0 0px;
+}/* Center the jewelry piece vertically */
+
+
+/* Normal size for other jewelry pieces */
+#jewelry-piece:not(.watch-container):not(.apple-watch-container) {
+    min-height: auto;
+    padding: 0px 0;
+}
+
+/* Watch pool stays small */
+.watch-pool-container img {
+    width: 100px !important;
+    height: 100px !important;
+}
+
+/* Vertical centering only when needed */
+.watch-container,
+.apple-watch-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+/* Normal jewelry pieces */
+.bracelet-container,
+.keychain-container,
+.anklet-container,
+.necklace-container,
+.ring-container {
+    min-height: auto;
+    padding: 0px 0;
+}
+
+
+
+/* Smaller watch bases for mobile */
+@media (max-width: 768px) {
+    .watch-container .product-base-image,
+    .apple-watch-container .product-base-image {
+        width: 200px;
+        max-height: 200px;
+        margin: 0 10px;
+    }
+}
+
+/* Watch pool stays small on all devices */
+.watch-pool-container img {
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: contain;
+}
+
+/* Mobile adjustments for watch pool */
+@media (max-width: 480px) {
+    .watch-pool-container img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+}
+
+/* Vertical centering for watches only */
+.watch-container,
+.apple-watch-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+@media (max-width: 768px) {
+    .watch-container,
+    .apple-watch-container {
+        min-height: 150px;
+    }
+}
+
+/* Normal jewelry pieces stay compact */
+.bracelet-container,
+.keychain-container,
+.anklet-container,
+.necklace-container,
+.ring-container {
+    min-height: auto;
+    padding: 0px 0;
+    justify-content: center;
+}
+
+/* Mobile horizontal scrolling for jewelry pieces */
+@media (max-width: 768px) {
+    #jewelry-piece {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        padding-bottom: 10px;
+    }
+    
+    .slot {
+        flex: 0 0 70px;
+        width: 70px;
+        height: 70px;
+    }
+}
+
+/* Special mobile handling for watches */
+@media (max-width: 480px) {
+    .watch-container .product-base-image,
+    .apple-watch-container .product-base-image {
+        width: 200px;
+        max-height: 200px;
+    }
+    
+    .watch-container,
+    .apple-watch-container {
+        min-height: 120px;
+    }
+}
+
+/* Main container */
+.bracelet-container {
+  width: 100%;
+  overflow-x: auto;
+  padding: 10px 0;
+  background: #fff0f5;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Jewelry piece element */
+#jewelry-piece {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  padding: 0;
+  margin: 0 auto;
+  width: max-content; /* Better than min-content for this case */
+  min-width: 100%; /* Ensures it takes at least full container width */
+}
+
+/* Individual slots */
+.slot {
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+  margin: 0;
+  padding: 0;
+  scroll-snap-align: start;
+}
+
+/* Watch base styling */
+.product-base-container {
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  display: flex;
+  align-items: center;
+}
+
+
+
+/* Main container */
+.bracelet-container {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  overflow-x: auto;
+  padding: 10px 0;
+  background: #fff0f5;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scrollbar-width: thin; /* For Firefox */
+}
+
+/* Hide scrollbar when not needed */
+.bracelet-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+/* Jewelry piece element */
+#jewelry-piece {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  padding: 10px;
+  margin: 0 auto;
+  width: max-content;
+  min-width: 100%;
+  scroll-snap-type: x mandatory;
+}
+
+/* Individual slots */
+.slot {
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+  margin: 0;
+  padding: 0;
+  scroll-snap-align: center;
+}
+/* Watch containers */
+.watch-container, 
+.apple-watch-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+/* Watch base images */
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .watch-container .product-base-image,
+  .apple-watch-container .product-base-image {
+    max-width: 200px;
+    height: 100px;
+    margin: 0 10px;
+  }
+  
+  .slot {
+    flex: 0 0 70px;
+    width: 70px;
+    height: 70px;
+  }
+}
+/* Individual charm mode */
+#jewelry-piece.individual-container {
+  justify-content: flex-start;
+  padding-bottom: 15px; /* Space for scrollbar */
+}
+
+/* Always show scrollbar for individual charms */
+#jewelry-piece.individual-container::-webkit-scrollbar {
+  height: 8px;
+  display: block;
+}
+
+#jewelry-piece.individual-container::-webkit-scrollbar-thumb {
+  background: #d6336c;
+  border-radius: 4px;
+}
+
+/* Watch pool container */
+.watch-pool-container {
+  position: static;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+  margin: 20px auto;
+  padding: 15px;
+  background: #fff0f5;
+  border-radius: 16px;
+  max-width: 800px;
+}
+
+.watch-option {
+  width: 100px;
+  height: 100px;
+  position: relative;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .watch-pool-container {
+    gap: 2px;
+    padding: 10px;
+  }
+  
+  .watch-option {
+    width: 80px;
+    height: 80px;
+  }
+}
+/* Scroll indicators */
+.bracelet-container {
+  position: relative;
+}
+
+.bracelet-container::before,
+.bracelet-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.bracelet-container::before {
+  left: 0;
+  background: linear-gradient(to right, #fff0f5, rgba(255,240,245,0));
+}
+
+.bracelet-container::after {
+  right: 0;
+  background: linear-gradient(to left, #fff0f5, rgba(255,240,245,0));
+}
+
+/* Only show when scrolled */
+.bracelet-container.scroll-start::before,
+.bracelet-container.scroll-end::after {
+  display: none;
+}
+
+.bracelet-container:not(.scroll-start)::before {
+  display: block;
+}
+
+.bracelet-container:not(.scroll-end)::after {
+  display: block;
+}
+
+/* Ensure jewelry piece takes full width */
+#jewelry-piece {
+  width: 100%;
+  min-width: 100%;
+}
+
+/* Keychain base image */
+.keychain-container .product-base-image {
+  width: 120px;
+  height: auto;
+  margin-right: 15px;
+}
+
+/* Watch slots positioning */
+.watch-container .slot,
+.apple-watch-container .slot {
+  margin: 0 2px;
+}
+
+/* Force scrollbar visibility */
+.bracelet-container {
+  scrollbar-width: auto; /* For Firefox */
+  overflow-x: auto;
+}
+
+.bracelet-container::-webkit-scrollbar {
+  height: 8px;
+  display: block;
+}
+
+/* Watch Base Container */
+.product-base-container {
+  position: relative;
+  z-index: 2; /* Ensure it stays above other elements */
+}
+
+/* Watch Base Images */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+  width: auto !important;
+  height: 120px !important;
+  max-width: 300px !important;
+  object-fit: contain;
+  margin: 0 15px;
+  display: block;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .watch-container .product-base-image,
+  .apple-watch-container .product-base-image {
+    height: 100px !important;
+    max-width: 200px !important;
+    margin: 0 10px;
+  }
+}
+
+/* Jewelry Piece Container */
+#jewelry-piece {
+  scroll-behavior: smooth;
+  scroll-padding: 0 50%;
+}
+
+/* Slots */
+.slot {
+  scroll-snap-align: center;
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+}
+
+/* Base container styles */
+#jewelry-piece {
+  scroll-behavior: smooth;
+}
+
+/* Keychain specific styles */
+.keychain-container {
+  justify-content: flex-start;
+}
+.keychain-container .product-base-image {
+  width: 120px;
+  height: auto;
+  margin-right: 15px;
+}
+
+/* Watch/Apple Watch specific styles */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+  width: auto;
+  height: 120px;
+  max-width: 300px;
+  object-fit: contain;
+}
+
+/* Slot styles */
+.slot {
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+  margin: 0 2px;
+  scroll-snap-align: start;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .watch-container .product-base-image,
+  .apple-watch-container .product-base-image {
+    height: 100px;
+    max-width: 200px;
+  }
+  
+  .slot {
+    flex: 0 0 70px;
+    width: 70px;
+    height: 70px;
+  }
+}
+/* Base charm size adjustments */
+.slot img[data-type="base"] {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: all 0.3s ease;
+}
+
+/* Specifically for watch base charms */
+.watch-container .watch-base-charm img[data-type="base"],
+.apple-watch-container .watch-base-charm img[data-type="base"] {
+  width: 50% !important;
+  height: 50% !important;
+  transform: translate(50%, 50%); /* Center the smaller charm */
+}
+
+/* Regular slot styling remains unchanged */
+.slot {
+  width: 84px;
+  height: 84px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Make sure the base image stays full size */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+  width: auto !important;
+  height: 120px !important;
+  max-width: 300px !important;
+}
+/* Base slot styling */
+.slot {
+  position: relative;
+  flex-shrink: 0;
+  margin: 0 1px; /* Reduced from 2px */
+}
+
+/* Watch-specific base charm sizing */
+.watch-container .slot,
+.apple-watch-container .slot {
+  width: 84px;
+  height: 84px;
+}
+
+/* Make base charms smaller */
+.watch-container .slot > img[data-type="base"],
+.apple-watch-container .slot > img[data-type="base"] {
+  width: 42px !important;
+  height: 42px !important;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Reduce gap between slots specifically for watches */
+.watch-container,
+.apple-watch-container {
+  gap: 2px !important; /* Reduced from 4px */
+}
+
+/* Main base images stay full size */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+  width: auto !important;
+  height: 120px !important;
+  max-width: 300px !important;
+  margin: 0 10px !important; /* Adjusted from 15px */
+}
+/* Ultra-compact spacing option */
+.watch-container .slot,
+.apple-watch-container .slot {
+  margin: 0 !important;
+  position: relative;
+}
+
+.watch-container .slot::after,
+.apple-watch-container .slot::after {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background: rgba(214, 51, 108, 0.2);
+}
+
+/* Base slot styling - now size-specific */
+.slot {
+  position: relative;
+  flex-shrink: 0;
+  margin: 0 1px; /* Reduced gap */
+}
+
+/* Default slot size (for bracelets, necklaces, etc.) */
+.bracelet-container .slot,
+.anklet-container .slot, 
+.necklace-container .slot,
+.ring-container .slot,
+.keychain-container .slot {
+  width: 84px;
+  height: 84px;
+}
+
+/* Smaller slots for watches */
+.watch-container .slot,
+.apple-watch-container .slot {
+  width: 40px; /* Reduced from 84px */
+  height: 40px;
+}
+
+/* Base charm images - proportional to slot size */
+.slot > img[data-type="base"] {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Main watch base images stay large */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+  width: auto;
+  height: 120px;
+  max-width: 300px;
+  margin: 0 10px;
+}
+@media (max-width: 768px) {
+  .watch-container .slot,
+  .apple-watch-container .slot {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .watch-container .product-base-image,
+  .apple-watch-container .product-base-image {
+    height: 100px;
+    max-width: 250px;
+  }
+}
+/* Watch-specific slot sizing */
+.watch-container .slot,
+.apple-watch-container .slot,
+.watch-slot {
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 1px !important;
+  flex: 0 0 40px !important;
+}
+
+/* Watch container styles */
+.watch-container, .apple-watch-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    align-items: center;
+    padding: 10px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Watch base image */
+.watch-container .product-base-image,
+.apple-watch-container .product-base-image {
+    width: auto;
+    height: 120px;
+    max-width: 300px;
+    margin: 0 15px;
+    flex-shrink: 0;
+}
+
+/* Slot styles */
+.slot {
+    position: relative;
+    flex-shrink: 0;
+    margin: 0 1px;
+}
+
+/* Watch-specific slot sizes */
+.watch-container .slot,
+.apple-watch-container .slot {
+    width: 40px;
+    height: 40px;
+}
+
+/* Long charm styles */
+.slot.long-slot {
+    width: 40px;
+    height: 80px;
+}
+
+
+/* Charm images */
+.slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+/* Remove base image for long slots */
+.slot.long-slot img[data-type="base"] {
+  display: none;
+}
+
+/* Hide sold-out styling ONLY for dangly charms (both regular and large) */
+.dangly-charm.sold-out,
+.slot.has-dangly img.dangly-charm.sold-out {
+    display: none !important;
+}
+
+/* Keep sold-out styling for all other charms (regular, long, etc.) */
+.charm.sold-out:not(.dangly-charm) {
+    opacity: 0.5;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.charm.sold-out:not(.dangly-charm)::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: 1;
+    border-radius: 4px;
+}
+
+
+/* Force standard size for charm pool items */
+.charms-grid .charm {
+    width: 84px !important;
+    height: 84px !important;
+    margin: 2px;
+}
+
+/* Specific styles for long/dangly charms in pool */
+.charms-grid .long-charm {
+    width: 168px !important;  /* 2x width for long charms */
+    height: 84px !important;
+    grid-column: span 2;
+}
+
+.charms-grid .dangly-charm {
+    width: 84px !important;
+    height: 168px !important; /* 2x height for dangly */
+    grid-row: span 2;
+}
+
+/* Watch-specific overrides ONLY for jewelry piece */
+.watch-container .slot,
+.apple-watch-container .slot {
+    width: 40px !important;
+    height: 40px !important;
+}
+
+/* Explicitly exclude charm pools from watch scaling */
+.watch-container .charms-grid .charm,
+.apple-watch-container .charms-grid .charm {
+    width: 84px !important;
+    height: 84px !important;
+}
+/* Individual mode slots */
+#jewelry-piece.individual-container .slot {
+    width: 84px !important;
+    height: 84px !important;
+    margin: 0 4px 4px 0; /* Tighten vertical spacing */
+}
+
+/* Individual base charms */
+#jewelry-piece.individual-container .slot img[data-type="base"] {
+    width: 84px !important;
+    height: 84px !important;
+    object-fit: contain;
+}
+
+/* Individual charm controls */
+.slot-controls {
+    height: 30px; /* Reduced from default */
+    margin-top: 4px; /* Tighter spacing */
+}
+
+/* Visual indicator for empty slots */
+.individual-slot:empty::after {
+    font-size: 2rem; /* Smaller "+" icon */
+    opacity: 0.3;
+}
+
+.product-selector {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.product-btn {
+    background: #ff85b3;
+    color: white;
+    border: none;
+    border-radius: 50px; /* Fully rounded ends */
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.product-btn:hover {
+    background: #ff5fa3;
+    transform: translateY(-2px);
+}
+
+.product-btn.active {
+    background: #d6336c;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #d6336c;
+}
+
+.product-btn i {
+    font-size: 1rem;
+}
+
+/* Custom icons for jewelry types */
+.fa-bracelet:before {
+    content: "\f0c1"; /* Using link icon as bracelet */
+}
+
+.fa-anklet:before {
+    content: "\f0c1"; /* Using link icon as anklet */
+}
+
+.fa-necklace:before {
+    content: "\f0c1"; /* Using necklace icon */
+}
+
+.fa-ring:before {
+    content: "\f713"; /* Using diamond icon as ring */
+}
+.material-option {
+    padding: 0.5rem 1rem;
+    border-radius: 50px; /* Fully rounded */
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.material-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.material-option.selected {
+    border-color: #d6336c;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #d6336c;
+}
+
+/* Material specific styles */
+.material-option.silver {
+    background: #e0e0e0;
+    color: #333;
+    border: 1px solid #b0b0b0;
+}
+
+.material-option.gold {
+    background: linear-gradient(135deg, #ffd700, #daa520);
+    color: #333;
+    border: 1px solid #c79400;
+}
+
+.material-option.mix {
+    background: linear-gradient(90deg, #e0e0e0 50%, #ffd700 50%);
+    color: #333;
+    border: 1px solid #b0b0b0;
+    position: relative;
+    overflow: hidden;
+}
+
+.material-option.mix::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 100%;
+    background: rgba(0,0,0,0.2);
+}
+
+/* Icons */
+.material-option i {
+    font-size: 0.9rem;
+}
+
+/* Specific icon colors */
+.material-option.silver i {
+    color: #606060;
+}
+
+.material-option.gold i {
+    color: #8a6d00;
+}
+
+.material-option.mix i {
+    background: linear-gradient(90deg, #606060 50%, #8a6d00 50%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.charm-set-warning {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.warning-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+.warning-content h3 {
+    color: #d6336c;
+    margin-top: 0;
+}
+
+.confirm-btn {
+    background: #d6336c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+ .slot.has-dangly {
+      width: 100px !important;
+
+    height: 220px;
+}
+.slot.has-dangly img.dangly-charm {
+    width: 90px !important;
+    height: 220px !important;
+    object-fit: contain;
+}
+
+/* Scrollbar styling */
+.watch-container::-webkit-scrollbar,
+.apple-watch-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.watch-container::-webkit-scrollbar-thumb,
+.apple-watch-container::-webkit-scrollbar-thumb {
+    background: #d6336c;
+    border-radius: 4px;
+}/* Watch-specific styles */
+.watch-container .slot,
+.apple-watch-container .slot {
+    width: 40px !important;
+    height: 40px !important;
+    margin: 0 1px !important;
+}
+
+/* Dangly charms on watches */
+.watch-container .has-dangly,
+.apple-watch-container .has-dangly {
+    height: 80px !important; /* 2x normal slot height */
+}
+
+.watch-container .dangly-charm,
+.apple-watch-container .dangly-charm {
+    width: 40px !important;
+    height: 80px !important; /* 1:2 ratio */
+    object-fit: contain !important;
+}
+
+/* Long charms on watches */
+.watch-container .long-slot,
+.apple-watch-container .long-slot {
+    width: 80px !important; /* 2 slots wide */
+    height: 40px !important; /* normal height */
+}
+
+.watch-container .long-charm,
+.apple-watch-container .long-charm {
+    width: 80px !important;
+    height: 40px !important; /* 2:1 ratio */
+    object-fit: contain !important;
+}
+
+
+
+.watch-container .slot.has-dangly,
+.apple-watch-container .slot.has-dangly
+ {
+    height: 120px;
+}
+.watch-container .slot.has-dangly img.dangly-charm ,
+.apple-watch-container .slot.has-dangly img.dangly-charm {
+    width: 50px !important;
+    height: 120px !important;
+    object-fit: contain;
+}
+
+
+
+.watch-container .slot.long-slot img.long-charm ,
+.apple-watch-container  .slot.long-slot img.long-charm 
+ {
+   width: 100px !important;
+    height: 50px !important;
+    object-fit: contain;
+      object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;            }
+
+
+.watch-container .slot.long-slot .long-charm ,
+.apple-watch-container .slot.long-slot .long-charm {
+width: 100px !important;
+    height: 50px !important;
+        object-fit: contain;
+         position: relative;      /* For proper z-index */
+    z-index: 1;             /* Ensure it stays above base */
+}
+
+
+.watch-container .slot.long-slot, 
+.apple-watch-container.slot.long-slot  {
+  width: 100px !important; /* Force 2x width */
+  height: 50px !important;
+  margin-right: 0 !important;
+  flex: 0 0 100px !important; /* Prevent flex shrinking */
+} 
+
+
+/* Long charm in pool */
+.charms-grid .long-charm {
+    width: 150px !important;
+    height: 100px !important;
+    grid-column: span 2;
+}
+
+.slot.long-slot img {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+
+
+.slot.long-slot .long-charm {
+    width: 100px !important;
+    height: 220px !important;
+      position: relative;
+          z-index: 1;
+
+}
+
+.watch-container .slot.long-slot img, 
+.apple-watch-container .slot.long-slot img {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.watch-container .slot.has-dangly img, 
+.apple-watch-container .slot.has-dangly  img {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+
+/* Long charm container - spans 2 slots */
+.slot.long-slot {
+  width: 168px !important; /* Force 2x width */
+  height: 84px !important;
+  margin-right: 0 !important;
+  flex: 0 0 168px !important; /* Prevent flex shrinking */
+}
+
+/* Watch-specific long charm */
+.watch-container .slot.long-slot,
+.apple-watch-container .slot.long-slot {
+  width: 80px !important;
+  height: 40px !important;
+  flex: 0 0 80px !important;
+}
+
+/* Long charm image - fills container */
+.slot.long-slot img.long-charm {
+  position: absolute;
+  width: 168px !important;
+  height: 84px !important;
+  left: 0;
+  top: 0;
+}
+
+/* Watch long charm image */
+.watch-container .slot.long-slot img.long-charm,
+.apple-watch-container .slot.long-slot img.long-charm {
+  width: 80px !important;
+  height: 40px !important;
+}
+/* Auth Styles */
+.auth-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    background: #d6336c;
+    color: white;
+}
+
+.user-profile {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.auth-tabs {
+    display: flex;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #f5a0c2;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 0.8rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    font-weight: 600;
+    color: #666;
+}
+
+.auth-tab.active {
+    border-bottom-color: #d6336c;
+    color: #d6336c;
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+#logout-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    cursor: pointer;
+}
+/* Order History Styles */
+.order-history {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    padding: 1rem;
+    max-width: 400px;
+    max-height: 500px;
+    overflow-y: auto;
+    z-index: 1000;
+    border: 2px solid #f5a0c2;
+}
+
+.order-history-header {
+    border-bottom: 2px solid #f5a0c2;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.order-history-header h3 {
+    color: #d6336c;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.empty-orders {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #666;
+}
+
+.empty-orders p {
+    margin: 0.5rem 0;
+}
+
+.order-item {
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #fafafa;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 0.5rem;
+}
+
+.order-info strong {
+    color: #d6336c;
+    display: block;
+}
+
+.order-date {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.order-status {
+    text-align: right;
+}
+
+.status-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.status-badge.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.processing {
+    background: #cce7ff;
+    color: #004085;
+}
+
+.status-badge.completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.shipped {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.order-total {
+    font-weight: bold;
+    color: #d6336c;
+}
+
+.order-items-preview {
+    margin: 0.5rem 0;
+}
+
+.order-item-preview {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    padding: 0.2rem 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.order-item-preview:last-child {
+    border-bottom: none;
+}
+
+.view-order-btn {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+/* Order Details Modal */
+.order-details-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-details-section h3 {
+    color: #d6336c;
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding: 0.3rem 0;
+}
+
+.order-item-detail {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.item-details {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.item-design {
+    margin-top: 0.5rem;
+    text-align: center;
+}
+/* User Profile Buttons */
+.orders-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.logout-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}/* Info Message Style */
+.discount-message.info {
+    background: #e2e3e5;
+    border: 1px solid #d6d8db;
+    color: #383d41;
+}
+
+/* Minimum amount warning */
+.minimum-amount-warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin: 5px 0;
+    font-size: 0.85rem;
+    text-align: center;
+}/* ===== GAMIFICATION STYLES ===== */
+
+/* 1. Limited Time Offer Banner */
+.offer-banner {
+    background: linear-gradient(135deg, #ff6b6b, #d6336c);
+    color: white;
+    padding: 12px 20px;
+    text-align: center;
+    position: relative;
+    border-radius: 10px;
+    margin: 10px auto;
+    max-width: 600px;
+    box-shadow: 0 4px 15px rgba(214, 51, 108, 0.3);
+    animation: pulse 2s infinite;
+    z-index: 100;
+}
+
+.offer-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.offer-icon {
+    font-size: 1.2rem;
+}
+
+.offer-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+#countdown-timer {
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-family: monospace;
+    min-width: 45px;
+    display: inline-block;
+    text-align: center;
+}
+
+.offer-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.offer-close:hover {
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+/* 2. Free Shipping Progress */
+.shipping-progress {
+    background: #f8f9fa;
+    border: 2px solid #d6336c;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 15px auto;
+    max-width: 500px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #d6336c;
+    font-size: 0.9rem;
+}
+
+.progress-bar {
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    width: 0%;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.2) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 10px 10px;
+    animation: move 2s linear infinite;
+}
+
+@keyframes move {
+    0% { background-position: 0 0; }
+    100% { background-position: 10px 0; }
+}
+
+/* 3. Discount Messages */
+.discount-messages {
+    margin: 10px auto;
+    max-width: 500px;
+}
+
+.discount-message {
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.discount-message.countdown {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+}
+
+.discount-message.seasonal {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.discount-message.welcome {
+    background: #cce7ff;
+    border: 1px solid #b3d9ff;
+    color: #004085;
+}
+
+/* 4. Frequently Bought Together */
+.frequently-bought {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #f5a0c2;
+}
+
+.frequently-bought h4 {
+    color: #d6336c;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.recommended-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.recommended-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.recommended-item:hover {
+    border-color: #d6336c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(214, 51, 108, 0.1);
+}
+
+.recommended-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.item-price {
+    color: #d6336c;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.add-recommended {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.add-recommended:hover {
+    background: #45a049;
+    transform: scale(1.1);
+}
+
+/* 5. Loyalty Points */
+.loyalty-points {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #333;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+.points-display {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.points-icon {
+    font-size: 0.9rem;
+}
+
+/* 6. User Profile Updates */
+.user-profile {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 0.8rem 1rem;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.orders-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.orders-btn:hover {
+    background: #45a049;
+    transform: translateY(-1px);
+}
+
+.logout-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: #ff5252;
+    transform: translateY(-1px);
+}
+
+/* 7. Account Prompt Modal */
+.prompt-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.prompt-options .btn {
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+#continue-guest {
+    background: #6c757d;
+    color: white;
+}
+
+#continue-guest:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+#already-have-account {
+    background: #17a2b8;
+    color: white;
+}
+
+#already-have-account:hover {
+    background: #138496;
+    transform: translateY(-1px);
+}
+
+/* 8. Order History Styles */
+.order-history {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    padding: 1rem;
+    max-width: 400px;
+    max-height: 500px;
+    overflow-y: auto;
+    z-index: 1000;
+    border: 2px solid #f5a0c2;
+}
+
+.order-history-header {
+    border-bottom: 2px solid #f5a0c2;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.order-history-header h3 {
+    color: #d6336c;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.empty-orders {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #666;
+}
+
+.empty-orders p {
+    margin: 0.5rem 0;
+}
+
+.order-item {
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #fafafa;
+    transition: all 0.3s ease;
+}
+
+.order-item:hover {
+    border-color: #d6336c;
+    transform: translateY(-2px);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 0.5rem;
+}
+
+.order-info strong {
+    color: #d6336c;
+    display: block;
+    font-size: 0.9rem;
+}
+
+.order-date {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.order-status {
+    text-align: right;
+}
+
+.status-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.status-badge.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.processing {
+    background: #cce7ff;
+    color: #004085;
+}
+
+.status-badge.completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.shipped {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.order-total {
+    font-weight: bold;
+    color: #d6336c;
+    font-size: 0.9rem;
+}
+
+.order-items-preview {
+    margin: 0.5rem 0;
+}
+
+.order-item-preview {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    padding: 0.2rem 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.order-item-preview:last-child {
+    border-bottom: none;
+}
+
+.view-order-btn {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    background: #d6336c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.view-order-btn:hover {
+    background: #c2255c;
+    transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .offer-banner {
+        margin: 10px;
+        padding: 10px 15px;
+    }
+    
+    .offer-content {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .offer-close {
+        position: static;
+        transform: none;
+        margin-top: 5px;
+    }
+    
+    .shipping-progress {
+        margin: 10px;
+        padding: 12px;
+    }
+    
+    .user-profile {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.8rem;
+    }
+    
+    .order-history {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+/* Animation for new elements */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.offer-banner,
+.shipping-progress,
+.frequently-bought {
+    animation: slideDown 0.5s ease-out;
+}
+/* Collapsible Orders Styles */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.profile-header:hover {
+    background: rgba(214, 51, 108, 0.05);
+    border-radius: 10px;
+    padding: 0.5rem;
+}
+
+.collapsible-orders {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.3s ease;
+    opacity: 0;
+    margin-top: 0;
+}
+
+.collapsible-orders.expanded {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 1rem;
+}
+
+.orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-top: 1px solid #f0f0f0;
+    cursor: pointer;
+}
+
+.orders-header h4 {
+    color: #d6336c;
+    margin: 0;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.collapse-btn {
+    background: none;
+    border: none;
+    color: #d6336c;
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.collapse-btn:hover {
+    background: rgba(214, 51, 108, 0.1);
+    transform: scale(1.1);
+}
+
+.collapse-btn .fa-chevron-up {
+    transition: transform 0.3s ease;
+}
+
+.collapse-btn.collapsed .fa-chevron-up {
+    transform: rotate(180deg);
+}
+
+.orders-content {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+}
+
+/* Order items inside collapsible */
+.orders-content .order-item {
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+    background: #fafafa;
+    transition: all 0.3s ease;
+}
+
+.orders-content .order-item:hover {
+    border-color: #d6336c;
+    transform: translateY(-1px);
+}
+
+.orders-content .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 0.5rem;
+    padding: 0;
+    cursor: default;
+}
+
+.orders-content .order-header:hover {
+    background: none;
+    padding: 0;
+}
+
+.orders-content .order-info strong {
+    color: #d6336c;
+    display: block;
+    font-size: 0.85rem;
+}
+
+.orders-content .order-date {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.orders-content .order-status {
+    text-align: right;
+}
+
+.orders-content .status-badge {
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+.orders-content .order-total {
+    font-weight: bold;
+    color: #d6336c;
+    font-size: 0.85rem;
+}
+
+.orders-content .order-items-preview {
+    margin: 0.3rem 0;
+}
+
+.orders-content .order-item-preview {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    padding: 0.1rem 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.orders-content .order-item-preview:last-child {
+    border-bottom: none;
+}
+
+.orders-content .view-order-btn {
+    width: 100%;
+    padding: 0.4rem;
+    font-size: 0.75rem;
+    margin-top: 0.3rem;
+    background: #d6336c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.orders-content .view-order-btn:hover {
+    background: #c2255c;
+}
+
+/* Empty orders state */
+.orders-content .empty-orders {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #666;
+    font-style: italic;
+}
+
+.orders-content .empty-orders p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+}
+
+/* Smooth scrolling */
+.orders-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.orders-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.orders-content::-webkit-scrollbar-thumb {
+    background: #d6336c;
+    border-radius: 10px;
+}
+
+.orders-content::-webkit-scrollbar-thumb:hover {
+    background: #c2255c;
+}/* Add to your CSS */
+.discount-messages {
+    margin: 10px 0;
+    padding: 0;
+}
+
+.discount-message {
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin: 5px 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.discount-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.discount-message.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.discount-message.warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+/* Discount Messages Styling */
+.discount-messages {
+    margin: 15px 0;
+    padding: 0;
+}
+
+.discount-banner {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 12px;
+    margin: 10px 0;
+    border: 2px solid;
+    gap: 15px;
+}
+
+.discount-banner.success {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    border-color: #28a745;
+    color: #155724;
+}
+
+.discount-banner.eligible {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    border-color: #ffc107;
+    color: #856404;
+}
+
+.discount-banner.not-eligible {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+.discount-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.discount-content {
+    flex: 1;
+}
+
+.discount-title {
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.discount-details {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #666;
+    font-weight: 500;
+}
+
+.discount-arrow {
+    color: #d6336c;
+    font-weight: bold;
+}
+
+.final-price {
+    color: #d6336c;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.discount-savings {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #28a745;
+}
+
+.amount-needed {
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.discount-minimum {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 3px;
+}
+
+/* Cart Discount Styling */
+.cart-discount-applied,
+.cart-discount-eligible,
+.cart-discount-not-eligible {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.cart-discount-applied {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.cart-discount-eligible {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.cart-discount-not-eligible {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.discount-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.cart-total-with-discount {
+    text-align: center;
+}
+
+.price-comparison {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.price-comparison .original-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 1rem;
+}
+
+.price-comparison .final-price {
+    color: #d6336c;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.savings-message {
+    color: #4CAF50;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Price Display Styling */
+#total-price {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #d6336c;
+    text-align: center;
+    padding: 10px;
+    background: #fff0f5;
+    border-radius: 10px;
+    border: 2px solid #f5a0c2;
+}
