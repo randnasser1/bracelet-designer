@@ -9571,11 +9571,11 @@ body, html, .main-content, .designer-page {
   flex-wrap: wrap;
   padding: 12px;
   gap: 12px;
-  align-items: flex-start;
+  align-items: stretch;
   width: 100%;
   box-sizing: border-box;
   min-height: calc(100vh - 80px);
-  justify-content: flex-start;
+  justify-content: stretch;
 }
 
 /* Wrapper that keeps character box and dangly pool side-by-side */
@@ -9584,13 +9584,12 @@ body, html, .main-content, .designer-page {
   flex-direction: row;
   align-items: stretch;
   gap: 12px;
-  flex-shrink: 0;
-  width: auto;
-  flex-basis: auto;
+  flex: 1 1 auto;
+  min-width: 300px;
 }
 
 .lego-designer-page .character-section {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   min-width: unset;
   background: #f9f9f9;
   border-radius: 15px;
@@ -9682,7 +9681,6 @@ body, html, .main-content, .designer-page {
   padding: 16px;
   border: 4px solid #333;
   overflow: auto;
-  max-height: calc(100vh - 100px);
 }
 
 .lego-designer-page .customization-title {
@@ -10508,11 +10506,9 @@ body.keychain-mode-on .lego-dangly-sidebar {
     height: clamp(200px, 28vw, 280px);
 }
 
-/* ── Shrink canvas when keychain ON so the dangly pool fits beside it ── */
-body.keychain-mode-on .lego-designer-page .character-canvas {
-    width: clamp(180px, 22vw, 240px);
-    height: clamp(180px, 22vw, 240px);
-}
+/* Keep character canvas same size whether keychain is ON or OFF */
+/* No shrinking needed - flexbox handles the layout naturally */
+
 
 .lego-designer-page .options-grid {
     grid-template-columns: repeat(auto-fill, minmax(clamp(110px, 15vw, 180px), 1fr));
@@ -10527,6 +10523,19 @@ body.keychain-mode-on .lego-designer-page .character-canvas {
 }
 
 /* Mobile: stack vertically */
+@media (max-width: 900px) {
+    .lego-designer-page .main-content {
+        flex-direction: column;
+    }
+    .character-with-sidebar {
+        min-width: auto;
+    }
+    .lego-designer-page .customization-section {
+        min-width: auto;
+        width: 100%;
+    }
+}
+
 @media (max-width: 640px) {
     body.keychain-mode-on .lego-designer-page .character-canvas {
         width: min(200px, 75vw);
