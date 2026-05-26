@@ -4556,10 +4556,10 @@ async function prepareOrderData(formData, totalJOD, totalUSD, paypalData = null)
             size: item.size,
             price: item.price,
             originalPrice: item.originalPrice,
-            designImage: item.designImage,
-            isFullGlam: item.isFullGlam,
-            materialType: item.materialType,
-            charms: item.charms,
+            designImage: item.designImage ?? null,
+            isFullGlam: item.isFullGlam ?? false,
+            materialType: item.materialType ?? null,
+            charms: item.charms ?? [],
             timestamp: new Date().toISOString()
         };
     });
