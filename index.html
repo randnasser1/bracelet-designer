@@ -9568,13 +9568,14 @@ body, html, .main-content, .designer-page {
 
 .lego-designer-page .main-content {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   padding: 12px;
   gap: 12px;
   align-items: flex-start;
   width: 100%;
   box-sizing: border-box;
   min-height: calc(100vh - 80px);
+  justify-content: flex-start;
 }
 
 /* Wrapper that keeps character box and dangly pool side-by-side */
@@ -9584,17 +9585,23 @@ body, html, .main-content, .designer-page {
   align-items: stretch;
   gap: 12px;
   flex-shrink: 0;
-  width: 100%;
+  width: auto;
+  flex-basis: auto;
 }
 
 .lego-designer-page .character-section {
-  flex: none;
+  flex: 0 0 auto;
   min-width: unset;
   background: #f9f9f9;
   border-radius: 15px;
-  padding: 8px;
+  padding: 12px 8px 8px 8px;
   border: 4px solid #333;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: auto;
 }
 
 .lego-designer-page .section-title {
@@ -9608,15 +9615,16 @@ body, html, .main-content, .designer-page {
 }
 
 .lego-designer-page .character-canvas {
-  width: clamp(220px, 36vw, 380px);
-  height: clamp(220px, 36vw, 380px);
-  margin: 0 auto 4px;
+  width: clamp(220px, 32vw, 320px);
+  height: clamp(220px, 32vw, 320px);
+  margin: 0;
   position: relative;
   background: #f0f0f0;
   border-radius: 10px;
   border: 5px solid #333;
   overflow: hidden;
   transition: width 0.35s ease, height 0.35s ease;
+  flex-shrink: 0;
 }
 
 .lego-designer-page .lego-piece {
@@ -9637,10 +9645,13 @@ body, html, .main-content, .designer-page {
 .lego-designer-page .piece-accessories { z-index: 50; }
 
 .lego-designer-page .view-controls {
-  margin: 4px 0 0;
+  margin: 0;
+  padding: 0;
   display: flex;
   justify-content: center;
   gap: 8px;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .lego-designer-page .view-btn {
@@ -9664,13 +9675,14 @@ body, html, .main-content, .designer-page {
 }
 
 .lego-designer-page .customization-section {
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 1 1 auto;
+  min-width: 300px;
   background: #f9f9f9;
   border-radius: 15px;
   padding: 16px;
   border: 4px solid #333;
-  overflow: hidden;
+  overflow: auto;
+  max-height: calc(100vh - 100px);
 }
 
 .lego-designer-page .customization-title {
@@ -9678,17 +9690,6 @@ body, html, .main-content, .designer-page {
   color: #333;
   margin-bottom: 20px;
   text-align: center;
-}
-.character-section {
-    flex: 0.8;  /* instead of 1 */
-    min-width: 260px;
-}
-.character-canvas {
-    width: 280px;
-    height: 280px;
-    margin: 0 auto;
-    position: relative;
-    overflow: visible;
 }
 .lego-designer-page .category-tabs {
   display: flex;
@@ -9775,13 +9776,15 @@ body, .lego-designer-page {
 .lego-designer-page .action-buttons {
   display: flex;
   justify-content: center;
-  margin-top: 30px;
-  gap: 15px;
+  margin-top: 12px;
+  margin-bottom: 16px;
+  gap: 10px;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .lego-designer-page .btn {
-  padding: 14px 28px;
+  padding: clamp(8px, 1.5vw, 14px) clamp(14px, 2.2vw, 28px);
   border-radius: 50px;
   border: none;
   font-weight: bold;
@@ -9789,7 +9792,8 @@ body, .lego-designer-page {
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  font-size: clamp(0.75rem, 1.2vw, 0.95rem);
 }
 
 .lego-designer-page .btn-random {
@@ -9810,6 +9814,17 @@ body, .lego-designer-page {
 .lego-designer-page .btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* LEGO Price Display */
+#lego-price-display {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+#lego-price-breakdown {
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 
 .lego-designer-page footer {
@@ -10268,12 +10283,13 @@ img[loading="lazy"] {
     position: relative;
     flex-shrink: 0;
     width: 180px;
+    max-height: calc(100vh - 120px);
     background: linear-gradient(135deg, #fff5f8 0%, #ffe0e7 100%);
     border-radius: 24px;
     box-shadow: 0 10px 30px rgba(214, 51, 108, 0.2);
     border: 2px solid rgba(255, 133, 179, 0.5);
     transition: all 0.3s ease;
-    display: flex;
+    display: none;
     flex-direction: column;
     overflow: hidden;
 }
@@ -10381,15 +10397,6 @@ img[loading="lazy"] {
 
 /* Make dangly charms bar hidden until keychain mode is ON */
 #lego-keychain-side-panel,
-#lego-available-charms {
-    display: none !important;
-}
-
-/* Override when active */
-#lego-keychain-side-panel[style*="display: block"],
-#lego-available-charms[style*="display: block"] {
-    display: block !important;
-}#lego-keychain-side-panel,
 #lego-available-charms,
 .lego-dangly-sidebar {
     display: none !important;
@@ -10463,21 +10470,23 @@ body.keychain-mode-on .lego-dangly-sidebar {
 /* ── Canvas wrapper: relative container so toggle positions above canvas ── */
 .canvas-wrapper {
     position: relative;
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
-    text-align: center;
+    gap: 0;
 }
 
 /* ── Toggle overlaid on the canvas-wrapper, top-center, outside overflow:hidden ── */
 .kc-canvas-overlay {
-    position: absolute !important;
-    top: 8px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 200 !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    z-index: 10 !important;
     width: auto !important;
     margin: 0 !important;
-    padding: 5px 14px !important;
+    padding: 6px 14px !important;
     font-size: 0.76rem !important;
     border-radius: 20px !important;
     white-space: nowrap !important;
@@ -10486,6 +10495,7 @@ body.keychain-mode-on .lego-dangly-sidebar {
     box-shadow: 0 2px 10px rgba(214,51,108,0.2) !important;
     cursor: pointer !important;
     pointer-events: auto !important;
+    flex-shrink: 0;
 }
 .kc-canvas-overlay.active {
     background: rgba(255,224,238,0.94) !important;
@@ -10500,8 +10510,8 @@ body.keychain-mode-on .lego-dangly-sidebar {
 
 /* ── Shrink canvas when keychain ON so the dangly pool fits beside it ── */
 body.keychain-mode-on .lego-designer-page .character-canvas {
-    width: clamp(160px, 22vw, 240px);
-    height: clamp(160px, 22vw, 240px);
+    width: clamp(180px, 22vw, 240px);
+    height: clamp(180px, 22vw, 240px);
 }
 
 .lego-designer-page .options-grid {
@@ -10522,8 +10532,21 @@ body.keychain-mode-on .lego-designer-page .character-canvas {
         width: min(200px, 75vw);
         height: min(200px, 75vw);
     }
-    .lego-dangly-sidebar { width: 150px; }
-    .character-with-sidebar { gap: 8px; }
+    .lego-dangly-sidebar { 
+        width: 100%;
+        max-height: 280px;
+    }
+    .character-with-sidebar { 
+        gap: 8px;
+        flex-direction: column;
+    }
+    .lego-designer-page .main-content {
+        flex-direction: column;
+    }
+    .lego-designer-page .customization-section {
+        min-width: auto;
+        width: 100%;
+    }
 }
 </style>
 </head>
