@@ -3662,6 +3662,15 @@ function initProduct(product) {
     const fullGlamBtn = document.getElementById('full-glam-btn');
     const addCharmsLabel = document.querySelector('.add-charms-label');
 
+    // Ensure the jewelry piece container is available
+    if (!jewelryPiece) {
+        jewelryPiece = document.getElementById('jewelry-piece');
+    }
+    if (!jewelryPiece) {
+        console.error('initProduct: jewelry-piece element not found in DOM.');
+        return;
+    }
+
     // Reset design state
     jewelryPiece.innerHTML = '';
     selectedCharm = null;
